@@ -1,5 +1,9 @@
 import discord
 from discord.ext import commands
+from utils.vars import DEFAULT_PREFIX, MONGOCLIENT
+
+DATABASE = MONGOCLIENT['Axiol']
+PREFIXES = DATABASE["Prefixes"] #Prefixes Collection
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -13,16 +17,21 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def suggest(self, ctx, *, ideadesc=None):
-    
+
+        try:
+            pref = PREFIXES.find_one({"serverid": ctx.author.guild.id}).get("prefix")
+        except AttributeError:
+            pref = DEFAULT_PREFIX
+
         if ideadesc is not None:
-            channel = self.bot.get_channel(843548616505294848)
+            channel = self.bot.get_channel(843548616505294848) #Support server suggestion channel id
             embed = discord.Embed(title=f"{ctx.author.name}'s idea", description=f"This idea came from server **{ctx.author.guild.name}**!", color=discord.Color.teal())
             embed.add_field(name="Suggestion", value=ideadesc)
             msg = await channel.send(embed=embed)
             await msg.add_reaction("✅")
             await msg.add_reaction("❌")
         else:
-            await ctx.send(f"You need to describe your idea too! This is the format: ```# <YourIdeaDescription>```")
+            await ctx.send(f"You need to describe your idea too! This is the format: ```{pref} <YourIdeaDescription>``` Don't forget the space after prefix :D")
 
 
 def setup(bot):

@@ -2,12 +2,10 @@ import os
 import discord
 import asyncio
 from discord.ext import commands
-from pymongo import MongoClient
 import utils.emojis as emoji
-from utils.vars import DEFAULT_PREFIX
+from utils.vars import DEFAULT_PREFIX, MONGOCLIENT, TOKEN
 
 #Database Fetching
-MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL"))
 DATABASE = MONGOCLIENT['Axiol']
 PREFIXES = DATABASE["Prefixes"] #Prefixes Collection
 
@@ -24,7 +22,7 @@ bot.remove_command('help')
 #Changing presence and alerting on ready
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Get started with #help or whatever your server prefix is if changed"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="Get started with .help or whatever your server prefix is if changed"))
     print("I'm Ready!")
 
 #Loading Cogs
@@ -81,4 +79,4 @@ async def prefix(ctx):
             
 
 #Starting Bot
-bot.run(os.environ.get("TOKEN"))
+bot.run(TOKEN)

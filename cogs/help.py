@@ -1,7 +1,7 @@
 import discord
 import asyncio
 from discord.ext import commands
-import emojis
+import utils.emojis as emoji
 
 class Help(commands.Cog):
     def __init__(self, bot):

@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-from bot import serverprefix
-
 class Commands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -15,6 +13,7 @@ class Commands(commands.Cog):
 
     @commands.command()
     async def suggest(self, ctx, *, ideadesc=None):
+    
         if ideadesc is not None:
             channel = self.bot.get_channel(843548616505294848)
             embed = discord.Embed(title=f"{ctx.author.name}'s idea", description=f"This idea came from server **{ctx.author.guild.name}**!", color=discord.Color.teal())
@@ -23,7 +22,7 @@ class Commands(commands.Cog):
             await msg.add_reaction("✅")
             await msg.add_reaction("❌")
         else:
-            await ctx.send(f"You need to describe your idea too! This is the format: ```?{serverprefix} <YourIdeaDescription>```")
+            await ctx.send(f"You need to describe your idea too! This is the format: ```# <YourIdeaDescription>```")
 
 
 def setup(bot):

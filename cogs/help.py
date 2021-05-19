@@ -32,6 +32,8 @@ class Help(commands.Cog):
         modembed.add_field(name=pref+"kick `<reason>`", value="Kicks the user out of the server, reason is optional", inline=False)
         modembed.add_field(name=pref+"mute", value="Assigns 'Muted' role to the user hence disabling their ability to send messages! If the role does not exist then I can make it on my own when the command is used!", inline=False)
         modembed.add_field(name=pref+"unmute", value="Removes the 'Muted' role therefore lets the user send messages.", inline=False)
+        modembed.add_field(name=pref+"purge `<amount>`", value="Deletes the number of messages defined in the command from the channel", inline=False)
+
         modembed.set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
 
 

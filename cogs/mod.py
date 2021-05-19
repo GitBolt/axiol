@@ -68,11 +68,17 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["clean", "deletemsgs"])
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit: int):
-        await ctx.channel.purge(limit=limit)
-        info = await ctx.send(f"Deleted {limit} messages (Including the command).")
-        await asyncio.sleep(3)
-        await info.delete()
-            
+        if limit is not None:
+            await ctx.channel.purge(limit=limit)
+            info = await ctx.send(f"Deleted {limit} messages (Including the command).")
+            await asyncio.sleep(3)
+            await info.delete()
+        else:
+            try:
+                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
+            except AttributeError:
+                pref = var.DEFAULT_PREFIX
+            await ctx.send(f"You need to define the amount too! Follow this format:\n```{pref}purge <amount>```\n Amount should be in numbers.")
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

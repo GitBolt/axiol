@@ -1,7 +1,7 @@
 import discord
+import asyncio
 from discord.ext import commands
 import utils.vars as var
-
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -64,7 +64,15 @@ class Moderation(commands.Cog):
 
         await ctx.send(f"`{member}` have been kicked from the server")
 
-    
+
+    @commands.command(aliases=["clean", "deletemsgs"])
+    @commands.has_permissions(manage_messages=True)
+    async def purge(self, ctx, limit: int):
+        await ctx.channel.purge(limit=limit)
+        info = await ctx.send(f"Deleted {limit} messages (Including the command).")
+        await asyncio.sleep(3)
+        await info.delete()
+            
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

@@ -37,7 +37,7 @@ async def prefix(ctx):
         current_prefix = var.DEFAULT_PREFIX
 
     embed = discord.Embed(title="Prefix :D that's the way you control me aye!",
-                        description=f"The prefix for this server is\n``{current_prefix}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
+                        description=f"The prefix for this server is\n```{current_prefix}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
                         color=var.MAGENTA)
     message = await ctx.send(embed=embed)
     await message.add_reaction(var.SETTINGS)

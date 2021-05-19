@@ -31,13 +31,12 @@ class ReactionRoles(commands.Cog):
                 await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
             else:
                 guildrrlist = guildrr["reaction_roles"]
-                msgidlist = []
-                emojilist = []
-
-                for messageids in guildrrlist:msgidlist.append(messageids.get("messageid"))
-                for emojis in guildrrlist: emojilist.append(emojis.get("emoji"))
-
-                if emoji in emojilist and msg.id in msgidlist:
+                for i in guildrrlist: 
+                    if i.get("messageid") == msg.id and i.get("emoji") == str(emoji):
+                        check = True
+                    else:
+                        check = False
+                if check == True:
                     await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
                 else:
                     newlist = guildrrlist.copy()
@@ -200,10 +199,10 @@ class ReactionRoles(commands.Cog):
                 if payload.message_id == i.get("messageid") and str(payload.emoji) == i.get("emoji"):
                     roleid = i.get("roleid")
                     
-            guild = self.bot.get_guild(payload.guild_id)
-            assignrole = guild.get_role(roleid)
-            if payload.member.bot == False:
-                await payload.member.add_roles(assignrole)
+                    guild = self.bot.get_guild(payload.guild_id)
+                    assignrole = guild.get_role(roleid)
+                    if payload.member.bot == False:
+                        await payload.member.add_roles(assignrole)
 
         if guildrr is not None and payload.message_id in guildrr["unique_messages"]:
             channel = await self.bot.fetch_channel(payload.channel_id)
@@ -222,11 +221,11 @@ class ReactionRoles(commands.Cog):
                 if payload.message_id == i.get("messageid") and str(payload.emoji) == i.get("emoji"):
                     roleid = i.get("roleid")
 
-            member = await(await self.bot.fetch_guild(payload.guild_id)).fetch_member(payload.user_id)
-            if member is not None:
-                guild = self.bot.get_guild(payload.guild_id)
-                removerole = guild.get_role(roleid)
-                await member.remove_roles(removerole)
+                    member = await(await self.bot.fetch_guild(payload.guild_id)).fetch_member(payload.user_id)
+                    if member is not None:
+                        guild = self.bot.get_guild(payload.guild_id)
+                        removerole = guild.get_role(roleid)
+                        await member.remove_roles(removerole)
 
 def setup(bot):
     bot.add_cog(ReactionRoles(bot))

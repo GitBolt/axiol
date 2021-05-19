@@ -34,10 +34,8 @@ class ReactionRoles(commands.Cog):
                 msgidlist = []
                 emojilist = []
 
-                for messageids in guildrrlist:
-                    msgidlist.append(messageids.get("messageid"))
-                for emojis in guildrrlist:
-                    emojilist.append(emojis.get("emoji"))
+                for messageids in guildrrlist:msgidlist.append(messageids.get("messageid"))
+                for emojis in guildrrlist: emojilist.append(emojis.get("emoji"))
 
                 if emoji in emojilist and msg.id in msgidlist:
                     await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
@@ -115,7 +113,6 @@ class ReactionRoles(commands.Cog):
                 msg = await ctx.fetch_message(i.get("messageid"))
                 role = guild.get_role(i.get("roleid"))
                 emoji = i.get("emoji")
-
                 embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n [Jump to the message!](https://discord.com/channels/{guild.id}/{msg.channel.id}/{msg.id})", inline=False)
             await ctx.send(embed=embed)
         else:
@@ -128,26 +125,63 @@ class ReactionRoles(commands.Cog):
         
         if msg is not None:
             guildrr = var.REACTIONROLES.find_one({"_id": ctx.guild.id})
-            allmsgids = []
-            uniquelist = guildrr["unique_messages"]
-            for i in guildrr["reaction_roles"]:
-                allmsgids.append(i.get("messageid"))
+            if guildrr is not None:
+                allmsgids = []
+                uniquelist = guildrr["unique_messages"]
+                for i in guildrr["reaction_roles"]:
+                    allmsgids.append(i.get("messageid"))
+                    
+                if msg.id in allmsgids:
+                    newlist = uniquelist.copy()
+                    
+                    newlist.append(msg.id)
+                    newdata = {"$set":{
+                        "unique_messages": newlist
+                    }}
+                    var.REACTIONROLES.update_one(guildrr, newdata)
+                    await ctx.send(embed=discord.Embed(title="Successfully marked the message with unique reactions", 
+                    description=f"Now users can only react to one emoji and take one role in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
+                    color=var.GREEN))
                 
-            if msg.id in allmsgids:
-
-                newlist = uniquelist.copy()
-                
-                newlist.append(msg.id)
-                newdata = {"$set":{
-                    "unique_messages": newlist
-                }}
-                var.REACTIONROLES.update_one(guildrr, newdata)
-                await ctx.send(embed=discord.Embed(title="Successfully marked the message with unique reactions", 
-                description=f"Now users can only react to one emoji in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
-                color=var.GREEN))
-            
+                else:
+                    await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role.")
             else:
-                await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role.")
+                await ctx.send("Cannot mark that message with unique reactions since you don't have any reaction roles yet :(")
+        else:
+            try:
+                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
+            except AttributeError:
+                pref = var.DEFAULT_PREFIX
+            await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{pref}uniquerr <messageid>")
+
+    @commands.command(aliases=["rruniqueremove", "ununiquerr"])
+    @commands.has_permissions(administrator=True)
+    async def removeunique(self, ctx, msg:discord.Message=None):
+        
+        if msg is not None:
+            guildrr = var.REACTIONROLES.find_one({"_id": ctx.guild.id})
+            if guildrr is not None:
+                allmsgids = []
+                uniquelist = guildrr["unique_messages"]
+                for i in guildrr["reaction_roles"]:
+                    allmsgids.append(i.get("messageid"))
+                    
+                if msg.id in allmsgids and msg.id in uniquelist:
+                    newlist = uniquelist.copy()
+                    
+                    newlist.remove(msg.id)
+                    newdata = {"$set":{
+                        "unique_messages": newlist
+                    }}
+                    var.REACTIONROLES.update_one(guildrr, newdata)
+                    await ctx.send(embed=discord.Embed(title="Successfully unmarked the message with unique reactions", 
+                    description=f"Now users can only react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
+                    color=var.GREEN))
+                
+                else:
+                    await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role so can't remove the unique mark either.")
+            else:
+                await ctx.send("Cannot remove the unique mark from that message since you don't have any reaction roles yet :(")
         else:
             try:
                 pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
@@ -160,15 +194,8 @@ class ReactionRoles(commands.Cog):
     async def on_raw_reaction_add(self, payload):
 
         guildrr = var.REACTIONROLES.find_one({"_id": payload.guild_id})
-
-        if guildrr is not None and payload.message_id in guildrr["unique_messages"]:
-            channel = await self.bot.fetch_channel(payload.channel_id)
-            message = await channel.fetch_message(payload.message_id)
-            for r in message.reactions:
-                if payload.member in await r.users().flatten() and not payload.member.bot and str(r) != str(payload.emoji):
-                    await message.remove_reaction(r.emoji, payload.member)
-
-        elif guildrr["reaction_roles"] is not None:           
+        
+        if guildrr is not None and guildrr["reaction_roles"] is not None:           
             for i in guildrr["reaction_roles"]:
                 if payload.message_id == i.get("messageid") and str(payload.emoji) == i.get("emoji"):
                     roleid = i.get("roleid")
@@ -177,6 +204,13 @@ class ReactionRoles(commands.Cog):
             assignrole = guild.get_role(roleid)
             if payload.member.bot == False:
                 await payload.member.add_roles(assignrole)
+
+        if guildrr is not None and payload.message_id in guildrr["unique_messages"]:
+            channel = await self.bot.fetch_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
+            for r in message.reactions:
+                if payload.member in await r.users().flatten() and not payload.member.bot and str(r) != str(payload.emoji):
+                    await message.remove_reaction(r.emoji, payload.member)
 
 
     @commands.Cog.listener()

@@ -26,19 +26,23 @@ class Moderation(commands.Cog):
         await ctx.guild.unban(member)
         await member.send(embed=discord.Embed(title=f"You have been unbanned from {ctx.guild.name}!",
                                             description="Yay I would be happy to see you back!", color=var.GREEN).add_field(name="Unbanned by", value=ctx.author))
-        await ctx.send(f'`{member}`` is now unbanned!')
+        await ctx.send(f'`{member}` is now unbanned!')
     
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def mute(self, ctx, member:discord.Member=None):
         if not discord.utils.get(ctx.guild.roles, name='Muted'):
+            await ctx.send(embed=discord.Embed(title="Creating a Muted role...", 
+                                            description="Since there is no role named 'Mute' and this is the first time the command is used, I am creating a muted role!")
+                                            .set_footer("This is only a one time process, next mute won't create any new role and use the already existing one."))
+
             perms = discord.Permissions(send_messages=False)
             mutedrole = await ctx.guild.create_role(name="Muted", colour=discord.Colour(0xa8a8a8), permissions=perms)
         mutedrole = discord.utils.get(ctx.guild.roles, name='Muted')
         await mutedrole.edit(position=1)
         await member.add_roles(mutedrole)
-        await ctx.send(f"`{member}` have been muted")
+        await ctx.send(f"`{member}` have been muted!")
 
 
     @commands.command()

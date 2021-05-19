@@ -67,7 +67,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=["clean", "deletemsgs"])
     @commands.has_permissions(manage_messages=True)
-    async def purge(self, ctx, limit: int):
+    async def purge(self, ctx, limit:int=None):
         if limit is not None:
             await ctx.channel.purge(limit=limit)
             info = await ctx.send(f"Deleted {limit} messages (Including the command).")

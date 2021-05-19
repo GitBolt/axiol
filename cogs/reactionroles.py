@@ -119,7 +119,7 @@ class ReactionRoles(commands.Cog):
             await ctx.send("This server does not have any active reaction roles right now")
     
 
-    @commands.command(aliases=["rrunique"])
+    @commands.command(aliases=["rrunique", "addunique", "uniqurr", "markunique", "uniquemark", "msgunique", "uniquereact", "uniquereactions"])
     @commands.has_permissions(administrator=True)
     async def uniquerr(self, ctx, msg:discord.Message=None):
         
@@ -154,7 +154,7 @@ class ReactionRoles(commands.Cog):
                 pref = var.DEFAULT_PREFIX
             await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{pref}uniquerr <messageid>")
 
-    @commands.command(aliases=["rruniqueremove", "ununiquerr"])
+    @commands.command(aliases=["removerrunique", "addunique", "uniqueremove", "unmarkunique", "uniqueunmark", "rurr", "clearunique"])
     @commands.has_permissions(administrator=True)
     async def removeunique(self, ctx, msg:discord.Message=None):
         
@@ -175,7 +175,7 @@ class ReactionRoles(commands.Cog):
                     }}
                     var.REACTIONROLES.update_one(guildrr, newdata)
                     await ctx.send(embed=discord.Embed(title="Successfully unmarked the message with unique reactions", 
-                    description=f"Now users can only react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
+                    description=f"Now users can react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
                     color=var.GREEN))
                 
                 else:

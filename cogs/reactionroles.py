@@ -89,7 +89,7 @@ class ReactionRoles(commands.Cog):
                 await msg.clear_reactions()
                 await ctx.send(embed=discord.Embed(title="Reaction role removed", 
                 description=f"Reaction role with {emoji} on [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id}) was removed",
-                color=var.GREEN))
+                color=var.CGREEN))
         else:
             try:
                 pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
@@ -103,7 +103,7 @@ class ReactionRoles(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def allrr(self, ctx):
 
-        embed = discord.Embed(title="All active reaction roles", color=var.MAGENTA)
+        embed = discord.Embed(title="All active reaction roles", color=var.CMAIN2)
         guildrr = var.REACTIONROLES.find_one({"_id": ctx.guild.id})
 
         if guildrr is not None:
@@ -140,7 +140,7 @@ class ReactionRoles(commands.Cog):
                     var.REACTIONROLES.update_one(guildrr, newdata)
                     await ctx.send(embed=discord.Embed(title="Successfully marked the message with unique reactions", 
                     description=f"Now users can only react to one emoji and take one role in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
-                    color=var.GREEN))
+                    color=var.CGREEN))
                 
                 else:
                     await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role.")
@@ -152,6 +152,7 @@ class ReactionRoles(commands.Cog):
             except AttributeError:
                 pref = var.DEFAULT_PREFIX
             await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{pref}uniquerr <messageid>")
+
 
     @commands.command(aliases=["removerrunique", "uniqueremove", "unmarkunique", "uniqueunmark", "rurr", "clearunique"])
     @commands.has_permissions(administrator=True)
@@ -175,7 +176,7 @@ class ReactionRoles(commands.Cog):
                     var.REACTIONROLES.update_one(guildrr, newdata)
                     await ctx.send(embed=discord.Embed(title="Successfully unmarked the message with unique reactions", 
                     description=f"Now users can react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
-                    color=var.GREEN))
+                    color=var.CGREEN))
                 
                 else:
                     await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role so can't remove the unique mark either.")

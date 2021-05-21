@@ -38,12 +38,14 @@ async def prefix(ctx):
 
     embed = discord.Embed(title="Prefix :D that's the way you control me aye!",
                         description=f"The prefix for this server is\n```{current_prefix}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
-                        color=var.MAGENTA)
+                        color=var.CMAIN2)
     message = await ctx.send(embed=embed)
     await message.add_reaction(var.SETTINGS)
 
+
     def reactioncheck(reaction, user):
-        return str(reaction.emoji) == var.SETTINGS and reaction.message == message and user.id == ctx.author.id
+        if user == ctx.author and reaction.message == message:
+            return str(reaction.emoji) == var.SETTINGS
 
     await bot.wait_for('reaction_add', check=reactioncheck)
     await ctx.send(embed=discord.Embed(description="Next message which you will send will become the prefix :eyes:\n"+
@@ -52,7 +54,8 @@ async def prefix(ctx):
     await message.clear_reactions()
 
     def prefixmsgcheck(message):
-        return message.author.id == ctx.author.id and message.guild.id == ctx.guild.id
+        if message.author == ctx.author:
+            return message.guild.id == ctx.guild.id
 
     try:
         message = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)

@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 #Config
 TOKEN = os.environ.get("TOKEN")
-DEFAULT_PREFIX = "!"
+DEFAULT_PREFIX = "."
 
 #DB
 MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL"))

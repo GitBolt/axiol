@@ -10,9 +10,7 @@ def serverprefix(bot, message):
         return var.DEFAULT_PREFIX
     return var.PREFIXES.find_one({"serverid": message.guild.id}).get("prefix")
     
-bot = commands.Bot(command_prefix = serverprefix)
-bot.remove_command('help')
-
+bot = commands.Bot(command_prefix = serverprefix, help_command=None)
 
 @bot.event
 async def on_ready():

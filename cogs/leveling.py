@@ -27,8 +27,8 @@ class Leveling(commands.Cog):
                 await msg.add_reaction(var.DISABLE)
                 await msg.add_reaction(var.CANCEL)
             else:
-                dismsg = await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server is currently disabled").add_field(name="Enable", value=f"React to {var.ENABLE}"))
-                dismsg.add_reaction(var.ENABLE)
+                msg = await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server is currently disabled", color=var.CGREEN).add_field(name="Enable", value=f"React to {var.ENABLE}"))
+                await msg.add_reaction(var.ENABLE)
         else:
             msg = await ctx.send(embed=discord.Embed(title="Add leveling to you server",
                                 description=f"React to the {var.CONFIRM} emoji to enable leveling on this server", color=var.CMAIN))
@@ -50,7 +50,7 @@ class Leveling(commands.Cog):
             await ctx.send("Successfully setted up leveling for this server")
 
         if str(reaction.emoji) == var.SETTINGS:
-            await ctx.send("set")
+            await ctx.send("Coming soon!")
 
         if str(reaction.emoji) == var.DISABLE:
             col = var.LEVELDATABASE[str(ctx.guild.id)]
@@ -64,14 +64,21 @@ class Leveling(commands.Cog):
                 pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
             except AttributeError:
                 pref = var.DEFAULT_PREFIX
-            await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server has been disabled, this means that the rank data is still there but users won't gain xp until enabled again", color=var.CBLUE).add_field(name=pref+"levelsetup", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"))
-        
+            await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server has been disabled, this means that the rank data is still there but users won't gain xp until enabled again", color=var.CMAIN).add_field(name=pref+"levelsetup", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"))
+
         if str(reaction.emoji) == var.CANCEL:
             var.LEVELDATABASE[str(ctx.guild.id)].drop()
-            await ctx.send(embed=discord.Embed(title="Leveling removed", description="Leveling have been removed from this server, that means all the rank data has been deleted"), color=var.CORANGE)
+            await ctx.send(embed=discord.Embed(title="Leveling removed", description="Leveling have been removed from this server, that means all the rank data has been deleted", color=var.CORANGE))
         
         if str(reaction.emoji) == var.ENABLE:
-            await ctx.send("en")
+            col = var.LEVELDATABASE[str(ctx.guild.id)]
+            data = col.find_one({"_id": 0})
+
+            newdata = {"$set":{
+                        "status": True
+                    }}
+            var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+            await ctx.send("Successfully enabled leveling again on this server!")
     
         
 

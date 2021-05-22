@@ -16,6 +16,8 @@ class Commands(commands.Cog):
 
         await ctx.send(embed=embed)
 
+
+
     @commands.command()
     async def suggest(self, ctx, *, desc=None):
         if desc is not None:
@@ -32,6 +34,17 @@ class Commands(commands.Cog):
             await ctx.send("Suggestion sent to the support server!")
         else:
             await ctx.send(f"You need to describe your idea too! This is the format\n```{currentprefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
+
+
+    @commands.command()
+    async def invite(self, ctx):
+
+        embed = discord.Embed(title="Axiol invite",
+        description="[Invite the bot from here](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)",
+        color=var.CBLUE
+        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

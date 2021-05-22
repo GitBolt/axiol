@@ -2,7 +2,7 @@
   <a href="https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot">
     <img
       alt="Axiol"
-      src="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png"
+      src="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
       width="150"
     />
   </a>

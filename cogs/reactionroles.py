@@ -103,7 +103,7 @@ class ReactionRoles(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def allrr(self, ctx):
 
-        embed = discord.Embed(title="All active reaction roles", color=var.CMAIN2)
+        embed = discord.Embed(title="All active reaction roles", color=var.CMAIN)
         guildrr = var.REACTIONROLES.find_one({"_id": ctx.guild.id})
 
         if guildrr is not None:

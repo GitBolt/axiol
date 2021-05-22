@@ -2,44 +2,59 @@ import random
 import discord
 from discord.ext import commands
 import utils.vars as var
-
+from utils.funcs import currentprefix
 
 class Leveling(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
 
-    @commands.command(aliases=["setuplevel", "setuplevels", "addlevel", "addleveling", "startleveling"])
+    @commands.command(aliases=["level", "setuplevels", "setuplevel"])
     @commands.has_permissions(administrator=True)
-    async def levelsetup(self, ctx):
+    async def levels(self, ctx):
+        if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names(): #Check if leveling exists 
+            if var.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == True: #If leveling exists and enabled
 
-        if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
-            if var.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == True:
-                em = discord.Embed(title="Configure Leveling for your server", 
-                    description=f"Leveling is already enabled in this server", color=var.CTEAL)
+                embed = discord.Embed(title="Configure Leveling for this server", 
+                description=f"Leveling is enabled in this server", 
+                color=var.CMAIN
+                ).add_field(name="Configure", value=f"React to {var.SETTINGS}"
+                ).add_field(name="Disable", value=f"React to {var.DISABLE}"
+                ).add_field(name="Remove", value=f"React to {var.DECLINE}"
+                ).set_footer(text="Removing will delete all rank data ⚠️")
 
-                em.add_field(name="Configure", value=f"React to {var.SETTINGS}")
-                em.add_field(name="Disable", value=f"React to {var.DISABLE}")
-                em.add_field(name="Remove", value=f"React to {var.CANCEL}")
-                em.set_footer(text="Removing leveling for the server deletes all the existing data ⚠️")
-                msg = await ctx.send(embed=em)
-                await msg.add_reaction(var.SETTINGS)
-                await msg.add_reaction(var.DISABLE)
-                await msg.add_reaction(var.CANCEL)
-            else:
-                msg = await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server is currently disabled", color=var.CGREEN).add_field(name="Enable", value=f"React to {var.ENABLE}"))
-                await msg.add_reaction(var.ENABLE)
-        else:
-            msg = await ctx.send(embed=discord.Embed(title="Add leveling to you server",
-                                description=f"React to the {var.CONFIRM} emoji to enable leveling on this server", color=var.CMAIN))
-            await msg.add_reaction(var.CONFIRM)
+                botmsg = await ctx.send(embed=embed)
+                await botmsg.add_reaction(var.SETTINGS)
+                await botmsg.add_reaction(var.DISABLE)
+                await botmsg.add_reaction(var.DECLINE)
 
+            else: #If leveling exists but disabled
+                embed = discord.Embed(title="Leveling disabled", 
+                description="Leveling for this server is currently disabled", 
+                color=var.CORANGE
+                ).add_field(name="Enable", value=f"React to {var.ENABLE}")
+                
+                botmsg = await ctx.send(embed=embed)
+                await botmsg.add_reaction(var.ENABLE)
+
+        else: #If leveling does not exist
+            embed = discord.Embed(title="Add leveling to you server",
+                    description=f"React to the {var.ACCEPT} emoji to enable leveling on this server!", 
+                    color=var.CMAIN)
+
+            botmsg = await ctx.send(embed=embed)
+            await botmsg.add_reaction(var.ACCEPT)
+
+        #Reaction checks
         def check(reaction, user):
-            if user == ctx.author and reaction.message == msg:
-                return str(reaction.emoji) == var.CONFIRM or var.SETTINGS or var.DISABLE or var.CANCEL or var.ENABLE
+            if user == ctx.author and reaction.message == botmsg:
+                return str(reaction.emoji) == var.ACCEPT or var.DECLINE or var.DISABLE or var.ENABLE or var.SETTINGS 
 
         reaction, user = await self.bot.wait_for('reaction_add', check=check)
-        if str(reaction.emoji) == var.CONFIRM:
+
+        if str(reaction.emoji) == var.ACCEPT: #Add leveling
+            await botmsg.clear_reactions()
+
             var.LEVELDATABASE.create_collection(str(ctx.guild.id))
             var.LEVELDATABASE[str(ctx.guild.id)].insert_one({
                 "_id": 0,
@@ -47,30 +62,26 @@ class Leveling(commands.Cog):
                 "alertchannel": ctx.channel.id,
                 "blacklistedchannels": []
             })    
-            await ctx.send("Successfully setted up leveling for this server")
 
-        if str(reaction.emoji) == var.SETTINGS:
-            await ctx.send("Coming soon!")
+            embed = discord.Embed(title="Successfully setted up leveling for this server",
+            description=f"To further configure, disable or remove leveling use the same command ( `{currentprefix(ctx)}levels` )",
+            color=var.CGREEN)
+            await ctx.send(embed=embed)
 
-        if str(reaction.emoji) == var.DISABLE:
-            col = var.LEVELDATABASE[str(ctx.guild.id)]
-            data = col.find_one({"_id": 0})
+        if str(reaction.emoji) == var.DECLINE:
+            await botmsg.clear_reactions()
 
-            newdata = {"$set":{
-                        "status": False
-                    }}
-            var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
-            try:
-                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-            except AttributeError:
-                pref = var.DEFAULT_PREFIX
-            await ctx.send(embed=discord.Embed(title="Leveling disabled", description="Leveling for this server has been disabled, this means that the rank data is still there but users won't gain xp until enabled again", color=var.CMAIN).add_field(name=pref+"levelsetup", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"))
-
-        if str(reaction.emoji) == var.CANCEL:
             var.LEVELDATABASE[str(ctx.guild.id)].drop()
-            await ctx.send(embed=discord.Embed(title="Leveling removed", description="Leveling have been removed from this server, that means all the rank data has been deleted", color=var.CORANGE))
-        
-        if str(reaction.emoji) == var.ENABLE:
+
+            embed = discord.Embed(title="Leveling removed", 
+            description="Leveling have been removed from this server, that means all the rank data has been deleted", 
+            color=var.CGREEN)
+
+            await ctx.send(embed=embed)
+
+        if str(reaction.emoji) == var.ENABLE: #Enable
+            await botmsg.clear_reactions()
+
             col = var.LEVELDATABASE[str(ctx.guild.id)]
             data = col.find_one({"_id": 0})
 
@@ -79,30 +90,101 @@ class Leveling(commands.Cog):
                     }}
             var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
             await ctx.send("Successfully enabled leveling again on this server!")
-    
+
+        if str(reaction.emoji) == var.DISABLE: #Disable
+            await botmsg.clear_reactions()
+
+            col = var.LEVELDATABASE[str(ctx.guild.id)]
+            data = col.find_one({"_id": 0})
+
+            newdata = {"$set":{
+                        "status": False
+                    }}
+            var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+
+            embed = discord.Embed(title="Leveling for this server has been disabled", 
+            description="This means that the rank data is still there but users won't gain xp until enabled again", 
+            color=var.CORANGE
+            ).add_field(name=currentprefix(ctx)+"levels", value=f"Use the command and react to the {var.ENABLE} to enable leveling again")
+
+            await ctx.send(embed=embed)
         
+        if str(reaction.emoji) == var.SETTINGS: #Configure
+            await botmsg.clear_reactions()
+            await ctx.invoke(self.bot.get_command('settings'))
+
+
+
+    @commands.command()
+    async def givexp(self, ctx, user:discord.Member=None, amount:int=None):
+        if user and amount is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+                col = var.LEVELDATABASE[str(ctx.guild.id)]
+                data = col.find_one({"_id": user.id})
+
+                newdata = {"$set":{
+                            "xp": data.get("xp") + amount
+                        }}
+                var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+                await ctx.send(f"Successfully awarded {user} with {amount} xp!")
+            else:
+                embed = discord.Embed(title="Can't give XP to the user",
+                description=f"Leveling for this server is not setted up, use the command `{currentprefix(ctx)} levels to enable leveling",
+                color=var.CRED)
+        else:
+            await ctx.send(f"You need to define the user and amount both, follow this format\n```{currentprefix(ctx)}givexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
+
+
+
+    @commands.command()
+    async def removexp(self, ctx, user:discord.Member=None, amount:int=None):
+        if user and amount is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+                col = var.LEVELDATABASE[str(ctx.guild.id)]
+                data = col.find_one({"_id": user.id})
+
+                newdata = {"$set":{
+                            "xp": data.get("xp") - amount
+                        }}
+                var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+                await ctx.send(f"Successfully removed {amount} xp from {user}!")
+            else:
+                embed = discord.Embed(title="Can't remove XP from the user",
+                description=f"Leveling for this server is not setted up, use the command `{currentprefix(ctx)} levels to enable leveling",
+                color=var.CRED)
+        else:
+            await ctx.send(f"You need to define the user and amount both, follow this format\n```{currentprefix(ctx)}removexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
+
+
+
+    @commands.command()
+    async def award(self, ctx):
+        await ctx.send("coming...")
+
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
-
         if str(message.guild.id) in var.LEVELDATABASE.list_collection_names():
-            guildlevels = var.LEVELDATABASE[str(message.guild.id)]
-            userdata = guildlevels.find_one({"_id": message.author.id})
+            if var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("status") == True:
 
-            if userdata is None:
-                guildlevels.insert_one({"_id": message.author.id, "xp": 0})
-            else:
-                xp = userdata["xp"] + random.randint(10, 30)
-                guildlevels.update_one(userdata, {"$set": {"xp": xp}})
-                level = 0
-                while True:
-                    if xp < ((50*(level**2))+(50*level)):
-                        break
-                    level += 1
-                xp -= ((50*((level-1)**2))+(50*(level-1)))
-                if xp == 0:
-                    if message.channel.id not in guildlevels.find_one({"_id":1}).get("noupdate_channels"):
-                        await message.channel.send(f"{message.author.mention} you leveled up to level {level}!")
+                guildlevels = var.LEVELDATABASE[str(message.guild.id)]
+                userdata = guildlevels.find_one({"_id": message.author.id})
+
+                if userdata is None:
+                    guildlevels.insert_one({"_id": message.author.id, "xp": 0})
+                else:
+                    xp = userdata["xp"] + random.randint(10, 30)
+                    guildlevels.update_one(userdata, {"$set": {"xp": xp}})
+                    level = 0
+                    while True:
+                        if xp < ((50*(level**2))+(50*level)):
+                            break
+                        level += 1
+                    xp -= ((50*((level-1)**2))+(50*(level-1)))
+                    if xp == 0:
+                        if message.channel.id not in guildlevels.find_one({"_id":1}).get("noupdate_channels"):
+                            await message.channel.send(f"{message.author.mention} you leveled up to level {level}!")
 
     
 
@@ -113,8 +195,8 @@ class Leveling(commands.Cog):
         else:
             user = rankuser
 
-        guildlevels = var.LEVELDATABASE[str(ctx.guild.id)]
-        if guildlevels is not None:
+        if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+            guildlevels = var.LEVELDATABASE[str(ctx.guild.id)]
             userdata = guildlevels.find_one({"_id": user.id})
             if userdata is None:
                 await ctx.send("The user does not have any rank yet :(")
@@ -141,9 +223,12 @@ class Leveling(commands.Cog):
                 embed.add_field(name="XP", value=f"{xp}/{int(200*((1/2)*level))}", inline=True)
                 embed.add_field(name="Level", value=level, inline=True)
                 embed.set_thumbnail(url=user.avatar_url)
-                msg = await ctx.channel.send(embed=embed)
+                if var.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == False:
+                    embed.set_footer(text="Leveling for this server is disabled this means the xp is still there but members won't gain any new xp")
+                await ctx.channel.send(embed=embed)
         else:
-            await ctx.send("No one in this server has any rank yet :O")
+            await ctx.send("Leveling is not enabled on this server :(")
+
 
 
     @commands.command()

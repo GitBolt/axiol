@@ -3,7 +3,7 @@ import discord
 import asyncio
 from discord.ext import commands
 import utils.vars as var
-
+from utils.funcs import currentprefix
 
 def serverprefix(bot, message):
     if var.PREFIXES.find_one({"serverid": message.guild.id}) is None:
@@ -29,56 +29,49 @@ for filename in os.listdir('./cogs'):
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def prefix(ctx):
-    try:
-        current_prefix = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-    except AttributeError:
-        current_prefix = var.DEFAULT_PREFIX
-
     embed = discord.Embed(title="Prefix :D that's the way you control me aye!",
-                        description=f"The prefix for this server is\n```{current_prefix}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
-                        color=var.CMAIN2)
-    message = await ctx.send(embed=embed)
-    await message.add_reaction(var.SETTINGS)
-
+    description=f"The prefix for this server is\n```{currentprefix(ctx)}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
+    color=var.CMAIN)
+    botmsg = await ctx.send(embed=embed)
+    await botmsg.add_reaction(var.SETTINGS)
 
     def reactioncheck(reaction, user):
-        if user == ctx.author and reaction.message == message:
+        if user == ctx.author and reaction.message == botmsg:
             return str(reaction.emoji) == var.SETTINGS
 
     await bot.wait_for('reaction_add', check=reactioncheck)
     await ctx.send(embed=discord.Embed(description="Next message which you will send will become the prefix :eyes:\n"+
-                                    f"To cancel it enter\n```{current_prefix}cancel```",
-                                    color=var.ORANGE))
-    await message.clear_reactions()
+    f"To cancel it enter\n```{currentprefix(ctx)}cancel```",
+    color=var.CORANGE).set_footer(text="Automatic cancel after 1 minute"))
+    await botmsg.clear_reactions()
 
     def prefixmsgcheck(message):
         if message.author == ctx.author:
             return message.guild.id == ctx.guild.id
 
     try:
-        message = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)
+        usermsg = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)
 
-        if message.content == current_prefix+"cancel":
+        if usermsg.content == currentprefix(ctx)+"cancel":
             await ctx.send("Cancelled prefix change.")
             
-        elif message.content == var.DEFAULT_PREFIX:
+        elif usermsg.content == var.DEFAULT_PREFIX:
             var.PREFIXES.delete_one({"serverid": ctx.guild.id})
             await ctx.send(f"Changed your prefix to the default one\n```{var.DEFAULT_PREFIX}```")
 
-        elif current_prefix == var.DEFAULT_PREFIX:
-            var.PREFIXES.insert_one({"_id": var.PREFIXES.estimated_document_count()+1, "serverid": ctx.guild.id, "prefix": message.content})
-            await ctx.send(f"Updated your new prefix, it's\n```{message.content}```")
+        elif currentprefix(ctx) == var.DEFAULT_PREFIX: #New prefix change if our current prefix is default one
+            var.PREFIXES.insert_one({"_id": var.PREFIXES.estimated_document_count()+1, "serverid": ctx.guild.id, "prefix": usermsg.content})
+            await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
 
         else:
-            oldprefix = var.PREFIXES.find_one({"serverid": message.guild.id})
-            newprefix = {"$set": {"serverid": message.guild.id, "prefix": message.content}}
+            oldprefix = var.PREFIXES.find_one({"serverid": usermsg.guild.id})
+            newprefix = {"$set": {"serverid": usermsg.guild.id, "prefix": usermsg.content}}
             
             var.PREFIXES.update_one(oldprefix, newprefix)
-            await ctx.send(f"Updated your new prefix, it's\n```{message.content}```")
+            await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
 
     except asyncio.TimeoutError:
         await ctx.send(f"You took too long to enter your new prefix {ctx.author.mention} ;-;")
             
-
 
 bot.run(var.TOKEN)

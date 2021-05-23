@@ -1,6 +1,6 @@
 from .vars import PREFIXES, DEFAULT_PREFIX
 
-def prefix(ctx):
+def getprefix(ctx):
     try:
         return PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
     except AttributeError:

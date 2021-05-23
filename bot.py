@@ -3,7 +3,7 @@ import discord
 import asyncio
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import currentprefix
+from utils.funcs import getprefix
 
 def serverprefix(bot, message):
     if var.PREFIXES.find_one({"serverid": message.guild.id}) is None:
@@ -31,7 +31,7 @@ for filename in os.listdir('./cogs'):
 async def prefix(ctx):
     embed = discord.Embed(
     title="Prefix :D that's the way you control me aye!",
-    description=f"The prefix for this server is\n```{currentprefix(ctx)}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
+    description=f"The prefix for this server is\n```{getprefix(ctx)}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
     color=var.CMAIN
     )
     botmsg = await ctx.send(embed=embed)
@@ -44,7 +44,7 @@ async def prefix(ctx):
     await bot.wait_for('reaction_add', check=reactioncheck)
     await ctx.send(embed=discord.Embed(
                 description="Next message which you will send will become the prefix :eyes:\n"+
-                f"To cancel it enter\n```{currentprefix(ctx)}cancel```",
+                f"To cancel it enter\n```{getprefix(ctx)}cancel```",
                 color=var.CORANGE
                 ).set_footer(text="Automatic cancel after 1 minute")
                 )
@@ -57,14 +57,14 @@ async def prefix(ctx):
     try:
         usermsg = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)
 
-        if usermsg.content == currentprefix(ctx)+"cancel":
+        if usermsg.content == getprefix(ctx)+"cancel":
             await ctx.send("Cancelled prefix change.")
             
         elif usermsg.content == var.DEFAULT_PREFIX:
             var.PREFIXES.delete_one({"serverid": ctx.guild.id})
             await ctx.send(f"Changed your prefix to the default one\n```{var.DEFAULT_PREFIX}```")
 
-        elif currentprefix(ctx) == var.DEFAULT_PREFIX: #New prefix change if our current prefix is default one
+        elif getprefix(ctx) == var.DEFAULT_PREFIX: #New prefix change if our current prefix is default one
             var.PREFIXES.insert_one({"_id": var.PREFIXES.estimated_document_count()+1, "serverid": ctx.guild.id, "prefix": usermsg.content})
             await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
 

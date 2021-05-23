@@ -2,7 +2,7 @@ import random
 import discord
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import prefix
+from utils.funcs import getprefix
 
 class Leveling(commands.Cog):
     def __init__(self, bot):
@@ -68,7 +68,7 @@ class Leveling(commands.Cog):
 
             embed = discord.Embed(
             title="Successfully setted up leveling for this server",
-            description=f"To further configure, disable or remove leveling use the same command (`{prefix(ctx)}levels`)",
+            description=f"To further configure, disable or remove leveling use the same command (`{getprefix(ctx)}levels`)",
             color=var.CGREEN
             )
             await ctx.send(embed=embed)
@@ -112,7 +112,7 @@ class Leveling(commands.Cog):
             title="Leveling for this server has been disabled", 
             description="This means that the rank data is still there but users won't gain xp until enabled again", 
             color=var.CORANGE
-            ).add_field(name=prefix(ctx)+"levels", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"
+            ).add_field(name=getprefix(ctx)+"levels", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"
             )
             await ctx.send(embed=embed)
         
@@ -136,12 +136,12 @@ class Leveling(commands.Cog):
             else:
                 embed = discord.Embed(
                 title="Can't give XP to the user",
-                description=f"Leveling for this server is not setted up, use the command `{prefix(ctx)} levels to enable leveling",
+                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)} levels to enable leveling",
                 color=var.CRED
                 )
                 await ctx.send(embed=embed)
         else:
-            await ctx.send(f"You need to define the user and amount both, follow this format\n```{prefix(ctx)}givexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
+            await ctx.send(f"You need to define the user and amount both, follow this format\n```{getprefix(ctx)}givexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
 
 
     @commands.command()
@@ -159,12 +159,12 @@ class Leveling(commands.Cog):
             else:
                 embed = discord.Embed(
                 title="Can't remove XP from the user",
-                description=f"Leveling for this server is not setted up, use the command `{prefix(ctx)} levels to enable leveling",
+                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)} levels to enable leveling",
                 color=var.CRED
                 )
                 await ctx.send(embed=embed)
         else:
-            await ctx.send(f"You need to define the user and amount both, follow this format\n```{prefix(ctx)}removexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
+            await ctx.send(f"You need to define the user and amount both, follow this format\n```{getprefix(ctx)}removexp <user> <amount>```\nFor user either user can be mentioned or ID can be used.")
 
 
     @commands.command()

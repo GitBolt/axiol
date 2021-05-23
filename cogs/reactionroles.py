@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import prefix
+from utils.funcs import getprefix
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -49,7 +49,7 @@ class ReactionRoles(commands.Cog):
                     await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
 
         else:
-            await ctx.send(f"Looks like you forgot something, make sure to follow this format when setting up reaction role\n```{prefix(ctx)}rr <messageid> <role> <emoji>```\nFor the role part, you can either mention the role or use it's id")
+            await ctx.send(f"Looks like you forgot something, make sure to follow this format when setting up reaction role\n```{getprefix(ctx)}rr <messageid> <role> <emoji>```\nFor the role part, you can either mention the role or use it's id")
 
             
     @commands.command(aliases=['removereactionrole', 'rrremove', 'reactionroleremove'])
@@ -89,7 +89,7 @@ class ReactionRoles(commands.Cog):
                             color=var.CGREEN)
                             )
         else:
-            await ctx.send(f"Looks like you missed out something, make sure to follow this format```{prefix(ctx)}removerr <messageid> <emoji>```")
+            await ctx.send(f"Looks like you missed out something, make sure to follow this format```{getprefix(ctx)}removerr <messageid> <emoji>```")
             
 
     @commands.command(aliases=['listrr', 'rrall', 'rrlist', 'allreactionroles', 'listreactionroles'])
@@ -145,11 +145,7 @@ class ReactionRoles(commands.Cog):
             else:
                 await ctx.send("Cannot mark that message with unique reactions since you don't have any reaction roles yet :(")
         else:
-            try:
-                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-            except AttributeError:
-                pref = var.DEFAULT_PREFIX
-            await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{pref}uniquerr <messageid>")
+            await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{getprefix(ctx)}uniquerr <messageid>")
 
 
     @commands.command(aliases=["removerrunique", "uniqueremove", "unmarkunique", "uniqueunmark", "rurr", "clearunique"])
@@ -182,11 +178,7 @@ class ReactionRoles(commands.Cog):
             else:
                 await ctx.send("Cannot remove the unique mark from that message since you don't have any reaction roles yet :(")
         else:
-            try:
-                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-            except AttributeError:
-                pref = var.DEFAULT_PREFIX
-            await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{pref}uniquerr <messageid>")
+            await ctx.send(f"You need to enter your message id to make it unique too! Follow this format```{getprefix(ctx)}uniquerr <messageid>")
 
 
     @commands.Cog.listener()

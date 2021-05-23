@@ -2,7 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import prefix
+from utils.funcs import getprefix
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -98,7 +98,7 @@ class Moderation(commands.Cog):
             await asyncio.sleep(2)
             await info.delete()
         else:
-            await ctx.send(f"You need to define the amount too! Follow this format:\n```{prefix(ctx)}purge <amount>```\n Amount should be in numbers.")
+            await ctx.send(f"You need to define the amount too! Follow this format:\n```{getprefix(ctx)}purge <amount>```\n Amount should be in numbers.")
 
 
 def setup(bot):

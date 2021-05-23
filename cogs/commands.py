@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import prefix
+from utils.funcs import getprefix
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -35,7 +35,7 @@ class Commands(commands.Cog):
             await msg.add_reaction(var.DECLINE)
             await ctx.send("Suggestion sent to the support server!")
         else:
-            await ctx.send(f"You need to describe your idea too! This is the format\n```{prefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
+            await ctx.send(f"You need to describe your idea too! This is the format\n```{getprefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
 
 
     @commands.command()

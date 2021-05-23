@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import utils.vars as var
-
+from utils.funcs import prefix
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -49,11 +49,7 @@ class ReactionRoles(commands.Cog):
                     await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
 
         else:
-            try:
-                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-            except AttributeError:
-                pref = var.DEFAULT_PREFIX
-            await ctx.send(f"Looks like you forgot something, make sure to follow this format when setting up reaction role\n```{pref}rr <messageid> <role> <emoji>```\nFor the role part, you can either mention the role or use it's id")
+            await ctx.send(f"Looks like you forgot something, make sure to follow this format when setting up reaction role\n```{prefix(ctx)}rr <messageid> <role> <emoji>```\nFor the role part, you can either mention the role or use it's id")
 
             
     @commands.command(aliases=['removereactionrole', 'rrremove', 'reactionroleremove'])
@@ -87,23 +83,23 @@ class ReactionRoles(commands.Cog):
                 }}
                 var.REACTIONROLES.update_one(guildrr, newdata)
                 await msg.clear_reactions()
-                await ctx.send(embed=discord.Embed(title="Reaction role removed", 
-                description=f"Reaction role with {emoji} on [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id}) was removed",
-                color=var.CGREEN))
+                await ctx.send(embed=discord.Embed(
+                            title="Reaction role removed", 
+                            description=f"Reaction role with {emoji} on [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id}) was removed",
+                            color=var.CGREEN)
+                            )
         else:
-            try:
-                pref = var.PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
-            except AttributeError:
-                pref = var.DEFAULT_PREFIX
-
-            await ctx.send(f"Looks like you missed out something, make sure to follow this format```{pref}removerr <messageid> <emoji>```")
+            await ctx.send(f"Looks like you missed out something, make sure to follow this format```{prefix(ctx)}removerr <messageid> <emoji>```")
             
 
     @commands.command(aliases=['listrr', 'rrall', 'rrlist', 'allreactionroles', 'listreactionroles'])
     @commands.has_permissions(administrator=True)
     async def allrr(self, ctx):
 
-        embed = discord.Embed(title="All active reaction roles", color=var.CMAIN)
+        embed = discord.Embed(
+        title="All active reaction roles", 
+        color=var.CMAIN
+        )
         guildrr = var.REACTIONROLES.find_one({"_id": ctx.guild.id})
 
         if guildrr is not None:
@@ -138,9 +134,11 @@ class ReactionRoles(commands.Cog):
                         "unique_messages": newlist
                     }}
                     var.REACTIONROLES.update_one(guildrr, newdata)
-                    await ctx.send(embed=discord.Embed(title="Successfully marked the message with unique reactions", 
-                    description=f"Now users can only react to one emoji and take one role in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
-                    color=var.CGREEN))
+                    await ctx.send(embed=discord.Embed(
+                                title="Successfully marked the message with unique reactions", 
+                                description=f"Now users can only react to one emoji and take one role in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
+                                color=var.CGREEN)
+                                )
                 
                 else:
                     await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role.")
@@ -174,10 +172,11 @@ class ReactionRoles(commands.Cog):
                         "unique_messages": newlist
                     }}
                     var.REACTIONROLES.update_one(guildrr, newdata)
-                    await ctx.send(embed=discord.Embed(title="Successfully unmarked the message with unique reactions", 
-                    description=f"Now users can react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
-                    color=var.CGREEN))
-                
+                    await ctx.send(embed=discord.Embed(
+                                title="Successfully unmarked the message with unique reactions", 
+                                description=f"Now users can react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
+                                color=var.CGREEN)
+                                )
                 else:
                     await ctx.send("Hmm it looks like that the message id you entered does not have any reaction role so can't remove the unique mark either.")
             else:

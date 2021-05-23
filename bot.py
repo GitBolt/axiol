@@ -29,9 +29,11 @@ for filename in os.listdir('./cogs'):
 @bot.command()
 @commands.has_permissions(administrator = True)
 async def prefix(ctx):
-    embed = discord.Embed(title="Prefix :D that's the way you control me aye!",
+    embed = discord.Embed(
+    title="Prefix :D that's the way you control me aye!",
     description=f"The prefix for this server is\n```{currentprefix(ctx)}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
-    color=var.CMAIN)
+    color=var.CMAIN
+    )
     botmsg = await ctx.send(embed=embed)
     await botmsg.add_reaction(var.SETTINGS)
 
@@ -40,14 +42,17 @@ async def prefix(ctx):
             return str(reaction.emoji) == var.SETTINGS
 
     await bot.wait_for('reaction_add', check=reactioncheck)
-    await ctx.send(embed=discord.Embed(description="Next message which you will send will become the prefix :eyes:\n"+
-    f"To cancel it enter\n```{currentprefix(ctx)}cancel```",
-    color=var.CORANGE).set_footer(text="Automatic cancel after 1 minute"))
+    await ctx.send(embed=discord.Embed(
+                description="Next message which you will send will become the prefix :eyes:\n"+
+                f"To cancel it enter\n```{currentprefix(ctx)}cancel```",
+                color=var.CORANGE
+                ).set_footer(text="Automatic cancel after 1 minute")
+                )
     await botmsg.clear_reactions()
 
     def prefixmsgcheck(message):
         if message.author == ctx.author:
-            return message.guild.id == ctx.guild.id
+            return message.channel.id == ctx.channel.id
 
     try:
         usermsg = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)

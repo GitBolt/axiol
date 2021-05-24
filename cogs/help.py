@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import utils.vars as var
 from utils.funcs import getprefix
+import asyncio
 
 class Help(commands.Cog):
     def __init__(self, bot):
@@ -11,17 +12,16 @@ class Help(commands.Cog):
     async def help(self, ctx):
 
         embed = discord.Embed(title="Axiol Help", description=f"Either enter the sub command or react to the emojis below!", color=var.CMAIN)
-        embed.add_field(name=getprefix(ctx)+"help levels", value="Leveling help 📊", inline=False)
+        embed.add_field(name=getprefix(ctx)+"help levels", value=f"Leveling help {var.LVL}", inline=False)
         embed.add_field(name=getprefix(ctx)+"help mod", value="Moderation help 🔨", inline=False)
         embed.add_field(name=getprefix(ctx)+"help rr", value="Reaction role help ✨", inline=False)
         embed.add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False)
         embed.add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False)
         embed.add_field(name=getprefix(ctx)+"invite",value="[Invite link for the bot!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False)
         embed.add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False)
-        embed.set_footer(text="📊 for leveling help\n🔨 for moderation help\n✨ for reaction roles help")
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
         helpmsg = await ctx.send(embed=embed)
-        await helpmsg.add_reaction('📊')
+        await helpmsg.add_reaction(var.LVL)
         await helpmsg.add_reaction('🔨')
         await helpmsg.add_reaction('✨')
 
@@ -56,20 +56,22 @@ class Help(commands.Cog):
 
 
         def check(reaction, user):
-            if user == ctx.author and reaction.message == helpmsg:
-                return str(reaction.emoji) == '🔨' or '✨' or '📊' and reaction.message == helpmsg
-        reaction, user = await self.bot.wait_for('reaction_add', check=check)
+            return user == ctx.author and reaction.message == helpmsg
       
-        if str(reaction.emoji) == '📊':
-            await helpmsg.edit(embed=levelembed)
-            await helpmsg.clear_reactions()
-        if str(reaction.emoji) == '🔨':
-            await helpmsg.edit(embed=modembed)
-            await helpmsg.clear_reactions()
-        if str(reaction.emoji) == '✨':
-            await helpmsg.edit(embed=rrembed)
-            await helpmsg.clear_reactions()
-
+        while True:
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
+                if str(reaction.emoji) == var.LVL:
+                    await helpmsg.edit(embed=levelembed)
+                    await helpmsg.remove_reaction(var.LVL, ctx.author)
+                if str(reaction.emoji) == '🔨':
+                    await helpmsg.edit(embed=modembed)
+                    await helpmsg.remove_reaction('🔨', ctx.author)
+                if str(reaction.emoji) == '✨':
+                    await helpmsg.edit(embed=rrembed)
+                    await helpmsg.remove_reaction('✨', ctx.author)
+            except asyncio.TimeoutError:
+                break
 
 
     @help.command(aliases=["level"])

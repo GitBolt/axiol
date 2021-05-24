@@ -17,6 +17,7 @@ class Help(commands.Cog):
         embed.add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False)
         embed.add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False)
         embed.add_field(name=getprefix(ctx)+"invite",value="[Invite link for the bot!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False)
+        embed.add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False)
         embed.set_footer(text="📊 for leveling help\n🔨 for moderation help\n✨ for reaction roles help")
         embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
         helpmsg = await ctx.send(embed=embed)

@@ -123,7 +123,7 @@ class Commands(commands.Cog):
             ).add_field(name="Author", value="React to 🇺")
             )
             def editreactioncheck(reaction, user):
-                return user == ctx.author and reaction.message == edit
+                return user == ctx.author and reaction.message == edit or reaction.message == preview
             editemojis = ["🇦", "🇫", "🇮", "🇺"]
             for i in editemojis:
                 await edit.add_reaction(i)
@@ -140,9 +140,8 @@ class Commands(commands.Cog):
                     await ctx.send("IIII")
                 if str(reaction.emoji) == "🇺":
                     await ctx.send("UUUUU")
-
             await channel.send(embed=embed)
-            
+            await ctx.send("Embed sent in "+channel.mention+" !")
         else:
             await ctx.send(f"You also need to define the channel too! Format:```{getprefix(ctx)}embed <#channel>```Don't worry, the embed won't be sent right away!")
 

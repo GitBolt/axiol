@@ -50,8 +50,7 @@ class Leveling(commands.Cog):
 
         #Reaction checks
         def check(reaction, user):
-            if user == ctx.author and reaction.message == botmsg:
-                return str(reaction.emoji) == var.ACCEPT or var.DECLINE or var.DISABLE or var.ENABLE or var.SETTINGS 
+            return user == ctx.author and reaction.message == botmsg
 
         reaction, user = await self.bot.wait_for('reaction_add', check=check)
 

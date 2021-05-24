@@ -38,8 +38,7 @@ async def prefix(ctx):
     await botmsg.add_reaction(var.SETTINGS)
 
     def reactioncheck(reaction, user):
-        if user == ctx.author and reaction.message == botmsg:
-            return str(reaction.emoji) == var.SETTINGS
+        return user == ctx.author and reaction.message == botmsg
 
     await bot.wait_for('reaction_add', check=reactioncheck)
     await ctx.send(embed=discord.Embed(
@@ -51,8 +50,7 @@ async def prefix(ctx):
     await botmsg.clear_reactions()
 
     def prefixmsgcheck(message):
-        if message.author == ctx.author:
-            return message.channel.id == ctx.channel.id
+        return message.author == ctx.author and message.channel.id == ctx.channel.id
 
     try:
         usermsg = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)

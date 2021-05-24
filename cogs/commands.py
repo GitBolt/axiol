@@ -71,8 +71,7 @@ class Commands(commands.Cog):
                 return user == ctx.author and reaction.message == preview
             
             def msgcheck(message):
-                if message.author == ctx.author:
-                    return message.channel.id == ctx.channel.id
+                return message.author == ctx.author and message.channel.id == ctx.channel.id
 
             while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck)

@@ -84,22 +84,38 @@ class Commands(commands.Cog):
                 await preview.edit(embed=embed)
 
             await preview.clear_reactions()    
-            titlebotmsg = await ctx.send("Now send a message to make it the **Title** of the embed :D")
+            titlebotmsg = await ctx.send(embed=discord.Embed(
+            title="Title",
+            description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
+            color=var.CBLUE)
+            )
             usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
             embed.title = usermsg.content
             await preview.edit(embed=embed)
             await titlebotmsg.delete()
 
-            descbotmsg = await ctx.send("Now send a message to make it the **Description**! Type `skip` if you don't want to")
+            descbotmsg = await ctx.send(embed=discord.Embed(
+            title="Description",
+            description=f"Now send a message to make it the description of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
+            color=var.CBLUE
+            ).add_field(name="** **", value="Type `skip` if you don't want to set this")
+            )
             usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
             if usermsg.content == "skip" or usermsg.content == "`skip`":
+                embed.description = None
+                await preview.edit(embed=embed)
                 await descbotmsg.delete()
             else:
                 embed.description = usermsg.content
                 await preview.edit(embed=embed)
                 await descbotmsg.delete()
 
-            thumbnailbotmsg = await ctx.send("Now send a image or link to make it the **Thumbnail**! Type `skip` if you don't want to")
+            thumbnailbotmsg = await ctx.send(embed=discord.Embed(
+            title="Thumbnail",
+            description=f"Now send a message to make it the description of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
+            color=var.CBLUE
+            ).add_field(name="** **", value="Type `skip` if you don't want to set this")
+            )
             usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
             if usermsg.attachments:
                 embed.set_thumbnail(url=usermsg.attachments[0].url)
@@ -130,17 +146,45 @@ class Commands(commands.Cog):
             while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=editreactioncheck)
                 if str(reaction.emoji) == var.ACCEPT:
+                    await channel.send(embed=embed)
+                    await ctx.send("Embed sent in "+channel.mention+" !")
                     break
                 if str(reaction.emoji) == "🇦":
-                    await ctx.send("AAAAAA")
+                    fieldbotmsg = await ctx.send("Send a message and seperate your **Field name and value** with `|`\nFor example: This is my field name | This is the field value!")
+                    usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+                    fieldlist = usermsg.content.split("|")
+                    embed.add_field(name=fieldlist[0], value=fieldlist[1], inline=False)
+                    await preview.edit(embed=embed)
+                    await fieldbotmsg.delete()
+                    await edit.remove_reaction("🇦", ctx.author)
+
                 if str(reaction.emoji) == "🇫":
-                    await ctx.send("FFFFF")
+                    footerbotmsg = await ctx.send("Send a message to make it the **Footer**!")
+                    usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+                    embed.set_footer(text=usermsg.content)
+                    await preview.edit(embed=embed)
+                    await footerbotmsg.delete()
+                    await edit.clear_reaction("🇫")
+
                 if str(reaction.emoji) == "🇮":
-                    await ctx.send("IIII")
+                    imagebotmsg = await ctx.send("Now send an image or link to add that **Image** to the embed!")
+                    usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)      
+                    if usermsg.attachments:
+                        embed.set_image(url=usermsg.attachments[0].url)
+                        await preview.edit(embed=embed)
+                        await thumbnailbotmsg.delete()
+                        edit.clear_reaction("🇮")
+                    else:
+                        embed.set_image(url=usermsg.content)
+                        await preview.edit(embed=embed)
+                        await imagebotmsg.delete()
+                        await edit.clear_reaction("🇮")
+
                 if str(reaction.emoji) == "🇺":
-                    await ctx.send("UUUUU")
-            await channel.send(embed=embed)
-            await ctx.send("Embed sent in "+channel.mention+" !")
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                    await preview.edit(embed=embed)
+                    await edit.clear_reaction("🇺")
+
         else:
             await ctx.send(f"You also need to define the channel too! Format:```{getprefix(ctx)}embed <#channel>```Don't worry, the embed won't be sent right away!")
 

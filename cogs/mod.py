@@ -89,10 +89,10 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit:int=None):
         if limit is not None:
-            await ctx.channel.purge(limit=limit)
+            await ctx.channel.purge(limit=limit+1)
 
             info = await ctx.send(embed=discord.Embed(
-                                description=f"Deleted {limit} messages (Including the command)",
+                                description=f"Deleted {limit} messages",
                                 color=var.CORANGE)
                                 )
             await asyncio.sleep(2)

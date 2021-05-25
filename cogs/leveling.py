@@ -1,8 +1,10 @@
 import random
+import asyncio
 import discord
+import math
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import getprefix
+from utils.funcs import getprefix, getxprange
 
 class Leveling(commands.Cog):
     def __init__(self, bot):
@@ -61,8 +63,9 @@ class Leveling(commands.Cog):
             var.LEVELDATABASE[str(ctx.guild.id)].insert_one({
                 "_id": 0,
                 "status": True,
+                "xprange": [15, 25],
                 "alertchannel": ctx.channel.id,
-                "blacklistedchannels": []
+                "blacklistedchannels": [],
             })    
 
             embed = discord.Embed(
@@ -72,19 +75,35 @@ class Leveling(commands.Cog):
             )
             await ctx.send(embed=embed)
 
-        if str(reaction.emoji) == var.DECLINE:
+        if str(reaction.emoji) == var.DECLINE: #Delete leveling
             await botmsg.clear_reactions()
-
-            var.LEVELDATABASE[str(ctx.guild.id)].drop()
-
             embed = discord.Embed(
-            title="Leveling removed", 
-            description="Leveling have been removed from this server, that means all the rank data has been deleted", 
-            color=var.CGREEN
+                        title="Rank data deletion",
+                        description=f"Keep in mind that this action is irreversable",
+                        color=var.CORANGE
+            ).add_field(name="Confirm Delete", value=var.ACCEPT
+            ).add_field(name="Cancel", value=var.DECLINE
             )
-            await ctx.send(embed=embed)
+            botdeletemsg = await ctx.send(embed=embed)
+            await botdeletemsg.add_reaction(var.ACCEPT)
+            await botdeletemsg.add_reaction(var.DECLINE)
 
-        if str(reaction.emoji) == var.ENABLE: #Enable
+            def cancelcheck(reaction, user):
+                return user == ctx.author and reaction.message == botdeletemsg
+            
+            reaction, user = await self.bot.wait_for('reaction_add', check=cancelcheck, timeout=60.0)
+            if str(reaction.emoji) == var.ACCEPT:
+                var.LEVELDATABASE[str(ctx.guild.id)].drop()
+                await ctx.send(embed=discord.Embed(
+                            title="Leveling removed", 
+                            description="Leveling have been removed from this server, that means all the rank data has been deleted", 
+                            color=var.CGREEN)
+                            )
+            if str(reaction.emoji) == var.DECLINE:
+                await ctx.send("Woosh that was close, cancelled leveling data deletion.")
+                
+
+        if str(reaction.emoji) == var.ENABLE: #Enable leveling
             await botmsg.clear_reactions()
 
             col = var.LEVELDATABASE[str(ctx.guild.id)]
@@ -96,7 +115,7 @@ class Leveling(commands.Cog):
             var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
             await ctx.send("Successfully enabled leveling again on this server!")
 
-        if str(reaction.emoji) == var.DISABLE: #Disable
+        if str(reaction.emoji) == var.DISABLE: #Disable leveling
             await botmsg.clear_reactions()
 
             col = var.LEVELDATABASE[str(ctx.guild.id)]
@@ -167,14 +186,101 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
-    async def award(self, ctx):
-        await ctx.send("Coming soon...")
+    async def blacklist(self, ctx, channel:discord.TextChannel=None):
+        if channel is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names(): 
+                guildcol = var.LEVELDATABASE.get_collection(str(ctx.guild.id))
+                settings = guildcol.find_one({"_id": 0})
+
+                newsettings = settings.get("blacklistedchannels").copy()
+                newsettings.append(channel.id)
+                newdata = {"$set":{
+                    "blacklistedchannels": newsettings
+                    }}
+                guildcol.update_one(settings, newdata)
+
+                await ctx.send(embed=discord.Embed(
+                            description=f"{channel.mention} has been blacklisted, hence users won't gain any xp in that channel.",
+                            color=var.CGREEN)
+                            )
+            else:
+                await ctx.send("Leveling for this server hasn't been setted up yet.")
+        else:
+            await ctx.send(f"Looks like you forgot to mention the channel, follow this format\n```{getprefix(ctx)}blacklist <#channel>```")
+
+    @commands.command()
+    async def removeblacklist(self, ctx, channel:discord.TextChannel=None):
+        if channel is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names(): 
+                guildcol = var.LEVELDATABASE.get_collection(str(ctx.guild.id))
+                settings = guildcol.find_one({"_id": 0})
+
+                newsettings = settings.get("blacklistedchannels").copy()
+                if channel.id in newsettings:
+                    newsettings.remove(channel.id)
+                else:
+                    await ctx.send(f"{channel.mention} was not blacklisted")
+                newdata = {"$set":{
+                    "blacklistedchannels": newsettings
+                    }}
+                guildcol.update_one(settings, newdata)
+
+                await ctx.send(embed=discord.Embed(
+                            description=f"{channel.mention} has been removed from blacklist, hence users will be able to gain xp again in that channel.",
+                            color=var.CGREEN)
+                            )
+            else:
+                await ctx.send("Leveling for this server hasn't been setted up yet.")
+        else:
+            await ctx.send(f"Looks like you forgot to mention the channel, follow this format\n```{getprefix(ctx)}blacklist <#channel>```")
+
+
+    @commands.command()
+    async def alertchannel(self, ctx, channel:discord.TextChannel=None):
+        if channel is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names(): 
+                guildcol = var.LEVELDATABASE.get_collection(str(ctx.guild.id))
+                settings = guildcol.find_one({"_id": 0})
+
+                newdata = {"$set":{
+                    "alertchannel": channel.id
+                    }}
+                guildcol.update_one(settings, newdata)
+                await ctx.send(embed=discord.Embed(
+                            description=f"{channel.mention} has been marked as the alert channel, hence users who will level up will get mentioned here!",
+                            color=var.CGREEN)
+                            )
+            else:
+                await ctx.send("Leveling for this server hasn't been setted up yet.")
+        else:
+            await ctx.send(f"Looks like you forgot to mention the channel, follow this format\n```{getprefix(ctx)}blacklist <#channel>```")
+
+    @commands.command()
+    async def xprange(self, ctx, minval:int=None, maxval:int=None):
+        if minval and maxval is not None:
+            if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+                guildcol = var.LEVELDATABASE.get_collection(str(ctx.guild.id))
+                settings = guildcol.find_one({"_id": 0})
+
+                newdata = {"$set":{
+                    "xprange": [minval, maxval]
+                }}
+                guildcol.update_one(settings, newdata)
+                await ctx.send(embed=discord.Embed(
+                            description=f"New xp range is now {minval} - {maxval}!",
+                            color=var.CGREEN)
+                )
+            else:
+                await ctx.send("Leveling for this server hasn't been setted up yet.")
+        else:
+            await ctx.send(f"Looks like you forgot to enter both minimum and maximum xp values, follow this format\n```{getprefix(ctx)}xprange <minxp> <maxxp>```")
 
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if str(message.guild.id) in var.LEVELDATABASE.list_collection_names():
-            if var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("status") == True:
+        if str(message.guild.id) in var.LEVELDATABASE.list_collection_names(): #If leveling exists
+            if(var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("status") == True #If it's enabled
+             and message.channel.id not in var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels")): #If the channel is not blacklisted
 
                 guildlevels = var.LEVELDATABASE[str(message.guild.id)]
                 userdata = guildlevels.find_one({"_id": message.author.id})
@@ -182,17 +288,14 @@ class Leveling(commands.Cog):
                 if userdata is None:
                     guildlevels.insert_one({"_id": message.author.id, "xp": 0})
                 else:
-                    xp = userdata["xp"] + random.randint(10, 30)
+                    xp = userdata["xp"]
+                    initlvl = int(1 + math.sqrt(1+10 * xp/120 )/2)
+                    xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
                     guildlevels.update_one(userdata, {"$set": {"xp": xp}})
-                    level = 0
-                    while True:
-                        if xp < ((50*(level**2))+(50*level)):
-                            break
-                        level += 1
-                    xp -= ((50*((level-1)**2))+(50*(level-1)))
-                    if xp == 0:
+                    levelnow = int(1 + math.sqrt(1+10 * xp/120 )/2)
+                    if levelnow > initlvl:
                         ch = self.bot.get_channel(guildlevels.find_one({"_id":0}).get("alertchannel"))
-                        await ch.send(f"{message.author.mention} you leveled up to level {level}!")
+                        await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
 
 
     @commands.command()
@@ -209,16 +312,10 @@ class Leveling(commands.Cog):
                 await ctx.send("The user does not have any rank yet :(")
             else:
                 xp = userdata["xp"]
-                level = 0
-                rank = 0
-                while True:
-                    if xp < ((50*(level**2))+(50*(level-1))):
-                        break
-                    level += 1
-
-                xp -= ((50*((level-1)**2))+(50*(level-1)))
+                level = int(1 + math.sqrt(1+10 * xp/120 )/2)
                 boxes = int((xp/(200*((1/2)* level)))*20)
                 rankings = guildlevels.find().sort("xp", -1)
+                rank = 0
                 for i in rankings:
                     rank += 1
                     if userdata["_id"] == i["_id"]:
@@ -226,9 +323,9 @@ class Leveling(commands.Cog):
 
                 embed = discord.Embed(
                 title=f"Level stats for {user.name}",
-                description=boxes * "<:blue:808242875933786112>" + (20-boxes) * "<:white:808242875728789525>", 
+                #description=boxes * "<:blue:808242875933786112>" + (20-boxes) * "<:white:808242875728789525>", 
                 color=var.CTEAL
-                ).add_field(name="Rank", value=f"{rank}/{ctx.guild.member_count}", inline=True
+                ).add_field(name="Rank", value=f"{rank}/{guildlevels.estimated_document_count()-1}", inline=True
                 ).add_field(name="XP", value=f"{xp}/{int(200*((1/2)*level))}", inline=True
                 ).add_field(name="Level", value=level, inline=True
                 ).set_thumbnail(url=user.avatar_url
@@ -244,9 +341,9 @@ class Leveling(commands.Cog):
     async def leaderboard(self, ctx):
         guildlevels = var.LEVELDATABASE[str(ctx.guild.id)]
         if guildlevels is not None:
-            rankings = guildlevels.find().sort("xp", -1)
+            rankings = guildlevels.find({ "_id": { "$ne": 0 } }  ).sort("xp")
             embed = discord.Embed(
-            title=f"Leaderboard for {ctx.guild.name}", 
+            title=f"Leaderboard", 
             color=var.CBLUE
             )
             rankcount = 0
@@ -255,7 +352,8 @@ class Leveling(commands.Cog):
                 user = await ctx.guild.fetch_member(i.get("_id"))
                 xp = i.get("xp")
                 embed.add_field(name=f"{rankcount}: {user.name}", value=f"Total XP: {xp}", inline=False)
-            print("hi")
+                if rankcount > 15:
+                    break
             await ctx.send(embed=embed)
         else:
             await ctx.send("No one in this server has any rank yet :OOOOOOOO") 

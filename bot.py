@@ -10,7 +10,8 @@ def serverprefix(bot, message):
         return var.DEFAULT_PREFIX
     return var.PREFIXES.find_one({"serverid": message.guild.id}).get("prefix")
     
-bot = commands.Bot(command_prefix = serverprefix, help_command=None)
+intents = discord.Intents().all()
+bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=intents)
 
 @bot.event
 async def on_ready():

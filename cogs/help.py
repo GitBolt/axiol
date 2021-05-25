@@ -23,7 +23,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
-    ).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
+    #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
     ).add_field(name=getprefix(ctx)+"settings", value="Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
@@ -100,11 +100,12 @@ class Help(commands.Cog):
         
         embed = discord.Embed(title="Configure leveling for this server",
         color=var.CTEAL
+        ).add_field(name=getprefix(ctx)+"xprange `<leastamount>` `<highestamount>`",value="Set the range between which users will be awarded with random xp", inline=False
         ).add_field(name=getprefix(ctx)+"blacklist `<#channel>`",value=f"Add the channel where you don't want users to gain xp.", inline=False
-        ).add_field(name=getprefix(ctx)+"xp `<leastamount>` `<highestamount>`",value="Set the range between which users will be awarded with random xp", inline=False
-        ).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
+        ).add_field(name=getprefix(ctx)+"removeblacklist `<#channel>`",value=f"Remove an xp blacklisted channel.", inline=False
         ).add_field(name=getprefix(ctx)+"alertchannel `<#channel>`", value="Define the channel where alerts will be sent for level ups!", inline=False
-        ).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
+        #).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
+        #).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
         )
         await ctx.send(embed=embed)
 

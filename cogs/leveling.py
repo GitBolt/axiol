@@ -209,7 +209,7 @@ class Leveling(commands.Cog):
             await ctx.send(f"Looks like you forgot to mention the channel, follow this format\n```{getprefix(ctx)}blacklist <#channel>```")
 
     @commands.command()
-    async def removeblacklist(self, ctx, channel:discord.TextChannel=None):
+    async def whitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names(): 
                 guildcol = var.LEVELDATABASE.get_collection(str(ctx.guild.id))

@@ -45,16 +45,10 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def mute(self, ctx, member:discord.Member=None):
         if not discord.utils.get(ctx.guild.roles, name='Muted'):
-            await ctx.send(embed=discord.Embed(
-                        title="Creating a Muted role...", 
-                        description="Since there is no role named 'Mute' and this is the first time the command is used, I am creating a muted role!"
-                        ).set_footer("This is only a one time process, next mute won't create any new role and use the already existing one.")
-                        )
-            perms = discord.Permissions(send_messages=False)
-            mutedrole = await ctx.guild.create_role(name="Muted", colour=discord.Colour(0xa8a8a8), permissions=perms)
-
-        mutedrole = discord.utils.get(ctx.guild.roles, name='Muted')
-        await mutedrole.edit(position=1)
+            mutedrole = await ctx.guild.create_role(name="Muted", colour=discord.Colour(0xa8a8a8))
+            for i in ctx.guild.text_channels:
+                await i.set_permissions(mutedrole, send_messages=False)
+        mutedrole = discord.utils.get(ctx.guild.roles, name="Muted")
         await member.add_roles(mutedrole)
         await ctx.send(f"`{member}` have been muted!")
 
@@ -63,7 +57,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     async def unmute(self, ctx, member:discord.Member=None):
         if not discord.utils.get(ctx.guild.roles, name='Muted'): 
-            await ctx.send("There is no muted role yet, Muting someone automatically makes one.")
+            await ctx.send("There is no muted role yet hence I cannot unmute, Muting someone automatically makes one.")
         mutedrole = discord.utils.get(ctx.guild.roles, name='Muted')
         await member.remove_roles(mutedrole)
         await ctx.send(f"`{member}` have been unmuted")

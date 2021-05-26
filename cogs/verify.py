@@ -37,6 +37,7 @@ class Verification(commands.Cog):
                     for i in ctx.guild.text_channels:
                         await i.set_permissions(NVerified, view_channel=False)
                     await channel.set_permissions(NVerified, view_channel=True)
+                    await channel.set_permissions(ctx.guild.default_role, view_channel=False)
 
                     await ctx.send(embed=discord.Embed(
                         title="Command verification",
@@ -56,6 +57,7 @@ class Verification(commands.Cog):
                     for i in ctx.guild.text_channels:
                         await i.set_permissions(NVerified, view_channel=False)
                     await channel.set_permissions(NVerified, view_channel=True)
+                    await channel.set_permissions(ctx.guild.default_role, view_channel=False)
 
                     await ctx.send(embed=discord.Embed(
                         title="Bot verification",
@@ -151,14 +153,6 @@ class Verification(commands.Cog):
             await ctx.send("Successfully removed verification from this server!")
         else:
             await ctx.send("Verification for this server is not setted up hence cannot remove it either ¯\_(ツ)_/¯ ")
-
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        guilddoc = var.VERIFY.find_one({"_id":member.guild.id})
-        if guilddoc is not None:
-            role = member.guild.get_role(guilddoc.get("roleid"))
-            await member.add_roles(role)
 
 
 def setup(bot):

@@ -50,6 +50,28 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    async def about(self, ctx):
+        guildcount = 0
+        membercount = 0
+        ping = f"{round(self.bot.latency*1000)}ms"
+        for guild in self.bot.guilds:
+            guildcount +=1
+            membercount += guild.member_count
+
+        embed = discord.Embed(
+        title="Some information about me :flushed:",
+        color=var.CMAIN
+        ).add_field(name="Server Count", value=guildcount, inline=False
+        ).add_field(name="Members", value=membercount, inline=False
+        ).add_field(name="Ping", value=ping, inline=False
+        ).add_field(name="Made by", value="Bolt#8905", inline=False
+        ).set_footer(text="I was born on 16 May, 2021"
+        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
+        )
+        await ctx.send(embed=embed)
+
+
+    @commands.command()
     async def embed(self, ctx, channel:discord.TextChannel=None):
 
         if channel is not None:
@@ -187,6 +209,7 @@ class Commands(commands.Cog):
 
         else:
             await ctx.send(f"You also need to define the channel too! Format:```{getprefix(ctx)}embed <#channel>```Don't worry, the embed won't be sent right away!")
+
 
 def setup(bot):
     bot.add_cog(Commands(bot))

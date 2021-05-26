@@ -61,6 +61,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.CMAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
     ).add_field(name=getprefix(ctx)+"invite",value="[My invite link!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False
     ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False

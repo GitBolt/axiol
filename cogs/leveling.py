@@ -136,7 +136,7 @@ class Leveling(commands.Cog):
         
         if str(reaction.emoji) == var.SETTINGS: #Configure
             await botmsg.clear_reactions()
-            await ctx.invoke(self.bot.get_command('settings'))
+            await ctx.invoke(self.bot.get_command('levelconfig'))
 
 
     @commands.command()
@@ -154,7 +154,7 @@ class Leveling(commands.Cog):
             else:
                 embed = discord.Embed(
                 title="Can't give XP to the user",
-                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)} levels to enable leveling",
+                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)}levels` to enable leveling",
                 color=var.CRED
                 )
                 await ctx.send(embed=embed)
@@ -177,7 +177,7 @@ class Leveling(commands.Cog):
             else:
                 embed = discord.Embed(
                 title="Can't remove XP from the user",
-                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)} levels to enable leveling",
+                description=f"Leveling for this server is not setted up, use the command `{getprefix(ctx)}levels` to enable leveling",
                 color=var.CRED
                 )
                 await ctx.send(embed=embed)
@@ -339,8 +339,8 @@ class Leveling(commands.Cog):
 
     @commands.command()
     async def leaderboard(self, ctx):
-        guildlevels = var.LEVELDATABASE[str(ctx.guild.id)]
-        if guildlevels is not None:
+        if str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+            guildlevels = var.LEVELDATABASE[str(ctx.guild.id)]
             rankings = guildlevels.find({ "_id": { "$ne": 0 } }  ).sort("xp")
             embed = discord.Embed(
             title=f"Leaderboard", 
@@ -356,7 +356,7 @@ class Leveling(commands.Cog):
                     break
             await ctx.send(embed=embed)
         else:
-            await ctx.send("No one in this server has any rank yet :OOOOOOOO") 
+            await ctx.send("Leveling is not enabled on this server :(") 
 
 
 def setup(bot):

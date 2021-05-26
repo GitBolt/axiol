@@ -32,13 +32,13 @@ class Moderation(commands.Cog):
             await ctx.send("You are not even banned why you trying to unban yourself :joy:")
         await ctx.guild.unban(member)
 
+        await ctx.send(f'`{member}` is now unbanned!')
         await member.send(embed=discord.Embed(
                         title=f"You have been unbanned from {ctx.guild.name}!",
                         description="Yay I would be happy to see you back!", 
                         color=var.CGREEN
                         ).add_field(name="Unbanned by", value=ctx.author)
                         )
-        await ctx.send(f'`{member}` is now unbanned!')
     
 
     @commands.command()

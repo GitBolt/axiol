@@ -9,10 +9,8 @@ def mainhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"help levels", value=f"Leveling help {var.LVL}", inline=False
     ).add_field(name=getprefix(ctx)+"help mod", value="Moderation help 🔨", inline=False
     ).add_field(name=getprefix(ctx)+"help rr", value="Reaction role help ✨", inline=False
-    ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False
-    ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
-    ).add_field(name=getprefix(ctx)+"invite",value="[My invite link!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False
-    ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    ).add_field(name=getprefix(ctx)+"help verification", value="Member verification help ✅", inline=False
+    ).add_field(name=getprefix(ctx)+"help extras", value=f"Commands that don't belong do the categories above ➡️", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
@@ -50,6 +48,25 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
     return embed
 
+def verifyhelp(ctx: commands.Context) -> discord.Embed:
+
+    embed = discord.Embed(title="Verification", color=var.CMAIN
+    ).add_field(name=getprefix(ctx)+"verification", value="Setup and configure member verification for your server!", inline=False
+    ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (if enabled)", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
+def extrahelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.CMAIN
+    ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
+    ).add_field(name=getprefix(ctx)+"invite",value="[My invite link!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False
+    ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
 
 class Help(commands.Cog):
     def __init__(self, bot):
@@ -61,6 +78,8 @@ class Help(commands.Cog):
         await helpmsg.add_reaction(var.LVL)
         await helpmsg.add_reaction('🔨')
         await helpmsg.add_reaction('✨')
+        await helpmsg.add_reaction('✅')
+        await helpmsg.add_reaction('➡️')
 
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
@@ -77,6 +96,13 @@ class Help(commands.Cog):
                 if str(reaction.emoji) == '✨':
                     await helpmsg.edit(embed=rrhelp(ctx))
                     await helpmsg.remove_reaction('✨', ctx.author)
+                if str(reaction.emoji) == '✅':
+                    await helpmsg.edit(embed=verifyhelp(ctx))
+                    await helpmsg.remove_reaction('✅', ctx.author)
+                if str(reaction.emoji) == '➡️':
+                    await helpmsg.edit(embed=extrahelp(ctx))
+                    await helpmsg.remove_reaction(var.CONTINUE, ctx.author)
+
             except asyncio.TimeoutError:
                 break
 
@@ -92,11 +118,18 @@ class Help(commands.Cog):
     async def rr(self, ctx):
         await ctx.send(embed=rrhelp(ctx))
 
+    @help.command()
+    async def verification(self, ctx):
+        await ctx.send(embed=verifyhelp(ctx))
+    
+    @help.command()
+    async def extras(self, ctx):
+        await ctx.send(embed=verifyhelp(ctx))
 
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def settings(self, ctx):
+    async def levelconfig(self, ctx):
         
         embed = discord.Embed(title="Configure leveling for this server",
         color=var.CTEAL

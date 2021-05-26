@@ -155,5 +155,15 @@ class Verification(commands.Cog):
             await ctx.send("Verification for this server is not setted up hence cannot remove it either ¯\_(ツ)_/¯ ")
 
 
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.channel.id in var.VERIFY.distinct("channel"):
+            if message.content == getprefix(message)+"verify":
+                print(message.content)
+                roleid = var.VERIFY.find_one({"_id": message.guild.id}).get("roleid")
+                role = message.guild.get_role(roleid)
+                await message.author.remove_roles(role)
+
+
 def setup(bot):
     bot.add_cog(Verification(bot))

@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import utils.vars as var
 from utils.funcs import getprefix
-
+import asyncio, random
 class Verification(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -155,15 +155,45 @@ class Verification(commands.Cog):
             await ctx.send("Verification for this server is not setted up hence cannot remove it either ¯\_(ツ)_/¯ ")
 
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.channel.id in var.VERIFY.distinct("channel"):
-            if message.content == getprefix(message)+"verify":
-                print(message.content)
-                roleid = var.VERIFY.find_one({"_id": message.guild.id}).get("roleid")
-                role = message.guild.get_role(roleid)
-                await message.author.remove_roles(role)
+    @commands.command()
+    @commands.cooldown(1, 15, commands.BucketType.user)
+    async def verify(self, ctx):
+        if ctx.channel.id in var.VERIFY.distinct("channel"): #Verify channel ids
+            if var.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command":
+                roleid = var.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
+                role = ctx.guild.get_role(roleid)
+                await ctx.author.remove_roles(role)
+            else:
+                images = random.choice(['https://cdn.discordapp.com/attachments/807140294764003350/808170831586787398/7h3fpaw1.png',
+                        'https://cdn.discordapp.com/attachments/807140294764003350/808170832744415283/bs4hm1gd.png',
+                        'https://cdn.discordapp.com/attachments/807140294764003350/808170834484789309/hdmxe425.png',
+                        'https://cdn.discordapp.com/attachments/807140294764003350/808170834514018304/kp6d1vs9.png',
+                        'https://cdn.discordapp.com/attachments/807140294764003350/808170835957383189/jd3573vq.png',])    
 
+                embed = discord.Embed(
+                    title="Beep Bop,  are you a bot?",
+                    description = 'Enter the text given in the image below to verify yourself',
+                    colour = var.CMAIN
+                    ).set_image(url=images
+                    ).set_footer(text='You have 15 seconds to enter the text, if you failed to enter it in time then type the command again.'
+                    )
+                botmsg = await ctx.send(embed=embed, delete_after=15)
+
+                def codecheck(message):
+                    return message.author == ctx.author and message.channel.id == ctx.channel.id
+                try:
+                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
+
+                    # ayo bot's aren't this smart
+                    cleanurl = embed.image.url[77:]
+                    code = cleanurl[:8]
+                    if usermsg.content == code:
+                        roleid = var.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
+                        role = ctx.guild.get_role(roleid)
+                        await ctx.author.remove_roles(role)
+                except asyncio.TimeoutError:
+                    em = discord.Embed(title="Time's up!", description="You failed to type the text under 15 seconds, try again.", colour=var.CORANGE)
+                    await ctx.send(embed=em, delete_after=2)
 
 def setup(bot):
     bot.add_cog(Verification(bot))

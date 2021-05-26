@@ -1,6 +1,4 @@
-from discord import guild
 from discord.ext import commands
-import discord
 import utils.vars as var
 
 class Welcome(commands.Cog):

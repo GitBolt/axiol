@@ -25,47 +25,61 @@ class Verification(commands.Cog):
 
                 def check(reaction, user):
                     return user == ctx.author and reaction.message == botmsg
+                try:
+                    reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
+                    if str(reaction.emoji) == var.ACCEPT:
+                        NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                        await botmsg.clear_reactions()
+                        embed.title="Processing..."
+                        embed.description="Setting up everything, just a second"
+                        embed.remove_field(1)
+                        await botmsg.edit(embed=embed)
+                        for i in ctx.guild.text_channels:
+                            await i.set_permissions(NVerified, view_channel=False)
+                        await channel.set_permissions(NVerified, view_channel=True)
+                        await channel.set_permissions(ctx.guild.default_role, view_channel=False)
 
-                reaction, user = await self.bot.wait_for('reaction_add', check=check)
-                if str(reaction.emoji) == var.ACCEPT:
-                    NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                        await ctx.send(embed=discord.Embed(
+                            title="Command verification",
+                            description=f"Successfully setted up verification. New members can now only access other channels after they verify in {channel.mention}",
+                            color=var.CGREEN
+                        ).set_footer(text="A new role 'Not Verified' is created which can only access the verification channel, after users verify their 'Not Verified' role is removed hence they are able access other channels.")
+                        )            
+                        var.VERIFY.insert_one({
+
+                            "_id":ctx.guild.id, 
+                            "type": "command", 
+                            "channel": channel.id, 
+                            "roleid": NVerified.id
+                        })
+
+                    if str(reaction.emoji) == "🤖":
+                        NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                        await botmsg.clear_reactions()
+                        embed.title="Processing..."
+                        embed.description="Setting up everything, just a second"
+                        embed.remove_field(0)
+                        await botmsg.edit(embed=embed)
+                        for i in ctx.guild.text_channels:
+                            await i.set_permissions(NVerified, view_channel=False)
+                        await channel.set_permissions(NVerified, view_channel=True)
+                        await channel.set_permissions(ctx.guild.default_role, view_channel=False)
+
+                        await ctx.send(embed=discord.Embed(
+                            title="Bot verification",
+                            description=f"Successfully setted up verification. New members can now only access other channels after they verify in {channel.mention}",
+                            color=var.CGREEN
+                        ).set_footer(text="A new role 'Not Verified' is created which can only access the verification channel, after users verify their 'Not Verified' role is removed hence they are able access other channels.")
+                        )
+                        var.VERIFY.insert_one({
+                            
+                            "_id":ctx.guild.id,
+                            "type": "bot",
+                            "channel": channel.id, 
+                            "roleid": NVerified.id
+                        })
+                except asyncio.TimeoutError:
                     await botmsg.clear_reactions()
-                    embed.title="Processing..."
-                    embed.description="Setting up everything, just a second"
-                    embed.remove_field(1)
-                    await botmsg.edit(embed=embed)
-                    for i in ctx.guild.text_channels:
-                        await i.set_permissions(NVerified, view_channel=False)
-                    await channel.set_permissions(NVerified, view_channel=True)
-                    await channel.set_permissions(ctx.guild.default_role, view_channel=False)
-
-                    await ctx.send(embed=discord.Embed(
-                        title="Command verification",
-                        description=f"Successfully setted up verification. New members can now only access other channels after they verify in {channel.mention}",
-                        color=var.CGREEN
-                    ).set_footer(text="A new role 'Not Verified' is created which can only access the verification channel, after users verify their 'Not Verified' role is removed hence they are able access other channels.")
-                    )            
-                    var.VERIFY.insert_one({"_id":ctx.guild.id, "type": "command", "channel": channel.id, "roleid": NVerified.id})
-
-                if str(reaction.emoji) == "🤖":
-                    NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
-                    await botmsg.clear_reactions()
-                    embed.title="Processing..."
-                    embed.description="Setting up everything, just a second"
-                    embed.remove_field(0)
-                    await botmsg.edit(embed=embed)
-                    for i in ctx.guild.text_channels:
-                        await i.set_permissions(NVerified, view_channel=False)
-                    await channel.set_permissions(NVerified, view_channel=True)
-                    await channel.set_permissions(ctx.guild.default_role, view_channel=False)
-
-                    await ctx.send(embed=discord.Embed(
-                        title="Bot verification",
-                        description=f"Successfully setted up verification. New members can now only access other channels after they verify in {channel.mention}",
-                        color=var.CGREEN
-                    ).set_footer(text="A new role 'Not Verified' is created which can only access the verification channel, after users verify their 'Not Verified' role is removed hence they are able access other channels.")
-                    )
-                    var.VERIFY.insert_one({"_id":ctx.guild.id, "type": "bot", "channel": channel.id, "roleid": NVerified.id})
 
             else:
                 await ctx.send(f"Looks like you forgot to mention the verification channel, if you don't have one already then create it!\n```{getprefix(ctx)}verification <#channel>```")
@@ -103,7 +117,6 @@ class Verification(commands.Cog):
                 description="This is a basic type of verification where users enter a command in the verification channel and they are quickly verified and given access to other channels, this can be used to verify people and low-medium level raid/spam bot.",
                 color=var.CTEAL
                 )
-
             else:
                 embed = discord.Embed(
                 title="This server has Bot verification",
@@ -184,13 +197,13 @@ class Verification(commands.Cog):
                 try:
                     usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
 
-                    # ayo bot's aren't this smart
-                    cleanurl = embed.image.url[77:]
-                    code = cleanurl[:8]
+                    #ayo bots aren't this smart
+                    code = embed.image.url[77:-4]
                     if usermsg.content == code:
                         roleid = var.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                         role = ctx.guild.get_role(roleid)
                         await ctx.author.remove_roles(role)
+                        await botmsg.delete()
                 except asyncio.TimeoutError:
                     em = discord.Embed(title="Time's up!", description="You failed to type the text under 15 seconds, try again.", colour=var.CORANGE)
                     await ctx.send(embed=em, delete_after=2)

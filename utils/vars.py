@@ -5,15 +5,16 @@ from pymongo import MongoClient
 TOKEN = os.environ.get("TOKEN")
 DEFAULT_PREFIX = "."
 
-#Mongo Client
-MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL"))
+#All Database Stuff
+MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL")) #Client
 #Databases
-DATABASE = MONGOCLIENT["Axiol"]
+DATABASE = MONGOCLIENT["Axiol"] #Main DB
 LEVELDATABASE = MONGOCLIENT["Leveling"]
 #Collections
 PREFIXES = DATABASE["Prefixes"]
 REACTIONROLES = DATABASE["Reaction Roles"]
 VERIFY = DATABASE["Verify"]
+WELCOME = DATABASE["Welcome"]
 
 #Colours
 CMAIN = 0xFF006A #Everything

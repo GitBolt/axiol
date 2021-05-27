@@ -54,89 +54,93 @@ class Leveling(commands.Cog):
         def check(reaction, user):
             return user == ctx.author and reaction.message == botmsg
 
-        reaction, user = await self.bot.wait_for('reaction_add', check=check)
+        reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
+        try:
+            if str(reaction.emoji) == var.ACCEPT: #Add leveling
+                await botmsg.clear_reactions()
 
-        if str(reaction.emoji) == var.ACCEPT: #Add leveling
-            await botmsg.clear_reactions()
+                var.LEVELDATABASE.create_collection(str(ctx.guild.id))
+                var.LEVELDATABASE[str(ctx.guild.id)].insert_one({
+                    
+                    "_id": 0,
+                    "status": True,
+                    "xprange": [15, 25],
+                    "alertchannel": ctx.channel.id,
+                    "blacklistedchannels": [],
+                })    
 
-            var.LEVELDATABASE.create_collection(str(ctx.guild.id))
-            var.LEVELDATABASE[str(ctx.guild.id)].insert_one({
-                "_id": 0,
-                "status": True,
-                "xprange": [15, 25],
-                "alertchannel": ctx.channel.id,
-                "blacklistedchannels": [],
-            })    
+                embed = discord.Embed(
+                title="Successfully setted up leveling for this server",
+                description=f"To further configure, disable or remove leveling use the same command (`{getprefix(ctx)}levels`)",
+                color=var.CGREEN
+                )
+                await ctx.send(embed=embed)
 
-            embed = discord.Embed(
-            title="Successfully setted up leveling for this server",
-            description=f"To further configure, disable or remove leveling use the same command (`{getprefix(ctx)}levels`)",
-            color=var.CGREEN
-            )
-            await ctx.send(embed=embed)
+            if str(reaction.emoji) == var.DECLINE: #Delete leveling
+                await botmsg.clear_reactions()
+                embed = discord.Embed(
+                            title="Rank data deletion",
+                            description=f"Keep in mind that this action is irreversable",
+                            color=var.CORANGE
+                ).add_field(name="Confirm Delete", value=var.ACCEPT
+                ).add_field(name="Cancel", value=var.DECLINE
+                )
+                botdeletemsg = await ctx.send(embed=embed)
+                await botdeletemsg.add_reaction(var.ACCEPT)
+                await botdeletemsg.add_reaction(var.DECLINE)
 
-        if str(reaction.emoji) == var.DECLINE: #Delete leveling
-            await botmsg.clear_reactions()
-            embed = discord.Embed(
-                        title="Rank data deletion",
-                        description=f"Keep in mind that this action is irreversable",
-                        color=var.CORANGE
-            ).add_field(name="Confirm Delete", value=var.ACCEPT
-            ).add_field(name="Cancel", value=var.DECLINE
-            )
-            botdeletemsg = await ctx.send(embed=embed)
-            await botdeletemsg.add_reaction(var.ACCEPT)
-            await botdeletemsg.add_reaction(var.DECLINE)
-
-            def cancelcheck(reaction, user):
-                return user == ctx.author and reaction.message == botdeletemsg
-            
-            reaction, user = await self.bot.wait_for('reaction_add', check=cancelcheck, timeout=60.0)
-            if str(reaction.emoji) == var.ACCEPT:
-                var.LEVELDATABASE[str(ctx.guild.id)].drop()
-                await ctx.send(embed=discord.Embed(
-                            title="Leveling removed", 
-                            description="Leveling have been removed from this server, that means all the rank data has been deleted", 
-                            color=var.CGREEN)
-                            )
-            if str(reaction.emoji) == var.DECLINE:
-                await ctx.send("Woosh that was close, cancelled leveling data deletion.")
+                def cancelcheck(reaction, user):
+                    return user == ctx.author and reaction.message == botdeletemsg
                 
+                reaction, user = await self.bot.wait_for('reaction_add', check=cancelcheck, timeout=60.0)
+                if str(reaction.emoji) == var.ACCEPT:
+                    var.LEVELDATABASE[str(ctx.guild.id)].drop()
+                    await ctx.send(embed=discord.Embed(
+                                title="Leveling removed", 
+                                description="Leveling have been removed from this server, that means all the rank data has been deleted", 
+                                color=var.CGREEN)
+                                )
+                if str(reaction.emoji) == var.DECLINE:
+                    await ctx.send("Woosh that was close, cancelled leveling data deletion.")
+                    
 
-        if str(reaction.emoji) == var.ENABLE: #Enable leveling
+            if str(reaction.emoji) == var.ENABLE: #Enable leveling
+                await botmsg.clear_reactions()
+
+                col = var.LEVELDATABASE[str(ctx.guild.id)]
+                data = col.find_one({"_id": 0})
+
+                newdata = {"$set":{
+                            "status": True
+                        }}
+                var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+                await ctx.send("Successfully enabled leveling again on this server!")
+
+            if str(reaction.emoji) == var.DISABLE: #Disable leveling
+                await botmsg.clear_reactions()
+
+                col = var.LEVELDATABASE[str(ctx.guild.id)]
+                data = col.find_one({"_id": 0})
+
+                newdata = {"$set":{
+                            "status": False
+                        }}
+                var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
+
+                embed = discord.Embed(
+                title="Leveling for this server has been disabled", 
+                description="This means that the rank data is still there but users won't gain xp until enabled again", 
+                color=var.CORANGE
+                ).add_field(name=getprefix(ctx)+"levels", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"
+                )
+                await ctx.send(embed=embed)
+            
+            if str(reaction.emoji) == var.SETTINGS: #Configure
+                await botmsg.clear_reactions()
+                await ctx.invoke(self.bot.get_command('levelconfig'))
+                
+        except asyncio.TimeoutError:
             await botmsg.clear_reactions()
-
-            col = var.LEVELDATABASE[str(ctx.guild.id)]
-            data = col.find_one({"_id": 0})
-
-            newdata = {"$set":{
-                        "status": True
-                    }}
-            var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
-            await ctx.send("Successfully enabled leveling again on this server!")
-
-        if str(reaction.emoji) == var.DISABLE: #Disable leveling
-            await botmsg.clear_reactions()
-
-            col = var.LEVELDATABASE[str(ctx.guild.id)]
-            data = col.find_one({"_id": 0})
-
-            newdata = {"$set":{
-                        "status": False
-                    }}
-            var.LEVELDATABASE[str(ctx.guild.id)].update_one(data, newdata)
-
-            embed = discord.Embed(
-            title="Leveling for this server has been disabled", 
-            description="This means that the rank data is still there but users won't gain xp until enabled again", 
-            color=var.CORANGE
-            ).add_field(name=getprefix(ctx)+"levels", value=f"Use the command and react to the {var.ENABLE} to enable leveling again"
-            )
-            await ctx.send(embed=embed)
-        
-        if str(reaction.emoji) == var.SETTINGS: #Configure
-            await botmsg.clear_reactions()
-            await ctx.invoke(self.bot.get_command('levelconfig'))
 
 
     @commands.command()

@@ -5,11 +5,12 @@ from utils.funcs import getprefix
 import asyncio
 
 def mainhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Axiol Help", description=f"Either enter the sub command or react to the emojis below!", color=var.CMAIN
+    embed = discord.Embed(title="Axiol Help", description="Either enter the sub command or react to the emojis below!", color=var.CMAIN
     ).add_field(name=getprefix(ctx)+"help levels", value=f"Leveling help {var.LVL}", inline=False
     ).add_field(name=getprefix(ctx)+"help mod", value="Moderation help 🔨", inline=False
     ).add_field(name=getprefix(ctx)+"help rr", value="Reaction role help ✨", inline=False
     ).add_field(name=getprefix(ctx)+"help verification", value="Member verification help ✅", inline=False
+    ).add_field(name=getprefix(ctx)+"help welcome", value="Welcome greetings help 👋", inline=False
     ).add_field(name=getprefix(ctx)+"help extras", value=f"Commands that don't belong do the categories above ➡️", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
@@ -21,8 +22,8 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
+    ).add_field(name=getprefix(ctx)+"levelconfig", value="Configure leveling settings!", inline=False
     #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
-    ).add_field(name=getprefix(ctx)+"settings", value="Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
@@ -49,21 +50,30 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
-
     embed = discord.Embed(title="Verification", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"verification", value="Setup and configure member verification for your server!", inline=False
+    ).add_field(name=getprefix(ctx)+"verification", value="Setup and configure verification for your server!", inline=False
     ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
     ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (if enabled)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
+def welcomehelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
+    ).add_field(name=getprefix(ctx)+"welcome", value="Setup and configure welcome greetings for new joining server members!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomeremove", value="Remove welcome greetings (if enabled)", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+    
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.CMAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
-    ).add_field(name=getprefix(ctx)+"invite",value="[My invite link!](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)", inline=False
+    ).add_field(name=getprefix(ctx)+"invite",value="My invite link!", inline=False
     ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
@@ -80,13 +90,14 @@ class Help(commands.Cog):
         await helpmsg.add_reaction('🔨')
         await helpmsg.add_reaction('✨')
         await helpmsg.add_reaction('✅')
+        await helpmsg.add_reaction('👋')
         await helpmsg.add_reaction('➡️')
 
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
       
-        while True:
-            try:
+        try:
+            while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
                 if str(reaction.emoji) == var.LVL:
                     await helpmsg.edit(embed=levelhelp(ctx))
@@ -100,12 +111,16 @@ class Help(commands.Cog):
                 if str(reaction.emoji) == '✅':
                     await helpmsg.edit(embed=verifyhelp(ctx))
                     await helpmsg.remove_reaction('✅', ctx.author)
+                if str(reaction.emoji) == '👋':
+                    await helpmsg.edit(embed=welcomehelp(ctx))
+                    await helpmsg.remove_reaction('👋', ctx.author)
                 if str(reaction.emoji) == '➡️':
                     await helpmsg.edit(embed=extrahelp(ctx))
-                    await helpmsg.remove_reaction(var.CONTINUE, ctx.author)
+                    await helpmsg.remove_reaction('➡️', ctx.author)
 
-            except asyncio.TimeoutError:
-                break
+        except asyncio.TimeoutError:
+            await helpmsg.clear_reactions()
+
 
     @help.command(aliases=["level"])
     async def levels(self, ctx):
@@ -123,6 +138,10 @@ class Help(commands.Cog):
     async def verification(self, ctx):
         await ctx.send(embed=verifyhelp(ctx))
     
+    @help.command()
+    async def welcome(self, ctx):
+        await ctx.send(embed=welcomehelp(ctx))
+
     @help.command()
     async def extras(self, ctx):
         await ctx.send(embed=verifyhelp(ctx))

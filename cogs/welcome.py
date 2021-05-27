@@ -21,7 +21,8 @@ class Welcome(commands.Cog):
                     "_id":ctx.guild.id,
                     "channelid":channel.id,
                     "greeting": "Hope you enjoy your stay here :)",
-                    "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg"
+                    "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
+                    "assignroles": []
                 })
 
                 embed = discord.Embed(
@@ -75,7 +76,7 @@ class Welcome(commands.Cog):
                 var.WELCOME.update_one(guildwelcome, newdata)
                 await ctx.send(embed=discord.Embed(
                 title="Successfully changed the greeting message!",
-                description=f"The new greeting message is:\n{usermsg.content}",
+                description=f"The new greeting message is:\n\n**{usermsg.content}**",
                 color=var.CGREEN)
                 )
             except asyncio.TimeoutError:
@@ -134,6 +135,34 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    async def welcomerole(self, ctx, role:discord.Role=None):
+        guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
+        if guildwelcome is not None:
+            if role is not None:
+                rolelist = guildwelcome.get("assignroles")
+                updatedlist = rolelist.copy()
+                updatedlist.append(role.id)
+
+                newdata = {"$set":{
+                    "assignroles":updatedlist
+                }}
+                var.WELCOME.update_one(guildwelcome, newdata)
+                await ctx.send(embed=discord.Embed(
+                        title="Successfully added auto assign role",
+                        description=f"Users will be automatically given {role.mention} when they join",
+                        color=var.CGREEN
+                ))
+            else:
+                await ctx.send(f"You need to define the role too!\n```{getprefix(ctx)}welcomerole <role>```\nFor role either role mention or ID can be used")
+        else:
+            await ctx.send(embed=discord.Embed(
+                        title="Can not setup auto assign role",
+                        description=f"This server does not have welcome greetings setted up hence i cannot give users auto role too, use the command {getprefix(ctx)}welcome to enble it ",
+                        color=var.CRED
+            ))
+
+
+    @commands.command()
     async def welcomeremove(self, ctx):
         guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
         if guildwelcome is not None:
@@ -169,6 +198,10 @@ class Welcome(commands.Cog):
             color=discord.Colour.random()
             ).set_image(url=guildwelcome.get("image"))
             await channel.send(content=greeting(member.mention), embed=embed)
+            autoroles = guildwelcome.get("assignroles")
+            if autoroles != []:
+                for i in autoroles:
+                    await member.add_roles(member.guild.get_role(i))
 
 
 def setup(bot):

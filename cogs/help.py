@@ -64,6 +64,7 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used.", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeremove", value="Remove welcome greetings (if enabled)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed

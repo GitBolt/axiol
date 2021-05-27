@@ -27,14 +27,31 @@ class Welcome(commands.Cog):
 
                 embed = discord.Embed(
                 title="Successfully setted up welcome greeting",
-                description=f"Now members joining the server will now be greeted in {channel.mention} channel!",
+                description=f"Now members joining the server will now be greeted in {channel.mention} channel! Use the command again `{getprefix(ctx)}welcome` to view all welcome settings",
                 color=var.CGREEN
                 )
+                if ctx.guild.id in var.VERIFY.distinct("_id"):
+                    embed.set_footer(name="Since this server has verification setted up, you might want to change the permission of welcome channel and let 'Not Verified' role view it too :)")
                 await ctx.send(embed=embed)
             else:
                 await ctx.send(f"You need to define the greeting channel too!\n```{getprefix(ctx)}welcome <#channel>```")
         else:
-            await ctx.send("Welcome greeting for this server is already enabled")
+            autorole = guildwelcome.get("assignroles")
+            if autorole == []:
+                roles = None
+            else:
+                roles = []
+                for i in autorole:
+                    roles.append(ctx.guild.get_role(i).mention)
+            embed = discord.Embed(
+            title="This server has welcome greetings already setted up",
+            description=f"If you wish to remove welcome greetings, use the command `{getprefix(ctx)}welcomeremove`",
+            color=var.CBLUE
+            ).add_field(name="Channel", value=self.bot.get_channel(guildwelcome.get("channelid")).mention, inline=False
+            ).add_field(name="Message", value=guildwelcome.get("greeting"), inline=False
+            ).add_field(name="Auto Roles", value=', '.join(roles), inline=False
+            ).set_image(url=guildwelcome.get("image"))
+            await ctx.send(embed=embed)
 
 
     @commands.command()
@@ -150,8 +167,8 @@ class Welcome(commands.Cog):
                 await ctx.send(embed=discord.Embed(
                         title="Successfully added auto assign role",
                         description=f"Users will be automatically given {role.mention} when they join",
-                        color=var.CGREEN
-                ))
+                        color=var.CGREEN)
+                )
             else:
                 await ctx.send(f"You need to define the role too!\n```{getprefix(ctx)}welcomerole <role>```\nFor role either role mention or ID can be used")
         else:
@@ -169,8 +186,8 @@ class Welcome(commands.Cog):
             var.WELCOME.delete_one(guildwelcome)
             await ctx.send(embed=discord.Embed(
             title="Successfully deleted welcome greetings",
-            description=f"You can enable it again using {getprefix(ctx)}welcome"),
-            color=var.CGREEN
+            description=f"You can enable it again using {getprefix(ctx)}welcome",
+            color=var.CGREEN)
             )
         else:
             await ctx.send(embed=discord.Embed(

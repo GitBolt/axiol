@@ -21,9 +21,9 @@ In User and Role fields, either mention and ID can be used
 | :--------------------| :-----------------------: |
 | `help`|Help| 
 | `help <subhelp>`|Help| 
-| `levelconfig`|Help| 
-|Leveling
-| `levels`|Leveling|                  
+| `plugins` |Setup|
+| `prefix`|Setup|
+|Leveling            
 | `rank <user>`|Leveling|                  
 | `leaderboard`|Leveling|                  
 | `givexp`  ***`<user>`*** ***`<amount>`***|Leveling|                  
@@ -33,7 +33,6 @@ In User and Role fields, either mention and ID can be used
 | `alertchannel`  ***`<#channel>`***|Leveling|                  
 | `xprange` ***`<min-amount>`*** ***`<max-amount>`***|Leveling|  
 |Moderation                        
-| `prefix`|Moderation|
 | `ban` ***`<user>`*** `<reason>`|Moderation|                  
 | `unban` ***`<user>`***|Moderation|                  
 | `mute` ***`<user>`*** |Moderation|                  
@@ -45,24 +44,26 @@ In User and Role fields, either mention and ID can be used
 | `removerr` ***`<messageid>`*** ***`<emoji>`*** |Reaction Roles|    
 | `allrr`|Reaction Roles|   
 | `uniquerr` ***`<messageid>`***|Reaction Roles|    
-| `removeunique` ***`<messageid>`*** |Reaction Roles|    
+| `removeunique` ***`<messageid>`***|Reaction Roles|    
 |Verification
-| `verification` |Verification|    
-| `verifytype`  |Verification|    
-| `verifyswitch`  |Verification|    
-| `verifyremove`  |Verification|    
+| `verifytype`|Verification|  
+| `verifychannel` ***`<#channel>`***|Verification  
+| `verifyswitch`|Verification|    
+| `verifyremove`|Verification|    
 |Welcome
-| `welcome`  |Welcome|    
-| `welcomechannel` ***`<#channel>`***  |Welcome|   
-| `welcomeimage`  |Welcome|   
-| `welcomerole` ***`<role`***  |Welcome|   
-| `welcomeremove`  |Welcome|   
+| `welcomecard`|Welcome|    
+| `welcomechannel` ***`<#channel>`***|Welcome| 
+| `welcomemessage`|Welcome|  
+| `welcomeimage`|Welcome|   
+| `welcomerole` ***`<role>`***|Welcome|   
+| `welcomereset`|Welcome|   
 |Extra
-| `embed` ***`<#channel>`***  |Extra|   
-| `about`  |Extra|   
-| `suggest` ***`<idea description>`***  |Extra|   
-| `invite`   |Extra|   
-| `source`   |Extra|   
+| `embed` ***`<#channel>`***|Extra| 
+| `stats`|Extra|  
+| `about` |Extra|   
+| `suggest` ***`<idea description>`***|Extra|   
+| `invite`|Extra|   
+| `source`|Extra|   
 
 
 ### Support Server

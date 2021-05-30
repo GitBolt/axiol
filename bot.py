@@ -60,7 +60,7 @@ async def on_guild_join(guild):
     #Support server Log channel ID
     embed = discord.Embed(
     title="I just joined a new server!",
-    description=f"Thank to this pog person for inviting me to **{guild.name}** :D",
+    description=f"Thanks to this pog person for inviting me to **{guild.name}** :D",
     color=var.CGREEN
     ).add_field(name="Member count", value=guild.member_count
     )

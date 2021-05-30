@@ -11,6 +11,7 @@ class Settings(commands.Cog):
 
 
     @commands.command(aliases=["extensions", "extentions", "addons"])
+    @commands.has_permissions(administrator=True)
     async def plugins(self, ctx):
         GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id":False}) #Getting server's plugin document
         enabled_amount = len([keys for keys, values in GuildDoc.items() if values == True])

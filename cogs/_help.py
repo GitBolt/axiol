@@ -48,6 +48,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
 
 def welcomehelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
+    ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False

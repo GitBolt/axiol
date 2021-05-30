@@ -20,47 +20,15 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
-    async def welcome(self, ctx, channel:discord.TextChannel=None):
-        guildwelcome = var.WELCOME.find_one({"_id": ctx.guild.id})
-        if guildwelcome is None:
-            if channel is not None:
-                var.WELCOME.insert_one({
-
-                    "_id":ctx.guild.id,
-                    "channelid":channel.id,
-                    "greeting": "Hope you enjoy your stay here :)",
-                    "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
-                    "assignroles": []
-                })
-
-                embed = discord.Embed(
-                title="Successfully setted up welcome greeting",
-                description=f"Now members joining the server will now be greeted in {channel.mention} channel! Use the command again `{getprefix(ctx)}welcome` to view all welcome settings",
-                color=var.CGREEN
-                )
-                if ctx.guild.id in var.VERIFY.distinct("_id"):
-                    embed.set_footer(name="Since this server has verification setted up, you might want to change the permission of welcome channel and let 'Not Verified' role view it too :)")
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send(f"You need to define the greeting channel too!\n```{getprefix(ctx)}welcome <#channel>```")
-        else:
-            autorole = guildwelcome.get("assignroles")
-            if autorole == []:
-                roles = None
-            else:
-                roles = []
-                for i in autorole:
-                    roles.append(ctx.guild.get_role(i).mention)
-            embed = discord.Embed(
-            title="This server has welcome greetings already setted up",
-            description=f"If you wish to remove welcome greetings, use the command `{getprefix(ctx)}welcomeremove`",
-            color=var.CBLUE
-            ).add_field(name="Channel", value=self.bot.get_channel(guildwelcome.get("channelid")).mention, inline=False
-            ).add_field(name="Message", value=guildwelcome.get("greeting"), inline=False
-            ).add_field(name="Auto Roles", value=', '.join(roles), inline=False
-            ).set_image(url=guildwelcome.get("image"))
-            await ctx.send(embed=embed)
-
+    async def welcomecard(self, ctx):
+        GuildDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
+        embed = discord.Embed(
+        title="Welcome to the server!",
+        description=GuildDoc.get("greeting"),
+        color=discord.Colour.random()
+        ).set_image(url=GuildDoc.get("image")
+        )
+        await ctx.send(content=greeting(ctx.author.mention), embed=embed)
 
 
     @commands.command()

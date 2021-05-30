@@ -34,7 +34,7 @@ for filename in os.listdir('./customcogs'):
 
 @bot.event
 async def on_guild_join(guild):
-    #Inserting plugin configs if it does not exist
+    #Inserting plugin configs if it does not exist (incase of re inviting)
     if not var.PLUGINS.count_documents({"_id":guild.id}, limit=1):
         var.PLUGINS.insert_one({
 
@@ -46,7 +46,7 @@ async def on_guild_join(guild):
             "Verification": False,
             "Welcome": False,
         })
-    #Inserting leveling data if it does not exist
+    #Inserting leveling data if it does not exist (incase of re inviting) 
     if not str(guild.id) in var.LEVELDATABASE.list_collection_names():
         GuildDoc = var.LEVELDATABASE.create_collection(str(guild.id))
         GuildDoc.insert_one({

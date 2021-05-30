@@ -10,7 +10,7 @@ class Leveling(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
+    #Simple check to see if this cog (plugin) is enabled
     def cog_check(self, ctx):
         GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
@@ -60,7 +60,7 @@ class Leveling(commands.Cog):
         embed = discord.Embed(
         title=f"Leaderboard", 
         color=var.CBLUE
-        )
+        ).set_thumbnail(url=ctx.guild.icon_url)
         rankcount = 0
         for i in rankings:
             rankcount += 1
@@ -183,19 +183,12 @@ class Leveling(commands.Cog):
             await ctx.send(f"Looks like you forgot to enter both minimum and maximum xp values, follow this format\n```{getprefix(ctx)}xprange <minxp> <maxxp>```")
 
 
-    def cog_check(self, ctx):
-        servers = []
-        for i in var.PLUGINS.find({"Leveling": True}):
-            servers.append(i.get("_id"))
-            if ctx.guild.id in servers:
-                return ctx.guild.id
-
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        GuildDoc = var.PLUGINS.find_one({"_id": message.guild.id})
-        if GuildDoc.get("Leveling") == True:
+        #Listeners don't care about cog checks so need to add a check manually
+        GuildPluginDoc = var.PLUGINS.find_one({"_id": message.guild.id})
+        if GuildPluginDoc.get("Leveling") == True:
 
             if not message.channel.id in var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
                 GuildDoc = var.LEVELDATABASE[str(message.guild.id)]

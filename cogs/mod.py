@@ -8,12 +8,11 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    #Simple check to see if this cog (plugin) is enabled
     def cog_check(self, ctx):
-        servers = []
-        for i in var.PLUGINS.find({"Moderation": True}):
-            servers.append(i.get("_id"))
-            if ctx.guild.id in servers:
-                return ctx.guild.id
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Moderation") == True:
+            return ctx.guild.id
 
 
     @commands.command()

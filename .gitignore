@@ -1,3 +1,11 @@
-.vscode
+#Enviroments
+.env
 env
+ENV
+venv
+VENV
+
+#Everything else
 __pycache__
+.vscode
+

@@ -8,7 +8,15 @@ class ReactionRoles(commands.Cog):
         self.bot = bot
 
 
-    @commands.command(aliases=['reactionrole', 'addrr', 'addreactionrole', 'rradd', 'reactionroleadd'])
+    def cog_check(self, ctx):
+        servers = []
+        for i in var.PLUGINS.find({"Reaction Roles": True}):
+            servers.append(i.get("_id"))
+            if ctx.guild.id in servers:
+                return ctx.guild.id
+
+
+    @commands.command()
     @commands.has_permissions(administrator=True)
     async def rr(self, ctx, msg:discord.Message=None, role: discord.Role=None, emoji=None):
 

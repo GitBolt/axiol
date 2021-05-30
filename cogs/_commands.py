@@ -72,6 +72,22 @@ class Commands(commands.Cog):
         await ctx.send(embed=embed)
 
 
+
+    @commands.command()
+    async def stats(self, ctx):
+        embed = discord.Embed(
+        title=f"{ctx.guild.name}", 
+        color=var.CTEAL)
+        embed.add_field(name="Owner", value=ctx.guild.owner, inline=False)
+        embed.add_field(name="All Members", value=ctx.guild.member_count, inline=False)
+        embed.add_field(name="Channels", value=len(ctx.guild.channels), inline=False)
+        embed.add_field(name="Voice Channels", value=len(ctx.guild.voice_channels), inline=False)
+        embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=False)
+        embed.add_field(name="Boost Level", value=ctx.guild.premium_tier, inline=False)
+        embed.add_field(name="Created at", value=ctx.guild.created_at , inline=False)
+        embed.set_thumbnail(url = ctx.guild.icon_url)
+        await ctx.send(embed=embed)
+
     @commands.command()
     async def embed(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:

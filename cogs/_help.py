@@ -4,32 +4,20 @@ import utils.vars as var
 from utils.funcs import getprefix
 import asyncio
 
-def mainhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Axiol Help", description="Either enter the sub command or react to the emojis below!", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"help levels", value=f"Leveling help {var.LVL}", inline=False
-    ).add_field(name=getprefix(ctx)+"help mod", value="Moderation help 🔨", inline=False
-    ).add_field(name=getprefix(ctx)+"help rr", value="Reaction role help ✨", inline=False
-    ).add_field(name=getprefix(ctx)+"help verification", value="Member verification help ✅", inline=False
-    ).add_field(name=getprefix(ctx)+"help welcome", value="Welcome greetings help 👋", inline=False
-    ).add_field(name=getprefix(ctx)+"help extras", value=f"Commands that don't belong do the categories above ➡️", inline=False
-    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
-    return embed
 
 def levelhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Ah yes leveling, MEE6 who?", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"levels", value="Setup and configure leveling!", inline=False
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user, user id or user mention can be used to check ranks, user field is optional for checking rank of yourself.", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
-    ).add_field(name=getprefix(ctx)+"levelconfig", value="Configure leveling settings!", inline=False
     #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
+    ).add_field(name=getprefix(ctx)+"levelconfig", value=f"Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def modhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Moderation", description="What's better than entering a sweet little ban command?", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"prefix", value="Check and change your server prefix!", inline=False
     ).add_field(name=getprefix(ctx)+"ban `<reason>`", value="Bans a user until unbanned, reason is optional", inline=False
     ).add_field(name=getprefix(ctx)+"unban", value="Unbans a banned user", inline=False
     ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server, reason is optional", inline=False
@@ -51,8 +39,8 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Verification", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"verification", value="Setup and configure verification for your server!", inline=False
     ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
+    ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
     ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (if enabled)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
@@ -60,7 +48,6 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
 
 def welcomehelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"welcome", value="Setup and configure welcome greetings for new joining server members!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
@@ -72,9 +59,10 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.CMAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics!", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
-    ).add_field(name=getprefix(ctx)+"invite",value="My invite link!", inline=False
+    ).add_field(name=getprefix(ctx)+"invite",value="My bot invite link!", inline=False
     ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
@@ -84,68 +72,97 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
-        helpmsg = await ctx.send(embed=mainhelp(ctx))
-        await helpmsg.add_reaction(var.LVL)
-        await helpmsg.add_reaction('🔨')
-        await helpmsg.add_reaction('✨')
-        await helpmsg.add_reaction('✅')
-        await helpmsg.add_reaction('👋')
-        await helpmsg.add_reaction('➡️')
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+
+        embed = discord.Embed(
+        title="Axiol Help",
+        description="Help commands for enabled plugins!",
+        color=var.CMAIN
+        ).add_field(name=getprefix(ctx)+"plugins", value="Enable/Disable plugins", inline=False
+        ).add_field(name=getprefix(ctx)+"prefix", value="Change prefix", inline=False
+        ).set_footer(text="Either use the subcommand or react to the emojis below"
+        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+
+        for i in GuildDoc:
+            if GuildDoc.get(i) == True:
+                helpname = i.lower()
+                if i.lower() == "reaction roles":
+                    helpname = i.lower().replace(" ", "")
+                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.PLUGINEMOJIS.get(i)}", inline=False)
+        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Commands that don't belong to categories above {var.CONTINUE} ", inline=False)
+        helpmsg = await ctx.send(embed=embed)
+
+        for i in GuildDoc:
+            if GuildDoc.get(i) == True:
+                await helpmsg.add_reaction(var.PLUGINEMOJIS.get(i))
+        await helpmsg.add_reaction(var.CONTINUE)
 
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
-      
+
+        HelpDict = {
+            "Leveling": levelhelp,
+            "Moderation": modhelp,
+            "Reaction Roles":rrhelp,
+            "Verification": verifyhelp,
+            "Welcome": welcomehelp,
+        }
+
         try:
             while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
-                if str(reaction.emoji) == var.LVL:
-                    await helpmsg.edit(embed=levelhelp(ctx))
-                    await helpmsg.remove_reaction(var.LVL, ctx.author)
-                if str(reaction.emoji) == '🔨':
-                    await helpmsg.edit(embed=modhelp(ctx))
-                    await helpmsg.remove_reaction('🔨', ctx.author)
-                if str(reaction.emoji) == '✨':
-                    await helpmsg.edit(embed=rrhelp(ctx))
-                    await helpmsg.remove_reaction('✨', ctx.author)
-                if str(reaction.emoji) == '✅':
-                    await helpmsg.edit(embed=verifyhelp(ctx))
-                    await helpmsg.remove_reaction('✅', ctx.author)
-                if str(reaction.emoji) == '👋':
-                    await helpmsg.edit(embed=welcomehelp(ctx))
-                    await helpmsg.remove_reaction('👋', ctx.author)
-                if str(reaction.emoji) == '➡️':
-                    await helpmsg.edit(embed=extrahelp(ctx))
-                    await helpmsg.remove_reaction('➡️', ctx.author)
+                if str(reaction.emoji) in var.PLUGINEMOJIS.values():
 
+                    helptype = list(var.PLUGINEMOJIS.keys())[list(var.PLUGINEMOJIS.values()).index(str(reaction.emoji))]
+                    await helpmsg.edit(embed=HelpDict.get(helptype)(ctx))
+                    await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
+                
+                #Since extra help is always there
+                if str(reaction.emoji) == var.CONTINUE:
+                    await helpmsg.edit(embed=extrahelp(ctx))
+                    await helpmsg.remove_reaction(var.CONTINUE, ctx.author)
         except asyncio.TimeoutError:
             await helpmsg.clear_reactions()
 
 
-    @help.command(aliases=["level"])
-    async def levels(self, ctx):
-        await ctx.send(embed=levelhelp(ctx))
+           
+    @help.command()
+    async def leveling(self, ctx):
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Leveling") == True:
+            await ctx.send(embed=levelhelp(ctx))
+        
 
     @help.command()
-    async def mod(self, ctx):
-        await ctx.send(embed=modhelp(ctx))
+    async def moderation(self, ctx):
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Moderation") == True:
+            await ctx.send(embed=modhelp(ctx))
 
     @help.command()
-    async def rr(self, ctx):
-        await ctx.send(embed=rrhelp(ctx))
+    async def reactionroles(self, ctx):
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Reaction Roles") == True:
+            await ctx.send(embed=rrhelp(ctx))
 
     @help.command()
     async def verification(self, ctx):
-        await ctx.send(embed=verifyhelp(ctx))
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Verification") == True:
+            await ctx.send(embed=verifyhelp(ctx))
     
     @help.command()
     async def welcome(self, ctx):
-        await ctx.send(embed=welcomehelp(ctx))
+        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Welcome") == True:
+            await ctx.send(embed=welcomehelp(ctx))
 
     @help.command()
     async def extras(self, ctx):
-        await ctx.send(embed=verifyhelp(ctx))
+        await ctx.send(embed=extrahelp(ctx))
 
 
     @commands.command()
@@ -158,10 +175,43 @@ class Help(commands.Cog):
         ).add_field(name=getprefix(ctx)+"blacklist `<#channel>`",value=f"Add the channel where you don't want users to gain xp.", inline=False
         ).add_field(name=getprefix(ctx)+"whitelist `<#channel>`",value=f"Whitelist an xp blacklisted channel.", inline=False
         ).add_field(name=getprefix(ctx)+"alertchannel `<#channel>`", value="Define the channel where alerts will be sent for level ups!", inline=False
+        ).add_field(name="Reset data", value=f"React to {var.DECLINE}", inline=False)
         #).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
         #).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
+        botmsg = await ctx.send(embed=embed)
+        await botmsg.add_reaction(var.DECLINE)
+
+        def reactioncheck(reaction, user):
+            if str(reaction.emoji) == var.DECLINE:
+                return user == ctx.author and reaction.message == botmsg
+
+        await self.bot.wait_for('reaction_add', check=reactioncheck)
+        await botmsg.clear_reactions()
+        embed = discord.Embed(
+                    title="Rank data deletion",
+                    description=f"Keep in mind that this action is irreversable",
+                    color=var.CORANGE
+        ).add_field(name="Confirm Delete", value=var.ACCEPT
+        ).add_field(name="Cancel", value=var.DECLINE
         )
-        await ctx.send(embed=embed)
+        botdeletemsg = await ctx.send(embed=embed)
+        await botdeletemsg.add_reaction(var.ACCEPT)
+        await botdeletemsg.add_reaction(var.DECLINE)
+
+        def deletereaction_check(reaction, user):
+            return user == ctx.author and reaction.message == botdeletemsg
+        
+        reaction, user = await self.bot.wait_for('reaction_add', check=deletereaction_check, timeout=60.0)
+        if str(reaction.emoji) == var.ACCEPT:
+            var.LEVELDATABASE.get_collection(str(ctx.guild.id)).remove({ "_id" : { "$ne": 0 } })
+            await ctx.send(embed=discord.Embed(
+                        title="Leveling removed", 
+                        description="Leveling have been removed from this server, that means all the rank data has been deleted", 
+                        color=var.CORANGE)
+                        )
+        if str(reaction.emoji) == var.DECLINE:
+            await ctx.send("Woosh that was close, cancelled leveling data deletion.")
+
 
 def setup(bot):
     bot.add_cog(Help(bot))

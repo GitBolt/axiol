@@ -11,6 +11,14 @@ class Welcome(commands.Cog):
         self.bot = bot
 
 
+    def cog_check(self, ctx):
+        servers = []
+        for i in var.PLUGINS.find({"Welcome": True}):
+            servers.append(i.get("_id"))
+            if ctx.guild.id in servers:
+                return ctx.guild.id
+
+
     @commands.command()
     async def welcome(self, ctx, channel:discord.TextChannel=None):
         guildwelcome = var.WELCOME.find_one({"_id": ctx.guild.id})
@@ -54,6 +62,7 @@ class Welcome(commands.Cog):
             await ctx.send(embed=embed)
 
 
+
     @commands.command()
     async def welcomechannel(self, ctx, channel:discord.TextChannel=None):
         guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
@@ -69,7 +78,7 @@ class Welcome(commands.Cog):
                 color=var.CGREEN)
                 )
             else:
-                await ctx.send(f"You need to define the greeting channel to change it!\n```{getprefix(ctx)}welcomechannel <#channel>")
+                await ctx.send(f"You need to define the greeting channel to change it!\n```{getprefix(ctx)}welcomechannel <#channel>```")
         else:
             await ctx.send(embed=discord.Embed(
                         title="Can not setup welcome channel",
@@ -199,23 +208,31 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        guildverify = var.VERIFY.find_one({"_id": member.guild.id})
-        if guildverify is not None:
-            roleid = guildverify.get("roleid")
+        GuildVerifyDoc = var.VERIFY.find_one({"_id": member.guild.id})
+        GuildWelcomeDoc = var.WELCOME.find_one({"_id": member.guild.id})
+
+        #Verification Stuff
+        if GuildVerifyDoc is not None:
+            roleid = GuildVerifyDoc.get("roleid")
             role = member.guild.get_role(roleid)
             await member.add_roles(role)
 
-        guildwelcome = var.WELCOME.find_one({"_id": member.guild.id})
-        if guildwelcome is not None:
-            channel = self.bot.get_channel(guildwelcome.get("channelid"))
+
+        #Welcome stuff
+        servers = []
+        for i in var.PLUGINS.find({"Welcome": True}):
+            servers.append(i.get("_id"))
+
+        if member.guild.id in servers and GuildWelcomeDoc is not None:
+            channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
 
             embed = discord.Embed(
             title="Welcome to the server!",
-            description=guildwelcome.get("greeting"),
+            description=GuildWelcomeDoc.get("greeting"),
             color=discord.Colour.random()
-            ).set_image(url=guildwelcome.get("image"))
+            ).set_image(url=GuildWelcomeDoc.get("image"))
             await channel.send(content=greeting(member.mention), embed=embed)
-            autoroles = guildwelcome.get("assignroles")
+            autoroles = GuildWelcomeDoc.get("assignroles")
             if autoroles != []:
                 for i in autoroles:
                     await member.add_roles(member.guild.get_role(i))

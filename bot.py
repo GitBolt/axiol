@@ -1,17 +1,18 @@
 import os
 import discord
-import asyncio
 from discord.ext import commands
 import utils.vars as var
-from utils.funcs import getprefix
 
+
+#Function to get current server prefix
 def serverprefix(bot, message):
     if var.PREFIXES.find_one({"serverid": message.guild.id}) is None:
         return var.DEFAULT_PREFIX
     return var.PREFIXES.find_one({"serverid": message.guild.id}).get("prefix")
-    
+
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=intents)
+
 
 @bot.event
 async def on_ready():
@@ -26,56 +27,61 @@ for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
+for filename in os.listdir('./customcogs'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'customcogs.{filename[:-3]}')
 
-@bot.command()
-@commands.has_permissions(administrator = True)
-async def prefix(ctx):
+
+@bot.event
+async def on_guild_join(guild):
+    #Inserting plugin configs if it does not exist
+    if not var.PLUGINS.count_documents({"_id":guild.id}, limit=1):
+        var.PLUGINS.insert_one({
+
+            "_id":guild.id,
+
+            "Leveling":True,
+            "Moderation": True,
+            "Reaction Roles": True,
+            "Verification": False,
+            "Welcome": False,
+        })
+    #Inserting leveling data if it does not exist
+    if not str(guild.id) in var.LEVELDATABASE.list_collection_names():
+        GuildDoc = var.LEVELDATABASE.create_collection(str(guild.id))
+        GuildDoc.insert_one({
+
+            "_id": 0,
+            "xprange": [15, 25],
+            "alertchannel": None,
+            "blacklistedchannels": [],
+            })    
+
+    #Support server Log channel ID
     embed = discord.Embed(
-    title="Prefix :D that's the way you control me aye!",
-    description=f"The prefix for this server is\n```{getprefix(ctx)}```\nWanna change it? React to the {var.SETTINGS} emoji below!",
-    color=var.CMAIN
+    title="I just joined a new server!",
+    description=f"Thank to this pog person for inviting me to **{guild.name}** :D",
+    color=var.CGREEN
+    ).add_field(name="Member count", value=guild.member_count
     )
-    botmsg = await ctx.send(embed=embed)
-    await botmsg.add_reaction(var.SETTINGS)
+    await bot.get_channel(848207106821980213).send(embed=embed)           
 
-    def reactioncheck(reaction, user):
-        return user == ctx.author and reaction.message == botmsg
 
-    await bot.wait_for('reaction_add', check=reactioncheck)
-    await ctx.send(embed=discord.Embed(
-                description="Next message which you will send will become the prefix :eyes:\n"+
-                f"To cancel it enter\n```{getprefix(ctx)}cancel```",
-                color=var.CORANGE
-                ).set_footer(text="Automatic cancel after 1 minute")
-                )
-    await botmsg.clear_reactions()
+@bot.event
+async def on_guild_remove(guild):
+    embed = discord.Embed(
+    title="I just got removed from a server",
+    description=f"Someone removed me from **{guild.name}** :(",
+    color=var.CRED
+    ).add_field(name="Member count", value=guild.member_count
+    )
+    await bot.get_channel(848207106821980213).send(embed=embed)    
 
-    def prefixmsgcheck(message):
-        return message.author == ctx.author and message.channel.id == ctx.channel.id
 
-    try:
-        usermsg = await bot.wait_for('message', check=prefixmsgcheck, timeout=60.0)
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.CheckFailure):
+#         pass
 
-        if usermsg.content == getprefix(ctx)+"cancel":
-            await ctx.send("Cancelled prefix change.")
-            
-        elif usermsg.content == var.DEFAULT_PREFIX:
-            var.PREFIXES.delete_one({"serverid": ctx.guild.id})
-            await ctx.send(f"Changed your prefix to the default one\n```{var.DEFAULT_PREFIX}```")
-
-        elif getprefix(ctx) == var.DEFAULT_PREFIX: #New prefix change if our current prefix is default one
-            var.PREFIXES.insert_one({"_id": var.PREFIXES.estimated_document_count()+1, "serverid": ctx.guild.id, "prefix": usermsg.content})
-            await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
-
-        else:
-            oldprefix = var.PREFIXES.find_one({"serverid": usermsg.guild.id})
-            newprefix = {"$set": {"serverid": usermsg.guild.id, "prefix": usermsg.content}}
-            
-            var.PREFIXES.update_one(oldprefix, newprefix)
-            await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
-
-    except asyncio.TimeoutError:
-        await ctx.send(f"You took too long to enter your new prefix {ctx.author.mention} ;-;")
-            
 
 bot.run(var.TOKEN)

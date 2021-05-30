@@ -8,6 +8,13 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    def cog_check(self, ctx):
+        servers = []
+        for i in var.PLUGINS.find({"Moderation": True}):
+            servers.append(i.get("_id"))
+            if ctx.guild.id in servers:
+                return ctx.guild.id
+
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -23,6 +30,7 @@ class Moderation(commands.Cog):
                         ).add_field(name="Banned by", value=ctx.author)
                         )
         await ctx.send(f"`{member}` got banned :O")
+
 
 
     @commands.command()
@@ -41,6 +49,7 @@ class Moderation(commands.Cog):
                         )
     
 
+
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def mute(self, ctx, member:discord.Member=None):
@@ -53,6 +62,7 @@ class Moderation(commands.Cog):
         await ctx.send(f"`{member}` have been muted!")
 
 
+
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def unmute(self, ctx, member:discord.Member=None):
@@ -63,6 +73,7 @@ class Moderation(commands.Cog):
         await ctx.send(f"`{member}` have been unmuted")
 
     
+
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member:discord.Member=None, *, reason="No reason provided"):
@@ -77,6 +88,7 @@ class Moderation(commands.Cog):
                         ).add_field(name="Kicked by", value=ctx.author)
                         )
         await ctx.send(f"`{member}` have been kicked from the server")
+
 
 
     @commands.command(aliases=["clean", "deletemsgs"])

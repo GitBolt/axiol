@@ -34,17 +34,17 @@ class Settings(commands.Cog):
             return user == ctx.author and reaction.message == botmsg
 
         def enablecheck(reaction, user):
-            if str(reaction.emoji) == var.ENABLE and reaction.message.guild.id == ctx.guild.id:
+            if str(reaction.emoji) == var.ENABLE:
                 return user == ctx.author and reaction.message == enabledbotmsg
 
         def disablecheck(reaction, user):
-            if str(reaction.emoji) == var.DISABLE and reaction.message.guild.id == ctx.guild.id:
+            if str(reaction.emoji) == var.DISABLE:
                 return user == ctx.author and reaction.message == enabledbotmsg
 
         while True:
             try:
                 reaction, user = await self.bot.wait_for('reaction_add', check=reactioncheck, timeout=60.0)
-                
+                GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
                 if str(reaction.emoji) in var.PLUGINEMOJIS.values():
                     await botmsg.remove_reaction(str(reaction.emoji), ctx.author)
                     extension_type = list(var.PLUGINEMOJIS.keys())[list(var.PLUGINEMOJIS.values()).index(str(reaction.emoji))]
@@ -87,6 +87,16 @@ class Settings(commands.Cog):
                         embed.color=var.CGREEN
                         await enabledbotmsg.edit(embed=embed)
                         await enabledbotmsg.clear_reactions()
+                        if str(reaction.emoji) == var.LVL:
+                            if not str(ctx.guild.id) in var.LEVELDATABASE.list_collection_names():
+                                GuildDoc = var.LEVELDATABASE.create_collection(str(ctx.guild.id))
+                                GuildDoc.insert_one({
+
+                                    "_id": 0,
+                                    "xprange": [15, 25],
+                                    "alertchannel": None,
+                                    "blacklistedchannels": [],
+                                    })  
 
                         if str(reaction.emoji) == "👋":
                             GuildWelcomeDoc = var.WELCOME.find_one({"_id": ctx.guild.id})

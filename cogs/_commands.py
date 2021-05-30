@@ -129,7 +129,7 @@ class Commands(commands.Cog):
                 description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
                 color=var.CBLUE)
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=30.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
                 embed.title = usermsg.content
                 await preview.edit(embed=embed)
                 await titlebotmsg.delete()
@@ -140,7 +140,7 @@ class Commands(commands.Cog):
                 color=var.CBLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=30.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
                 if usermsg.content == "skip" or usermsg.content == "`skip`":
                     embed.description = None
                     await preview.edit(embed=embed)
@@ -152,11 +152,11 @@ class Commands(commands.Cog):
 
                 thumbnailbotmsg = await ctx.send(embed=discord.Embed(
                 title="Thumbnail",
-                description=f"Now send a message to make it the description of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
+                description=f"Now send a message to make it the thumbnail of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
                 color=var.CBLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=20.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
                 if usermsg.attachments:
                     embed.set_thumbnail(url=usermsg.attachments[0].url)
                     await preview.edit(embed=embed)
@@ -168,6 +168,8 @@ class Commands(commands.Cog):
                     await preview.edit(embed=embed)
                     await thumbnailbotmsg.delete()
                 
+                await embed.set_footer(text=None)
+                await preview.edit(embed=embed)
                 await preview.add_reaction(var.ACCEPT)
                 edit = await ctx.send(embed=discord.Embed(
                             description=f"React to the {var.ACCEPT} emoji in the original [preview](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id}) to send your embed! To edit more react to the respective emojis below",
@@ -184,7 +186,7 @@ class Commands(commands.Cog):
                     await edit.add_reaction(i)
 
                 while True:
-                    reaction, user = await self.bot.wait_for('reaction_add', check=editreactioncheck, timeout=30.0)
+                    reaction, user = await self.bot.wait_for('reaction_add', check=editreactioncheck, timeout=120.0)
                     if str(reaction.emoji) == var.ACCEPT:
                         await channel.send(embed=embed)
                         await ctx.send("Embed sent in "+channel.mention+" !")

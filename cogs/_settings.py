@@ -148,7 +148,7 @@ class Settings(commands.Cog):
                                 await botmsg.edit(embed=embed)
                                 for i in ctx.guild.text_channels:
                                     await i.set_permissions(NVerified, view_channel=False)
-                                await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True)
+                                await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
                                 await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
                                 var.VERIFY.insert_one({
                                     

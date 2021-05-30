@@ -18,15 +18,17 @@ bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=int
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(
                             type=discord.ActivityType.streaming,
-                            name=f"Get started with {var.DEFAULT_PREFIX}help"
+                            name=f"Get started with {var.DEFAULT_PREFIX} help"
                             ))
-    print("I'm Ready!")
+    print("I woke up 🌥️")
 
 
+#Loading pogs
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
 
+#Custom pogs
 for filename in os.listdir('./customcogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'customcogs.{filename[:-3]}')
@@ -35,17 +37,17 @@ for filename in os.listdir('./customcogs'):
 @bot.event
 async def on_guild_join(guild):
     #Inserting plugin configs if it does not exist (incase of re inviting)
-    if not var.PLUGINS.count_documents({"_id":guild.id}, limit=1):
+    if not var.PLUGINS.count_documents({"_id": guild.id}, limit=1):
         var.PLUGINS.insert_one({
 
             "_id":guild.id,
-
             "Leveling":True,
             "Moderation": True,
             "Reaction Roles": True,
             "Verification": False,
             "Welcome": False,
         })
+
     #Inserting leveling data if it does not exist (incase of re inviting) 
     if not str(guild.id) in var.LEVELDATABASE.list_collection_names():
         GuildDoc = var.LEVELDATABASE.create_collection(str(guild.id))
@@ -60,7 +62,7 @@ async def on_guild_join(guild):
     #Support server Log channel ID
     embed = discord.Embed(
     title="I just joined a new server!",
-    description=f"Thanks to this pog person for inviting me to **{guild.name}** :D",
+    description=f"Thanks to this kind person for inviting me to **{guild.name}** :D",
     color=var.CGREEN
     ).add_field(name="Member count", value=guild.member_count
     )
@@ -76,12 +78,6 @@ async def on_guild_remove(guild):
     ).add_field(name="Member count", value=guild.member_count
     )
     await bot.get_channel(848207106821980213).send(embed=embed)    
-
-
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CheckFailure):
-#         pass
 
 
 bot.run(var.TOKEN)

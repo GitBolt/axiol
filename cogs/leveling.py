@@ -188,27 +188,30 @@ class Leveling(commands.Cog):
     async def on_message(self, message):
         #Listeners don't care about cog checks so need to add a check manually
         GuildPluginDoc = var.PLUGINS.find_one({"_id": message.guild.id})
-        if GuildPluginDoc.get("Leveling") == True:
 
-            if not message.channel.id in var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
-                GuildDoc = var.LEVELDATABASE[str(message.guild.id)]
-                userdata = GuildDoc.find_one({"_id": message.author.id})
+        try:
+            if GuildPluginDoc.get("Leveling") == True:
 
-                if userdata is None:
-                    GuildDoc.insert_one({"_id": message.author.id, "xp": 0})
-                else:
-                    xp = userdata["xp"]
-                    initlvl = int(1 + math.sqrt(1+10 * xp/120 )/2)
-                    xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
-                    GuildDoc.update_one(userdata, {"$set": {"xp": xp}})
-                    levelnow = int(1 + math.sqrt(1+10 * xp/120 )/2)
-                    if levelnow > initlvl:
-                        ch = self.bot.get_channel(GuildDoc.find_one({"_id":0}).get("alertchannel"))
-                        if ch is not None:
-                            await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
-                        else:
-                            await message.channel.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                if not message.channel.id in var.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
+                    GuildDoc = var.LEVELDATABASE[str(message.guild.id)]
+                    userdata = GuildDoc.find_one({"_id": message.author.id})
 
+                    if userdata is None:
+                        GuildDoc.insert_one({"_id": message.author.id, "xp": 0})
+                    else:
+                        xp = userdata["xp"]
+                        initlvl = int(1 + math.sqrt(1+10 * xp/120 )/2)
+                        xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
+                        GuildDoc.update_one(userdata, {"$set": {"xp": xp}})
+                        levelnow = int(1 + math.sqrt(1+10 * xp/120 )/2)
+                        if levelnow > initlvl:
+                            ch = self.bot.get_channel(GuildDoc.find_one({"_id":0}).get("alertchannel"))
+                            if ch is not None:
+                                await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                            else:
+                                await message.channel.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+        except AttributeError:
+            print(message.guild.name)
 
 
 def setup(bot):

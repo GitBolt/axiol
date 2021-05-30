@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from discord.ext import commands
 
 
@@ -12,6 +11,7 @@ class LogicallyAnswered(commands.Cog):
     #Simple check to make sure this custom cog only runs on this server
     def cog_check(self, ctx):
         return ctx.guild.id == 751491708465840159
+
 
     @commands.command()
     async def poll(self, ctx, *, msg:str=None):
@@ -33,6 +33,7 @@ class LogicallyAnswered(commands.Cog):
         
         elif not role in ctx.author.roles:
             await ctx.send("You don't have level 30+ role yet, you can't use the command right now.")
+
 
 
     #Soon gonna add auto reactions too
@@ -64,6 +65,7 @@ class LogicallyAnswered(commands.Cog):
                         await message.delete()
                     elif '_' in i:
                         await message.delete()
+
 
 
 def setup(bot):

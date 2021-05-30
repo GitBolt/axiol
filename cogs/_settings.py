@@ -99,14 +99,20 @@ class Settings(commands.Cog):
                                     "blacklistedchannels": [],
                                     })  
 
+                        #Since welcome is not enabled by default ->
+                        #The time when plugin is enabled the document is inserted -> 
+                        #If document already exists that means the plugin is being re-enabled ->
+                        #Hence no need to make another new document and go ahead with the orignal one
                         if str(reaction.emoji) == "👋":
                             GuildWelcomeDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
                             if GuildWelcomeDoc is None:
+
                                 embed = discord.Embed(
                                 title="Send the welcome channel where I can greet members!",
                                 description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to greet new members :D",
                                 color=var.CBLUE
-                                ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the channel/channelID is valid other wise this won't work")
+                                ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the Channel/ChannelID is valid other wise this won't work"
+                                )
                                 await ctx.send(embed=embed)
                                 def messagecheck(message):
                                     return message.author == ctx.author and message.channel.id == ctx.channel.id
@@ -121,8 +127,15 @@ class Settings(commands.Cog):
                                     "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
                                     "assignroles": []
                                 })
-                                await ctx.send(f"New members will now be greeted in {self.bot.get_channel(chid).mention}! To configure welcoming check out `{getprefix(ctx)}help welcome`")
-                        
+                                successembed = discord.Embed(
+                                title="Welcome greeting successfully setted up",
+                                description=f"{var.ACCEPT} New members will now be greeted in {self.bot.get_channel(chid).mention}!",
+                                color=var.CGREEN
+                                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help welcome`")
+                                
+                                await ctx.send(embed=successembed)
+                       
+                        #Same with verification
                         if str(reaction.emoji) == var.ACCEPT:
                             GuildVerifyDoc = var.VERIFY.find_one({"_id": ctx.guild.id})
                             if GuildVerifyDoc is None:
@@ -157,7 +170,14 @@ class Settings(commands.Cog):
                                     "channel": chid, 
                                     "roleid": NVerified.id
                                 })
-                                await ctx.send(f"New members will now be verfied in {self.bot.get_channel(chid).mention}! To configure verification system further check out ```{getprefix(ctx)}help verification```\nDefault verification is **command**")
+                                successembed = discord.Embed(
+                                title="Verification successfully setted up",
+                                description=f"{var.ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
+                                color=var.CGREEN
+                                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                                ).set_footer(text="Default verification type is command")
+                                
+                                await ctx.send(embed=successembed)
 
             except asyncio.TimeoutError:
                 await botmsg.clear_reactions()

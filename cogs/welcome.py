@@ -18,9 +18,11 @@ class Welcome(commands.Cog):
             return ctx.guild.id
 
 
+
     @commands.command()
     async def welcomecard(self, ctx):
         GuildDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
+        
         embed = discord.Embed(
         title="Welcome to the server!",
         description=GuildDoc.get("greeting"),
@@ -30,147 +32,139 @@ class Welcome(commands.Cog):
         await ctx.send(content=greeting(ctx.author.mention), embed=embed)
 
 
+
     @commands.command()
     async def welcomechannel(self, ctx, channel:discord.TextChannel=None):
-        guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
-        if guildwelcome is not None:
-            if channel is not None:
-                newdata = {"$set":{
-                    "channelid": channel.id
-                }}
-                var.WELCOME.update_one(guildwelcome, newdata)
-                await ctx.send(embed=discord.Embed(
-                title="Changed welcome channel",
-                description=f"Now users will be greeted in {channel.mention}!",
-                color=var.CGREEN)
-                )
-            else:
-                await ctx.send(f"You need to define the greeting channel to change it!\n```{getprefix(ctx)}welcomechannel <#channel>```")
+        GuildDoc = var.WELCOME.find_one({"_id":ctx.guild.id})
+
+        if channel is not None:
+            newdata = {"$set":{
+                "channelid": channel.id
+            }}
+            var.WELCOME.update_one(GuildDoc, newdata)
+            await ctx.send(embed=discord.Embed(
+            title="Changed welcome channel",
+            description=f"{var.ACCEPT} Now users will be greeted in {channel.mention}",
+            color=var.CGREEN)
+            )
+
         else:
             await ctx.send(embed=discord.Embed(
-                        title="Can not setup welcome channel",
-                        description=f"This server does not have welcome greetings setted up hence I cannot change the channel too, use the command {getprefix(ctx)}welcome to enble it ",
-                        color=var.CRED
-            ))
+            description=f"{var.ERROR} You need to define the greeting channel to change it!",
+            color=var.CRED
+            ).add_field(name="Format", value=f"{getprefix(ctx)}welcomechannel `<#channel>`"))
+
 
 
     @commands.command()
     async def welcomemessage(self, ctx):
-        guildwelcome = var.WELCOME.find_one({"_id": ctx.guild.id})
-        if guildwelcome is not None:
-            await ctx.send("Send a message to make it the greeting (description) of welcome message embeds!")
-            def msgcheck(message):
-                return message.author == ctx.author and message.channel.id == ctx.channel.id
-            try:
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+        GuildDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
+
+        botmsg = await ctx.send(embed=discord.Embed(
+                    tite="Send a message to make it the message",
+                    description="The next message which you will send will become the embed description!",
+                    color=var.CBLUE
+        ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
+        )
+
+        def msgcheck(message):
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
+
+        try:
+            usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+            if usermsg.content == "cancel" or "`cancel`":
+                await ctx.send("Cancelled welcome message change :ok_hand:")
+            else:
                 newdata = {"$set":{
                     "greeting": usermsg.content
                 }}
-                var.WELCOME.update_one(guildwelcome, newdata)
+                var.WELCOME.update_one(GuildDoc, newdata)
+
                 await ctx.send(embed=discord.Embed(
                 title="Successfully changed the greeting message!",
-                description=f"The new greeting message is:\n\n**{usermsg.content}**",
+                description=f"The new greeting message is:\n**{usermsg.content}**",
                 color=var.CGREEN)
                 )
-            except asyncio.TimeoutError:
-                await ctx.send("You took too long ;-;")
-        else:
-            await ctx.send(embed=discord.Embed(
-                        title="Can not setup welcome message",
-                        description=f"This server does not have welcome greetings setted up hence I cannot change the message too, use the command {getprefix(ctx)}welcome to enble it ",
-                        color=var.CRED
-            ))
+        except asyncio.TimeoutError:
+            await ctx.send("You took too long ;-;")
+
 
 
     @commands.command()
     async def welcomeimage(self, ctx):
-        guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
-        if guildwelcome is not None:
-            await ctx.send("Send an image or image link to make it the greeting image!")
+        GuildDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
 
-            def msgcheck(message):
-                return message.author == ctx.author and message.channel.id == ctx.channel.id
-            try:
-                usermsg = await self.bot.wait_for("message", check=msgcheck, timeout=30.0)
-                if usermsg.attachments:
-                    newdata = {"$set":{
-                        "image": usermsg.attachments[0].url
-                    }}
-                    var.WELCOME.update_one(guildwelcome, newdata)
-                    await ctx.send(embed=discord.Embed(
-                    title="Successfully changed welcome image",
-                    description="New welcome image is:",
-                    color=var.CGREEN
-                    ).set_image(url=usermsg.attachments[0].url)
-                    )
-                elif usermsg.content.startswith("http"):
-                    newdata = {"$set":{
-                        "image": usermsg.content
-                    }}
-                    var.WELCOME.update_one(guildwelcome, newdata)
-                    await ctx.send(embed=discord.Embed(
-                    title="Successfully changed welcome image",
-                    description="New welcome image is:",
-                    color=var.CGREEN
-                    ).set_image(url=usermsg.content)
-                    )
-                else:
-                    await ctx.send("Invalid image")
-            except asyncio.TimeoutError:
-                await ctx.send("You too too long ;-;")
+        botmsg = await ctx.send(embed=discord.Embed(
+                    tite="Send a message to make it the image",
+                    description="Either send the image as a file or use a link!",
+                    color=var.CBLUE
+        ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
+        )
+        def msgcheck(message):
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
+        try:
+            usermsg = await self.bot.wait_for("message", check=msgcheck, timeout=60.0)
+            if usermsg.content == "cancel" or "`cancel`":
+                await ctx.send("Cancelled image change :ok_hand:")
+            if usermsg.attachments:
+                newdata = {"$set":{
+                    "image": usermsg.attachments[0].url
+                }}
+                var.WELCOME.update_one(GuildDoc, newdata)
+                await ctx.send(embed=discord.Embed(
+                title="Successfully changed welcome image",
+                description="New welcome image is:",
+                color=var.CGREEN
+                ).set_image(url=usermsg.attachments[0].url)
+                )
+            elif usermsg.content.startswith("http"):
+                newdata = {"$set":{
+                    "image": usermsg.content
+                }}
+                var.WELCOME.update_one(GuildDoc, newdata)
+                await ctx.send(embed=discord.Embed(
+                title="Successfully changed welcome image",
+                description="New welcome image is:",
+                color=var.CGREEN
+                ).set_image(url=usermsg.content)
+                )
+            else:
+                await ctx.send("Invalid image")
+        except asyncio.TimeoutError:
+            await ctx.send("You too too long ;-;")
                 
-        else:
-            await ctx.send(embed=discord.Embed(
-                        title="Can not setup welcome image",
-                        description=f"This server does not have welcome greetings setted up hence I cannot change the image too, use the command {getprefix(ctx)}welcome to enble it ",
-                        color=var.CRED
-            ))
-
+                
 
     @commands.command()
     async def welcomerole(self, ctx, role:discord.Role=None):
-        guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
-        if guildwelcome is not None:
-            if role is not None:
-                rolelist = guildwelcome.get("assignroles")
-                updatedlist = rolelist.copy()
-                updatedlist.append(role.id)
+        GuildDoc = var.WELCOME.find_one({"_id":ctx.guild.id})
+        if role is not None:
+            rolelist = GuildDoc.get("assignroles")
+            updatedlist = rolelist.copy()
+            updatedlist.append(role.id)
 
-                newdata = {"$set":{
-                    "assignroles":updatedlist
-                }}
-                var.WELCOME.update_one(guildwelcome, newdata)
-                await ctx.send(embed=discord.Embed(
-                        title="Successfully added auto assign role",
-                        description=f"Users will be automatically given {role.mention} when they join",
-                        color=var.CGREEN)
-                )
-            else:
-                await ctx.send(f"You need to define the role too!\n```{getprefix(ctx)}welcomerole <role>```\nFor role either role mention or ID can be used")
-        else:
+            newdata = {"$set":{
+                "assignroles":updatedlist
+            }}
+            var.WELCOME.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
-                        title="Can not setup auto assign role",
-                        description=f"This server does not have welcome greetings setted up hence i cannot give users auto role too, use the command {getprefix(ctx)}welcome to enble it ",
-                        color=var.CRED
-            ))
+                    title="Successfully added auto assign role",
+                    description=f"{var.ACCEPT} Users will be automatically given {role.mention} when they join",
+                    color=var.CGREEN)
+            )
+        else:
+            await ctx.send(f"You need to define the role too!\n```{getprefix(ctx)}welcomerole <role>```\nFor role either role mention or ID can be used")
+
 
 
     @commands.command()
-    async def welcomeremove(self, ctx):
-        guildwelcome = var.WELCOME.find_one({"_id":ctx.guild.id})
-        if guildwelcome is not None:
-            var.WELCOME.delete_one(guildwelcome)
-            await ctx.send(embed=discord.Embed(
-            title="Successfully deleted welcome greetings",
-            description=f"You can enable it again using {getprefix(ctx)}welcome",
-            color=var.CGREEN)
-            )
-        else:
-            await ctx.send(embed=discord.Embed(
-                        title="Can not remove welcome greetings",
-                        description=f"This server does not have welcome greetings setted up hence i cannot remove them too, use the command {getprefix(ctx)}welcome to enble it ",
-                        color=var.CRED
-            ))
+    async def welcomereset(self, ctx):
+        GuildDoc = var.WELCOME.find_one({"_id": ctx.guild.id})
+        var.WELCOME.delete_one(GuildDoc)
+        await ctx.send(embed=discord.Embed(
+        description=f"{var.ACCEPT} Successfully changed the embed back to the default one",
+        color=var.CGREEN)
+        )
 
 
     @commands.Cog.listener()

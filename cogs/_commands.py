@@ -168,7 +168,7 @@ class Commands(commands.Cog):
                     await preview.edit(embed=embed)
                     await thumbnailbotmsg.delete()
                 
-                await embed.set_footer(text=None)
+                embed.set_footer(text="")
                 await preview.edit(embed=embed)
                 await preview.add_reaction(var.ACCEPT)
                 edit = await ctx.send(embed=discord.Embed(

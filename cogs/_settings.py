@@ -34,11 +34,11 @@ class Settings(commands.Cog):
             return user == ctx.author and reaction.message == botmsg
 
         def enablecheck(reaction, user):
-            if str(reaction.emoji) == var.ENABLE:
+            if str(reaction.emoji) == var.ENABLE and reaction.message.guild.id == ctx.guild.id:
                 return user == ctx.author and reaction.message == enabledbotmsg
 
         def disablecheck(reaction, user):
-            if str(reaction.emoji) == var.DISABLE:
+            if str(reaction.emoji) == var.DISABLE and reaction.message.guild.id == ctx.guild.id:
                 return user == ctx.author and reaction.message == enabledbotmsg
 
         while True:

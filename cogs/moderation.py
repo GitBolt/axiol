@@ -2,6 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 import utils.vars as var
+import utils.database as db
 from utils.funcs import getprefix
 
 class Moderation(commands.Cog):
@@ -10,7 +11,7 @@ class Moderation(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     def cog_check(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Moderation") == True:
             return ctx.guild.id
 
@@ -90,7 +91,7 @@ class Moderation(commands.Cog):
 
 
 
-    @commands.command(aliases=["clean", "deletemsgs"])
+    @commands.command(aliases=["clean", "clear"])
     @commands.has_permissions(manage_messages=True)
     async def purge(self, ctx, limit:int=None):
         if limit is not None:

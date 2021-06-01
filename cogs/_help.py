@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import utils.vars as var
+import utils.database as db
 from utils.funcs import getprefix
 import asyncio
 
@@ -37,6 +38,17 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
     return embed
 
+def welcomehelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
+    ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used.", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomereset", value="Reset to default welcome embed message", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Verification", color=var.CMAIN
     ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
@@ -46,14 +58,12 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def welcomehelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
-    ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used.", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomereset", value="Reset to default welcome embed message", inline=False
+def chatbothelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Chatbot (BETA)", color=var.CMAIN,
+    description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!"
+    ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Make a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
+    ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Remove a chatbot channel (if added)", inline=False
+    ).add_field(name=getprefix(ctx)+"chatbotchannels", value="View all channels where chat bot is enabled!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
     
@@ -76,7 +86,7 @@ class Help(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
 
         embed = discord.Embed(
         title="Axiol Help",
@@ -90,7 +100,7 @@ class Help(commands.Cog):
         for i in GuildDoc:
             if GuildDoc.get(i) == True:
                 helpname = i.lower()
-                if i.lower() == "reaction roles":
+                if i.lower() == "reaction roles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
                 embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.PLUGINEMOJIS.get(i)}", inline=False)
         embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Commands that don't belong to categories above {var.CONTINUE} ", inline=False)
@@ -108,8 +118,9 @@ class Help(commands.Cog):
             "Leveling": levelhelp,
             "Moderation": modhelp,
             "Reaction Roles":rrhelp,
-            "Verification": verifyhelp,
             "Welcome": welcomehelp,
+            "Verification": verifyhelp,
+            "Chatbot": chatbothelp
         }
 
         try:
@@ -132,34 +143,40 @@ class Help(commands.Cog):
            
     @help.command()
     async def leveling(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
             await ctx.send(embed=levelhelp(ctx))
         
 
     @help.command()
     async def moderation(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Moderation") == True:
             await ctx.send(embed=modhelp(ctx))
 
     @help.command()
     async def reactionroles(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Reaction Roles") == True:
             await ctx.send(embed=rrhelp(ctx))
-
-    @help.command()
-    async def verification(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Verification") == True:
-            await ctx.send(embed=verifyhelp(ctx))
     
     @help.command()
     async def welcome(self, ctx):
-        GuildDoc = var.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Welcome") == True:
             await ctx.send(embed=welcomehelp(ctx))
+
+    @help.command()
+    async def verification(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Verification") == True:
+            await ctx.send(embed=verifyhelp(ctx))
+
+    @help.command()
+    async def chatbot(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Chatbot") == True:
+            await ctx.send(embed=chatbothelp(ctx))
 
     @help.command()
     async def extras(self, ctx):
@@ -204,7 +221,7 @@ class Help(commands.Cog):
         
         reaction, user = await self.bot.wait_for('reaction_add', check=deletereaction_check, timeout=60.0)
         if str(reaction.emoji) == var.ACCEPT:
-            var.LEVELDATABASE.get_collection(str(ctx.guild.id)).remove({ "_id" : { "$ne": 0 } })
+            db.LEVELDATABASE.get_collection(str(ctx.guild.id)).remove({ "_id" : { "$ne": 0 } })
             await ctx.send(embed=discord.Embed(
                         title="Leveling removed", 
                         description="Leveling have been removed from this server, that means all the rank data has been deleted", 

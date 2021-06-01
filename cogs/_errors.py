@@ -17,7 +17,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(embed=discord.Embed(
                         title="Command not found",
-                        description=f"{var.ERROR} the command which you entered does not exist",
+                        description=f"{var.ERROR} The command which you entered does not exist",
                         color=var.CRED
             ))
 
@@ -27,7 +27,8 @@ class Errors(commands.Cog):
                     title="Invalid Channel",
                     description=f"{var.ERROR} I was not able to find the channel which you entered",
                     color=var.CRED
-            ))
+            ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+            )
 
         #Missing Permissions
         if isinstance(error, commands.MissingPermissions):

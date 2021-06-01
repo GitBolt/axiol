@@ -1,27 +1,15 @@
 import os
-from pymongo import MongoClient
+from utils.database import LEVELDATABASE
 
 #Config
 TOKEN = os.environ.get("TOKEN")
 DEFAULT_PREFIX = "."
 
-#All Database Stuff
-MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL")) #Client
-#Databases
-DATABASE = MONGOCLIENT["Axiol"] #Main DB
-LEVELDATABASE = MONGOCLIENT["Leveling"]
-#Collections
-PREFIXES = DATABASE["Prefixes"]
-PLUGINS = DATABASE["Plugins"]
-REACTIONROLES = DATABASE["Reaction Roles"]
-VERIFY = DATABASE["Verify"]
-WELCOME = DATABASE["Welcome"]
-
 #Colours
 CMAIN = 0xFF006A #Everything
-CRED = 0xFF0000 #Error or alert
 CGREEN = 0x15ff00 #Success
-CORANGE = 0xFF4400 #Inform or warning
+CRED = 0xFF0000 #Error
+CORANGE = 0xFF4400 #Warning
 CBLUE = 0x00AEFF #Data
 CTEAL = 0x00EEFF #Data
 
@@ -31,10 +19,10 @@ ACCEPT = "<:Accept:847850079968559175>"
 DECLINE = "<:Decline:847850006995402822>"
 ENABLE = "<:Enable:847850083819323442>"
 DISABLE = "<:Disable:847850081700020254>"
-ERROR = "<:Error:847848749459439697>"
 SETTINGS = "<:Settings:847850081965178901>"
 CONTINUE = "<:Continue:847850081587167234>"
 #Extra Emoji
+ERROR = "<:Error:849342766898610196>"
 LVL = "<:Icon:846436455496941588>"
 BOT = "<:BotVerification:846990577442095114>"
 #Colour Emojis
@@ -49,6 +37,8 @@ PLUGINEMOJIS = {
     "Leveling": LVL,
     "Moderation": "🔨",
     "Reaction Roles": "✨",
-    "Verification": ACCEPT,
     "Welcome": "👋",
+    "Verification": ACCEPT,
+    "Chatbot": "🤖",
 }
+

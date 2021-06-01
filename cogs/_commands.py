@@ -34,7 +34,7 @@ class Commands(commands.Cog):
     @commands.command()
     async def suggest(self, ctx, *, desc=None):
         if desc is not None:
-            channel = self.bot.get_channel(843548616505294848) #Support server suggestion channel id
+            channel = self.bot.get_channel(843548616505294848) #Support server suggestion channel
 
             embed = discord.Embed(
             title=f"{ctx.author}'s idea", 
@@ -72,7 +72,6 @@ class Commands(commands.Cog):
         await ctx.send(embed=embed)
 
 
-
     @commands.command()
     async def stats(self, ctx):
         embed = discord.Embed(
@@ -87,6 +86,7 @@ class Commands(commands.Cog):
         embed.add_field(name="Created at", value=ctx.guild.created_at , inline=False)
         embed.set_thumbnail(url = ctx.guild.icon_url)
         await ctx.send(embed=embed)
+
 
     @commands.command()
     async def embed(self, ctx, channel:discord.TextChannel=None):

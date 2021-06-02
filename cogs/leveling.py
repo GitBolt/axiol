@@ -225,7 +225,7 @@ class Leveling(commands.Cog):
         #Listeners don't care about cog checks so need to add a check manually
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
-        if GuildPluginDoc.get("Leveling") == True:
+        if GuildPluginDoc.get("Leveling") == True and message.author.bot == False:
 
             if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
                 GuildDoc = db.LEVELDATABASE[str(message.guild.id)]

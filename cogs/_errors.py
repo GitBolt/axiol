@@ -13,13 +13,6 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         
-        #Invalid command
-        if isinstance(error, commands.CommandNotFound):
-            await ctx.send(embed=discord.Embed(
-                        title="Command not found",
-                        description=f"{var.ERROR} The command which you entered does not exist",
-                        color=var.CRED
-            ))
 
         #Invalid Channel
         if isinstance(error, commands.ChannelNotFound):

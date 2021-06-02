@@ -90,10 +90,10 @@ class Help(commands.Cog):
 
         embed = discord.Embed(
         title="Axiol Help",
-        description="Help commands for enabled plugins!",
+        description=f"Help commands for the plugins which are enabled!",
         color=var.CMAIN
-        ).add_field(name=getprefix(ctx)+"plugins", value="Enable/Disable plugins", inline=False
         ).add_field(name=getprefix(ctx)+"prefix", value="Change prefix", inline=False
+        ).add_field(name=getprefix(ctx)+"plugins", value=f"Configure plugins {var.PLUGINSEMOJI}", inline=False
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
 
@@ -103,9 +103,12 @@ class Help(commands.Cog):
                 if i.lower() == "reaction roles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
                 embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.PLUGINEMOJIS.get(i)}", inline=False)
-        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Commands that don't belong to categories above {var.CONTINUE} ", inline=False)
+
+        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Non plugin commands {var.CONTINUE}️ ", inline=False)
         helpmsg = await ctx.send(embed=embed)
 
+
+        await helpmsg.add_reaction(var.PLUGINSEMOJI)
         for i in GuildDoc:
             if GuildDoc.get(i) == True:
                 await helpmsg.add_reaction(var.PLUGINEMOJIS.get(i))
@@ -113,6 +116,7 @@ class Help(commands.Cog):
 
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
+
 
         HelpDict = {
             "Leveling": levelhelp,
@@ -136,6 +140,10 @@ class Help(commands.Cog):
                 if str(reaction.emoji) == var.CONTINUE:
                     await helpmsg.edit(embed=extrahelp(ctx))
                     await helpmsg.remove_reaction(var.CONTINUE, ctx.author)
+                if str(reaction.emoji) == var.PLUGINSEMOJI:
+                    await ctx.invoke(self.bot.get_command('plugins'))
+                    await helpmsg.remove_reaction(var.PLUGINSEMOJI, ctx.author)
+
         except asyncio.TimeoutError:
             await helpmsg.clear_reactions()
 

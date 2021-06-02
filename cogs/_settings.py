@@ -11,12 +11,12 @@ class Settings(commands.Cog):
         self.bot = bot
 
 
-    @commands.command(aliases=["extensions", "extentions", "addons"])
+    @commands.command(aliases=["plugin", "extensions", "extentions", "addons"])
     @commands.has_permissions(administrator=True)
     async def plugins(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id":False}) #Getting guild's plugin document and removing the ID
         enabled_amount = len([keys for keys, values in GuildDoc.items() if values == True])
-        total_amount = len(GuildDoc) -1 #Removing ID
+        total_amount = len(GuildDoc)
 
         embed = discord.Embed(
         title="All available plugins",
@@ -105,7 +105,15 @@ class Settings(commands.Cog):
                         def messagecheck(message):
                             return message.author == ctx.author and message.channel.id == ctx.channel.id
                         usermsg = await self.bot.wait_for('message', check=messagecheck)
-                        chid = int(usermsg.content.strip("<>#"))
+                        try:
+                            chid = int(usermsg.content.strip("<>#"))
+                        except:
+                            await ctx.send(embed=discord.Embed(
+                                    title="Invalid Channel",
+                                    description=f"{var.ERROR} I was not able to find the channel which you entered",
+                                    color=var.CRED
+                            ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                            )
 
                         db.WELCOME.insert_one({
 
@@ -124,7 +132,7 @@ class Settings(commands.Cog):
                         await ctx.send(embed=successembed)
                 
                     #Same with verification
-                    if str(reaction.emoji) == var.ACCEPT and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
+                    if str(reaction.emoji) =="➡️" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
 
                         embed = discord.Embed(
                         title="Send the verify channel",
@@ -137,7 +145,15 @@ class Settings(commands.Cog):
                             return message.author == ctx.author and message.channel.id == ctx.channel.id
 
                         usermsg = await self.bot.wait_for('message', check=messagecheck)
-                        chid = int(usermsg.content.strip("<>#"))
+                        try:
+                            chid = int(usermsg.content.strip("<>#"))
+                        except:
+                            await ctx.send(embed=discord.Embed(
+                                    title="Invalid Channel",
+                                    description=f"{var.ERROR} I was not able to find the channel which you entered",
+                                    color=var.CRED
+                            ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                            )
                         NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
                         await botmsg.clear_reactions()
 

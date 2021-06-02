@@ -196,7 +196,7 @@ class Help(commands.Cog):
     async def levelconfig(self, ctx):
         
         embed = discord.Embed(title="Configure leveling for this server",
-        color=var.CTEAL
+        color=var.C_TEAL
         ).add_field(name=getprefix(ctx)+"xprange `<leastamount>` `<highestamount>`",value="Set the range between which users will be awarded with random xp", inline=False
         ).add_field(name=getprefix(ctx)+"blacklist `<#channel>`",value=f"Add the channel where you don't want users to gain xp.", inline=False
         ).add_field(name=getprefix(ctx)+"whitelist `<#channel>`",value=f"Whitelist an xp blacklisted channel.", inline=False

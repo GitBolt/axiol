@@ -80,10 +80,12 @@ class Leveling(commands.Cog):
         if user and amount is not None:
             GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
             data = GuildCol.find_one({"_id": user.id})
-
-            newdata = {"$set":{
-                        "xp": data.get("xp") + amount
-                    }}
+            if data is None:
+                GuildCol.insert_one({"_id": user.id, "xp": amount})
+            else:
+                newdata = {"$set":{
+                            "xp": data.get("xp") + amount
+                        }}
             GuildCol.update_one(data, newdata)
             await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:

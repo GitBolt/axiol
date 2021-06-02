@@ -43,7 +43,9 @@
         "How are you?",
         "Good and you?",
         "Hope you are doing good",
-        "What's up"
+        "What's up",
+        "How was your day",
+        "Wassup"
       ],
       "responses":[
         "I'm doing great! thanks",
@@ -268,14 +270,16 @@
         "Alrighty",
         "Oh okay",
         "👌",
-        "Ohk"
+        "Ohk",
+        "Got it"
       ]
     },
     {
       "tag": "work",
       "patterns":[
         "Which work do you do",
-        "What is Your goal"
+        "What is Your goal",
+        "what are you doing"
       ],
       "responses":[
         "I just like helping people around :)",
@@ -303,7 +307,8 @@
       "patterns":[
         "Who are you?",
         "Are you real",
-        "What is special about you"
+        "What is special about you",
+        "what kind of thing are you"
       ],
       "responses":[
         "I'm a just a discord bot made by someone",
@@ -316,7 +321,7 @@
       "tag": "not sure replies",
       "patterns":[
         "Are you smart?",
-        "Do you like ice cream?",
+        "Do you like?",
         "Would you take over humans?",
         "Do you know english?",
         "Is this good?",
@@ -328,6 +333,22 @@
         "Maybe, maybe not",
         ":shrug:",
         "idk, maybe"
+      ]
+    },
+    {
+      "tag": "no straight answer",
+      "patterns":[
+        "How do you know?",
+        "Wait how",
+        "Is it possible?",
+        "what",
+        "no"
+      ],
+      "responses":[
+        ":eyes:",
+        "ooop",
+        ":eyes: y e s ",
+        ">.<"
       ]
     }
   ]

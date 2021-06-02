@@ -1,11 +1,13 @@
-#Enviroments
+# Enviroments
 .env
 env
 ENV
 venv
 VENV
 
-#Everything else
+# Everything else
 __pycache__
 .vscode
 
+# Private cog
+customcogs/_private.py

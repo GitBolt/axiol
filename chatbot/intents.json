@@ -9,27 +9,9 @@
         "Prefix please"
       ],
       "responses":[
-        "Oh my prefix is {prefix}",
-        "My prefix is {prefix}!",
-        "You can use me using {prefix} in this server!",
-        "To use me just add {prefix} before commands, use {prefix}help to get started :))",
-        "{prefix} is my prefix in this server :D"
-      ]
-    },
-    
-    {
-      "tag": "store",
-      "patterns":[
-        "Remember my name",
-        "Remeber what i say",
-        "Call me",
-        "My name is"
-      ],
-      "responses":[
-        "Alright",
-        "Got it",
-        "Oh okay :D",
-        "Sure!"
+        "Oh my prefix is `.`",
+        "My prefix is `.`!",
+        "You can use me using `.`"
       ]
     },
 
@@ -250,11 +232,12 @@
       "patterns":[
         "How many servers are you in",
         "When were you made",
-        "When is your birthday?"
+        "When is your birthday?",
+        "Where do you live"
       ],
       "responses":[
-        "I was made on 17 May 2021 and I am in around 100 servers as of now",
-        "My birthday is on 17 may 2021! And i am in around 100 servers :) "
+        "I was made on 17 May 2021 and I live in around 7 servers as of now",
+        "My birthday is on 17 may 2021! And I live in around 7 servers :) "
       ]
     },
     {

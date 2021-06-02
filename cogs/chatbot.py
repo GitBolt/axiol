@@ -107,7 +107,7 @@ class Chatbot(commands.Cog):
                     intents = json.load(json_data)
 
                 FILE = "chatbot/data.pth"
-                data = torch.load(FILE)
+                data = torch.load(FILE, map_location='cpu')
 
                 input_size = data["input_size"]
                 hidden_size = data["hidden_size"]

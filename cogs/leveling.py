@@ -2,9 +2,9 @@ import random
 import discord
 import math
 from discord.ext import commands
-import utils.vars as var
+import utils.variables as var
 import utils.database as db
-from utils.funcs import getprefix, getxprange
+from utils.functions import getprefix, getxprange
 
 
 class Leveling(commands.Cog):
@@ -42,7 +42,7 @@ class Leveling(commands.Cog):
 
             embed = discord.Embed(
             title=f"Level stats for {user.name}",
-            color=var.CTEAL
+            color=var.C_TEAL
             ).add_field(name="Rank", value=f"{rank}/{GuildCol.estimated_document_count()-1}", inline=True
             ).add_field(name="XP", value=f"{xp}/{int(200*((1/2)*level))}", inline=True
             ).add_field(name="Level", value=level, inline=True
@@ -61,7 +61,7 @@ class Leveling(commands.Cog):
         
         embed = discord.Embed(
         title=f"Leaderboard", 
-        color=var.CBLUE
+        color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url)
         rankcount = 0
         for i in rankings:
@@ -88,8 +88,8 @@ class Leveling(commands.Cog):
             await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the member and the amount to give them xp",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the member and the amount to give them xp",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}givexp <user> <amount>`"
             ).set_footer(text="For user either user mention or user ID can be used")
             )
@@ -108,8 +108,8 @@ class Leveling(commands.Cog):
             await ctx.send(f"Successfully removed {amount} xp from {user}!")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the member and the amount to remove their xp",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the member and the amount to remove their xp",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removexp <user> <amount>`"
             ).set_footer(text="For user either user mention or user ID can be used")
             )
@@ -131,12 +131,12 @@ class Leveling(commands.Cog):
 
             await ctx.send(embed=discord.Embed(
                         description=f"{channel.mention} has been blacklisted, hence users won't gain any xp in that channel.",
-                        color=var.CGREEN)
+                        color=var.C_GREEN)
                         )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the channel to blacklist it",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the channel to blacklist it",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}blacklist <#channel>`"
             )
             )
@@ -160,12 +160,12 @@ class Leveling(commands.Cog):
 
             await ctx.send(embed=discord.Embed(
                         description=f"{channel.mention} has been removed from blacklist, hence users will be able to gain xp again in that channel.",
-                        color=var.CGREEN)
+                        color=var.C_GREEN)
                         )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the channel to whitelist it",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the channel to whitelist it",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}whitelist <#channel>`"
             )
             )
@@ -184,12 +184,12 @@ class Leveling(commands.Cog):
             GuildCol.update_one(settings, newdata)
             await ctx.send(embed=discord.Embed(
                         description=f"{channel.mention} has been marked as the alert channel, hence users who will level up will get mentioned here!",
-                        color=var.CGREEN)
+                        color=var.C_GREEN)
                         )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the channel to make it the alert channel",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the channel to make it the alert channel",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
             )
             )
@@ -208,12 +208,12 @@ class Leveling(commands.Cog):
             GuildCol.update_one(settings, newdata)
             await ctx.send(embed=discord.Embed(
                         description=f"New xp range is now {minval} - {maxval}!",
-                        color=var.CGREEN)
+                        color=var.C_GREEN)
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the xp range",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the xp range",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}xprange <min_xp> <max_xp>`"
             )
             )

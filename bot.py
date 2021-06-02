@@ -1,7 +1,7 @@
 import os
 import discord
 from discord.ext import commands
-import utils.vars as var
+import utils.variables as var
 import utils.database as db
 
 #Function to get current server prefix
@@ -64,7 +64,7 @@ async def on_guild_join(guild):
     embed = discord.Embed(
     title="I just joined a new server!",
     description=f"Thanks to this kind person for inviting me to **{guild.name}** :D",
-    color=var.CGREEN
+    color=var.C_GREEN
     ).add_field(name="Member count", value=guild.member_count
     )
     await bot.get_channel(848207106821980213).send(embed=embed)           
@@ -75,7 +75,7 @@ async def on_guild_remove(guild):
     embed = discord.Embed(
     title="I just got removed from a server",
     description=f"Someone removed me from **{guild.name}** :(",
-    color=var.CRED
+    color=var.C_RED
     ).add_field(name="Member count", value=guild.member_count
     )
     await bot.get_channel(848207106821980213).send(embed=embed)    

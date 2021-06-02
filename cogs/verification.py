@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import utils.vars as var
+import utils.variables as var
 import utils.database as db
-from utils.funcs import getprefix
+from utils.functions import getprefix
 import random
 
 
@@ -27,13 +27,13 @@ class Verification(commands.Cog):
             embed = discord.Embed(
             title=f"This server has Command verification",
             description="This is a basic type of verification where users enter a command in the verification channel and they are quickly verified and given access to other channels, this can be used to verify people and low-medium level raid/spam bot.",
-            color=var.CTEAL
+            color=var.C_TEAL
             )
         else:
             embed = discord.Embed(
             title="This server has Bot verification",
             description="This is a slightly more advanced bot captcha like verification most suitable to bypass advance bot raids, after users enter the command a captcha image is sent in the channel with distorted text (good enough for a human to read) and if the users enter the code correctly they are verified. The image lasts only for 15 seconds, entering the command again will send another new image.",
-            color=var.CTEAL
+            color=var.C_TEAL
             )
         await ctx.send(embed=embed)
 
@@ -55,14 +55,14 @@ class Verification(commands.Cog):
             embed = discord.Embed(
             title="Successfully changed the verification channel",
             description=f"Members will now be verified in {channel.mention}!",
-            color=var.CBLUE
+            color=var.C_BLUE
             )
             await ctx.send(embed=embed)
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the verification channel to change it",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the verification channel to change it",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifychannel #channel`"))
 
 
@@ -82,7 +82,7 @@ class Verification(commands.Cog):
         await ctx.send(embed=discord.Embed(
                     title="Switched to " + newdata.get("$set").get("type") + " verification",
                     description="Use the command again to switch to the other method",
-                    color=var.CGREEN)
+                    color=var.C_GREEN)
         )
     
 
@@ -104,7 +104,7 @@ class Verification(commands.Cog):
                 roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                 role = ctx.guild.get_role(roleid)
 
-                await ctx.send(f"Verification successful {var.ACCEPT} - **{ctx.author}**", delete_after=1)
+                await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
                 await ctx.author.remove_roles(role)
 
             else: #Bot verification
@@ -119,7 +119,7 @@ class Verification(commands.Cog):
                 embed = discord.Embed(
                     title="Beep Bop,  are you a bot?",
                     description = 'Enter the text given in the image below to verify yourself',
-                    colour = var.CMAIN
+                    colour = var.C_MAIN
                     ).set_image(url=Image
                     ).set_footer(text='You have 15 seconds to enter the text, if you failed to enter it in time then type the command again.'
                     )
@@ -135,7 +135,7 @@ class Verification(commands.Cog):
                 if usermsg.content == code:
                     roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                     role = ctx.guild.get_role(roleid)
-                    await ctx.send(f"Verification successful {var.ACCEPT} - **{ctx.author}**", delete_after=1)
+                    await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
                     await ctx.author.remove_roles(role)
                     await botmsg.delete()
                     await usermsg.delete()

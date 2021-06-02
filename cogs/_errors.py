@@ -2,7 +2,7 @@ import sys
 import traceback
 import discord
 from discord.ext import commands
-import utils.vars as var
+from utils.variables import E_ERROR, C_RED
 
 
 class Errors(commands.Cog):
@@ -18,8 +18,8 @@ class Errors(commands.Cog):
         if isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
-                    description=f"{var.ERROR} I was not able to find the channel which you entered",
-                    color=var.CRED
+                    description=f"{E_ERROR} I was not able to find the channel which you entered",
+                    color=C_RED
             ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
             )
 
@@ -27,14 +27,13 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(
                         title="Missing Permissions",
-                        description=f"{var.ERROR} {ctx.author.mention} You don't have permissions to do that",
-                        color=var.CRED
+                        description=f"{E_ERROR} {ctx.author.mention} You don't have permissions to do that",
+                        color=C_RED
             ))
 
         #Cog check failure
         if isinstance(error, commands.CheckFailure):
             pass
-
 
         else:
             #All unhandled Errors will print their original traceback

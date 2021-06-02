@@ -11,13 +11,8 @@ LEVELDATABASE = MONGOCLIENT["Leveling"]
 
 #Collections
 PLUGINS = DATABASE["Plugins"]
-
 PREFIXES = DATABASE["Prefixes"]
-
 REACTIONROLES = DATABASE["Reaction Roles"]
-
 WELCOME = DATABASE["Welcome"]
-
 VERIFY = DATABASE["Verify"]
-
 CHATBOT = DATABASE["Chatbot"]

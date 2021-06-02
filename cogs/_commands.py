@@ -1,8 +1,8 @@
 import asyncio
 import discord
 from discord.ext import commands
-import utils.vars as var
-from utils.funcs import getprefix
+import utils.variables as var
+from utils.functions import getprefix
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -14,7 +14,7 @@ class Commands(commands.Cog):
         embed = discord.Embed(
         title="My Github Source Code Woohoo", 
         description="[GitBolt - Axiol](https://github.com/GitBolt/Axiol)", 
-        color=var.CTEAL
+        color=var.C_TEAL
         ).set_thumbnail(url="https://cdn0.iconfinder.com/data/icons/shift-logotypes/32/Github-512.png"
         )
         await ctx.send(embed=embed)
@@ -25,7 +25,7 @@ class Commands(commands.Cog):
         embed = discord.Embed(
         title="My invite link!",
         description="[Invite me from here](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)",
-        color=var.CBLUE
+        color=var.C_BLUE
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
         )
         await ctx.send(embed=embed)
@@ -39,12 +39,12 @@ class Commands(commands.Cog):
             embed = discord.Embed(
             title=f"{ctx.author}'s idea", 
             description=f"This idea came from a server named **{ctx.guild.name}**!", 
-            color=var.CBLUE
+            color=var.C_BLUE
             ).add_field(name="Suggestion", value=desc
             )
             msg = await channel.send(embed=embed)
-            await msg.add_reaction(var.ACCEPT)
-            await msg.add_reaction(var.DECLINE)
+            await msg.add_reaction(var.E_ACCEPT)
+            await msg.add_reaction(var.E_DECLINE)
             await ctx.send("Suggestion sent to the support server!")
         else:
             await ctx.send(f"You need to describe your idea too! This is the format\n```{getprefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
@@ -61,7 +61,7 @@ class Commands(commands.Cog):
 
         embed = discord.Embed(
         title="Some information about me :flushed:",
-        color=var.CMAIN
+        color=var.C_MAIN
         ).add_field(name="Server Count", value=guildcount, inline=False
         ).add_field(name="Members", value=membercount, inline=False
         ).add_field(name="Ping", value=ping, inline=False
@@ -76,7 +76,7 @@ class Commands(commands.Cog):
     async def stats(self, ctx):
         embed = discord.Embed(
         title=f"{ctx.guild.name}", 
-        color=var.CTEAL)
+        color=var.C_TEAL)
         embed.add_field(name="Owner", value=ctx.guild.owner, inline=False)
         embed.add_field(name="All Members", value=ctx.guild.member_count, inline=False)
         embed.add_field(name="Channels", value=len(ctx.guild.channels), inline=False)
@@ -94,17 +94,17 @@ class Commands(commands.Cog):
 
             embed = discord.Embed(
             title="Create an embed",
-            description=f"React to the emojis below to choose your color! When you are done press the {var.CONTINUE} emoji to continue editing",
-            color=var.CMAIN
+            description=f"React to the emojis below to choose your color! When you are done press the {var.E_CONTINUE} emoji to continue editing",
+            color=var.C_MAIN
             ).set_footer(text="This message will become the live preview of the embed you are creating!"
             )
             preview = await ctx.send(embed=embed)
-            emojis = [var.ERED,var.EPINK,var.EGREEN,var.EBLUE,var.EORANGE,var.EYELLOW]
+            emojis = [var.E_RED,var.E_PINK,var.E_GREEN,var.E_BLUE,var.E_ORANGE,var.E_YELLOW]
             colors = [0xFF0000, 0xFF58BC, 0x24FF00, 0x00E0FF, 0xFF5C00, 0xFFC700]
 
             for i in emojis:
                 await preview.add_reaction(i)
-            await preview.add_reaction(var.CONTINUE)
+            await preview.add_reaction(var.E_CONTINUE)
             
             def previewreactioncheck(reaction, user):
                 return user == ctx.author and reaction.message == preview
@@ -115,7 +115,7 @@ class Commands(commands.Cog):
             try:
                 while True:
                     reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=30.0)
-                    if str(reaction.emoji) == var.CONTINUE:
+                    if str(reaction.emoji) == var.E_CONTINUE:
                         break
 
                     index = emojis.index(str(reaction))
@@ -127,7 +127,7 @@ class Commands(commands.Cog):
                 titlebotmsg = await ctx.send(embed=discord.Embed(
                 title="Title",
                 description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
-                color=var.CBLUE)
+                color=var.C_BLUE)
                 )
                 usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
                 embed.title = usermsg.content
@@ -153,7 +153,7 @@ class Commands(commands.Cog):
                 thumbnailbotmsg = await ctx.send(embed=discord.Embed(
                 title="Thumbnail",
                 description=f"Now send a message to make it the thumbnail of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
-                color=var.CBLUE
+                color=var.C_BLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
                 usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
@@ -170,10 +170,10 @@ class Commands(commands.Cog):
                 
                 embed.set_footer(text="")
                 await preview.edit(embed=embed)
-                await preview.add_reaction(var.ACCEPT)
+                await preview.add_reaction(var.E_ACCEPT)
                 edit = await ctx.send(embed=discord.Embed(
-                            description=f"React to the {var.ACCEPT} emoji in the original [preview](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id}) to send your embed! To edit more react to the respective emojis below",
-                            color=var.CBLUE
+                            description=f"React to the {var.E_ACCEPT} emoji in the original [preview](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id}) to send your embed! To edit more react to the respective emojis below",
+                            color=var.C_BLUE
                 ).add_field(name="Add field", value="React to 🇦", inline=False
                 ).add_field(name="Footer", value="React to 🇫", inline=False
                 ).add_field(name="Image", value="React to 🇮", inline=False
@@ -187,7 +187,7 @@ class Commands(commands.Cog):
 
                 while True:
                     reaction, user = await self.bot.wait_for('reaction_add', check=editreactioncheck, timeout=120.0)
-                    if str(reaction.emoji) == var.ACCEPT:
+                    if str(reaction.emoji) == var.E_ACCEPT:
                         await channel.send(embed=embed)
                         await ctx.send("Embed sent in "+channel.mention+" !")
                         break

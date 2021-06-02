@@ -1,13 +1,13 @@
 import discord
 from discord.ext import commands
-import utils.vars as var
+import utils.variables as var
 import utils.database as db
-from utils.funcs import getprefix
+from utils.functions import getprefix
 import asyncio
 
 
 def levelhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Ah yes leveling, MEE6 who?", color=var.CMAIN
+    embed = discord.Embed(title="Ah yes leveling, MEE6 who?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user, user id or user mention can be used to check ranks, user field is optional for checking rank of yourself.", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
@@ -18,7 +18,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def modhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Moderation", description="What's better than entering a sweet little ban command?", color=var.CMAIN
+    embed = discord.Embed(title="Moderation", description="What's better than entering a sweet little ban command?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<reason>`", value="Bans a user until unbanned, reason is optional", inline=False
     ).add_field(name=getprefix(ctx)+"unban", value="Unbans a banned user", inline=False
     ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server, reason is optional", inline=False
@@ -29,7 +29,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def rrhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Reaction Roles", color=var.CMAIN
+    embed = discord.Embed(title="Reaction Roles", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rr `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server! For role either role ID or role ping can be used.", inline=False
     ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Remove any existing reaction role.", inline=False
     ).add_field(name=getprefix(ctx)+"allrr", value="View all active reaction roles in the server!", inline=False
@@ -39,7 +39,7 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def welcomehelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Welcome Greetings", color=var.CMAIN
+    embed = discord.Embed(title="Welcome Greetings", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
@@ -50,7 +50,7 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Verification", color=var.CMAIN
+    embed = discord.Embed(title="Verification", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
@@ -59,7 +59,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def chatbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Chatbot (BETA)", color=var.CMAIN,
+    embed = discord.Embed(title="Chatbot (BETA)", color=var.C_MAIN,
     description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!"
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Make a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Remove a chatbot channel (if added)", inline=False
@@ -68,7 +68,7 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     return embed
     
 def extrahelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.CMAIN
+    embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics!", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
@@ -91,9 +91,9 @@ class Help(commands.Cog):
         embed = discord.Embed(
         title="Axiol Help",
         description=f"Help commands for the plugins which are enabled!",
-        color=var.CMAIN
+        color=var.C_MAIN
         ).add_field(name=getprefix(ctx)+"prefix", value="Change prefix", inline=False
-        ).add_field(name=getprefix(ctx)+"plugins", value=f"Configure plugins {var.PLUGINSEMOJI}", inline=False
+        ).add_field(name=getprefix(ctx)+"plugins", value=f"Configure plugins {var.E_PLUGINS}", inline=False
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
 
@@ -102,17 +102,17 @@ class Help(commands.Cog):
                 helpname = i.lower()
                 if i.lower() == "reaction roles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
-                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.PLUGINEMOJIS.get(i)}", inline=False)
+                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.DICT_PLUGINEMOJIS.get(i)}", inline=False)
 
-        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Non plugin commands {var.CONTINUE}️ ", inline=False)
+        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Non plugin commands {var.E_CONTINUE}️ ", inline=False)
         helpmsg = await ctx.send(embed=embed)
 
 
-        await helpmsg.add_reaction(var.PLUGINSEMOJI)
+        await helpmsg.add_reaction(var.E_PLUGINS)
         for i in GuildDoc:
             if GuildDoc.get(i) == True:
-                await helpmsg.add_reaction(var.PLUGINEMOJIS.get(i))
-        await helpmsg.add_reaction(var.CONTINUE)
+                await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
+        await helpmsg.add_reaction(var.E_CONTINUE)
 
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
@@ -130,19 +130,19 @@ class Help(commands.Cog):
         try:
             while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
-                if str(reaction.emoji) in var.PLUGINEMOJIS.values():
+                if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
 
-                    helptype = list(var.PLUGINEMOJIS.keys())[list(var.PLUGINEMOJIS.values()).index(str(reaction.emoji))]
+                    helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
                     await helpmsg.edit(embed=HelpDict.get(helptype)(ctx))
                     await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
                 
                 #Since extra help is always there
-                if str(reaction.emoji) == var.CONTINUE:
+                if str(reaction.emoji) == var.E_CONTINUE:
                     await helpmsg.edit(embed=extrahelp(ctx))
-                    await helpmsg.remove_reaction(var.CONTINUE, ctx.author)
-                if str(reaction.emoji) == var.PLUGINSEMOJI:
+                    await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+                if str(reaction.emoji) == var.E_PLUGINS:
                     await ctx.invoke(self.bot.get_command('plugins'))
-                    await helpmsg.remove_reaction(var.PLUGINSEMOJI, ctx.author)
+                    await helpmsg.remove_reaction(var.E_PLUGINS, ctx.author)
 
         except asyncio.TimeoutError:
             await helpmsg.clear_reactions()

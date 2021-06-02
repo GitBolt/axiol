@@ -1,4 +1,4 @@
-from utils.vars import DEFAULT_PREFIX
+from utils.variables import DEFAULT_PREFIX
 from utils.database import PREFIXES, LEVELDATABASE, PLUGINS
 
 def getprefix(ctx):
@@ -13,6 +13,9 @@ def getxprange(message):
     xprange =settings.get("xprange")
     return xprange
 
+
+
+#Some functions to counter errors and warning while working locally :p
 def updateplugins(plugin):
     PLUGINS.update_many(
         { plugin: { "$exists": False } },
@@ -22,7 +25,7 @@ def updateplugins(plugin):
     )
 
 def updatedb(serverid):
-    if serverid not in LEVELDATABASE.list_collection_names():
+    try:
         GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
         GuildLevelDB.insert_one({
 
@@ -31,8 +34,8 @@ def updatedb(serverid):
             "alertchannel": None,
             "blacklistedchannels": [],
             }) 
+        print(f"Added Leveling {serverid}")
 
-    if not PLUGINS.count_documents({"_id": serverid}, limit=1):
         PLUGINS.insert_one({
 
                     "_id":serverid,
@@ -43,7 +46,15 @@ def updatedb(serverid):
                     "Verification": False,
                     "Chatbot": False,
                 })
+        print(f"Added Plugins {serverid}")
 
+    except:
+        print(f"Already there {serverid}")
 
-#updatedb(843516084266729512)
-#updateplugins()
+"""
+serveridlist = []
+for i in serveridlist:
+    updatedb(843516084266729512)
+updateplugins()
+
+"""

@@ -3,9 +3,9 @@ import json
 import discord
 import torch
 from discord.ext import commands
-from utils.funcs import getprefix
+from utils.functions import getprefix
 import utils.database as db
-import utils.vars as var
+import utils.variables as var
 from chatbot.model import NeuralNet
 from chatbot.utils import bag_of_words, tokenize
 
@@ -46,8 +46,8 @@ class Chatbot(commands.Cog):
             await ctx.send(f"Successfully added {channel.mention}")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the channel in order to make it bot chat",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the channel in order to make it bot chat",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}setchatbot <#channel>`"
             )
             )
@@ -76,8 +76,8 @@ class Chatbot(commands.Cog):
                 await ctx.send("This channel is not a bot chatting channel")
         else:   
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the channel in order to remove bot chat",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the channel in order to remove bot chat",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removechatbot <#channel>`"
             )
             )
@@ -88,7 +88,7 @@ class Chatbot(commands.Cog):
         GuildDoc = db.CHATBOT.find_one({"_id": ctx.guild.id})
         embed = discord.Embed(
             title="All chatbot channels in this server",
-            color=var.CTEAL
+            color=var.C_TEAL
         )
         if GuildDoc.get("channels") != []:
             for i in GuildDoc.get("channels"):

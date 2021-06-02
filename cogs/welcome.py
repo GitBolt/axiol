@@ -1,9 +1,9 @@
 import asyncio
 import discord
 from discord.ext import commands
-import utils.vars as var
+import utils.variables as var
 import utils.database as db
-from utils.funcs import getprefix
+from utils.functions import getprefix
 from utils.greetings import greeting
 
 
@@ -45,14 +45,14 @@ class Welcome(commands.Cog):
             db.WELCOME.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
             title="Changed welcome channel",
-            description=f"{var.ACCEPT} Now users will be greeted in {channel.mention}",
-            color=var.CGREEN)
+            description=f"{var.E_ACCEPT} Now users will be greeted in {channel.mention}",
+            color=var.C_GREEN)
             )
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the greeting channel to change it",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the greeting channel to change it",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomechannel #channel`"))
 
 
@@ -64,7 +64,7 @@ class Welcome(commands.Cog):
         await ctx.send(embed=discord.Embed(
                     tite="Send a message to make it the message",
                     description="The next message which you will send will become the embed description!",
-                    color=var.CBLUE
+                    color=var.C_BLUE
         ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
         )
 
@@ -82,9 +82,9 @@ class Welcome(commands.Cog):
                 db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
-                title=f"{var.ACCEPT} Successfully changed the greeting message!",
+                title=f"{var.E_ACCEPT} Successfully changed the greeting message!",
                 description=f"The new greeting message is:\n**{usermsg.content}**",
-                color=var.CGREEN)
+                color=var.C_GREEN)
                 )
         except asyncio.TimeoutError:
             await ctx.send("You took too long to enter your message ;-;")
@@ -98,7 +98,7 @@ class Welcome(commands.Cog):
         await ctx.send(embed=discord.Embed(
                     tite="Send a message to make it the image",
                     description="Either send the image as a file or use a link!",
-                    color=var.CBLUE
+                    color=var.C_BLUE
         ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
         )
         def msgcheck(message):
@@ -114,9 +114,9 @@ class Welcome(commands.Cog):
                 db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
-                title=f"{var.ACCEPT} Successfully changed welcome image",
+                title=f"{var.E_ACCEPT} Successfully changed welcome image",
                 description="New welcome image is:",
-                color=var.CGREEN
+                color=var.C_GREEN
                 ).set_image(url=usermsg.attachments[0].url)
                 )
             elif usermsg.content.startswith("http"):
@@ -126,9 +126,9 @@ class Welcome(commands.Cog):
                 db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
-                title=f"{var.ACCEPT} Successfully changed welcome image",
+                title=f"{var.E_ACCEPT} Successfully changed welcome image",
                 description="New welcome image is:",
-                color=var.CGREEN
+                color=var.C_GREEN
                 ).set_image(url=usermsg.content)
                 )
             else:
@@ -152,13 +152,13 @@ class Welcome(commands.Cog):
             db.WELCOME.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                     title="Successfully added auto assign role",
-                    description=f"{var.ACCEPT} Users will be automatically given {role.mention} when they join",
-                    color=var.CGREEN)
+                    description=f"{var.E_ACCEPT} Users will be automatically given {role.mention} when they join",
+                    color=var.C_GREEN)
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.ERROR} You need to define the role",
-            color=var.CRED
+            description=f"{var.E_ERROR} You need to define the role",
+            color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomerole <role>`"
             ).set_footer(text="For role either role ID or role mention can be used")
             )
@@ -175,8 +175,8 @@ class Welcome(commands.Cog):
         }}
         db.WELCOME.update_one(GuildDoc, newdata)
         await ctx.send(embed=discord.Embed(
-        description=f"{var.ACCEPT} Successfully changed the welcome embed back to the default one",
-        color=var.CGREEN)
+        description=f"{var.E_ACCEPT} Successfully changed the welcome embed back to the default one",
+        color=var.C_GREEN)
         )
 
 

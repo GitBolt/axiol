@@ -9,9 +9,9 @@
         "Prefix please"
       ],
       "responses":[
-        "Oh my prefix is `.`",
-        "My prefix is `.`!",
-        "You can use me using `.`"
+        "Oh my default prefix is `.` (Incase this is not working, ask admins if they have changed it)",
+        "My default prefix is `.`!",
+        "You can use me using `.` (Ask admins if they have changed the prefix)"
       ]
     },
 
@@ -296,6 +296,20 @@
         "Yeah :D",
         "Yup!",
         "Yeaa"
+      ]
+    },
+    {
+      "tag":"about",
+      "patterns":[
+        "Who are you?",
+        "Are you real",
+        "What is special about you"
+      ],
+      "responses":[
+        "I'm a just a discord bot made by someone",
+        "My name is Axiol and I am just a discord bot",
+        "I am a discord bot and I like cats!",
+        "I'm a dumb discord bot :D"
       ]
     }
   ]

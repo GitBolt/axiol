@@ -8,62 +8,10 @@
   </a>
 </p>
 
-Axiol is a Discord bot coded in pure Python. It is an advanced highly customizable bot with great user interaction </br>
-For any suggestions, the command `suggest` can be used (starting with the server prefix. Default is `.`) and the suggestion will be sent to the
-[Offical Discord Support Server](https://discord.gg/Rzz5WS9jXW)
-
-
-## All commands
-Variables which are not in ***`bold italics`*** are optional <br/>
-In User and Role fields, either mention and ID can be used
-
-| Command              |      Category             |
-| :--------------------| :-----------------------: |
-| `help`|Help| 
-| `help <subhelp>`|Help| 
-| `plugins` |Setup|
-| `prefix`|Setup|
-|Leveling            
-| `rank <user>`|Leveling|                  
-| `leaderboard`|Leveling|                  
-| `givexp`  ***`<user>`*** ***`<amount>`***|Leveling|                  
-| `removexp` ***`<user>`*** ***`<amount>`***|Leveling|                  
-| `whitelist` ***`<#channel>`***|Leveling|               
-| `blacklist` ***`<#channel>`***|Leveling|                  
-| `alertchannel`  ***`<#channel>`***|Leveling|                  
-| `xprange` ***`<min-amount>`*** ***`<max-amount>`***|Leveling|  
-|Moderation                        
-| `ban` ***`<user>`*** `<reason>`|Moderation|                  
-| `unban` ***`<user>`***|Moderation|                  
-| `mute` ***`<user>`*** |Moderation|                  
-| `unmute` ***`<user>`***|Moderation|                  
-| `kick` ***`<user>`*** `<reason>`|Moderation|                  
-| `purge` ***`<amount>`*** |Moderation|                  
-|Reaction Roles
-| `rr` ***`<messageid>`*** ***`<role>`*** ***`<emoji>`*** |Reaction Roles|    
-| `removerr` ***`<messageid>`*** ***`<emoji>`*** |Reaction Roles|    
-| `allrr`|Reaction Roles|   
-| `uniquerr` ***`<messageid>`***|Reaction Roles|    
-| `removeunique` ***`<messageid>`***|Reaction Roles|    
-|Verification
-| `verifytype`|Verification|  
-| `verifychannel` ***`<#channel>`***|Verification  
-| `verifyswitch`|Verification|    
-| `verifyremove`|Verification|    
-|Welcome
-| `welcomecard`|Welcome|    
-| `welcomechannel` ***`<#channel>`***|Welcome| 
-| `welcomemessage`|Welcome|  
-| `welcomeimage`|Welcome|   
-| `welcomerole` ***`<role>`***|Welcome|   
-| `welcomereset`|Welcome|   
-|Extra
-| `embed` ***`<#channel>`***|Extra| 
-| `stats`|Extra|  
-| `about` |Extra|   
-| `suggest` ***`<idea description>`***|Extra|   
-| `invite`|Extra|   
-| `source`|Extra|   
+Axiol is a Discord bot coded in pure Python. It is an advanced highly customizable interactive bot.</br>
+For any suggestions, the command `suggest` (Starting with the server prefix) can be used and the suggestion will be sent to the
+[Offical Discord Support Server](https://discord.gg/Rzz5WS9jXW).
+Default prefix is a dot `.`
 
 
 ### Support Server

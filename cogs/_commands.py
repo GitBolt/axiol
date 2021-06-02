@@ -137,7 +137,7 @@ class Commands(commands.Cog):
                 descbotmsg = await ctx.send(embed=discord.Embed(
                 title="Description",
                 description=f"Now send a message to make it the description of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
-                color=var.CBLUE
+                color=var.C_BLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
                 usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)

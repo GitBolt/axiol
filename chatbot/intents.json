@@ -311,6 +311,24 @@
         "I am a discord bot and I like cats!",
         "I'm a dumb discord bot :D"
       ]
+    },
+    {
+      "tag": "not sure replies",
+      "patterns":[
+        "Are you smart?",
+        "Do you like ice cream?",
+        "Would you take over humans?",
+        "Do you know english?",
+        "Is this good?",
+        "Are you intelligent"
+      ],
+      "responses":[
+        "Maybe :eyes:",
+        "I think yes :eyes:",
+        "Maybe, maybe not",
+        ":shrug:",
+        "idk, maybe"
+      ]
     }
   ]
 }

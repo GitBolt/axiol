@@ -69,7 +69,7 @@ class Leveling(commands.Cog):
     @commands.command()
     async def leaderboard(self, ctx):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-        rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp") #All sorted documents (users) excluding id 0 (Since it's config doc)
+        rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("-xp") #All sorted documents (users) excluding id 0 (Since it's config doc)
         
         embed = discord.Embed(
         title=f"Leaderboard", 
@@ -94,6 +94,7 @@ class Leveling(commands.Cog):
             data = GuildCol.find_one({"_id": user.id})
             if data is None:
                 GuildCol.insert_one({"_id": user.id, "xp": amount})
+                await ctx.send(f"Successfully awarded {user} with {amount} xp!")
             else:
                 newdata = {"$set":{
                             "xp": data.get("xp") + amount

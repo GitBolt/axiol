@@ -1,9 +1,9 @@
-from utils.variables import DEFAULT_PREFIX
-from utils.database import PREFIXES, LEVELDATABASE, PLUGINS
+from variables import DEFAULT_PREFIX
+from database import PREFIXES, LEVELDATABASE, PLUGINS
 
 def getprefix(ctx):
     try:
-        return PREFIXES.find_one({"serverid": ctx.guild.id}).get("prefix")
+        return PREFIXES.find_one({"_id": ctx.guild.id}).get("prefix")
     except AttributeError:
         return DEFAULT_PREFIX
     
@@ -25,7 +25,8 @@ def updateplugins(plugin):
     )
 
 def updatedb(serverid):
-    try:
+
+    if not str(serverid) in LEVELDATABASE.list_collection_names():
         GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
         GuildLevelDB.insert_one({
 
@@ -36,6 +37,7 @@ def updatedb(serverid):
             }) 
         print(f"Added Leveling {serverid}")
 
+    if not PLUGINS.count_documents({"_id": serverid}, limit=1):
         PLUGINS.insert_one({
 
                     "_id":serverid,
@@ -48,13 +50,18 @@ def updatedb(serverid):
                 })
         print(f"Added Plugins {serverid}")
 
+    try:
+        PREFIXES.insert_one({
+            "_id": serverid,
+            "prefix": "ax"
+        })
+        print(f"Added prefix {serverid}")
+
     except:
         print(f"Already there {serverid}")
 
-"""
-serveridlist = []
-for i in serveridlist:
-    updatedb(843516084266729512)
-updateplugins()
 
-"""
+serveridlist = []
+#for i in serveridlist:
+    #updatedb(i)
+#updateplugins()

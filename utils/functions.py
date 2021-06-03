@@ -1,5 +1,5 @@
-from variables import DEFAULT_PREFIX
-from database import PREFIXES, LEVELDATABASE, PLUGINS
+from utils.variables import DEFAULT_PREFIX
+from utils.database import PREFIXES, LEVELDATABASE, PLUGINS
 
 def getprefix(ctx):
     try:

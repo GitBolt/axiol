@@ -2,6 +2,8 @@ import random
 import discord
 import math
 from discord.ext import commands
+from discord.ext.commands.core import guild_only
+from discord.guild import Guild
 import utils.variables as var
 import utils.database as db
 from utils.functions import getprefix, getxprange
@@ -32,20 +34,30 @@ class Leveling(commands.Cog):
                 await ctx.send("The user does not have any rank yet...")
         else:
             xp = userdata["xp"]
-            level = int(1 + math.sqrt(1+10 * xp/120 )/2)
-            rankings = GuildCol.find().sort("xp", -1)
+            lvl = 0
             rank = 0
-            for i in rankings:
+            while True:
+                if xp < ((50*(lvl**2))+(50*lvl)):
+                    break
+                lvl += 1
+            xp -= ((50*((lvl-1)**2))+(50*(lvl-1)))
+            try:
+                boxes = int((xp/(200*((1/2) * lvl)))*20)
+            except:
+                boxes = 0
+            ranking = GuildCol.find().sort("xp", -1)
+            for x in ranking:
                 rank += 1
-                if userdata["_id"] == i["_id"]:
+                if userdata["_id"] == x["_id"]:
                     break
 
             embed = discord.Embed(
             title=f"Level stats for {user.name}",
             color=var.C_TEAL
             ).add_field(name="Rank", value=f"{rank}/{GuildCol.estimated_document_count()-1}", inline=True
-            ).add_field(name="XP", value=f"{xp}/{int(200*((1/2)*level))}", inline=True
-            ).add_field(name="Level", value=level, inline=True
+            ).add_field(name="XP", value=f"{xp}/{int(200*((1/2)*lvl))}", inline=True
+            ).add_field(name="Level", value=lvl, inline=True
+            ).add_field(name="Progress", value=boxes * "<:current:850041599139905586>" +(20-boxes) * "<:left:850041599127584776>", inline=False
             ).set_thumbnail(url=user.avatar_url
             )
             if db.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == False:
@@ -221,6 +233,29 @@ class Leveling(commands.Cog):
             )
 
 
+    @commands.command(aliases=["removealerts"])
+    async def togglealerts(self, ctx):
+        GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+        GuildConfig = GuildCol.find_one({"_id": 0})
+        if GuildConfig.get("alerts") == True:
+            newdata = {"$set":{
+                "alerts": False
+            }}
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_ACCEPT} Successfully disabled alerts!",
+                color=var.C_GREEN
+            ))
+        else:
+            newdata = {"$set":{
+                "alerts": True
+            }}
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_ACCEPT} Successfully enabled alerts!",
+                color=var.C_GREEN
+            ))
+        GuildCol.update_one(GuildConfig, newdata)
+
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -228,8 +263,8 @@ class Leveling(commands.Cog):
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
         if GuildPluginDoc.get("Leveling") == True and message.author.bot == False:
-
             if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
+
                 GuildDoc = db.LEVELDATABASE[str(message.guild.id)]
                 userdata = GuildDoc.find_one({"_id": message.author.id})
 
@@ -237,16 +272,29 @@ class Leveling(commands.Cog):
                     GuildDoc.insert_one({"_id": message.author.id, "xp": 0})
                 else:
                     xp = userdata["xp"]
-                    initlvl = int(1 + math.sqrt(1+10 * xp/120 )/2)
+
+                    initlvl = 0
+                    while True:
+                        if xp < ((50*(initlvl**2))+(50*initlvl)):
+                            break
+                        initlvl += 1
+
                     xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
                     GuildDoc.update_one(userdata, {"$set": {"xp": xp}})
-                    levelnow = int(1 + math.sqrt(1+10 * xp/120 )/2)
-                    if levelnow > initlvl:
+
+                    levelnow = 0
+                    while True:
+                        if xp < ((50*(levelnow**2))+(50*levelnow)):
+                            break
+                        levelnow += 1
+
+                    if levelnow > initlvl and GuildDoc.find_one({"_id":0}).get("alerts") == True:
                         ch = self.bot.get_channel(GuildDoc.find_one({"_id":0}).get("alertchannel"))
                         if ch is not None:
                             await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
                         else:
                             await message.channel.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+
 
 
 def setup(bot):

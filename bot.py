@@ -58,6 +58,7 @@ async def on_guild_join(guild):
             "xprange": [15, 25],
             "alertchannel": None,
             "blacklistedchannels": [],
+            "alerts": True
             })    
 
     #Support server Log

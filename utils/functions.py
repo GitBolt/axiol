@@ -34,6 +34,7 @@ def updatedb(serverid):
             "xprange": [15, 25],
             "alertchannel": None,
             "blacklistedchannels": [],
+            "alerts": True
             }) 
         print(f"Added Leveling {serverid}")
 

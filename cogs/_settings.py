@@ -216,22 +216,27 @@ class Settings(commands.Cog):
         try:
             usermsg = await self.bot.wait_for('message', check=messagecheck, timeout=60.0)
 
-            if usermsg.content == getprefix(ctx)+"cancel":
-                await ctx.send("Cancelled prefix change.")
+            if usermsg.content == getprefix(ctx)+"cancel": #Cancel
+                await ctx.send("Cancelled prefix change :ok_hand:")
                 
-            elif usermsg.content == var.DEFAULT_PREFIX:
-                db.PREFIXES.delete_one({"serverid": ctx.guild.id})
+            elif usermsg.content == var.DEFAULT_PREFIX: #Same prefixes so deleting the doc
+                db.PREFIXES.delete_one({"_id": ctx.guild.id})
                 await ctx.send(f"Changed your prefix to the default one\n```{var.DEFAULT_PREFIX}```")
 
-            elif getprefix(ctx) == var.DEFAULT_PREFIX:
-                db.PREFIXES.insert_one({"_id": db.PREFIXES.estimated_document_count()+1, "serverid": ctx.guild.id, "prefix": usermsg.content})
+            elif getprefix(ctx) == var.DEFAULT_PREFIX: #If current prefix is default then insert new
+                db.PREFIXES.insert_one({
+                    "_id": ctx.guild.id, 
+                    "prefix": usermsg.content
+                    })
                 await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
 
-            else:
-                oldprefix = db.PREFIXES.find_one({"serverid": usermsg.guild.id})
-                newprefix = {"$set": {"serverid": usermsg.guild.id, "prefix": usermsg.content}}
+            else: #Exists so just update it
+                GuildDoc = db.PREFIXES.find_one({"_id": usermsg.guild.id})
+                newdata = {"$set": {
+                    "prefix": usermsg.content
+                    }}
                 
-                db.PREFIXES.update_one(oldprefix, newprefix)
+                db.PREFIXES.update_one(GuildDoc, newdata)
                 await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
 
         except asyncio.TimeoutError:

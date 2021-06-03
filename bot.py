@@ -6,9 +6,9 @@ import utils.database as db
 
 #Function to get current server prefix
 def serverprefix(bot, message):
-    if db.PREFIXES.find_one({"serverid": message.guild.id}) is None:
+    if db.PREFIXES.find_one({"_id": message.guild.id}) is None:
         return var.DEFAULT_PREFIX
-    return db.PREFIXES.find_one({"serverid": message.guild.id}).get("prefix")
+    return db.PREFIXES.find_one({"_id": message.guild.id}).get("prefix")
 
 intents = discord.Intents().all()
 bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=intents)

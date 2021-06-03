@@ -18,7 +18,7 @@ class AutoReactions(commands.Cog):
             description=f"{var.E_ERROR} You need to define the message and emoji both to add an autoreact",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}autoreact <messageid> <emoji>`"
-            )
+            ))
 
 
 

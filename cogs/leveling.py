@@ -98,8 +98,8 @@ class Leveling(commands.Cog):
                 newdata = {"$set":{
                             "xp": data.get("xp") + amount
                         }}
-            GuildCol.update_one(data, newdata)
-            await ctx.send(f"Successfully awarded {user} with {amount} xp!")
+                GuildCol.update_one(data, newdata)
+                await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the member and the amount to give them xp",

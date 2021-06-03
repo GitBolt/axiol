@@ -65,25 +65,77 @@ class Leveling(commands.Cog):
             await ctx.channel.send(embed=embed)
 
 
-
+#Trash
     @commands.command()
     async def leaderboard(self, ctx):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-        rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("-xp") #All sorted documents (users) excluding id 0 (Since it's config doc)
+        rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
         
         embed = discord.Embed(
         title=f"Leaderboard", 
         color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url)
+        ).set_thumbnail(url=ctx.guild.icon_url
+        ).set_footer(text="Page 1/2")
+
         rankcount = 0
         for i in rankings:
             rankcount += 1
-            user = await ctx.guild.fetch_member(i.get("_id"))
-            xp = i.get("xp")
-            embed.add_field(name=f"{rankcount}: {user.name}", value=f"Total XP: {xp}", inline=False)
-            if rankcount > 15:
+            try:
+                user = ctx.guild.get_member(i.get("_id"))
+                xp = i.get("xp")
+                embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+            except:
+                print(f"Not found {i}")
+
+            if rankcount == 10:
                 break
-        await ctx.send(embed=embed)
+
+        botmsg = await ctx.send(embed=embed)
+        await botmsg.add_reaction("⬅️")
+        await botmsg.add_reaction(var.E_CONTINUE)
+
+
+        def reactioncheck(reaction, user):
+            return user == ctx.author and reaction.message == botmsg
+        
+        while True:
+            reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+
+            if str(reaction.emoji) == var.E_CONTINUE:
+                embed.set_footer(text="Page 2/2")
+                embed.clear_fields()
+                rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
+                rankcount = 10
+                for i in rankings[10:]:
+                    rankcount += 1
+                    try:
+                        user = ctx.guild.get_member(i.get("_id"))
+                        xp = i.get("xp")
+                        embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+                    except:
+                        print(f"Not found {i}")
+                    if rankcount == 20:
+                        break
+                await botmsg.edit(embed=embed)
+                await botmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+
+            if str(reaction.emoji) == "⬅️":
+                embed.set_footer(text="Page 1/2")
+                embed.clear_fields()
+                rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
+                rankcount = 0
+                for i in rankings:
+                    rankcount += 1
+                    try:
+                        user = ctx.guild.get_member(i.get("_id"))
+                        xp = i.get("xp")
+                        embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+                    except:
+                        print(f"Not found {i}")
+                    if rankcount == 10:
+                        break
+                await botmsg.edit(embed=embed)
+                await botmsg.remove_reaction("⬅️", ctx.author)
 
 
 

@@ -19,7 +19,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
-    async def verifytype(self, ctx):
+    async def verifyinfo(self, ctx):
         GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
         verifytype = GuildDoc.get("type")
         if verifytype == "command":
@@ -35,6 +35,8 @@ class Verification(commands.Cog):
             description="This is a slightly more advanced bot captcha like verification most suitable to bypass advance bot raids, after users enter the command a captcha image is sent in the channel with distorted text (good enough for a human to read) and if the users enter the code correctly they are verified. The image lasts only for 15 seconds, entering the command again will send another new image.",
             color=var.C_TEAL
             )
+        embed.add_field(name="Verification Channel", value=self.bot.get_channel(GuildDoc.get("channel")).mention)
+        embed.add_field(name="Not Verified Role", value=ctx.guild.get_role(GuildDoc.get("roleid")).mention)
         await ctx.send(embed=embed)
 
 
@@ -92,6 +94,11 @@ class Verification(commands.Cog):
         GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
         db.VERIFY.delete_one(GuildDoc)
         await discord.utils.get(ctx.guild.roles, name="Not Verified").delete()
+        GuildPluginDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        newdata = {"$set":{
+            "Verification": False
+        }}
+        db.PLUGINS.update_one(GuildPluginDoc, newdata)
         await ctx.send("Successfully removed verification from this server!")
 
 

@@ -38,7 +38,7 @@ DICT_PLUGINEMOJIS = {
     "Moderation": "🔨",
     "Reaction Roles": "✨",
     "Welcome": "👋",
-    "Verification": E_ACCEPT,
+    "Verification": "✅",
     "Chatbot": "🤖",
 }
 

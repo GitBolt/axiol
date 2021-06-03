@@ -141,9 +141,10 @@ class Chatbot(commands.Cog):
 
                 elif prob.item() > 0.4:
                     await message.channel.send(random.choice([
-                        "Okay so I gotta agree, I'm dumb and I wasn't able to understand what you said ;-;",
                         "Can you word this a bit differently, I couldn't understand",
                         "Hmmm?",
+                        "What?",
+                        "Wait say that again but differently"
                     ]))
 
                 else:

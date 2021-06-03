@@ -142,7 +142,7 @@ class Help(commands.Cog):
                     await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
                 if str(reaction.emoji) == var.E_PLUGINS:
                     await ctx.invoke(self.bot.get_command('plugins'))
-                    await helpmsg.remove_reaction(var.E_PLUGINS, ctx.author)
+                    await helpmsg.clear_reactions()
 
         except asyncio.TimeoutError:
             await helpmsg.clear_reactions()

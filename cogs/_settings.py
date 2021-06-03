@@ -93,94 +93,94 @@ class Settings(commands.Cog):
 
                         #Since welcome is not enabled by default ->
                         #The time plugin is enabled, there is no information avaialable in the db ->
-                    #Hence we ask for the welcome channel and insert the data
-                    if str(reaction.emoji) == "👋" and db.WELCOME.find_one({"_id": ctx.guild.id}) is None:
+                        #Hence we ask for the welcome channel and insert the data
+                        if str(reaction.emoji) == "👋" and db.WELCOME.find_one({"_id": ctx.guild.id}) is None:
 
-                        embed = discord.Embed(
-                        title="Send the welcome channel where I can greet members!",
-                        description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to greet new members :D",
-                        color=var.C_BLUE
-                        ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the Channel/ChannelID is valid other wise this won't work"
-                        )
-                        await ctx.send(embed=embed)
-                        def messagecheck(message):
-                            return message.author == ctx.author and message.channel.id == ctx.channel.id
-                        usermsg = await self.bot.wait_for('message', check=messagecheck)
-                        try:
-                            chid = int(usermsg.content.strip("<>#"))
-                        except:
-                            await ctx.send(embed=discord.Embed(
-                                    title="Invalid Channel",
-                                    description=f"{var.E_ERROR} I was not able to find the channel which you entered",
-                                    color=var.C_RED
-                            ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                            embed = discord.Embed(
+                            title="Send the welcome channel where I can greet members!",
+                            description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to greet new members :D",
+                            color=var.C_BLUE
+                            ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the Channel/ChannelID is valid other wise this won't work"
                             )
+                            await ctx.send(embed=embed)
+                            def messagecheck(message):
+                                return message.author == ctx.author and message.channel.id == ctx.channel.id
+                            usermsg = await self.bot.wait_for('message', check=messagecheck)
+                            try:
+                                chid = int(usermsg.content.strip("<>#"))
+                            except:
+                                await ctx.send(embed=discord.Embed(
+                                        title="Invalid Channel",
+                                        description=f"{var.E_ERROR} I was not able to find the channel which you entered",
+                                        color=var.C_RED
+                                ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                                )
 
-                        db.WELCOME.insert_one({
+                            db.WELCOME.insert_one({
 
-                            "_id":ctx.guild.id,
-                            "channelid":chid,
-                            "greeting": "Hope you enjoy your stay here :)",
-                            "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
-                            "assignroles": []
-                        })
-                        successembed = discord.Embed(
-                        title="Welcome greeting successfully setted up",
-                        description=f"{var.E_ACCEPT} New members will now be greeted in {self.bot.get_channel(chid).mention}!",
-                        color=var.C_GREEN
-                        ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help welcome`")
-                        
-                        await ctx.send(embed=successembed)
-                
-                    #Same with verification
-                    if str(reaction.emoji) =="➡️" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
-
-                        embed = discord.Embed(
-                        title="Send the verify channel",
-                        description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to verify new members :D",
-                        color=var.C_BLUE
-                        ).set_footer(text="The next message which you will send will become the verify channel, make sure that the channel/channelID is valid other wise this won't work")
-                        botmsg = await ctx.send(embed=embed)
-
-                        def messagecheck(message):
-                            return message.author == ctx.author and message.channel.id == ctx.channel.id
-
-                        usermsg = await self.bot.wait_for('message', check=messagecheck)
-                        try:
-                            chid = int(usermsg.content.strip("<>#"))
-                        except:
-                            await ctx.send(embed=discord.Embed(
-                                    title="Invalid Channel",
-                                    description=f"{var.E_ERROR} I was not able to find the channel which you entered",
-                                    color=var.C_RED
-                            ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
-                            )
-                        NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
-                        await botmsg.clear_reactions()
-
-                        embed.title="Processing..."
-                        embed.description="Setting up everything, just a second"
-                        embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
-                        await botmsg.edit(embed=embed)
-                        for i in ctx.guild.text_channels:
-                            await i.set_permissions(NVerified, view_channel=False)
-                        await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
-                        await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
-                        db.VERIFY.insert_one({
+                                "_id":ctx.guild.id,
+                                "channelid":chid,
+                                "greeting": "Hope you enjoy your stay here :)",
+                                "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
+                                "assignroles": []
+                            })
+                            successembed = discord.Embed(
+                            title="Welcome greeting successfully setted up",
+                            description=f"{var.E_ACCEPT} New members will now be greeted in {self.bot.get_channel(chid).mention}!",
+                            color=var.C_GREEN
+                            ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help welcome`")
                             
-                            "_id":ctx.guild.id,
-                            "type": "command",
-                            "channel": chid, 
-                            "roleid": NVerified.id
-                        })
-                        successembed = discord.Embed(
-                        title="Verification successfully setted up",
-                        description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
-                        color=var.C_GREEN
-                        ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
-                        ).set_footer(text="Default verification type is command")
-                        
-                        await ctx.send(embed=successembed)
+                            await ctx.send(embed=successembed)
+                    
+                        #Same with verification
+                        if str(reaction.emoji) =="✅" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
+
+                            embed = discord.Embed(
+                            title="Send the verify channel",
+                            description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to verify new members :D",
+                            color=var.C_BLUE
+                            ).set_footer(text="The next message which you will send will become the verify channel, make sure that the channel/channelID is valid other wise this won't work")
+                            botmsg = await ctx.send(embed=embed)
+
+                            def messagecheck(message):
+                                return message.author == ctx.author and message.channel.id == ctx.channel.id
+
+                            usermsg = await self.bot.wait_for('message', check=messagecheck)
+                            try:
+                                chid = int(usermsg.content.strip("<>#"))
+                            except:
+                                await ctx.send(embed=discord.Embed(
+                                        title="Invalid Channel",
+                                        description=f"{var.E_ERROR} I was not able to find the channel which you entered",
+                                        color=var.C_RED
+                                ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                                )
+                            NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                            await botmsg.clear_reactions()
+
+                            embed.title="Processing..."
+                            embed.description="Setting up everything, just a second"
+                            embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
+                            await botmsg.edit(embed=embed)
+                            for i in ctx.guild.text_channels:
+                                await i.set_permissions(NVerified, view_channel=False)
+                            await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
+                            await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+                            db.VERIFY.insert_one({
+                                
+                                "_id":ctx.guild.id,
+                                "type": "command",
+                                "channel": chid, 
+                                "roleid": NVerified.id
+                            })
+                            successembed = discord.Embed(
+                            title="Verification successfully setted up",
+                            description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
+                            color=var.C_GREEN
+                            ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                            ).set_footer(text="Default verification type is command")
+                            
+                            await ctx.send(embed=successembed)
 
             except asyncio.TimeoutError:
                 await botmsg.clear_reactions()

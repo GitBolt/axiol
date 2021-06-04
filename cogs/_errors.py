@@ -18,7 +18,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
-                    description=f"{E_ERROR} I was not able to find the channel which you entered",
+                    description=f"{E_ERROR} Are you sure the channel ID or channel mention was correct?",
                     color=C_RED
             ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
             )
@@ -35,7 +35,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Member not found",
-                description=f"{E_ERROR} I was not able to find this member in the server, perhaps they left?",
+                description=f"{E_ERROR} You sure the mention/ID is correct? Or maybe they left? Maybe they don't even exist? [SpongoBob?](https://youtu.be/wjXBqelv4GM)",
                 color=C_RED
             ))
 

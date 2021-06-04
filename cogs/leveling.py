@@ -1,9 +1,7 @@
 import random
 import discord
-import math
 from discord.ext import commands
-from discord.ext.commands.core import guild_only
-from discord.guild import Guild
+from discord.ext.commands.errors import RoleNotFound
 import utils.variables as var
 import utils.database as db
 from utils.functions import getprefix, getxprange
@@ -31,7 +29,7 @@ class Leveling(commands.Cog):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
         userdata = GuildCol.find_one({"_id": user.id})
         if userdata is None:
-                await ctx.send("The user does not have any rank yet...")
+                await ctx.send("This user does not have any rank yet...")
         else:
             xp = userdata["xp"]
             lvl = 0
@@ -65,17 +63,27 @@ class Leveling(commands.Cog):
             await ctx.channel.send(embed=embed)
 
 
-#Trash
+
     @commands.command()
     async def leaderboard(self, ctx):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-        rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
-        
+        rankings = GuildCol.find({
+
+                "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+                
+            }).sort("xp", -1)
+
+        if rankings.count() < 10:
+            exactpages = 1
+        else:
+            exactpages = rankings.count() / 10
+        all_pages = int(exactpages)
+
         embed = discord.Embed(
         title=f"Leaderboard", 
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
-        ).set_footer(text="Page 1/2")
+        )
 
         rankcount = 0
         for i in rankings:
@@ -89,53 +97,82 @@ class Leveling(commands.Cog):
 
             if rankcount == 10:
                 break
-
+            
+        embed.set_footer(text=f"Page 1/{all_pages}")
         botmsg = await ctx.send(embed=embed)
         await botmsg.add_reaction("⬅️")
-        await botmsg.add_reaction(var.E_CONTINUE)
-
+        await botmsg.add_reaction("➡️")
 
         def reactioncheck(reaction, user):
-            return user == ctx.author and reaction.message == botmsg
+            if str(reaction.emoji) == "➡️" or str(reaction.emoji) == "⬅️":
+                return user == ctx.author and reaction.message == botmsg
         
+        current_page = 0
         while True:
             reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
 
-            if str(reaction.emoji) == var.E_CONTINUE:
-                embed.set_footer(text="Page 2/2")
+            if str(reaction.emoji) == "➡️":
+                await botmsg.remove_reaction("➡️", ctx.author)
+                current_page += 1
+                pagern = current_page + 1
+                embed.set_footer(text=f"Page {pagern}/{all_pages}")
                 embed.clear_fields()
-                rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
-                rankcount = 10
-                for i in rankings[10:]:
+
+                rankings = GuildCol.find({
+
+                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+                     
+                    }).sort("xp", -1)
+
+                rankcount = (current_page)*10
+                user_amount = current_page*10
+                print(user_amount)
+                for i in rankings[user_amount:]:
                     rankcount += 1
-                    try:
-                        user = ctx.guild.get_member(i.get("_id"))
-                        xp = i.get("xp")
-                        embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-                    except:
-                        print(f"Not found {i}")
-                    if rankcount == 20:
+                    getuser = ctx.guild.get_member(i.get("_id"))
+                    xp = i.get("xp")
+                    if getuser == None:
+                        user = "*This user has left the server*"
+                    else:
+                        user = getuser
+                    embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+
+                    if rankcount == (current_page)*10 + 10:
                         break
                 await botmsg.edit(embed=embed)
-                await botmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+                
 
             if str(reaction.emoji) == "⬅️":
-                embed.set_footer(text="Page 1/2")
+                await botmsg.remove_reaction("⬅️", ctx.author)
+                current_page -= 1
+                if current_page < 0:
+                    await ctx.send(f"{ctx.author.mention} Ay where you going to negatives, that's the first page :facepalm:")
+                    current_page += 1
+                pagern = current_page + 1
+                embed.set_footer(text=f"Page {pagern}/{all_pages}")
                 embed.clear_fields()
-                rankings = GuildCol.find({ "_id": { "$ne": 0 } }  ).sort("xp", -1) #All sorted documents (users) excluding id 0 (Since it's config doc)
-                rankcount = 0
-                for i in rankings:
+
+                rankings = GuildCol.find({
+
+                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+                     
+                    }).sort("xp", -1)
+
+                rankcount = (current_page)*10
+                user_amount = current_page*10
+                for i in rankings[user_amount:]:
                     rankcount += 1
-                    try:
-                        user = ctx.guild.get_member(i.get("_id"))
-                        xp = i.get("xp")
-                        embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-                    except:
-                        print(f"Not found {i}")
-                    if rankcount == 10:
+                    getuser = ctx.guild.get_member(i.get("_id"))
+                    xp = i.get("xp")
+                    if getuser == None:
+                        user = "*This user has left the server*"
+                    else:
+                        user = getuser
+                    embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+
+                    if rankcount == (current_page)*10 + 10:
                         break
                 await botmsg.edit(embed=embed)
-                await botmsg.remove_reaction("⬅️", ctx.author)
 
 
 
@@ -144,7 +181,7 @@ class Leveling(commands.Cog):
 
         if amount > 10000000 :
             await ctx.send(embed=discord.Embed(
-                description=f"{var.var.E_ERROR} Ayo that's too much",
+                description=f"{var.E_ERROR} Ayo that's too much",
                 color=var.C_RED
             ))
         if user and amount is not None:
@@ -156,7 +193,7 @@ class Leveling(commands.Cog):
                 
             elif data.get("xp") > 10000000:
                 await ctx.send(embed=discord.Embed(
-                    description=f"{var.E_ERROR} Cannot give more xp to the user",
+                    description=f"{var.E_ERROR} Cannot give more xp to the user, they are too rich already",
                     color=var.C_RED
                 ))
             else:

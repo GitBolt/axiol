@@ -31,6 +31,15 @@ class Errors(commands.Cog):
                         color=C_RED
             ))
 
+        #Member not found (left)
+        if isinstance(error, commands.MemberNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="Member not found",
+                description=f"{E_ERROR} I was not able to find this member in the server, perhaps they left?",
+                color=C_RED
+            ))
+
+        
         #Cog check failure
         if isinstance(error, commands.CheckFailure):
             pass

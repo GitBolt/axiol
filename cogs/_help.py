@@ -52,10 +52,10 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Verification", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"verifytype", value="Get information about the type of verification server has!", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyinfo", value="Get information about the type of verification server has!", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
-    ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (if enabled)", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (Removes data and disables plugin)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
@@ -142,8 +142,8 @@ class Help(commands.Cog):
                     await helpmsg.edit(embed=extrahelp(ctx))
                     await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
                 if str(reaction.emoji) == var.E_PLUGINS:
-                    await ctx.invoke(self.bot.get_command('plugins'))
                     await helpmsg.clear_reactions()
+                    await ctx.invoke(self.bot.get_command('plugins'))
 
         except asyncio.TimeoutError:
             await helpmsg.clear_reactions()

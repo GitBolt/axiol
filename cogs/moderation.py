@@ -18,76 +18,142 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx, member:discord.User=None, *, reason="No reason given :("):
-        if member == ctx.author:
-            await ctx.send("You can't ban yourself :eyes:")
-        await ctx.guild.ban(member, reason=reason)
+    @commands.bot_has_permissions(ban_members=True)
+    async def ban(self, ctx, user:discord.User=None, *, reason="No reason given"):
+        if user is not None:
 
-        await member.send(embed=discord.Embed(
-                        title=f"You have been banned from {ctx.guild.name}",
-                        description="Sorry I'm just a bot and I follow orders :(", 
-                        color=var.C_RED).add_field(name="Reason", value=reason
-                        ).add_field(name="Banned by", value=ctx.author)
-                        )
-        await ctx.send(f"`{member}` got banned :O")
+            if user == ctx.author:
+                await ctx.send("You can't ban yourself :eyes:")
 
+            await ctx.guild.ban(user, reason=reason)
+
+            await user.send(embed=discord.Embed(
+                            title=f"You have been banned from {ctx.guild.name}",
+                            description="Sorry I'm just a bot and I follow orders :(", 
+                            color=var.C_RED).add_field(name="Reason", value=reason
+                            ).add_field(name="Banned by", value=ctx.author)
+                            )
+            await ctx.send(f"Applied ban to `{user}` :ok_hand:")
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the user to ban them, reason is optional",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}ban <user> <reason>`"
+            ).set_footer(text="For user either User mention or User ID can be used")
+            )
 
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
-    async def unban(self, ctx, member:discord.User=None):
-        if member == ctx.author:
-            await ctx.send("You are not even banned why you trying to unban yourself :joy:")
-        await ctx.guild.unban(member)
+    async def unban(self, ctx, user:discord.User=None):
+        if user is not None:
 
-        await ctx.send(f'`{member}` is now unbanned!')
-        await member.send(embed=discord.Embed(
-                        title=f"You have been unbanned from {ctx.guild.name}!",
-                        description="Yay I would be happy to see you back!", 
-                        color=var.C_GREEN
-                        ).add_field(name="Unbanned by", value=ctx.author)
-                        )
-    
+            if user == ctx.author:
+                await ctx.send("You are not even banned why you trying to unban yourself :face_with_raised_eyebrow:")
+
+            await ctx.guild.unban(user)
+
+            await ctx.send(f'Unbanned `{user}` :ok_hand:')
+            await user.send(embed=discord.Embed(
+                            title=f"You have been unbanned from {ctx.guild.name}!",
+                            description="Yay I would be happy to see you back!", 
+                            color=var.C_GREEN
+                            ).add_field(name="Unbanned by", value=ctx.author)
+                            )
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the user to unban them",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}unban <user>`"
+            ).set_footer(text="For user either User mention or User ID can be used")
+            )         
+
 
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def mute(self, ctx, member:discord.Member=None):
-        if not discord.utils.get(ctx.guild.roles, name='Muted'):
-            mutedrole = await ctx.guild.create_role(name="Muted", colour=discord.Colour(0xa8a8a8))
-            for i in ctx.guild.text_channels:
-                await i.set_permissions(mutedrole, send_messages=False)
-        mutedrole = discord.utils.get(ctx.guild.roles, name="Muted")
-        await member.add_roles(mutedrole)
-        await ctx.send(f"`{member}` have been muted!")
+        if member is not None:
+
+            if not discord.utils.get(ctx.guild.roles, name='Muted'):
+                mutedrole = await ctx.guild.create_role(name="Muted", colour=discord.Colour(0xa8a8a8))
+                for i in ctx.guild.text_channels:
+                    await i.set_permissions(mutedrole, send_messages=False)
+
+            mutedrole = discord.utils.get(ctx.guild.roles, name="Muted")
+            await member.add_roles(mutedrole)
+            await ctx.send(f"Applied chat mute to `{member}`` :mute:")
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define member in order to mute them",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}mute <member>`"
+            ).set_footer(text="For user either Member mention or Member ID can be used")
+            )
 
 
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     async def unmute(self, ctx, member:discord.Member=None):
-        if not discord.utils.get(ctx.guild.roles, name='Muted'): 
-            await ctx.send("There is no muted role yet hence I cannot unmute, Muting someone automatically makes one.")
-        mutedrole = discord.utils.get(ctx.guild.roles, name='Muted')
-        await member.remove_roles(mutedrole)
-        await ctx.send(f"`{member}` have been unmuted")
-
+        if member is not None:
+            if not discord.utils.get(ctx.guild.roles, name='Muted'): 
+                await ctx.send("There is no muted role yet hence I cannot unmute, Muting someone automatically makes one.")
+            mutedrole = discord.utils.get(ctx.guild.roles, name='Muted')
+            await member.remove_roles(mutedrole)
+            await ctx.send(f"`{member}` have been unmuted")
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the member to unmute them",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}unmute <member>`"
+            ).set_footer(text="For user either Member mention or Member ID can be used")
+            )
     
+
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member:discord.Member=None, *, reason="No reason provided"):
-        if member == ctx.author:
-            await ctx.send("You can't kick yourself :eyes:")
-        await member.kick(reason=reason)
+        if member is not None:
+            if member == ctx.author:
+                await ctx.send("You can't kick yourself :eyes:")
+            await member.kick(reason=reason)
 
-        await member.send(embed=discord.Embed(
-                        title=f"You have been kicked from {ctx.guild.name}",
-                        color=var.C_RED
-                        ).add_field(name="Reason", value=reason
-                        ).add_field(name="Kicked by", value=ctx.author)
-                        )
-        await ctx.send(f"`{member}` have been kicked from the server")
+            await member.send(embed=discord.Embed(
+                            title=f"You have been kicked from {ctx.guild.name}",
+                            color=var.C_RED
+                            ).add_field(name="Reason", value=reason
+                            ).add_field(name="Kicked by", value=ctx.author)
+                            )
+            await ctx.send(f"`{member}` have been kicked from the server")
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the member to kick them",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}kick <member>`"
+            ).set_footer(text="For user either Member mention or Member ID can be used")
+            )
+
+
+
+    @commands.command(aliases=["nickname", "changenick"])
+    @commands.has_permissions(change_nickname=True)
+    async def nick(self, ctx, member: discord.Member=None, *,nick=None):
+        if member and nick is not None:
+
+            await member.edit(nick=nick)
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_ACCEPT} Nickname changed for {member.mention} to {nick}",
+                color=var.C_GREEN
+            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define both the member and their new nick",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}nick <member> <new nick>`"
+            ).set_footer(text="For Member either mention or Member ID can be used")
+            )
 
 
 
@@ -101,10 +167,16 @@ class Moderation(commands.Cog):
                                 description=f"Deleted {limit} messages",
                                 color=var.C_ORANGE)
                                 )
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
             await info.delete()
         else:
-            await ctx.send(f"You need to define the amount too! Follow this format:\n```{getprefix(ctx)}purge <amount>```\n Amount should be in numbers.")
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the amount to delete messages too!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}purge <amount>`"
+            )
+            )
+
 
 
 def setup(bot):

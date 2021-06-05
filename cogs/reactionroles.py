@@ -65,7 +65,7 @@ class ReactionRoles(commands.Cog):
             else:
                 await ctx.send(embed=discord.Embed(
                     title="Role position error",
-                    description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your role as shown below\n\n **Server Settings > Roles > Click on the {bot_member.roles[1].mention} Role > Drag it above the {role.mention} Role **(Shown as the Developer role in the image below)",
+                    description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your reaction role as shown below\n\n **Server Settings > Roles > Click on the {bot_member.roles[1].mention} Role > Drag it above the {role.mention} Role **(Shown as the Developer role in the image below)",
                     color=var.C_RED
                 ).set_image(url="https://cdn.discordapp.com/attachments/843519647055609856/850711272726986802/unknown.png")
                 )

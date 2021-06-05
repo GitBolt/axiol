@@ -129,7 +129,7 @@ class Commands(commands.Cog):
                 description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
                 color=var.C_BLUE)
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=200.0)
                 embed.title = usermsg.content
                 await preview.edit(embed=embed)
                 await titlebotmsg.delete()
@@ -140,7 +140,7 @@ class Commands(commands.Cog):
                 color=var.C_BLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=200.0)
                 if usermsg.content == "skip" or usermsg.content == "`skip`":
                     embed.description = None
                     await preview.edit(embed=embed)
@@ -156,7 +156,7 @@ class Commands(commands.Cog):
                 color=var.C_BLUE
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
-                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
+                usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=200.0)
                 if usermsg.attachments:
                     embed.set_thumbnail(url=usermsg.attachments[0].url)
                     await preview.edit(embed=embed)

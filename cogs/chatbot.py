@@ -37,7 +37,7 @@ class Chatbot(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @commands.command()
+    @commands.command(aliases=["disablechatbot", "chatbot"])
     async def setchatbot(self, ctx, channel:discord.TextChannel=None):
 
         if db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
@@ -57,7 +57,7 @@ class Chatbot(commands.Cog):
             }}
 
             db.CHATBOT.update_one(GuildDoc, newdata)
-            await ctx.send(f"Successfully added {channel.mention}")
+            await ctx.send(f"Enabled Chatbot for {channel.mention}")
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the channel in order to make it bot chat",
@@ -67,7 +67,7 @@ class Chatbot(commands.Cog):
             )
 
     
-    @commands.command()
+    @commands.command(aliases=["disablechatbot"])
     async def removechatbot(self, ctx, channel:discord.TextChannel=None):
 
         if db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
@@ -85,7 +85,7 @@ class Chatbot(commands.Cog):
                     "channels": newlist
                 }}
                 db.CHATBOT.update_one(GuildDoc, newdata)
-                await ctx.send(f"removed {channel.mention}")
+                await ctx.send(f"Disabled Chatbot from {channel.mention}")
             else:
                 await ctx.send("This channel is not a bot chatting channel")
         else:   

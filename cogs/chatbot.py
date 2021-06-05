@@ -117,7 +117,7 @@ class Chatbot(commands.Cog):
         else:
             channels = []
 
-        if f'<@!{self.bot.user.id}>' in message.content or message.channel.id in channels and message.author.bot != True:
+        if f'<@!{self.bot.user.id}>' in message.content and message.author.bot != True or message.channel.id in channels and message.author.bot != True:
 
             with open('chatbot/intents.json', 'r') as json_data:
                 intents = json.load(json_data)

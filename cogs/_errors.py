@@ -27,7 +27,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(
                         title="Missing Permissions",
-                        description=f"{E_ERROR} {ctx.author.mention} You don't have permissions to do that",
+                        description=f"{E_ERROR} You don't have permissions to do that {ctx.author.name} ",
                         color=C_RED
             ))
 
@@ -39,7 +39,6 @@ class Errors(commands.Cog):
                 color=C_RED
             ))
 
-        
         #Cog check failure
         if isinstance(error, commands.CheckFailure):
             pass

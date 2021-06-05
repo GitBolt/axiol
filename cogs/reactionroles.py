@@ -18,8 +18,8 @@ class ReactionRoles(commands.Cog):
 
     @commands.command()
     async def rr(self, ctx, msg:discord.Message=None, role: discord.Role=None, emoji=None):
-
-        if msg and role and emoji is not None:
+        bot_member = ctx.guild.get_member(self.bot.user.id)
+        if msg and role and emoji is not None and bot_member.roles[1].position > role.position:
             GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
             if GuildDoc == None:
                 db.REACTIONROLES.insert_one({
@@ -54,7 +54,14 @@ class ReactionRoles(commands.Cog):
                     db.REACTIONROLES.update_one(GuildDoc, newdata)
                     await msg.add_reaction(emoji)
                     await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
-
+        
+        elif bot_member.roles[1].position < role.position:
+            await ctx.send(embed=discord.Embed(
+                title="Role position error",
+                description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your role as shown below",
+                color=var.C_RED
+                ).set_image(url="https://cdn.discordapp.com/attachments/843519647055609856/850711272726986802/unknown.png")
+                )
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the message, role and emoji all three to add a reaction role",

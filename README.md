@@ -19,4 +19,4 @@ Default prefix is a dot `.`
 
 
 ### Invite
-[Invite the bot from here](https://discord.com/api/oauth2/authorize?client_id=843484459113775114&permissions=8&scope=bot)
+[Invite the bot from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=402778198&scope=bot)

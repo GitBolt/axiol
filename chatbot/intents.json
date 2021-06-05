@@ -9,7 +9,8 @@
         "Tell me your prefix",
         "Start command please",
         "Prefix please",
-        "Command?"
+        "Command?",
+        "Tell prefix"
       ],
       "responses":[
         "Oh my prefix is `~` ",
@@ -219,6 +220,23 @@
         "I get that often ;-;"
       ]
     },
+    {
+      "tag":"appreciate",
+      "patterns":[
+        "you are cool",
+        "you are nice",
+        "i like you",
+        "you are smart"
+      ],
+      "responses":[
+        "Thanks haha",
+        ":smile:",
+        "Thank you :)",
+        "Thanks! :)",
+        "You too :smile:",
+        "So are you! :)"
+      ]
+    },
 
     {
       "tag": "apologize",
@@ -274,7 +292,8 @@
         "Never mind",
         "nvm",
         "No problem",
-        "Nothing much"
+        "Nothing much",
+        "nothing"
       ],
       "responses":[
         "Alrighty",
@@ -359,7 +378,8 @@
         "Is it possible?",
         "what",
         "no",
-        "why"
+        "why",
+        "huh"
       ],
       "responses":[
         ":eyes:",
@@ -378,6 +398,59 @@
         "no",
         "n o",
         "no :eyes:"
+      ]
+    },
+    {
+      "tag": "laught_abrs",
+      "patterns":[
+        "lol",
+        "lmao",
+        "lmfao",
+        "lul",
+        "lel",
+        "xD",
+        "kekw"
+      ],
+      "responses":[
+        "hehe",
+        ":D",
+        "lol",
+        "xD",
+        "haha",
+        ":relieved:"
+      ]
+    },
+    {
+      "tag": "not_able",
+      "patterns":[
+        "Search this",
+        "Tell me the meaning",
+        "Give me answers",
+        "Search on internet",
+        "Send DM",
+        "Run command"
+      ],
+      "responses":[
+        "Sorry right now I am not able to do that",
+        "I'm not that advanced right now",
+        "Sorry I am uncapable of doing that :(",
+        "I wish I could do that, but atleast not right now"
+      ]
+    },
+    {
+      "tag": "nou",
+      "patterns":[
+        "ur mom",
+        "your mom",
+        "you smell",
+        "stinky"
+      ],
+      "responses":[
+        "No you",
+        "<:7689_unoreversecard:850800438160392212>",
+        "*uno reverse* <:7689_unoreversecard:850800438160392212>",
+        "no u <:7689_unoreversecard:850800438160392212>",
+        "no you *pulls out uno reverse card*"
       ]
     }
   ]

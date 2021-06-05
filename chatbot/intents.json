@@ -3,15 +3,20 @@
     {
       "tag": "prefix",
       "patterns":[
+        "What is your prefix",
+        "Prefix",
         "What's your prefix",
         "Tell me your prefix",
         "Start command please",
-        "Prefix please"
+        "Prefix please",
+        "Command?"
       ],
       "responses":[
-        "Oh my default prefix is `.` (Incase this is not working, ask admins if they have changed it)",
-        "My default prefix is `.`!",
-        "You can use me using `.` (Ask admins if they have changed the prefix)"
+        "Oh my prefix is `~` ",
+        "My prefix is `~` :relieved:",
+        "You can use me using `~` in this server :D ",
+        "Control me using `~` :cowboy:",
+        "My prefix is `~` :ok_hand:"
       ]
     },
 
@@ -23,7 +28,8 @@
         "Is anyone there?",
         "Yo",
         "Sup",
-        "Wassup"
+        "Wassup",
+        "Oi"
       ],
       "responses": [
         "Heyyyy",
@@ -33,7 +39,7 @@
         "How are you doing?",
         "Heyy, how are you?",
         "What's good",
-        "hi"
+        "hi :wave:"
       ]
     },
 
@@ -44,8 +50,7 @@
         "Good and you?",
         "Hope you are doing good",
         "What's up",
-        "How was your day",
-        "Wassup"
+        "How was your day"
       ],
       "responses":[
         "I'm doing great! thanks",
@@ -101,7 +106,7 @@
         "Say a joke"
       ],
       "responses": [
-        "Why did the hipster burn his mouth? He drank the coffee before it was cool.",
+        "I don't know any joke :shrug:",
         "I'm pretty bad with jokes lol",
         "Not really tbh, I don't know jokes haha"
       ]
@@ -145,14 +150,15 @@
         "You are dumb",
         "stupid",
         "Idiot",
-        "You don't know anything"
+        "You don't know anything",
+        "retarded"
       ],
       "responses":[
         "I mean you are not wrong :p",
         "Yeah man, tbh I agree with that",
         "I wish I was smarter ;-;",
         "~~I mean you are not wrong, I still need to learn more~~",
-        "I literally forget what you said just a second ago this so yea pretty dumb",
+        "I literally forgot what you said just a second ago this so yea pretty dumb",
         "Yup, I still need to learn more ",
         "Consistently improving! One day I will be smarter than you 🥴 ||jk||"
       ]
@@ -180,13 +186,14 @@
       "tag": "name",
       "patterns":[
         "What is your name?",
-        "What does your name mean"
+        "What does your name mean",
+        "Who named you"
       ],
       "responses":[
-        "My name is Axiol which was given by my creator",
+        "My name is Axiol which was given by my creator, idk if it means something",
         "I don't know if Axiol means anything but that's my name",
         "I was named by my creator, not sure if Axiol even means anything",
-        "Axiol sounds cool doesn't it? haha"
+        "Axiol sounds cool doesn't it? Not sure if that means anything or not"
       ]
     },
 
@@ -208,8 +215,8 @@
         "I am very offended by your statemnt and going to report you to discord ||jk i won't||",
         "Ok ig ;-;",
         "Why, thank you",
-        "A lot of people have said that to me idk why...",
-        "I get that often not sure why ;-;"
+        "A lot of people have said that to me :cowboy:",
+        "I get that often ;-;"
       ]
     },
 
@@ -219,14 +226,15 @@
         "Sorry",
         "I am sorry",
         "Forgive me",
-        "I would like to apologize"
+        "I would like to apologize",
+        "I feel bad"
       ],
       "responses":[
         "All good!",
         "It's fine :D",
         "No problem haha, it's all good",
         "That's okay!",
-        "It's all good, no need to apologize :)))"
+        "It's all good, no need to apologize or feel bad :)))"
       ]
     },
     {
@@ -238,8 +246,9 @@
         "Where do you live"
       ],
       "responses":[
-        "I was made on 17 May 2021 and I live in around 7 servers as of now",
-        "My birthday is on 17 may 2021! And I live in around 7 servers :) "
+        "I was made on 17 May 2021 and I live in around 9 servers as of now",
+        "My birthday is on 17 may 2021! And I live in around 9 servers :) ",
+        "You can use the command `about` starting with the server prefix to get information about me!"
       ]
     },
     {
@@ -248,7 +257,8 @@
         "soo",
         "hmm",
         "well",
-        "bored"
+        "bored",
+        "soooo"
       ],
       "responses":[
         "Bored?",
@@ -293,7 +303,9 @@
         "That's nice",
         "Good",
         "Do you agree",
-        "Nice"
+        "Nice",
+        "Alright",
+        "Really?"
       ],
       "responses":[
         "Yup",
@@ -325,7 +337,11 @@
         "Would you take over humans?",
         "Do you know english?",
         "Is this good?",
-        "Are you intelligent"
+        "Are you intelligent",
+        "you like humans?",
+        "Do you have feelings?",
+        "do you feel?",
+        "Do you like potatoes?"
       ],
       "responses":[
         "Maybe :eyes:",
@@ -342,13 +358,26 @@
         "Wait how",
         "Is it possible?",
         "what",
-        "no"
+        "no",
+        "why"
       ],
       "responses":[
         ":eyes:",
-        "ooop",
         ":eyes: y e s ",
-        ">.<"
+        ":p",
+        ":shrug:"
+      ]
+    },
+    {
+      "tag": "no",
+      "patterns":[
+        "tell me",
+        "are you real"
+      ],
+      "responses":[
+        "no",
+        "n o",
+        "no :eyes:"
       ]
     }
   ]

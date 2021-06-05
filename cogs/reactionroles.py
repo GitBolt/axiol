@@ -19,47 +19,50 @@ class ReactionRoles(commands.Cog):
     @commands.command()
     async def rr(self, ctx, msg:discord.Message=None, role: discord.Role=None, emoji=None):
         bot_member = ctx.guild.get_member(self.bot.user.id)
-        if msg and role and emoji is not None and bot_member.roles[1].position > role.position:
-            GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
-            if GuildDoc == None:
-                db.REACTIONROLES.insert_one({
+        botrole = bot_member.roles[1]
 
-                    "_id": ctx.guild.id,
-                    "reaction_roles": [{
-                        "messageid": msg.id,
-                        "roleid": role.id,
-                        "emoji": str(emoji)
-                        }],
-                    "unique_messages":[]
+        if msg and role and emoji is not None:
+            if botrole.position > role.position:
+                GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+                if GuildDoc == None:
+                    db.REACTIONROLES.insert_one({
 
-                    })
+                        "_id": ctx.guild.id,
+                        "reaction_roles": [{
+                            "messageid": msg.id,
+                            "roleid": role.id,
+                            "emoji": str(emoji)
+                            }],
+                        "unique_messages":[]
 
-                await msg.add_reaction(emoji)
-                await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
-            else:
-                guildrrlist = GuildDoc["reaction_roles"]
-                def check():
-                    for i in guildrrlist: 
-                        if i.get("messageid") == msg.id and i.get("emoji") == str(emoji):
-                            return True
+                        })
 
-                if check() == True:
-                    await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
-                else:
-                    newlist = guildrrlist.copy()
-                    newlist.append({"messageid":msg.id, "roleid": role.id, "emoji": str(emoji)})
-                    newdata = {"$set":{
-                        "reaction_roles": newlist
-                    }}
-                    db.REACTIONROLES.update_one(GuildDoc, newdata)
                     await msg.add_reaction(emoji)
                     await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
-        
-        elif bot_member.roles[1].position < role.position:
-            await ctx.send(embed=discord.Embed(
-                title="Role position error",
-                description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your role as shown below",
-                color=var.C_RED
+                else:
+                    guildrrlist = GuildDoc["reaction_roles"]
+                    def check():
+                        for i in guildrrlist: 
+                            if i.get("messageid") == msg.id and i.get("emoji") == str(emoji):
+                                return True
+
+                    if check() == True:
+                        await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
+                    else:
+                        newlist = guildrrlist.copy()
+                        newlist.append({"messageid":msg.id, "roleid": role.id, "emoji": str(emoji)})
+                        newdata = {"$set":{
+                            "reaction_roles": newlist
+                        }}
+                        db.REACTIONROLES.update_one(GuildDoc, newdata)
+                        await msg.add_reaction(emoji)
+                        await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
+
+            else:
+                await ctx.send(embed=discord.Embed(
+                    title="Role position error",
+                    description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your role as shown below\n\n **Server Settings > Roles > Click on the {bot_member.roles[1].mention} Role > Drag it above the {role.mention} Role **(Shown as the Developer role in the image below)",
+                    color=var.C_RED
                 ).set_image(url="https://cdn.discordapp.com/attachments/843519647055609856/850711272726986802/unknown.png")
                 )
         else:

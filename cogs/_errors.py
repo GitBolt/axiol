@@ -13,7 +13,6 @@ class Errors(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         
-
         #Invalid Channel
         if isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(
@@ -39,13 +38,28 @@ class Errors(commands.Cog):
                 color=C_RED
             ))
 
+
+        #Message not found
+        if isinstance(error, commands.MessageNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="Message not found",
+                description=f"{E_ERROR} Are you sure that the message ID belongs to this server and is valid?",
+                color=C_RED
+            ))
+
+        if isinstance(error, commands.RoleNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="Role not found",
+                description=f"{E_ERROR} Make sure that the ID or mention is correct. Maybe you pinged any member instead of the role? Maybe you copied the wrong ID?",
+                color=C_RED
+            ))
+
         #Cog check failure
         if isinstance(error, commands.CheckFailure):
             pass
 
+
         else:
-            #All unhandled Errors will print their original traceback
-            print(f'Ignoring exception in command {ctx.command}:', file=sys.stderr)
             traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
         

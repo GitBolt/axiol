@@ -12,11 +12,15 @@ class Leveling(commands.Cog):
         self.bot = bot
 
     #Simple check to see if this cog (plugin) is enabled
-    def cog_check(self, ctx):
+    async def cog_check(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
             return ctx.guild.id
-
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
 
     @commands.command()

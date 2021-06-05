@@ -10,11 +10,15 @@ class ReactionRoles(commands.Cog):
 
 
     #Simple check to see if this cog (plugin) is enabled
-    def cog_check(self, ctx):
+    async def cog_check(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Reaction Roles") == True:
             return ctx.guild.id
-
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Reaction Roles plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @commands.command()
     async def rr(self, ctx, msg:discord.Message=None, role: discord.Role=None, emoji=None):

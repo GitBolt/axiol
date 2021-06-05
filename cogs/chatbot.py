@@ -37,7 +37,7 @@ class Chatbot(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @commands.command(aliases=["disablechatbot", "chatbot"])
+    @commands.command(aliases=["enablechatbot"])
     async def setchatbot(self, ctx, channel:discord.TextChannel=None):
 
         if db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:

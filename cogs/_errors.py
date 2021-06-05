@@ -38,6 +38,13 @@ class Errors(commands.Cog):
                 color=C_RED
             ))
 
+        #User not found (account deleted)
+        if isinstance(error, commands.UserNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="User not found",
+                description=f"{E_ERROR} Make sure the User ID is correct, if you are sure it's correct then perhaps the User deleted their account?",
+                color=C_RED
+            ))
 
         #Message not found
         if isinstance(error, commands.MessageNotFound):

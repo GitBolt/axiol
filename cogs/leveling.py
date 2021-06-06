@@ -1,7 +1,6 @@
 import random
 import discord
 from discord.ext import commands
-from discord.ext.commands.errors import RoleNotFound
 import utils.variables as var
 import utils.database as db
 from utils.functions import getprefix, getxprange
@@ -21,6 +20,7 @@ class Leveling(commands.Cog):
                 description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
+
 
 
     @commands.command()
@@ -179,6 +179,36 @@ class Leveling(commands.Cog):
                 await botmsg.edit(embed=embed)
 
 
+    @commands.command()
+    async def levelinfo(self, ctx):
+        GuildDoc = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find_one({"_id": 0})
+        xprange = GuildDoc.get("xprange")
+        bl = []
+
+        for i in GuildDoc.get("blacklistedchannels"):
+            bl.append(self.bot.get_channel(i).mention)
+
+        blacklistedchannels = ', '.join(bl)
+        rankings = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find({"_id": { "$ne": 0}}).sort("xp, -1")
+        for i in rankings:
+            maxrank = ctx.guild.get_member(i.get("_id"))
+            break
+            
+        status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled"   
+
+        embed = discord.Embed(
+        title="Server leveling information",
+        color=var.C_BLUE
+        ).set_thumbnail(url=ctx.guild.icon_url
+        ).add_field(name="Highest XP Member", value=maxrank
+        ).add_field(name="Leveling XP Range", value=xprange, inline=False
+        ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
+        ).add_field(name="Alert Status", value=status
+        ).add_field(name="Alert channel", value=self.bot.get_channel(GuildDoc.get("alertchannel")).mention, inline=False
+        )
+
+        await ctx.send(embed=embed)
+
 
     @commands.command()
     async def givexp(self, ctx, user:discord.Member=None, amount:int=None):
@@ -235,7 +265,29 @@ class Leveling(commands.Cog):
             )
 
 
-#Leveling Configs
+    @commands.command()
+    async def xprange(self, ctx, minval:int=None, maxval:int=None):
+        if minval and maxval is not None:
+            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            settings = GuildCol.find_one({"_id": 0})
+
+            newdata = {"$set":{
+                "xprange": [minval, maxval]
+            }}
+            GuildCol.update_one(settings, newdata)
+            await ctx.send(embed=discord.Embed(
+                        description=f"New xp range is now {minval} - {maxval}!",
+                        color=var.C_GREEN)
+            )
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the xp range",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}xprange <min_xp> <max_xp>`"
+            )
+            )
+
+
     @commands.command()
     async def blacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
@@ -291,54 +343,6 @@ class Leveling(commands.Cog):
             )
 
 
-
-    @commands.command()
-    async def alertchannel(self, ctx, channel:discord.TextChannel=None):
-        if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
-            settings = GuildCol.find_one({"_id": 0})
-
-            newdata = {"$set":{
-                "alertchannel": channel.id
-                }}
-            GuildCol.update_one(settings, newdata)
-            await ctx.send(embed=discord.Embed(
-                        description=f"{channel.mention} has been marked as the alert channel, hence users who will level up will get mentioned here!",
-                        color=var.C_GREEN)
-                        )
-        else:
-            await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel to make it the alert channel",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
-            )
-            )
-
-
-
-    @commands.command()
-    async def xprange(self, ctx, minval:int=None, maxval:int=None):
-        if minval and maxval is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
-            settings = GuildCol.find_one({"_id": 0})
-
-            newdata = {"$set":{
-                "xprange": [minval, maxval]
-            }}
-            GuildCol.update_one(settings, newdata)
-            await ctx.send(embed=discord.Embed(
-                        description=f"New xp range is now {minval} - {maxval}!",
-                        color=var.C_GREEN)
-            )
-        else:
-            await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the xp range",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}xprange <min_xp> <max_xp>`"
-            )
-            )
-
-
     @commands.command(aliases=["removealerts"])
     async def togglealerts(self, ctx):
         GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
@@ -361,6 +365,28 @@ class Leveling(commands.Cog):
             ))
         GuildCol.update_one(GuildConfig, newdata)
 
+
+    @commands.command()
+    async def alertchannel(self, ctx, channel:discord.TextChannel=None):
+        if channel is not None:
+            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            settings = GuildCol.find_one({"_id": 0})
+
+            newdata = {"$set":{
+                "alertchannel": channel.id
+                }}
+            GuildCol.update_one(settings, newdata)
+            await ctx.send(embed=discord.Embed(
+                        description=f"{channel.mention} has been marked as the alert channel, hence users who will level up will get mentioned here!",
+                        color=var.C_GREEN)
+                        )
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the channel to make it the alert channel",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
+            )
+            )
 
 
     @commands.Cog.listener()
@@ -399,7 +425,12 @@ class Leveling(commands.Cog):
                         if ch is not None:
                             await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
                         else:
-                            await message.channel.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                            embed = discord.Embed(
+                            title="You leveled up!",
+                            description=f"{var.E_ACCEPT} You are now level {levelnow}!",
+                            color=var.C_MAIN
+                            )
+                            await message.channel.send(content=message.author.mention, embed=embed)
 
 
 

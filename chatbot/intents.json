@@ -17,7 +17,8 @@
         "My prefix is `~` :relieved:",
         "You can use me using `~` in this server :D ",
         "Control me using `~` :cowboy:",
-        "My prefix is `~` :ok_hand:"
+        "My prefix is `~` :ok_hand:",
+        "My prefix in this server is `~` :D"
       ]
     },
 
@@ -30,7 +31,8 @@
         "Yo",
         "Sup",
         "Wassup",
-        "Oi"
+        "Oi",
+        "What's up"
       ],
       "responses": [
         "Heyyyy",
@@ -50,15 +52,16 @@
         "How are you?",
         "Good and you?",
         "Hope you are doing good",
-        "What's up",
-        "How was your day"
+        "How was your day",
+        "nothing much, hbu"
       ],
       "responses":[
         "I'm doing great! thanks",
-        "Pretty good today haha, ty for asking",
+        "Pretty good , ty for asking",
         "I'm good, thanks for asking!",
         "Good good, thanks for asking",
-        "Pretty good actually"
+        "Pretty good actually",
+        "Good as usual, thanks for asking"
       ]
     },
 
@@ -94,7 +97,8 @@
         "Happy to help!", 
         "Any time!", 
         "My pleasure",
-        ":)))"
+        ":)))",
+        ":smile:"
       ]
     },
 
@@ -109,7 +113,7 @@
       "responses": [
         "I don't know any joke :shrug:",
         "I'm pretty bad with jokes lol",
-        "Not really tbh, I don't know jokes haha"
+        "I don't know jokes haha"
       ]
     },
 
@@ -133,7 +137,8 @@
       "patterns": [
         "In which language are you made?",
         "Which progamming language are you made in?",
-        "Your favourite language?"
+        "Your favourite language?",
+        "Coding language?"
       ],
       "responses":[
         "Python!",
@@ -141,7 +146,7 @@
         "Python ;)",
         "Python haha",
         "What do you think? ||Python 🤫||",
-        "I'm made entirely in Python, actually I am open source too haha, just head over to github.com/GitBolt/Axiol"
+        "I'm made entirely in Python, actually I am open source too , just head over to https://github.com/GitBolt/Axiol"
       ]      
     },
 
@@ -152,7 +157,8 @@
         "stupid",
         "Idiot",
         "You don't know anything",
-        "retarded"
+        "retarded",
+        "you are shit"
       ],
       "responses":[
         "I mean you are not wrong :p",
@@ -162,39 +168,6 @@
         "I literally forgot what you said just a second ago this so yea pretty dumb",
         "Yup, I still need to learn more ",
         "Consistently improving! One day I will be smarter than you 🥴 ||jk||"
-      ]
-    },
-
-    {
-      "tag": "games",
-      "patterns":[
-        "Do you play any games?",
-        "Do you like games?",
-        "What do you say about games?",
-        "How about games",
-        "Do you like video games"
-      ],
-      "responses": [
-        "I can't play games ;-;",
-        "I have never played any games in my life lol",
-        "I can't really say since I haven't played any games .-.",
-        "Minecraft looks good however I have never played any game",
-        "All I do is chatting so ye I haven't played any games"
-      ]
-    },
-
-    {
-      "tag": "name",
-      "patterns":[
-        "What is your name?",
-        "What does your name mean",
-        "Who named you"
-      ],
-      "responses":[
-        "My name is Axiol which was given by my creator, idk if it means something",
-        "I don't know if Axiol means anything but that's my name",
-        "I was named by my creator, not sure if Axiol even means anything",
-        "Axiol sounds cool doesn't it? Not sure if that means anything or not"
       ]
     },
 
@@ -217,16 +190,54 @@
         "Ok ig ;-;",
         "Why, thank you",
         "A lot of people have said that to me :cowboy:",
-        "I get that often ;-;"
+        "I get that often ;-;",
+        "T_T"
       ]
     },
+
+    {
+      "tag": "games",
+      "patterns":[
+        "Do you play any games?",
+        "Do you like games?",
+        "What do you say about games?",
+        "How about games",
+        "Do you like video games",
+        "Sports?"
+      ],
+      "responses": [
+        "I can't play games ;-;",
+        "I have never played any games in my life lol",
+        "I can't really say since I haven't played any games .-.",
+        "Minecraft looks good however I have never played any game",
+        "All I do is chatting so ye I haven't played any games"
+      ]
+    },
+
+    {
+      "tag": "name",
+      "patterns":[
+        "What is your name?",
+        "What does your name mean",
+        "Who named you",
+        "Tell me your name"
+      ],
+      "responses":[
+        "My name is Axiol which was given by my creator, idk if it means something",
+        "I don't know if Axiol means anything but that's my name",
+        "I was named by my creator, not sure if Axiol even means anything",
+        "Axiol sounds cool doesn't it? Not sure if that means anything or not"
+      ]
+    },
+
     {
       "tag":"appreciate",
       "patterns":[
         "you are cool",
         "you are nice",
         "i like you",
-        "you are smart"
+        "you are smart",
+        "You are epic"
       ],
       "responses":[
         "Thanks haha",
@@ -234,7 +245,8 @@
         "Thank you :)",
         "Thanks! :)",
         "You too :smile:",
-        "So are you! :)"
+        "So are you! :)",
+        "You are too! thanks"
       ]
     },
 
@@ -348,8 +360,9 @@
         "I'm a dumb discord bot :D"
       ]
     },
+
     {
-      "tag": "not sure replies",
+      "tag": "uncertain",
       "patterns":[
         "Are you smart?",
         "Do you like?",
@@ -360,7 +373,8 @@
         "you like humans?",
         "Do you have feelings?",
         "do you feel?",
-        "Do you like potatoes?"
+        "Do you like potatoes?",
+        "Are you my friend?"
       ],
       "responses":[
         "Maybe :eyes:",
@@ -370,8 +384,9 @@
         "idk, maybe"
       ]
     },
+
     {
-      "tag": "no straight answer",
+      "tag": "no_answer",
       "patterns":[
         "How do you know?",
         "Wait how",
@@ -379,7 +394,9 @@
         "what",
         "no",
         "why",
-        "huh"
+        "huh",
+        "what do you mean",
+        "wdym"
       ],
       "responses":[
         ":eyes:",
@@ -401,7 +418,7 @@
       ]
     },
     {
-      "tag": "laught_abrs",
+      "tag": "laugh",
       "patterns":[
         "lol",
         "lmao",
@@ -409,7 +426,9 @@
         "lul",
         "lel",
         "xD",
-        "kekw"
+        "kekw",
+        "lmaooooo",
+        "XDDDD"
       ],
       "responses":[
         "hehe",
@@ -438,19 +457,23 @@
       ]
     },
     {
-      "tag": "nou",
+      "tag": "no_u",
       "patterns":[
         "ur mom",
         "your mom",
         "you smell",
-        "stinky"
+        "stinky",
+        "you are a fool",
+        "you kinda cringe",
+        "you are cringe",
+        "you sound dumb"
       ],
       "responses":[
         "No you",
         "<:7689_unoreversecard:850800438160392212>",
         "*uno reverse* <:7689_unoreversecard:850800438160392212>",
         "no u <:7689_unoreversecard:850800438160392212>",
-        "no you *pulls out uno reverse card*"
+        "No you *pulls out uno reverse card*"
       ]
     }
   ]

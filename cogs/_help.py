@@ -14,6 +14,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"togglealerts", value="Disable or Enable alert message for level ups!", inline=False
     #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
+    ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings!", inline=False
     ).add_field(name=getprefix(ctx)+"levelconfig", value=f"Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
@@ -31,7 +32,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
 
 def rrhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Reaction Roles", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"rr `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server! For role either role ID or role ping can be used.", inline=False
+    ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server! For role either role ID or role ping can be used.", inline=False
     ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Remove any existing reaction role.", inline=False
     ).add_field(name=getprefix(ctx)+"allrr", value="View all active reaction roles in the server!", inline=False
     ).add_field(name=getprefix(ctx)+"uniquerr `<messageid>`", value="Mark a message with unique reactions! Users would be able to react once hence take one role from the message.", inline=False

@@ -21,47 +21,54 @@ class ReactionRoles(commands.Cog):
             ))
 
     @commands.command()
-    async def rr(self, ctx, msg:discord.Message=None, role: discord.Role=None, emoji=None):
+    async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji=None):
         bot_member = ctx.guild.get_member(self.bot.user.id)
         botrole = bot_member.roles[1]
 
-        if msg and role and emoji is not None:
-            if botrole.position > role.position:
-                GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
-                if GuildDoc == None:
-                    db.REACTIONROLES.insert_one({
+        if channel and msgid and role and emoji is not None:
+            try:
+                msg = await channel.fetch_message(msgid)
+                if botrole.position > role.position:
+                    GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+                    if GuildDoc == None:
+                        db.REACTIONROLES.insert_one({
 
-                        "_id": ctx.guild.id,
-                        "reaction_roles": [{
-                            "messageid": msg.id,
-                            "roleid": role.id,
-                            "emoji": str(emoji)
-                            }],
-                        "unique_messages":[]
+                            "_id": ctx.guild.id,
+                            "reaction_roles": [{
+                                "messageid": msg.id,
+                                "roleid": role.id,
+                                "emoji": str(emoji)
+                                }],
+                            "unique_messages":[]
 
-                        })
+                            })
 
-                    await msg.add_reaction(emoji)
-                    await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
-                else:
-                    guildrrlist = GuildDoc["reaction_roles"]
-                    def check():
-                        for i in guildrrlist: 
-                            if i.get("messageid") == msg.id and i.get("emoji") == str(emoji):
-                                return True
-
-                    if check() == True:
-                        await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
-                    else:
-                        newlist = guildrrlist.copy()
-                        newlist.append({"messageid":msg.id, "roleid": role.id, "emoji": str(emoji)})
-                        newdata = {"$set":{
-                            "reaction_roles": newlist
-                        }}
-                        db.REACTIONROLES.update_one(GuildDoc, newdata)
                         await msg.add_reaction(emoji)
                         await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
+                    else:
+                        guildrrlist = GuildDoc["reaction_roles"]
+                        def check():
+                            for i in guildrrlist: 
+                                if i.get("messageid") == msg.id and i.get("emoji") == str(emoji):
+                                    return True
 
+                        if check() == True:
+                            await ctx.send(f"You have already setted up this reaction role using {emoji} on that message :D I can see it in the database!")
+                        else:
+                            newlist = guildrrlist.copy()
+                            newlist.append({"messageid":msg.id, "roleid": role.id, "emoji": str(emoji)})
+                            newdata = {"$set":{
+                                "reaction_roles": newlist
+                            }}
+                            db.REACTIONROLES.update_one(GuildDoc, newdata)
+                            await msg.add_reaction(emoji)
+                            await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
+            except:
+                await ctx.send(embed=discord.Embed(
+                            title="Invalid Message ID",
+                            description=f"There are no messages with the ID **{msgid}** in {channel.mention}",
+                            color=var.C_RED
+                ))
             else:
                 await ctx.send(embed=discord.Embed(
                     title="Role position error",
@@ -71,9 +78,9 @@ class ReactionRoles(commands.Cog):
                 )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the message, role and emoji all three to add a reaction role",
+            description=f"{var.E_ERROR} You need to define the channel, message, role and emoji all three to add a reaction role",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}rr <messageid> <role> <emoji>`"
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}rr <#channel> <messageid> <role> <emoji>`"
             ).set_footer(text="You can use either role ID or mention it (use ID if you don't want to disturb everyone having the role)")
             )
 
@@ -101,9 +108,9 @@ class ReactionRoles(commands.Cog):
                 newlist = rrlist.copy()
                 for rrpairs in newlist:
                     if  msg.id == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
-                        removethis = rrpairs
+                        return rrpairs
                 
-                newlist.remove(removethis)
+                newlist.remove(rrpairs)
                 newdata = {"$set":{
                     "reaction_roles": newlist
                 }}
@@ -136,10 +143,23 @@ class ReactionRoles(commands.Cog):
         if GuildDoc is not None:
             for i in GuildDoc["reaction_roles"]:
                 guild = self.bot.get_guild(ctx.guild.id)
-                msg = await ctx.fetch_message(i.get("messageid"))
-                role = guild.get_role(i.get("roleid"))
-                emoji = i.get("emoji")
-                embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n [Jump to the message!](https://discord.com/channels/{guild.id}/{msg.channel.id}/{msg.id})", inline=False)
+                try:
+                    msg = await ctx.fetch_message(i.get("messageid"))
+                    role = guild.get_role(i.get("roleid"))
+                    emoji = i.get("emoji")
+                    embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n [Jump to the message!](https://discord.com/channels/{guild.id}/{msg.channel.id}/{msg.id})", inline=False)
+                except:
+                    rrlist = GuildDoc["reaction_roles"]
+                    newlist = rrlist.copy()
+                    for i in newlist:
+                        if  msg == i .get("messageid") and emoji == i .get("emoji"):
+                            return i 
+                    
+                    newlist.remove(i)
+                    newdata = {"$set":{
+                        "reaction_roles": newlist
+                    }}
+                    db.REACTIONROLES.update_one(GuildDoc, newdata)  
             await ctx.send(embed=embed)
         else:
             await ctx.send("This server does not have any active reaction roles right now")

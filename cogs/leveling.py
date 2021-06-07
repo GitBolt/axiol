@@ -178,29 +178,31 @@ class Leveling(commands.Cog):
     @commands.command()
     async def givexp(self, ctx, user:discord.Member=None, amount:int=None):
 
-        if amount > 10000000 :
-            await ctx.send(embed=discord.Embed(
-                description=f"{var.E_ERROR} Ayo that's too much",
-                color=var.C_RED
-            ))
         if user and amount is not None:
-            GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-            data = GuildCol.find_one({"_id": user.id})
-            if data is None:
-                GuildCol.insert_one({"_id": user.id, "xp": amount})
-                await ctx.send(f"Successfully awarded {user} with {amount} xp!")
-                
-            elif data.get("xp") > 10000000:
+
+            if amount > 10000000 :
                 await ctx.send(embed=discord.Embed(
-                    description=f"{var.E_ERROR} Cannot give more xp to the user, they are too rich already",
+                    description=f"{var.E_ERROR} Ayo that's too much",
                     color=var.C_RED
                 ))
             else:
-                newdata = {"$set":{
-                            "xp": data.get("xp") + amount
-                        }}
-                GuildCol.update_one(data, newdata)
-                await ctx.send(f"Successfully awarded {user} with {amount} xp!")
+                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                data = GuildCol.find_one({"_id": user.id})
+                if data is None:
+                    GuildCol.insert_one({"_id": user.id, "xp": amount})
+                    await ctx.send(f"Successfully awarded {user} with {amount} xp!")
+                    
+                elif data.get("xp") > 10000000:
+                    await ctx.send(embed=discord.Embed(
+                        description=f"{var.E_ERROR} Cannot give more xp to the user, they are too rich already",
+                        color=var.C_RED
+                    ))
+                else:
+                    newdata = {"$set":{
+                                "xp": data.get("xp") + amount
+                            }}
+                    GuildCol.update_one(data, newdata)
+                    await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the member and the amount to give them xp",

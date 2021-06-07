@@ -33,17 +33,13 @@ class Music(commands.Cog):
 
 
     @commands.command()
-    async def pause(self, ctx):
-        vc = ctx.author.voice.channel
-        await vc.connect()
-
-        if vc.is_playing():
-            vc.pause()
+    async def stop(self, ctx):
+        voice_client = ctx.voice_client
+        if voice_client:
+            await voice_client.disconnect()
+            await ctx.send(f"Disconnected from the voice channel")
         else:
-            await ctx.send("Nor playing")
-
-
-
+            await ctx.send("I am not connected to any voice channel")
 
 
 def setup(bot):

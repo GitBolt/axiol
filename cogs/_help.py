@@ -72,8 +72,9 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
 
 def musicbothelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Music (BETA)", color=var.C_MAIN,
-    description="Let's vibe to some music ay"
+    description="Currently in beta version with just two basic commands, a lot more is to come tomorrow!"
     ).add_field(name=getprefix(ctx)+"play `<url>`", value="Join a voice channel and enter the command to start playing music!", inline=False
+    ).add_field(name=getprefix(ctx)+"stop", value="Stops playing the music and leaves the VC"
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 

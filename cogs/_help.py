@@ -229,8 +229,8 @@ class Help(commands.Cog):
     @help.command()
     async def music(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Chatbot") == True:
-            await ctx.send(embed=chatbothelp(ctx))
+        if GuildDoc.get("Music") == True:
+            await ctx.send(embed=musicbothelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Music plugin is disabled in this server",

@@ -47,6 +47,7 @@ async def on_guild_join(guild):
             "Welcome": False,
             "Verification": False,
             "Chatbot": False,
+            "Music": True
         })
 
     #Inserting leveling data because this is enabled by default 

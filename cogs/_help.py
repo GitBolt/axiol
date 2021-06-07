@@ -69,7 +69,14 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"chatbotreport `<description>`", value="Send any report/bug related to the chatbot directly to the [Support server](https://discord.gg/KTn4TgwkUT)!"
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
-    
+
+def musicbothelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Music (BETA)", color=var.C_MAIN,
+    description="Let's vibe to some music ay"
+    ).add_field(name=getprefix(ctx)+"play `<url>`", value="Join a voice channel and enter the command to start playing music!", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
@@ -127,7 +134,8 @@ class Help(commands.Cog):
             "Reaction Roles":rrhelp,
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
-            "Chatbot": chatbothelp
+            "Chatbot": chatbothelp,
+            "Music": musicbothelp
         }
 
         try:
@@ -157,37 +165,77 @@ class Help(commands.Cog):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
             await ctx.send(embed=levelhelp(ctx))
-        
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @help.command()
     async def moderation(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Moderation") == True:
             await ctx.send(embed=modhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Moderation plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @help.command()
     async def reactionroles(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Reaction Roles") == True:
             await ctx.send(embed=rrhelp(ctx))
-    
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Reaction Roles plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
     @help.command()
     async def welcome(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Welcome") == True:
             await ctx.send(embed=welcomehelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Welcome plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @help.command()
     async def verification(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Verification") == True:
             await ctx.send(embed=verifyhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Verification plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @help.command()
     async def chatbot(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Chatbot") == True:
             await ctx.send(embed=chatbothelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Chatbot plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def music(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Chatbot") == True:
+            await ctx.send(embed=chatbothelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Music plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
 
     @help.command()
     async def extras(self, ctx):

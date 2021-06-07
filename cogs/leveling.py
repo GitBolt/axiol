@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import utils.variables as var
 import utils.database as db
-from utils.functions import getprefix, getxprange
+from utils.functions import getprefix, getxprange, pagination
 
 
 class Leveling(commands.Cog):
@@ -85,6 +85,7 @@ class Leveling(commands.Cog):
 
         embed = discord.Embed(
         title=f"Leaderboard", 
+        description="➡️ Next page\n ⬅️ Previous page\n ▶️ Last page\n ◀️ First page",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
         )
@@ -104,78 +105,42 @@ class Leveling(commands.Cog):
             
         embed.set_footer(text=f"Page 1/{all_pages}")
         botmsg = await ctx.send(embed=embed)
+        await botmsg.add_reaction("◀️")
         await botmsg.add_reaction("⬅️")
         await botmsg.add_reaction("➡️")
+        await botmsg.add_reaction("▶️")
 
         def reactioncheck(reaction, user):
-            if str(reaction.emoji) == "➡️" or str(reaction.emoji) == "⬅️":
+            if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
                 return user == ctx.author and reaction.message == botmsg
         
         current_page = 0
         while True:
             reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+            if str(reaction.emoji) == "◀️":
+                await botmsg.remove_reaction("◀️", ctx.author)
+                current_page = 0
+                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "➡️":
                 await botmsg.remove_reaction("➡️", ctx.author)
                 current_page += 1
-                pagern = current_page + 1
-                embed.set_footer(text=f"Page {pagern}/{all_pages}")
-                embed.clear_fields()
-
-                rankings = GuildCol.find({
-
-                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                     
-                    }).sort("xp", -1)
-
-                rankcount = (current_page)*10
-                user_amount = current_page*10
-                print(user_amount)
-                for i in rankings[user_amount:]:
-                    rankcount += 1
-                    getuser = ctx.guild.get_member(i.get("_id"))
-                    xp = i.get("xp")
-                    if getuser == None:
-                        user = "*This user has left the server*"
-                    else:
-                        user = getuser
-                    embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-
-                    if rankcount == (current_page)*10 + 10:
-                        break
+                await pagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
-                
 
             if str(reaction.emoji) == "⬅️":
                 await botmsg.remove_reaction("⬅️", ctx.author)
                 current_page -= 1
                 if current_page < 0:
-                    await ctx.send(f"{ctx.author.mention} Ay where you going to negatives, that's the first page :facepalm:")
                     current_page += 1
-                pagern = current_page + 1
-                embed.set_footer(text=f"Page {pagern}/{all_pages}")
-                embed.clear_fields()
+                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await botmsg.edit(embed=embed)
 
-                rankings = GuildCol.find({
-
-                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                     
-                    }).sort("xp", -1)
-
-                rankcount = (current_page)*10
-                user_amount = current_page*10
-                for i in rankings[user_amount:]:
-                    rankcount += 1
-                    getuser = ctx.guild.get_member(i.get("_id"))
-                    xp = i.get("xp")
-                    if getuser == None:
-                        user = "*This user has left the server*"
-                    else:
-                        user = getuser
-                    embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-
-                    if rankcount == (current_page)*10 + 10:
-                        break
+            if str(reaction.emoji) == "▶️":
+                await botmsg.remove_reaction("▶️", ctx.author)
+                current_page = all_pages-1
+                await pagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
 

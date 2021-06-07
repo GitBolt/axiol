@@ -1,4 +1,4 @@
-from utils.variables import DEFAULT_PREFIX
+from utils.variables import DEFAULT_PREFIX, E_ERROR
 from utils.database import PREFIXES, LEVELDATABASE, PLUGINS
 
 def getprefix(ctx):
@@ -7,6 +7,7 @@ def getprefix(ctx):
     except AttributeError:
         return DEFAULT_PREFIX
     
+
 def getxprange(message):
     col = LEVELDATABASE.get_collection(str(message.guild.id))
     settings = col.find_one({"_id": 0})
@@ -14,8 +15,36 @@ def getxprange(message):
     return xprange
 
 
+async def pagination(ctx, current_page, embed, GuildCol, all_pages):
+    pagern = current_page + 1
+    embed.set_footer(text=f"Page {pagern}/{all_pages}")
+    embed.clear_fields()
+
+    rankings = GuildCol.find({
+
+            "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+            
+        }).sort("xp", -1)
+
+    rankcount = (current_page)*10
+    user_amount = current_page*10
+    for i in rankings[user_amount:]:
+        rankcount += 1
+        getuser = ctx.guild.get_member(i.get("_id"))
+        xp = i.get("xp")
+        if getuser == None:
+            user = f"{E_ERROR} This user has left the server"
+        else:
+            user = getuser
+        embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+        if rankcount == (current_page)*10 + 10:
+            break
+
+
 
 #Some functions to counter errors and warning while working locally :p
+
+#Adding new plugin
 def updateplugins(plugin):
     PLUGINS.update_many(
         { plugin: { "$exists": False } },
@@ -24,6 +53,7 @@ def updateplugins(plugin):
             }
     )
 
+#updating leveling and plugin data
 def updatedb(serverid):
 
     if not str(serverid) in LEVELDATABASE.list_collection_names():

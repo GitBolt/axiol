@@ -8,7 +8,7 @@ import asyncio
 
 def levelhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Ah yes leveling, MEE6 who?", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user, user id or user mention can be used to check ranks, user field is optional for checking rank of yourself.", inline=False
+    ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user, user ID or user mention can be used to check ranks, user field is optional for checking rank of yourself.", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
@@ -20,23 +20,23 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def modhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Moderation", description="What's better than entering a sweet little ban command?", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"ban `<reason>`", value="Bans a user until unbanned, reason is optional", inline=False
-    ).add_field(name=getprefix(ctx)+"unban", value="Unbans a banned user", inline=False
-    ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server, reason is optional", inline=False
-    ).add_field(name=getprefix(ctx)+"mute", value="Assigns 'Muted' role to the user hence disabling their ability to send messages! If the role does not exist then I can make it on my own when the command is used!", inline=False
-    ).add_field(name=getprefix(ctx)+"unmute", value="Removes the 'Muted' role therefore lets the user send messages.", inline=False
+    embed = discord.Embed(title="What's better than entering a sweet little ban command?", description="For all fields which require `user`, either the User ID or User Mention can be used. Reason everywhere is optional :ok_hand:", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
+    ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans a any already banned user", inline=False
+    ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server", inline=False
+    ).add_field(name=getprefix(ctx)+"mute", value="Disables the ability for users to send text messages in all channels! Permissions can be changed", inline=False
+    ).add_field(name=getprefix(ctx)+"unmute", value="Removes the 'Muted' role therefore lets the user send messages", inline=False
     ).add_field(name=getprefix(ctx)+"purge `<amount>`", value="Deletes the number of messages defined in the command from the channel", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def rrhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Reaction Roles", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server! For role either role ID or role ping can be used.", inline=False
-    ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Remove any existing reaction role.", inline=False
+    embed = discord.Embed(title="Reaction Roles", description="For roles either the Role ID (to not disturb users in case they have the role) or Role mention can be used", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server!", inline=False
+    ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Remove any existing reaction role", inline=False
     ).add_field(name=getprefix(ctx)+"allrr", value="View all active reaction roles in the server!", inline=False
-    ).add_field(name=getprefix(ctx)+"uniquerr `<messageid>`", value="Mark a message with unique reactions! Users would be able to react once hence take one role from the message.", inline=False
-    ).add_field(name=getprefix(ctx)+"removeunique `<messageid>`", value="Unmark the message with unique reactions! Users would be able to react multiple times hence take multiple roles from the message.", inline=False
+    ).add_field(name=getprefix(ctx)+"uniquerr `<messageid>`", value="Mark a message with unique reactions! Users would be able to react once hence take one role from the message", inline=False
+    ).add_field(name=getprefix(ctx)+"removeunique `<messageid>`", value="Unmark the message with unique reactions! Users would be able to react multiple times hence take multiple roles from the message", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
     return embed
 
@@ -46,37 +46,38 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used.", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomereset", value="Reset to default welcome embed message", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomereset", value="Reset to the default welcome embed message", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Verification", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"verifyinfo", value="Get information about the type of verification server has!", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyinfo", value="Get information current server verification setup!", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
-    ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (Removes data and disables plugin)", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (Removes data and disables the plugin)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def chatbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Chatbot (BETA)", color=var.C_MAIN,
+    embed = discord.Embed(title="Chatbot", color=var.C_MAIN,
     description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!"
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Make a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Remove a chatbot channel (if added)", inline=False
     ).add_field(name=getprefix(ctx)+"chatbotchannels", value="View all channels where chat bot is enabled!", inline=False
+    ).add_field(name=getprefix(ctx)+"chatbotreport `<description>`", value="Send any report/bug related to the chatbot directly to the [Support server](https://discord.gg/KTn4TgwkUT)!"
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
     
 def extrahelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Extras", description="Commands that are useful bot don't belong to other categories!", color=var.C_MAIN
+    embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics!", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
     ).add_field(name=getprefix(ctx)+"invite",value="My bot invite link!", inline=False
-    ).add_field(name=getprefix(ctx)+"source", value="My Github source code!", inline=False
+    ).add_field(name=getprefix(ctx)+"source", value="Link to my Github repository since I am open source :D", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 

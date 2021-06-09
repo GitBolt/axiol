@@ -1,6 +1,0 @@
-[project]
-name = "Axiol"
-
-
-[[build.buildpacks]]
-uri = "https://github.com/xrisk/heroku-opus.git"

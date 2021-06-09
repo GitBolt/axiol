@@ -144,7 +144,7 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            "Music": musicbothelp
+            #"Music": musicbothelp
         }
 
         try:

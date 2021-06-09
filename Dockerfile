@@ -1,2 +1,1 @@
-FROM jrottenberg/ffmpeg
-RUN apt-get install ffmpeg
+FROM linuxserver/ffmpeg

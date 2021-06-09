@@ -8,6 +8,7 @@ VENV
 # Everything else
 __pycache__
 .vscode
+ffmpeg
 
 # Private cog
 customcogs/_private.py

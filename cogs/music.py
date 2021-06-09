@@ -1,5 +1,5 @@
 # import os
-#l import discord
+import discord
 # import asyncio
 # import itertools
 # from discord.ext import commands

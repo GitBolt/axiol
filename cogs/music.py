@@ -1,5 +1,5 @@
 # import os
-# import discord
+#l import discord
 # import asyncio
 # import itertools
 # from discord.ext import commands
@@ -145,13 +145,13 @@
 #         return self.bot.loop.create_task(self._cog.cleanup(guild))
 
 
-# class Music(commands.Cog):
+ class Music(commands.Cog):
 
 #     __slots__ = ('bot', 'players')
 
-#     def __init__(self, bot):
-#         self.bot = bot
-#         self.players = {}
+     def __init__(self, bot):
+         self.bot = bot
+         self.players = {}
 
 #     async def cleanup(self, guild):
 #         try:
@@ -174,24 +174,24 @@
 #         return player
 
 
-#     @commands.command(aliases=["join"])
-#     async def connect(self, ctx, *, channel: discord.VoiceChannel=None):
-#         if not channel:
-#             try:
-#                 channel = ctx.author.voice.channel
-#             except AttributeError:
-#                 await ctx.send(embed=discord.Embed(
-#                         description="Since you have not defined any voice channel in the command nor you are in one, where am I supposed to connect :thinking:", 
-#                         color=var.C_ORANGE))
+     @commands.command(aliases=["join"])
+     async def connect(self, ctx, *, channel: discord.VoiceChannel=None):
+         if not channel:
+             try:
+                 channel = ctx.author.voice.channel
+             except AttributeError:
+                 await ctx.send(embed=discord.Embed(
+                         description="Since you have not defined any voice channel in the command nor you are in one, where am I supposed to connect :thinking:", 
+                         color=var.C_ORANGE))
 
-#         vc = ctx.voice_client
-#         if channel is not None:
-#             if vc:
-#                 if vc.channel.id == channel.id:
-#                     return
-#                 await vc.move_to(channel)
-#             else:
-#                 await channel.connect()
+         vc = ctx.voice_client
+         if channel is not None:
+             if vc:
+                 if vc.channel.id == channel.id:
+                     return
+                 await vc.move_to(channel)
+             else:
+                 await channel.connect()
 
 #             await ctx.send(embed=discord.Embed(
 #                         description=f"{var.E_ACCEPT} Successfully connect to {channel.name}",
@@ -441,5 +441,5 @@
 #                 ))
 
 
-# def setup(bot):
-#     bot.add_cog(Music(bot))
+ def setup(bot):
+     bot.add_cog(Music(bot))

@@ -32,7 +32,6 @@ ffmpegopts = {
 
 ytdl = YoutubeDL(ytdlopts)
 
-discord.opus.load_opus()
 class YTDLSource(discord.PCMVolumeTransformer):
 
     def __init__(self, source, *, data, requester):

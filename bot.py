@@ -4,6 +4,9 @@ from discord.ext import commands
 import utils.variables as var
 import utils.database as db
 
+import ctypes
+import ctypes.util
+
 #Function to get current server prefix
 def serverprefix(bot, message):
     if db.PREFIXES.find_one({"_id": message.guild.id}) is None:
@@ -22,6 +25,17 @@ async def on_ready():
                             ))
     print("I woke up 🌥️")
 
+    print("ctypes - Find opus:")
+    a = ctypes.util.find_library('opus')
+    print(a)
+    
+    print("Discord - Load Opus:")
+    b = discord.opus.load_opus(a)
+    print(b)
+    
+    print("Discord - Is loaded:")
+    c = discord.opus.is_loaded()
+    print(c)
 
 #Loading pogs
 for filename in os.listdir('./cogs'):

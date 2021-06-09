@@ -73,16 +73,16 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
 def musicbothelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Music", color=var.C_MAIN,
     description="🎧 Let's vibe to some music! For Voice Channels either their Name or ID can be used since they can't be mentioned using `#` like Text Channels"
-    ).add_field(name=getprefix(ctx)+"connect `<voicechannel>`", value="Joins a voice channel! Voice Channel field is optional if you want me to join the same VC inside which you are in :D", inline=False
-    ).add_field(name=getprefix(ctx)+"play `<search>`", value="Search for music to play on YouTube! You can also use the video URL", inline=False
-    ).add_field(name=getprefix(ctx)+"pause", value="Pauses the currently playing music", inline=False
-    ).add_field(name=getprefix(ctx)+"resume", value="Resumes the paused music", inline=False
-    ).add_field(name=getprefix(ctx)+"skip", value="Skips the currently playing song", inline=False
-    ).add_field(name=getprefix(ctx)+"remove `<position>`", value=f"Removes a song from it's given queue position! Use the command `{getprefix(ctx)}queue` to view the position of upcoming songs", inline=False
-    ).add_field(name=getprefix(ctx)+"queue", value="Shows all the upcoming songs in the queue!", inline=False
-    ).add_field(name=getprefix(ctx)+"np", value="Shows the current playing song, NP is short for Now Playing!", inline=False
-    ).add_field(name=getprefix(ctx)+"volume `<1-100 value>`", value="Change the music volume! The limit is from 0 to 100", inline=False
-    ).add_field(name=getprefix(ctx)+"leave", value="Stops playing the music and leaves the VC, this also destroys the queue", inline=False
+    ).add_field(name=getprefix(ctx)+"connect `<voicechannel>`", value="Joins a voice channel! Voice Channel field is optional if you want me to join the same VC inside which you are in :D", 
+    ).add_field(name=getprefix(ctx)+"play `<search>`", value="Search for music to play on YouTube! You can also use the video URL",inline=False 
+    ).add_field(name=getprefix(ctx)+"pause", value="Pauses the currently playing music", inline=False 
+    ).add_field(name=getprefix(ctx)+"resume", value="Resumes the paused music", inline=False 
+    ).add_field(name=getprefix(ctx)+"np", value="Shows the current playing song, NP is short for Now Playing!",inline=False
+    ).add_field(name=getprefix(ctx)+"queue", value="Shows all the upcoming songs in the queue!",inline=False 
+    ).add_field(name=getprefix(ctx)+"remove `<position>`", value=f"Removes a song from it's given queue position!", 
+    ).add_field(name=getprefix(ctx)+"skip", value="Skips the currently playing song", 
+    ).add_field(name=getprefix(ctx)+"volume `<1-100 value>`", value="Change the music volume! The limit is from 0 to 100",
+    ).add_field(name=getprefix(ctx)+"leave", value="Stops playing the music and leaves the VC",inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
@@ -144,7 +144,7 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            #="Music": musicbothelp
+            "Music": musicbothelp
         }
 
         try:

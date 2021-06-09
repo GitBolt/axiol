@@ -1,18 +1,15 @@
+import os
 import discord
-from discord.ext import commands
 import asyncio
 import itertools
-import sys
-import traceback
+from discord.ext import commands
 from async_timeout import timeout
 from functools import partial
-import youtube_dl
 from youtube_dl import YoutubeDL
+
 import utils.variables as var
 from utils.functions import getprefix
 
-# Suppress noise about console usage from errors
-youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdlopts = {
     'format': 'bestaudio/best',
@@ -46,9 +43,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.web_url = data.get('webpage_url')
         self.duration = data.get('duration')
 
-        # YTDL info dicts (data) have other useful information you might want
-        # https://github.com/rg3/youtube-dl/blob/master/README.md
-
     def __getitem__(self, item: str):
         """Allows us to access attributes similar to a dict.
         This is only useful when you are NOT downloading.
@@ -66,8 +60,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(title="", description=f"Queued [{data['title']}]({data['webpage_url']}) [{ctx.author.mention}]", color=discord.Color.green())
-        await ctx.send(embed=embed)
+        await ctx.send(embed=discord.Embed(
+                description=f"Queued [{data['title']}]({data['webpage_url']}) [{ctx.author.mention}]", 
+                color=var.C_BLUE))
 
         if download:
             source = ytdl.prepare_filename(data)
@@ -76,17 +71,19 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         return cls(discord.FFmpegPCMAudio(source), data=data, requester=ctx.author)
 
+
     @classmethod
     async def regather_stream(cls, data, *, loop):
         """Used for preparing a stream, instead of downloading.
         Since Youtube Streaming links expire."""
+
         loop = loop or asyncio.get_event_loop()
         requester = data['requester']
 
         to_run = partial(ytdl.extract_info, url=data['webpage_url'], download=False)
         data = await loop.run_in_executor(None, to_run)
 
-        return cls(discord.FFmpegPCMAudio(data['url']), data=data, requester=requester)
+        return cls(discord.FFmpegPCMAudio(data['url'], executable=os.getcwd() + "/ffmpeg"), data=data, requester=requester)
 
 
 class MusicPlayer:
@@ -130,12 +127,7 @@ class MusicPlayer:
             if not isinstance(source, YTDLSource):
                 # Source was probably a stream (not downloaded)
                 # So we should regather to prevent stream expiration
-                try:
-                    source = await YTDLSource.regather_stream(source, loop=self.bot.loop)
-                except Exception as e:
-                    await self._channel.send(f'There was an error processing your song.\n'
-                                             f'```css\n[{e}]\n```')
-                    continue
+                source = await YTDLSource.regather_stream(source, loop=self.bot.loop)
 
             source.volume = self.volume
             self.current = source
@@ -185,7 +177,6 @@ class Music(commands.Cog):
 
     @commands.command(aliases=["join"])
     async def connect(self, ctx, *, channel: discord.VoiceChannel=None):
-
         if not channel:
             try:
                 channel = ctx.author.voice.channel
@@ -195,17 +186,18 @@ class Music(commands.Cog):
                         color=var.C_ORANGE))
 
         vc = ctx.voice_client
+        if channel is not None:
+            if vc:
+                if vc.channel.id == channel.id:
+                    return
+                await vc.move_to(channel)
+            else:
+                await channel.connect()
 
-        if vc:
-            if vc.channel.id == channel.id:
-                return
-            await vc.move_to(channel)
-        else:
-            await channel.connect()
-        await ctx.send(embed=discord.Embed(
-                    description=f"{var.E_ACCEPT} Successfully connect to {channel.name}",
-                    color=var.C_GREEN
-        ))
+            await ctx.send(embed=discord.Embed(
+                        description=f"{var.E_ACCEPT} Successfully connect to {channel.name}",
+                        color=var.C_GREEN
+            ))
 
 
     @commands.command()
@@ -244,7 +236,10 @@ class Music(commands.Cog):
                     ))
 
         elif vc.is_paused():
-            return
+            await ctx.send(embed=discord.Embed(
+                        description=f"I am have already paused playing",
+                        color=var.C_ORANGE
+            ))
 
         else:
             vc.pause()
@@ -264,7 +259,10 @@ class Music(commands.Cog):
                 color=var.C_ORANGE))
 
         elif not vc.is_paused():
-            return
+            await ctx.send(embed=discord.Embed(
+                        description="Continuing to play since it was never paused",
+                        color=var.C_BLUE
+            ))
 
         else:
             vc.resume()
@@ -356,48 +354,49 @@ class Music(commands.Cog):
     @commands.command()
     async def np(self, ctx):
         vc = ctx.voice_client
+        player = self.get_player(ctx)
 
-        if not vc or not vc.is_connected():
+        if vc is not None and player.current:
+            seconds = vc.source.duration % (24 * 3600) 
+            hour = seconds // 3600
+            seconds %= 3600
+            minutes = seconds // 60
+            seconds %= 60
+            if hour > 0:
+                duration = "%dh %02dm %02ds" % (hour, minutes, seconds)
+            else:
+                duration = "%02dm %02ds" % (minutes, seconds)
+
+            embed = discord.Embed(description=f"[{vc.source.title}]({vc.source.web_url}) [{vc.source.requester.mention}] | `{duration}`", color=var.C_MAIN)
+            embed.set_author(icon_url=self.bot.user.avatar_url, name=f"Now Playing 🎶")
+            await ctx.send(embed=embed)
+
+        elif vc is None:
             await ctx.send(embed=discord.Embed(
                 description="I'm not connected to a voice channel", 
                 color=var.C_ORANGE))
 
-
-        player = self.get_player(ctx)
-        if not player.current:
-            embed = discord.Embed(title="", description="I am currently not playing anything", color=discord.Color.green())
-            await ctx.send(embed=embed)
-        
-        seconds = vc.source.duration % (24 * 3600) 
-        hour = seconds // 3600
-        seconds %= 3600
-        minutes = seconds // 60
-        seconds %= 60
-        if hour > 0:
-            duration = "%dh %02dm %02ds" % (hour, minutes, seconds)
         else:
-            duration = "%02dm %02ds" % (minutes, seconds)
+            await ctx.send(embed=discord.Embed(
+                        description="I am currently not playing anything", 
+                        color=var.C_ORANGE))
+        
 
-        embed = discord.Embed(title="", description=f"[{vc.source.title}]({vc.source.web_url}) [{vc.source.requester.mention}] | `{duration}`", color=discord.Color.green())
-        embed.set_author(icon_url=self.bot.user.avatar_url, name=f"Now Playing 🎶")
-        await ctx.send(embed=embed)
 
 
     @commands.command()
     async def volume(self, ctx, *, vol: float=None):
-
         vc = ctx.voice_client
 
         if not vc or not vc.is_connected():
             await ctx.send(embed=discord.Embed(
                 description="I'm not connected to a voice channel", 
                 color=var.C_ORANGE))
-
         
         if not vol:
             return await ctx.send(embed=discord.Embed(
                             title=f"{vc.source.title}",
-                            description=f"🔊 **{(vc.source.volume)*100}%**", 
+                            description=f"Current volume is **{(vc.source.volume)*100}%**", 
                             color=var.C_BLUE))
 
         if not 0 < vol < 101:
@@ -412,8 +411,18 @@ class Music(commands.Cog):
 
         player.volume = vol / 100
         await ctx.send(embed=discord.Embed(
-                    description=f"{ctx.author} change the volume to {vol}%", 
+                    description=f"{ctx.author} changed the volume to {vol}%", 
                     color=var.C_BLUE))
+
+    @volume.error
+    async def volume_error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+                await ctx.send(embed=discord.Embed(
+                    title="Bad Argument",
+                    description=f"{var.E_ERROR} For volume you need to define only one value between 0 and 100.\n For example `{getprefix(ctx)}volume 50`",
+                    color=var.C_RED
+                )
+                )
 
 
     @commands.command()
@@ -422,16 +431,15 @@ class Music(commands.Cog):
 
         if not vc or not vc.is_connected():
             return await ctx.send(embed=discord.Embed(
-                description="I'm not connected to a voice channel", 
+                description="I'm not connected to a voice channel",
                 color=var.C_ORANGE))
 
         else:
+            await self.cleanup(ctx.guild)
             await ctx.send(embed=discord.Embed(
                             description=f"Successfully left the VC and cleared the queue",
                             color=var.C_GREEN
                 ))
-
-            await self.cleanup(ctx.guild)
 
 
 def setup(bot):

@@ -85,7 +85,7 @@ class Leveling(commands.Cog):
 
         embed = discord.Embed(
         title=f"Leaderboard", 
-        description=" ➡️ Next page\n ⬅️ Previous page\n ▶️ Last page\n ◀️ First page",
+        description="◀️ First page\n⬅️ Previous page\n➡️ Next page\n▶️ Last page\n",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
         )

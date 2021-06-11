@@ -12,7 +12,6 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
-    ).add_field(name=getprefix(ctx)+"togglealerts", value="Disable or Enable alert message for level ups!", inline=False
     #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
     ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings!", inline=False
     ).add_field(name=getprefix(ctx)+"levelconfig", value=f"Configure leveling settings!", inline=False
@@ -144,7 +143,7 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            #"Music": musicbothelp
+            "Music": musicbothelp
         }
 
         try:
@@ -261,7 +260,9 @@ class Help(commands.Cog):
         ).add_field(name=getprefix(ctx)+"blacklist `<#channel>`",value=f"Add the channel where you don't want users to gain xp.", inline=False
         ).add_field(name=getprefix(ctx)+"whitelist `<#channel>`",value=f"Whitelist an xp blacklisted channel.", inline=False
         ).add_field(name=getprefix(ctx)+"alertchannel `<#channel>`", value="Define the channel where alerts will be sent for level ups!", inline=False
-        ).add_field(name="Reset data", value=f"React to {var.DECLINE}", inline=False)
+        ).add_field(name=getprefix(ctx)+"togglealerts", value="Disable or Enable alert message for level ups!", inline=False
+        ).add_field(name="Reset data", value=f"React to {var.DECLINE}", inline=False
+        ).set_footer(text=f"Leveling is a plugin so to disable it, use the command {getprefix(ctx)}plugins and click on the leveling emoji")
         #).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
         #).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
         botmsg = await ctx.send(embed=embed)

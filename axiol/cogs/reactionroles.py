@@ -143,6 +143,7 @@ class ReactionRoles(commands.Cog):
         if GuildDoc is not None:
             for i in GuildDoc["reaction_roles"]:
                 guild = self.bot.get_guild(ctx.guild.id)
+                msg = await ctx.fetch_message(i.get("messageid"))
                 try:
                     msg = await ctx.fetch_message(i.get("messageid"))
                     role = guild.get_role(i.get("roleid"))
@@ -152,7 +153,7 @@ class ReactionRoles(commands.Cog):
                     rrlist = GuildDoc["reaction_roles"]
                     newlist = rrlist.copy()
                     for i in newlist:
-                        if  msg == i .get("messageid") and emoji == i .get("emoji"):
+                        if  msg == i.get("messageid") and emoji == i.get("emoji"):
                             return i 
                     
                     newlist.remove(i)

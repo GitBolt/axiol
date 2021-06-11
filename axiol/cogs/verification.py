@@ -107,7 +107,7 @@ class Verification(commands.Cog):
 
 
 
-    @commands.command()
+    @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):
         if ctx.channel.id in db.VERIFY.distinct("channel"): #Verify channel IDs
             await ctx.message.delete()

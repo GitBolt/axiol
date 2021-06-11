@@ -1,9 +1,16 @@
 import asyncio
 import discord
 from discord.ext import commands
+from discord.ext.commands import check, Context
 import variables as var
 import database as db
 from functions import getprefix
+
+
+def user_or_admin(myid):
+    async def predicate(ctx: Context):
+        return ctx.author.id == myid or ctx.author.guild_permissions.administrator 
+    return check(predicate)
 
 
 class Settings(commands.Cog):
@@ -12,7 +19,7 @@ class Settings(commands.Cog):
 
 
     @commands.command(aliases=["plugin", "extensions", "extentions", "addons"])
-    @commands.has_permissions(administrator=True)
+    @user_or_admin(791950104680071188) #This me
     async def plugins(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id":False}) #Getting guild's plugin document and removing the ID
         enabled_amount = len([keys for keys, values in GuildDoc.items() if values == True])
@@ -188,7 +195,7 @@ class Settings(commands.Cog):
 
 
     @commands.command()
-    @commands.has_permissions(administrator = True)
+    @user_or_admin(791950104680071188) #This me
     async def prefix(self, ctx):
         embed = discord.Embed(
         title="Prefix :D that's the way you control me aye!",

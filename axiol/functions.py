@@ -78,6 +78,7 @@ def updatedb(serverid):
                     "Welcome": False,
                     "Verification": False,
                     "Chatbot": False,
+                    "Music": True
                 })
         print(f"Added Plugins {serverid}")
 

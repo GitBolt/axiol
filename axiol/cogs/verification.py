@@ -41,6 +41,13 @@ class Verification(commands.Cog):
             )
         embed.add_field(name="Verification Channel", value=self.bot.get_channel(GuildDoc.get("channel")).mention)
         embed.add_field(name="Not Verified Role", value=ctx.guild.get_role(GuildDoc.get("roleid")).mention)
+        
+        if GuildDoc.get("assignrole") is None:
+            role = None
+        else:
+            role = ctx.guild.get_role(GuildDoc.get("assignrole")).mention
+
+        embed.add_field(name="Verified Role", value=role)
         await ctx.send(embed=embed)
 
 
@@ -110,6 +117,30 @@ class Verification(commands.Cog):
             description=f"{var.E_ERROR} You need to define the role too!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyrole <role>`"
+            ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
+            )
+
+
+    @commands.command()
+    async def verifyroleremove(self, ctx):
+        GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("assignrole") is not None:
+            role = ctx.guild.get_role(GuildDoc.get("assignrole"))
+
+            newdata = {"$set":{
+                "assignrole": None
+            }}
+            db.VERIFY.update_one(GuildDoc, newdata)
+            await ctx.send(embed=discord.Embed(
+                    description=f"{var.E_ACCEPT} Removed {role.mention} from verified role",
+                    color=var.C_GREEN
+            ).set_footer(text="Now users who verify successfully won't get this role")
+            )
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the role too!",
+            color=var.C_RED
+             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyroleremove <role>`"
             ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
             )
 

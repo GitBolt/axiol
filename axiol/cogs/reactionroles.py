@@ -149,17 +149,7 @@ class ReactionRoles(commands.Cog):
                     emoji = i.get("emoji")
                     embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n [Jump to the message!](https://discord.com/channels/{guild.id}/{msg.channel.id}/{msg.id})", inline=False)
                 except:
-                    rrlist = GuildDoc["reaction_roles"]
-                    newlist = rrlist.copy()
-                    for i in newlist:
-                        if  msg == i .get("messageid") and emoji == i .get("emoji"):
-                            return i 
-                    
-                    newlist.remove(i)
-                    newdata = {"$set":{
-                        "reaction_roles": newlist
-                    }}
-                    db.REACTIONROLES.update_one(GuildDoc, newdata)  
+                    pass
             await ctx.send(embed=embed)
         else:
             await ctx.send("This server does not have any active reaction roles right now")

@@ -162,7 +162,10 @@ class Settings(commands.Cog):
                                         color=var.C_RED
                                 ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                                 )
-                            NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                            if discord.utils.get(ctx.guild.roles, name="Not Verified"):
+                                NVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
+                            else:
+                                NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
                             await botmsg.clear_reactions()
 
                             embed.title="Processing..."

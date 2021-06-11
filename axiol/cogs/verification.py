@@ -100,6 +100,11 @@ class Verification(commands.Cog):
                 "assignrole": role.id
             }}
             db.VERIFY.update_one(GuildDoc, newdata)
+            await ctx.send(embed=discord.Embed(
+                    description=f"{var.E_ACCEPT} Successfully added {role.mention}",
+                    color=var.C_GREEN
+            ).set_footer(text="Now users who will successfully verify will get this role")
+            )
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the role too!",

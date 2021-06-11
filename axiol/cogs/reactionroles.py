@@ -143,14 +143,9 @@ class ReactionRoles(commands.Cog):
         if GuildDoc is not None:
             for i in GuildDoc["reaction_roles"]:
                 guild = self.bot.get_guild(ctx.guild.id)
-                msg = await ctx.fetch_message(i.get("messageid"))
-                try:
-                    msg = await ctx.fetch_message(i.get("messageid"))
-                    role = guild.get_role(i.get("roleid"))
-                    emoji = i.get("emoji")
-                    embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n [Jump to the message!](https://discord.com/channels/{guild.id}/{msg.channel.id}/{msg.id})", inline=False)
-                except:
-                    pass 
+                role = guild.get_role(i.get("roleid"))
+                emoji = i.get("emoji")
+                embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n", inline=False)
             await ctx.send(embed=embed)
         else:
             await ctx.send("This server does not have any active reaction roles right now")

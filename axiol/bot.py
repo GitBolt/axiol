@@ -37,7 +37,7 @@ for filename in os.listdir('./customcogs'):
 
 @bot.event
 async def on_guild_join(guild):
-    #Inserting plugin configs if it does not exist (incase of re inviting)
+    #Inserting plugin configs if it does not exist (incase of re-inviting)
     if not db.PLUGINS.count_documents({"_id": guild.id}, limit=1):
         db.PLUGINS.insert_one({
 

@@ -1,8 +1,8 @@
 import asyncio
 import discord
 from discord.ext import commands
-import utils.variables as var
-from utils.functions import getprefix
+import variables as var
+from functions import getprefix
 
 class Commands(commands.Cog):
     def __init__(self, bot):

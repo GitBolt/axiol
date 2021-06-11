@@ -1,10 +1,10 @@
 import asyncio
 import discord
 from discord.ext import commands
-import utils.variables as var
-import utils.database as db
-from utils.functions import getprefix
-from utils.greetings import greeting
+import variables as var
+import database as db
+from functions import getprefix
+from greetings import greeting
 
 
 class Welcome(commands.Cog):

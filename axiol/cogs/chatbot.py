@@ -3,12 +3,11 @@ import json
 import discord
 import torch
 from discord.ext import commands
-from utils.functions import getprefix
-import utils.database as db
-import utils.variables as var
+from functions import getprefix
+import database as db
+import variables as var
 from chatbot.model import NeuralNet
 from chatbot.utils import bag_of_words, tokenize
-from utils.functions import getprefix
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

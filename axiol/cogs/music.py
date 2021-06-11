@@ -7,8 +7,8 @@ from async_timeout import timeout
 from functools import partial
 from youtube_dl import YoutubeDL
 
-import utils.variables as var
-from utils.functions import getprefix
+import variables as var
+from functions import getprefix
 
 
 ytdlopts = {

@@ -1,6 +1,6 @@
 FROM python:3
 
-COPY . /main
+COPY /axiol /main 
 
 WORKDIR /main
 

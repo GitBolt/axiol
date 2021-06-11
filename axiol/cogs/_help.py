@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import utils.variables as var
-import utils.database as db
-from utils.functions import getprefix
+import variables as var
+import database as db
+from functions import getprefix
 import asyncio
 
 

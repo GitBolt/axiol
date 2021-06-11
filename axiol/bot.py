@@ -1,8 +1,8 @@
 import os
 import discord
 from discord.ext import commands
-import utils.variables as var
-import utils.database as db
+import database as db
+import variables as var
 
 
 #Function to get current server prefix

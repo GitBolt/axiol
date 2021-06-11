@@ -2,7 +2,7 @@ import sys
 import traceback
 import discord
 from discord.ext import commands
-from utils.variables import E_ERROR, C_RED
+from variables import E_ERROR, C_RED
 
 
 class Errors(commands.Cog):

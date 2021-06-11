@@ -11,4 +11,4 @@ __pycache__
 
 
 # Private cog
-customcogs/_private.py
+axiol/customcogs/private.py

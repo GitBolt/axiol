@@ -163,19 +163,35 @@ class Settings(commands.Cog):
                                 ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                                 )
                             if discord.utils.get(ctx.guild.roles, name="Not Verified"):
-                                NVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
-                            else:
-                                NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
-                            await botmsg.clear_reactions()
+                                alertbotmsg = await ctx.send(embed=discord.Embed(
+                                            title="**Not Verified** role found",
+                                            description="I have found a role named 'Not Verified' in this guild, do you want me to use this existing one or let me create a new one with proper permissions?",
+                                            color=var.C_BLUE
+                                ).add_field(name="Use existing", value=f"React to {var.E_ACCEPT}"
+                                ).add_field(name="Create new", value=f"{var.E_CONTINUE}"
+                                ).set_footer(text="Using the second option, I will create a new 'Not Verified' role however the existing 'Not Verified' role would still be there (in case you have some settings in it) don't get confused between two!")
+                                )
+                                await alertbotmsg.add_reaction(var.E_ACCEPT)
+                                await alertbotmsg.add_reaction(var.E_CONTINUE)
+                                def alertreactioncheck(reaction, user):
+                                    return user == ctx.author and reaction.message == alertbotmsg
+                                reaction, user = await self.bot.wait_for("reaction_add", check=alertreactioncheck)
 
-                            embed.title="Processing..."
-                            embed.description="Setting up everything, just a second"
-                            embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
-                            await botmsg.edit(embed=embed)
-                            for i in ctx.guild.text_channels:
-                                await i.set_permissions(NVerified, view_channel=False)
-                            await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
-                            await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+                                if str(reaction.emoji == var.E_ACCEPT):
+                                    NVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
+                                    
+                                elif str(reaction.emoji) == var.E_CONTINUE:
+                                    NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                                    embed.title="Processing..."
+                                    embed.description="Setting up everything, just a second"
+                                    embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
+                                    await botmsg.edit(embed=embed)
+                                    for i in ctx.guild.text_channels:
+                                        await i.set_permissions(NVerified, view_channel=False)
+                                    await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
+                                    await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+
+                            await botmsg.clear_reactions()
                             db.VERIFY.insert_one({
                                 
                                 "_id":ctx.guild.id,

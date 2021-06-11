@@ -69,7 +69,7 @@ class Verification(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the verification channel to change it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}verifychannel #channel`"))
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}verifychannel <#channel>`"))
 
 
 
@@ -92,6 +92,22 @@ class Verification(commands.Cog):
         )
     
 
+    @commands.command()
+    async def verifyrole(self, ctx, role:discord.Role=None):
+        if role is not None:
+            GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+            newdata = {'$set':{
+                "assignrole": role.id
+            }}
+            db.VERIFY.update_one(GuildDoc, newdata)
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the role too!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyrole <role>`"
+            ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
+            )
+
 
     @commands.command()
     async def verifyremove(self, ctx):
@@ -110,6 +126,8 @@ class Verification(commands.Cog):
     @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):
         if ctx.channel.id in db.VERIFY.distinct("channel"): #Verify channel IDs
+            assignrole = db.VERIFY.find_one({"_id": ctx.guild.id}).get("assignrole")
+
             await ctx.message.delete()
             if db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
                 roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
@@ -117,6 +135,8 @@ class Verification(commands.Cog):
 
                 await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
                 await ctx.author.remove_roles(role)
+                if assignrole is not None:
+                    await ctx.author.add_roles(ctx.guild.get_role(assignrole))
 
             else: #Bot verification
                 Image = random.choice([
@@ -148,6 +168,8 @@ class Verification(commands.Cog):
                     role = ctx.guild.get_role(roleid)
                     await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
                     await ctx.author.remove_roles(role)
+                    if assignrole is not None:
+                        await ctx.author.add_roles(ctx.guild.get_role(assignrole))
                     await botmsg.delete()
                     await usermsg.delete()
                 else:

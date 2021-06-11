@@ -162,6 +162,7 @@ class Settings(commands.Cog):
                                         color=var.C_RED
                                 ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                                 )
+                                
                             if discord.utils.get(ctx.guild.roles, name="Not Verified"):
                                 alertbotmsg = await ctx.send(embed=discord.Embed(
                                             title="**Not Verified** role found",
@@ -173,13 +174,23 @@ class Settings(commands.Cog):
                                 )
                                 await alertbotmsg.add_reaction(var.E_ACCEPT)
                                 await alertbotmsg.add_reaction(var.E_CONTINUE)
+
                                 def alertreactioncheck(reaction, user):
                                     return user == ctx.author and reaction.message == alertbotmsg
                                 reaction, user = await self.bot.wait_for("reaction_add", check=alertreactioncheck)
 
                                 if str(reaction.emoji == var.E_ACCEPT):
                                     NVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
-                                    
+                                    await botmsg.clear_reactions()
+                                    db.VERIFY.insert_one({
+                                        
+                                        "_id":ctx.guild.id,
+                                        "type": "command",
+                                        "channel": chid, 
+                                        "roleid": NVerified.id,
+                                        "assignrole": None
+                                    })
+
                                 elif str(reaction.emoji) == var.E_CONTINUE:
                                     NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
                                     embed.title="Processing..."
@@ -191,14 +202,33 @@ class Settings(commands.Cog):
                                     await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
                                     await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
 
-                            await botmsg.clear_reactions()
-                            db.VERIFY.insert_one({
-                                
-                                "_id":ctx.guild.id,
-                                "type": "command",
-                                "channel": chid, 
-                                "roleid": NVerified.id
-                            })
+                                    db.VERIFY.insert_one({
+                                        
+                                        "_id":ctx.guild.id,
+                                        "type": "command",
+                                        "channel": chid, 
+                                        "roleid": NVerified.id,
+                                        "assignrole": None
+                                    })
+                            else:
+                                NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
+                                embed.title="Processing..."
+                                embed.description="Setting up everything, just a second"
+                                embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
+                                await botmsg.edit(embed=embed)
+                                for i in ctx.guild.text_channels:
+                                    await i.set_permissions(NVerified, view_channel=False)
+                                await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
+                                await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+
+                                db.VERIFY.insert_one({
+                                    
+                                    "_id":ctx.guild.id,
+                                    "type": "command",
+                                    "channel": chid, 
+                                    "roleid": NVerified.id,
+                                    "assignrole": None
+                                })
                             successembed = discord.Embed(
                             title="Verification successfully setted up",
                             description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",

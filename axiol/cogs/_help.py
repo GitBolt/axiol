@@ -55,6 +55,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"verifyinfo", value="Get information current server verification setup!", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
+    ).add_field(name=getprefix(ctx)+"verifyrole `<role>`", value="Give a role to users when they successfully verify!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyremove", value="Remove verification from your server (Removes data and disables the plugin)", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed

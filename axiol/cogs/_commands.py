@@ -24,7 +24,7 @@ class Commands(commands.Cog):
     async def invite(self, ctx):
         embed = discord.Embed(
         title="My invite link!",
-        description="[Invite me from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=402778198&scope=bot)",
+        description="[Invite me from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)",
         color=var.C_BLUE
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
         )

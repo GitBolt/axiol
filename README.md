@@ -19,7 +19,7 @@ Oh yea default prefix is a dot `.`
 [Also the bot testing area](https://discord.gg/Rzz5WS9jXW)
 
 ### Invite
-[Invite the bot from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=402778198&scope=bot)
+[Invite the bot from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)
 
 ~~Also have I mentioned that the db structure is so bad that you can only work locally after fixing tens of errors?~~ Haha gottem code stealers</br>
 Make sure to check out [these functions](axiol/functions.py) to get it working locally in case you are interesting in contributing

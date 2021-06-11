@@ -56,7 +56,7 @@ class Settings(commands.Cog):
                 reaction, user = await self.bot.wait_for('reaction_add', check=reactioncheck, timeout=60.0)
                 GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
                 if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
-                    await botmsg.remove_reaction(str(reaction.emoji), ctx.author)
+                    await botmsg.clear_reactions()
                     plugin_type = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
 
                     embed = discord.Embed(

@@ -190,10 +190,11 @@ class Welcome(commands.Cog):
         GuildWelcomeDoc = db.WELCOME.find_one({"_id": member.guild.id})
 
         #Verification Stuff
-        if GuildVerifyDoc is not None:
-            roleid = GuildVerifyDoc.get("roleid")
-            role = member.guild.get_role(roleid)
-            await member.add_roles(role)
+        if db.PLUGINS.find_one({"_id": member.guild.id}).get("Verification") != False:
+            if GuildVerifyDoc is not None:
+                roleid = GuildVerifyDoc.get("roleid")
+                role = member.guild.get_role(roleid)
+                await member.add_roles(role)
 
 
         #Welcome stuff

@@ -25,6 +25,45 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    async def welcomesetup(self, ctx):
+        embed = discord.Embed(
+        title="Send the welcome channel where I can greet members!",
+        description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to greet new members :D",
+        color=var.C_BLUE
+        ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the Channel/ChannelID is valid other wise this won't work"
+        )
+        await ctx.send(embed=embed)
+        def messagecheck(message):
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
+        usermsg = await self.bot.wait_for('message', check=messagecheck)
+        try:
+            chid = int(usermsg.content.strip("<>#"))
+        except:
+            await ctx.send(embed=discord.Embed(
+                        title="Invalid Channel",
+                        description=f"{var.E_ERROR} I was not able to find the channel which you entered",
+                        color=var.C_RED
+                    ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
+                    )
+
+        db.WELCOME.insert_one({
+
+            "_id":ctx.guild.id,
+            "channelid":chid,
+            "greeting": "Hope you enjoy your stay here :)",
+            "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
+            "assignroles": []
+        })
+        successembed = discord.Embed(
+        title="Welcome greeting successfully setted up",
+        description=f"{var.E_ACCEPT} New members will now be greeted in {self.bot.get_channel(chid).mention}!",
+        color=var.C_GREEN
+        ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help welcome`")
+        
+        await ctx.send(embed=successembed)        
+
+
+    @commands.command()
     async def welcomecard(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
         
@@ -36,6 +75,40 @@ class Welcome(commands.Cog):
         )
         await ctx.send(content=greeting(ctx.author.mention), embed=embed)
 
+
+
+    @commands.command()
+    async def welcomemessage(self, ctx):
+        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+
+        await ctx.send(embed=discord.Embed(
+                    tite="Send a message to make it the welcome message",
+                    description="The next message which you will send will become the embed message!",
+                    color=var.C_BLUE
+        ).add_field(name="Cancel", value=f"Type `cancel` to stop this proccess")
+        )
+
+        def msgcheck(message):
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
+
+        try:
+            usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=300.0)
+
+            if usermsg.content == "cancel" or usermsg.content == "`cancel`":
+                await ctx.send("Cancelled welcome message change :ok_hand:")
+            else:
+                newdata = {"$set":{
+                    "greeting": usermsg.content
+                }}
+                db.WELCOME.update_one(GuildDoc, newdata)
+
+                await ctx.send(embed=discord.Embed(
+                title=f"{var.E_ACCEPT} Successfully changed the welcome message!",
+                description=f"The new welcome message is:\n**{usermsg.content}**",
+                color=var.C_GREEN)
+                )
+        except asyncio.TimeoutError:
+            await ctx.send(f"**{ctx.author.name}** you took too long to enter your message, try again maybe?")
 
 
     @commands.command()

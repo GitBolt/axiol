@@ -158,9 +158,16 @@ class Leveling(commands.Cog):
         for i in rankings:
             maxrank = ctx.guild.get_member(i.get("_id"))
             break
-            
+          
+        if GuilDoc.get("alertchannel") is not None:
+            alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
+            return alertchannel
+        else:
+            alertchannel = None
+            return alertchannel
+  
         status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled"   
-
+        
         embed = discord.Embed(
         title="Server leveling information",
         color=var.C_BLUE
@@ -169,7 +176,7 @@ class Leveling(commands.Cog):
         ).add_field(name="Leveling XP Range", value=xprange, inline=False
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
         ).add_field(name="Alert Status", value=status
-        ).add_field(name="Alert channel", value=self.bot.get_channel(GuildDoc.get("alertchannel")).mention, inline=False
+        ).add_field(name="Alert channel", value=alertchannel, inline=False
         )
 
         await ctx.send(embed=embed)

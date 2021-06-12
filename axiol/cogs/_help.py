@@ -269,10 +269,10 @@ class Help(commands.Cog):
         #).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
         #).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
         botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction(var.DECLINE)
+        await botmsg.add_reaction(var.E_DECLINE)
 
         def reactioncheck(reaction, user):
-            if str(reaction.emoji) == var.DECLINE:
+            if str(reaction.emoji) == var.E_DECLINE:
                 return user == ctx.author and reaction.message == botmsg
 
         await self.bot.wait_for('reaction_add', check=reactioncheck)
@@ -280,9 +280,9 @@ class Help(commands.Cog):
         embed = discord.Embed(
                     title="Rank data deletion",
                     description=f"Keep in mind that this action is irreversable",
-                    color=var.CORANGE
-        ).add_field(name="Confirm Delete", value=var.ACCEPT
-        ).add_field(name="Cancel", value=var.DECLINE
+                    color=var.C_ORANGE
+        ).add_field(name="Confirm Delete", value=var.E_ACCEPT
+        ).add_field(name="Cancel", value=var.E_DECLINE
         )
         botdeletemsg = await ctx.send(embed=embed)
         await botdeletemsg.add_reaction(var.ACCEPT)
@@ -292,14 +292,14 @@ class Help(commands.Cog):
             return user == ctx.author and reaction.message == botdeletemsg
         
         reaction, user = await self.bot.wait_for('reaction_add', check=deletereaction_check, timeout=60.0)
-        if str(reaction.emoji) == var.ACCEPT:
+        if str(reaction.emoji) == var.E_ACCEPT:
             db.LEVELDATABASE.get_collection(str(ctx.guild.id)).remove({ "_id" : { "$ne": 0 } })
             await ctx.send(embed=discord.Embed(
                         title="Leveling removed", 
                         description="Leveling have been removed from this server, that means all the rank data has been deleted", 
-                        color=var.CORANGE)
+                        color=var.C_ORANGE)
                         )
-        if str(reaction.emoji) == var.DECLINE:
+        if str(reaction.emoji) == var.E_DECLINE:
             await ctx.send("Woosh that was close, cancelled leveling data deletion.")
 
 

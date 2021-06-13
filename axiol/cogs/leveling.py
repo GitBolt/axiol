@@ -159,7 +159,7 @@ class Leveling(commands.Cog):
             maxrank = ctx.guild.get_member(i.get("_id"))
             break
           
-        if GuilDoc.get("alertchannel") is not None:
+        if GuildDoc.get("alertchannel") is not None:
             alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
             return alertchannel
         else:

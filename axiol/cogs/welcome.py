@@ -68,13 +68,20 @@ class Welcome(commands.Cog):
     async def welcomecard(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
         
+        def getcontent():
+            if GuildDoc.get("message") is None:
+                content = greeting(ctx.author.mention)
+            else:
+                content = GuildDoc.get("message")
+            return content
+            
         embed = discord.Embed(
         title="Welcome to the server!",
         description=GuildDoc.get("greeting"),
         color=discord.Colour.random()
         ).set_image(url=GuildDoc.get("image")
         )
-        await ctx.send(content=greeting(ctx.author.mention), embed=embed)
+        await ctx.send(content=getcontent(), embed=embed)
 
 
     @commands.command()
@@ -247,7 +254,8 @@ class Welcome(commands.Cog):
     async def welcomereset(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
         newdata = {"$set":{
-            "greeting": "Hope you enjoy your stay here :)",
+            "message": None,
+            "welcomegreeting": "Hope you enjoy your stay here ✨",
             "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
             "assignroles": []
         }}

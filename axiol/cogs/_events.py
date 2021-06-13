@@ -45,13 +45,20 @@ class Events(commands.Cog):
         if member.guild.id in servers:
             channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
 
+            def getcontent():
+                if GuildWelcomeDoc.get("message") is None:
+                    content = greeting(member.mention)
+                else:
+                    content = GuildWelcomeDoc.get("message")
+                return content
+
             embed = discord.Embed(
             title="Welcome to the server!",
             description=GuildWelcomeDoc.get("greeting"),
             color=discord.Colour.random()
             ).set_image(url=GuildWelcomeDoc.get("image"))
 
-            await channel.send(content=greeting(member.mention), embed=embed)
+            await channel.send(content=getcontent(), embed=embed)
 
             autoroles = GuildWelcomeDoc.get("assignroles")
             if autoroles != []:
@@ -63,6 +70,8 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        
+        #Leveling stuff
         GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
         if GuildPluginLevelingDoc.get("Leveling") == True and message.author.bot == False:
@@ -104,6 +113,7 @@ class Events(commands.Cog):
                             await message.channel.send(content=message.author.mention, embed=embed)
 
         
+        #Chatbot stuff
         GuildChatbotDoc = db.CHATBOT.find_one({"_id": message.guild.id})
 
         def channels():

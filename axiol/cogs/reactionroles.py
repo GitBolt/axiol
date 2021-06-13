@@ -23,8 +23,11 @@ class ReactionRoles(commands.Cog):
     @commands.command()
     async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji=None):
         bot_member = ctx.guild.get_member(self.bot.user.id)
-        botrole = bot_member.roles[1]
-
+        try:
+            botrole = bot_member.roles[1]
+        except IndexError:
+            botrole = bot_member.roles[0]
+            
         if channel and msgid and role and emoji is not None:
             try:
                 msg = await channel.fetch_message(msgid)

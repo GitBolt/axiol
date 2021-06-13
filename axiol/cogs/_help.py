@@ -43,8 +43,9 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
 def welcomehelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Welcome Greetings", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
-    ).add_field(name=getprefix(ctx)+"welcomechannel <#channel>", value="Change welcome channel!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomechannel `<#channel>`", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
+    ).add_field(name=getprefix(ctx)+"welcomegreeting", value="Change welcome greeting!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomeimage", value="Change the welcome image!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomerole `<role>`", value="Assign automatic role to a member when they join! For role either role mention or id can be used", inline=False
     ).add_field(name=getprefix(ctx)+"welcomereset", value="Reset to the default welcome embed message", inline=False

@@ -1,23 +1,8 @@
-import random
-import json
 import discord
-import torch
 from discord.ext import commands
 from functions import getprefix
 import database as db
 import variables as var
-from chatbot.model import NeuralNet
-from chatbot.utils import bag_of_words, tokenize
-
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-def sendresponse(ctx, tag, responselist):
-    choice = random.choice(responselist)
-    if tag == "prefix":
-        choice = choice.replace("~", getprefix(ctx))
-
-    return choice
 
 
 class Chatbot(commands.Cog):
@@ -110,63 +95,6 @@ class Chatbot(commands.Cog):
             await ctx.send("This server does not have any chat bot channel")
 
 
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        GuildChatbotDoc = db.CHATBOT.find_one({"_id": message.guild.id})
-        if GuildChatbotDoc is not None:
-            channels = GuildChatbotDoc.get("channels")
-        else:
-            channels = []
-        if message.author.bot == False:
-            if f'<@!{self.bot.user.id}>' in message.content or message.channel.id in channels:
-
-                with open('chatbot/intents.json', 'r') as json_data:
-                    intents = json.load(json_data)
-
-                FILE = "chatbot/data.pth"
-                data = torch.load(FILE, map_location='cpu')
-
-                input_size = data["input_size"]
-                hidden_size = data["hidden_size"]
-                output_size = data["output_size"]
-                all_words = data['all_words']
-                tags = data['tags']
-                model_state = data["model_state"]
-
-                model = NeuralNet(input_size, hidden_size, output_size).to(device)
-                model.load_state_dict(model_state)
-                model.eval()
-
-                sentence = message.content.strip(f"<@!{self.bot.user.id}>") #Removing the bot ping
-                sentence = tokenize(sentence)
-                X = bag_of_words(sentence, all_words)
-                X = X.reshape(1, X.shape[0])
-                X = torch.from_numpy(X).to(device)
-
-                output = model(X)
-                _, predicted = torch.max(output, dim=1)
-
-                tag = tags[predicted.item()]
-                probs = torch.softmax(output, dim=1)
-                prob = probs[0][predicted.item()]
-                if prob.item() > 0.85:
-                    for intent in intents['intents']:
-                        if tag == intent["tag"]:
-                            await message.channel.send(sendresponse(message, tag, intent["responses"]))
-
-                else:
-                    await self.bot.get_channel(843516136540864512).send(embed=discord.Embed(title={message.content},color=var.C_MAIN))    
-                    await message.channel.send(random.choice([
-                        "What?",
-                        "Sorry what?",
-                        "?",
-                        "Didn't understand",
-                        "Huh",
-                        ":face_with_raised_eyebrow:",
-                        "what",
-                        "Can you say that differently?"
-                    ]))
 
 def setup(bot):
     bot.add_cog(Chatbot(bot))

@@ -50,7 +50,8 @@ class Welcome(commands.Cog):
 
             "_id":ctx.guild.id,
             "channelid":chid,
-            "greeting": "Hope you enjoy your stay here :)",
+            "message": None,
+            "welcomegreeting": "Hope you enjoy your stay here ✨",
             "image": "https://image.freepik.com/free-vector/welcome-sign-neon-light_110464-147.jpg",
             "assignroles": []
         })
@@ -76,41 +77,6 @@ class Welcome(commands.Cog):
         await ctx.send(content=greeting(ctx.author.mention), embed=embed)
 
 
-
-    @commands.command()
-    async def welcomemessage(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
-
-        await ctx.send(embed=discord.Embed(
-                    tite="Send a message to make it the welcome message",
-                    description="The next message which you will send will become the embed message!",
-                    color=var.C_BLUE
-        ).add_field(name="Cancel", value=f"Type `cancel` to stop this proccess")
-        )
-
-        def msgcheck(message):
-            return message.author == ctx.author and message.channel.id == ctx.channel.id
-
-        try:
-            usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=300.0)
-
-            if usermsg.content == "cancel" or usermsg.content == "`cancel`":
-                await ctx.send("Cancelled welcome message change :ok_hand:")
-            else:
-                newdata = {"$set":{
-                    "greeting": usermsg.content
-                }}
-                db.WELCOME.update_one(GuildDoc, newdata)
-
-                await ctx.send(embed=discord.Embed(
-                title=f"{var.E_ACCEPT} Successfully changed the welcome message!",
-                description=f"The new welcome message is:\n**{usermsg.content}**",
-                color=var.C_GREEN)
-                )
-        except asyncio.TimeoutError:
-            await ctx.send(f"**{ctx.author.name}** you took too long to enter your message, try again maybe?")
-
-
     @commands.command()
     async def welcomechannel(self, ctx, channel:discord.TextChannel=None):
         GuildDoc = db.WELCOME.find_one({"_id":ctx.guild.id})
@@ -130,8 +96,7 @@ class Welcome(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the greeting channel to change it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomechannel #channel`"))
-
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomechannel <#channel>`"))
 
 
     @commands.command()
@@ -139,10 +104,46 @@ class Welcome(commands.Cog):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(embed=discord.Embed(
-                    tite="Send a message to make it the message",
+                    tite="Send a message to make it the welcome message",
+                    description="The next message which you will send will become the embed message!",
+                    color=var.C_BLUE
+        ).add_field(name="Cancel", value=f"Type `cancel` to stop this process"
+        ).set_footer(text="Don't confuse this with welcome greeting, that's different! This is the text message which pings the member and is outside the embed card itself, the greeting is the description of the embed")
+        )
+
+        def msgcheck(message):
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
+
+        try:
+            usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=300.0)
+
+            if usermsg.content == "cancel" or usermsg.content == "`cancel`":
+                await ctx.send("Cancelled welcome message change :ok_hand:")
+            else:
+                newdata = {"$set":{
+                    "message": usermsg.content
+                }}
+                db.WELCOME.update_one(GuildDoc, newdata)
+
+                await ctx.send(embed=discord.Embed(
+                title=f"{var.E_ACCEPT} Successfully changed the welcome message!",
+                description=f"The new welcome message is:\n**{usermsg.content}**",
+                color=var.C_GREEN)
+                )
+        except asyncio.TimeoutError:
+            await ctx.send(f"**{ctx.author.name}** you took too long to enter your message, try again maybe?")
+
+
+    @commands.command()
+    async def welcomegreeting(self, ctx):
+        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+
+        await ctx.send(embed=discord.Embed(
+                    tite="Send a message to make it the welcome greeting!",
                     description="The next message which you will send will become the embed description!",
                     color=var.C_BLUE
-        ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
+        ).add_field(name="Cancel", value=f"Type `cancel` to cancel this"
+        ).set_footer(text="Don't confuse this with embed message, that's different! This is the embed description which is inside the embed itself however welcome message is the content outside where members are pinged!")
         )
 
         def msgcheck(message):
@@ -150,11 +151,11 @@ class Welcome(commands.Cog):
 
         try:
             usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=60.0)
-            if usermsg.content == "cancel" or "`cancel`":
+            if usermsg.content == "cancel" or usermsg.content == "`cancel`":
                 await ctx.send("Cancelled welcome message change :ok_hand:")
             else:
                 newdata = {"$set":{
-                    "greeting": usermsg.content
+                    "welcomegreeting": usermsg.content
                 }}
                 db.WELCOME.update_one(GuildDoc, newdata)
 
@@ -164,8 +165,7 @@ class Welcome(commands.Cog):
                 color=var.C_GREEN)
                 )
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to enter your message ;-;")
-
+            await ctx.send(f"**{ctx.author.name}** you took too long to enter your message, try again maybe?")
 
 
     @commands.command()
@@ -182,7 +182,8 @@ class Welcome(commands.Cog):
             return message.author == ctx.author and message.channel.id == ctx.channel.id
         try:
             usermsg = await self.bot.wait_for("message", check=msgcheck, timeout=60.0)
-            if usermsg.content == "cancel" or "`cancel`":
+
+            if usermsg.content == "cancel" or usermsg.content == "`cancel`":
                 await ctx.send("Cancelled image change :ok_hand:")
             if usermsg.attachments:
                 newdata = {"$set":{
@@ -209,9 +210,9 @@ class Welcome(commands.Cog):
                 ).set_image(url=usermsg.content)
                 )
             else:
-                await ctx.send("Invalid image")
+                await ctx.send("Invalid image, try again")
         except asyncio.TimeoutError:
-            await ctx.send("You took too long to send the new image ;-;")
+            await ctx.send(f"**{ctx.author.name}** you took too long to enter your welcome image, try again maybe?")
                 
                 
 
@@ -256,38 +257,6 @@ class Welcome(commands.Cog):
         color=var.C_GREEN)
         )
 
-
-    @commands.Cog.listener()
-    async def on_member_join(self, member):
-        GuildVerifyDoc = db.VERIFY.find_one({"_id": member.guild.id})
-        GuildWelcomeDoc = db.WELCOME.find_one({"_id": member.guild.id})
-
-        #Verification Stuff
-        if db.PLUGINS.find_one({"_id": member.guild.id}).get("Verification") != False:
-            if GuildVerifyDoc is not None:
-                roleid = GuildVerifyDoc.get("roleid")
-                role = member.guild.get_role(roleid)
-                await member.add_roles(role)
-
-
-        #Welcome stuff
-        servers = []
-        for i in db.PLUGINS.find({"Welcome": True}):
-            servers.append(i.get("_id"))
-
-        if member.guild.id in servers and GuildWelcomeDoc is not None:
-            channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
-
-            embed = discord.Embed(
-            title="Welcome to the server!",
-            description=GuildWelcomeDoc.get("greeting"),
-            color=discord.Colour.random()
-            ).set_image(url=GuildWelcomeDoc.get("image"))
-            await channel.send(content=greeting(member.mention), embed=embed)
-            autoroles = GuildWelcomeDoc.get("assignroles")
-            if autoroles != []:
-                for i in autoroles:
-                    await member.add_roles(member.guild.get_role(i))
 
 
 def setup(bot):

@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, getxprange, pagination
+from functions import getprefix, pagination
 
 
 class Leveling(commands.Cog):
@@ -65,7 +65,6 @@ class Leveling(commands.Cog):
             if db.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == False:
                 embed.set_footer(text="Leveling for this server is disabled this means the xp is still there but members won't gain any new xp")
             await ctx.channel.send(embed=embed)
-
 
 
     @commands.command()
@@ -159,15 +158,15 @@ class Leveling(commands.Cog):
             maxrank = ctx.guild.get_member(i.get("_id"))
             break
           
-        if GuildDoc.get("alertchannel") is not None:
-            alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
-            return alertchannel
-        else:
-            alertchannel = None
+        def getalertchannel():
+            if GuildDoc.get("alertchannel") is not None:
+                alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
+            else:
+                alertchannel = None
             return alertchannel
   
-        status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled"   
-        
+        status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled" 
+
         embed = discord.Embed(
         title="Server leveling information",
         color=var.C_BLUE
@@ -176,7 +175,7 @@ class Leveling(commands.Cog):
         ).add_field(name="Leveling XP Range", value=xprange, inline=False
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
         ).add_field(name="Alert Status", value=status
-        ).add_field(name="Alert channel", value=alertchannel, inline=False
+        ).add_field(name="Alert channel", value=getalertchannel(), inline=False
         )
 
         await ctx.send(embed=embed)
@@ -361,50 +360,6 @@ class Leveling(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
             )
             )
-
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        #Listeners don't care about cog checks so need to add a check manually
-        GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
-
-        if GuildPluginDoc.get("Leveling") == True and message.author.bot == False:
-            if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
-
-                GuildDoc = db.LEVELDATABASE[str(message.guild.id)]
-                userdata = GuildDoc.find_one({"_id": message.author.id})
-
-                if userdata is None:
-                    GuildDoc.insert_one({"_id": message.author.id, "xp": 0})
-                else:
-                    xp = userdata["xp"]
-
-                    initlvl = 0
-                    while True:
-                        if xp < ((50*(initlvl**2))+(50*initlvl)):
-                            break
-                        initlvl += 1
-
-                    xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
-                    GuildDoc.update_one(userdata, {"$set": {"xp": xp}})
-
-                    levelnow = 0
-                    while True:
-                        if xp < ((50*(levelnow**2))+(50*levelnow)):
-                            break
-                        levelnow += 1
-
-                    if levelnow > initlvl and GuildDoc.find_one({"_id":0}).get("alerts") == True:
-                        ch = self.bot.get_channel(GuildDoc.find_one({"_id":0}).get("alertchannel"))
-                        if ch is not None:
-                            await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
-                        else:
-                            embed = discord.Embed(
-                            title="You leveled up!",
-                            description=f"{var.E_ACCEPT} You are now level {levelnow}!",
-                            color=var.C_MAIN
-                            )
-                            await message.channel.send(content=message.author.mention, embed=embed)
 
 
 

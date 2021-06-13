@@ -398,7 +398,8 @@
         "why",
         "huh",
         "what do you mean",
-        "wdym"
+        "wdym",
+        "How did you do that"
       ],
       "responses":[
         ":eyes:",
@@ -413,7 +414,8 @@
         "tell me",
         "are you real",
         "you lie",
-        "lier"
+        "lier",
+        "you always lie"
       ],
       "responses":[
         "no",
@@ -432,7 +434,8 @@
         "xD",
         "kekw",
         "lmaooooo",
-        "XDDDD"
+        "XDDDD",
+        "you are funny"
       ],
       "responses":[
         "hehe",
@@ -451,7 +454,11 @@
         "Give me answers",
         "Search on internet",
         "Send DM",
-        "Run command"
+        "Run command",
+        "Send me a DM",
+        "What is the meaning of life",
+        "Search about it",
+        "Do this for me"
       ],
       "responses":[
         "Sorry right now I am not able to do that",

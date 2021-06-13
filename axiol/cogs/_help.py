@@ -26,6 +26,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"mute", value="Disables the ability for users to send text messages in all channels! Permissions can be changed", inline=False
     ).add_field(name=getprefix(ctx)+"unmute", value="Removes the 'Muted' role therefore lets the user send messages", inline=False
     ).add_field(name=getprefix(ctx)+"purge `<amount>`", value="Deletes the number of messages defined in the command from the channel", inline=False
+    ).add_field(name=getprefix(ctx)+"nick `<member>`", value="Changes nickname of a member", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 

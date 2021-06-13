@@ -10,7 +10,8 @@
         "Start command please",
         "Prefix please",
         "Command?",
-        "Tell prefix"
+        "Tell prefix",
+        "what is your prefix my guy"
       ],
       "responses":[
         "Oh my prefix is `~` ",
@@ -127,8 +128,9 @@
       ],
       "responses":[
         "I was made by Bolt#8905 :D",
-        "Yep! I was made by https://github.com/GitBolt",
-        "yeah, Bolt#8905 made me"
+        "I was made by https://github.com/GitBolt",
+        "Bolt#8905 made me",
+        "My creator is Bolt#8905 https://github.com/GitBolt"
       ]
     },
 
@@ -409,7 +411,9 @@
       "tag": "no",
       "patterns":[
         "tell me",
-        "are you real"
+        "are you real",
+        "you lie",
+        "lier"
       ],
       "responses":[
         "no",

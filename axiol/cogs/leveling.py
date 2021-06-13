@@ -153,18 +153,13 @@ class Leveling(commands.Cog):
             bl.append(self.bot.get_channel(i).mention)
 
         blacklistedchannels = ', '.join(bl)
-        rankings = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find({"_id": { "$ne": 0}}).sort("xp, -1")
-        for i in rankings:
-            maxrank = ctx.guild.get_member(i.get("_id"))
-            break
-          
+        maxrank = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find().sort("xp", -1).limit(1)
         def getalertchannel():
             if GuildDoc.get("alertchannel") is not None:
                 alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
             else:
                 alertchannel = None
             return alertchannel
-  
         status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled" 
 
         embed = discord.Embed(

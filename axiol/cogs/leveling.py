@@ -168,8 +168,9 @@ class Leveling(commands.Cog):
         for i in GuildDoc.get("blacklistedchannels"):
             bl.append(self.bot.get_channel(i).mention)
 
-        blacklistedchannels = ', '.join(bl)
+        blacklistedchannels = ', '.join(bl) if not bl == [] else None
         maxrank = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find().sort("xp", -1).limit(1)
+        maxrank_user = self.bot.get_user(list(maxrank)[0].get("_id"))
         def getalertchannel():
             if GuildDoc.get("alertchannel") is not None:
                 alertchannel = self.bot.get_channel(GuildDoc.get("alertchannel")).mention
@@ -177,12 +178,11 @@ class Leveling(commands.Cog):
                 alertchannel = None
             return alertchannel
         status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled" 
-
         embed = discord.Embed(
         title="Server leveling information",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
-        ).add_field(name="Highest XP Member", value=maxrank
+        ).add_field(name="Highest XP Member", value=maxrank_user, inline=False
         ).add_field(name="Leveling XP Range", value=xprange, inline=False
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
         ).add_field(name="Alert Status", value=status
@@ -306,18 +306,19 @@ class Leveling(commands.Cog):
 
             newsettings = settings.get("blacklistedchannels").copy()
             if channel.id in newsettings:
+
                 newsettings.remove(channel.id)
+                newdata = {"$set":{
+                    "blacklistedchannels": newsettings
+                    }}
+                GuildCol.update_one(settings, newdata)
+                await ctx.send(embed=discord.Embed(
+                            description=f"{channel.mention} has been removed from blacklist, hence users will be able to gain xp again in that channel.",
+                            color=var.C_GREEN)
+                            )
             else:
                 await ctx.send(f"{channel.mention} was not blacklisted")
-            newdata = {"$set":{
-                "blacklistedchannels": newsettings
-                }}
-            GuildCol.update_one(settings, newdata)
 
-            await ctx.send(embed=discord.Embed(
-                        description=f"{channel.mention} has been removed from blacklist, hence users will be able to gain xp again in that channel.",
-                        color=var.C_GREEN)
-                        )
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the channel to whitelist it",

@@ -23,7 +23,7 @@ class Welcome(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-
+    #This command isn't really used, just putted this here to invoke on first welcome plugin enable
     @commands.command()
     async def welcomesetup(self, ctx):
         embed = discord.Embed(
@@ -221,7 +221,6 @@ class Welcome(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send(f"**{ctx.author.name}** you took too long to enter your welcome image, try again maybe?")
                 
-                
 
     @commands.command()
     async def welcomerole(self, ctx, role:discord.Role=None):
@@ -249,7 +248,6 @@ class Welcome(commands.Cog):
             )
 
 
-
     @commands.command()
     async def welcomereset(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
@@ -265,6 +263,47 @@ class Welcome(commands.Cog):
         color=var.C_GREEN)
         )
 
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        GuildVerifyDoc = db.VERIFY.find_one({"_id": member.guild.id})
+        GuildWelcomeDoc = db.WELCOME.find_one({"_id": member.guild.id})
+
+        #Verification Stuff
+        if db.PLUGINS.find_one({"_id": member.guild.id}).get("Verification") == True:
+            roleid = GuildVerifyDoc.get("roleid")
+            unverifiedrole = member.guild.get_role(roleid)
+
+            await member.add_roles(unverifiedrole)
+
+        #Main Welcome stuff
+        servers = []
+        for i in db.PLUGINS.find({"Welcome": True}):
+            servers.append(i.get("_id"))
+
+        if member.guild.id in servers:
+            channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
+
+            def getcontent():
+                if GuildWelcomeDoc.get("message") is None:
+                    content = greeting(member.mention)
+                else:
+                    content = GuildWelcomeDoc.get("message")
+                return content
+
+            embed = discord.Embed(
+            title="Welcome to the server!",
+            description=GuildWelcomeDoc.get("greeting"),
+            color=discord.Colour.random()
+            ).set_image(url=GuildWelcomeDoc.get("image"))
+
+            await channel.send(content=getcontent(), embed=embed)
+
+            autoroles = GuildWelcomeDoc.get("assignroles")
+            if autoroles != []:
+                for i in autoroles:
+                    autorole = member.guild.get_role(i)
+                    await member.add_roles(autorole)
 
 
 def setup(bot):

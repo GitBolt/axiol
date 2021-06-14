@@ -22,7 +22,22 @@
         "My prefix in this server is `~` :D"
       ]
     },
-
+    {
+      "tag": "help",
+      "patterns": [
+        "Help me",
+        "Send help",
+        "What is your help command",
+        "I need help",
+        "Can you send the help embed",
+        "help embed",
+        "please help"
+      ],
+      "responses":[
+        "help",
+        "Help yourself 🦥"
+      ]
+    },
     {
       "tag": "greetings",
       "patterns": [
@@ -399,13 +414,15 @@
         "huh",
         "what do you mean",
         "wdym",
-        "How did you do that"
+        "How did you do that",
+        "Why do you stop working"
       ],
       "responses":[
         ":eyes:",
-        ":eyes: y e s ",
         ":p",
-        ":shrug:"
+        ":shrug:",
+        "hehe :eyes:",
+        "¯\\_(ツ)_//¯"
       ]
     },
     {

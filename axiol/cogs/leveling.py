@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, leaderboardpagination
+from functions import getprefix, leaderboardpagination, getxprange
 
 
 class Leveling(commands.Cog):
@@ -356,6 +356,50 @@ class Leveling(commands.Cog):
             )
             )
 
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        
+        #Leveling stuff
+        GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
+
+        if GuildPluginLevelingDoc.get("Leveling") == True and message.author.bot == False:
+            if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
+
+                GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
+                userdata = GuildLevelDoc.find_one({"_id": message.author.id})
+
+                if userdata is None:
+                    GuildLevelDoc.insert_one({"_id": message.author.id, "xp": 0})
+                else:
+                    xp = userdata["xp"]
+
+                    initlvl = 0
+                    while True:
+                        if xp < ((50*(initlvl**2))+(50*initlvl)):
+                            break
+                        initlvl += 1
+
+                    xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
+                    GuildLevelDoc.update_one(userdata, {"$set": {"xp": xp}})
+
+                    levelnow = 0
+                    while True:
+                        if xp < ((50*(levelnow**2))+(50*levelnow)):
+                            break
+                        levelnow += 1
+
+                    if levelnow > initlvl and GuildLevelDoc.find_one({"_id":0}).get("alerts") == True:
+                        ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0}).get("alertchannel"))
+                        if ch is not None:
+                            await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                        else:
+                            embed = discord.Embed(
+                            title="You leveled up!",
+                            description=f"{var.E_ACCEPT} You are now level {levelnow}!",
+                            color=var.C_MAIN
+                            )
+                            await message.channel.send(content=message.author.mention, embed=embed)
 
 
 def setup(bot):

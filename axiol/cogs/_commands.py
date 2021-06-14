@@ -114,16 +114,22 @@ class Commands(commands.Cog):
 
             try:
                 while True:
-                    reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=30.0)
+                    reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=4.0)
                     if str(reaction.emoji) == var.E_CONTINUE:
                         break
 
                     index = emojis.index(str(reaction))
                     embed.color=colors[index]
-                    await preview.remove_reaction(emojis[index], ctx.author)
+                    try:
+                        await preview.remove_reaction(emojis[index], ctx.author)
+                    except discord.Forbidden:
+                        pass
                     await preview.edit(embed=embed)
-                
-                await preview.clear_reactions()    
+                try:
+                    await preview.clear_reactions()    
+                except discord.Forbidden:
+                    pass
+
                 titlebotmsg = await ctx.send(embed=discord.Embed(
                 title="Title",
                 description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",
@@ -198,7 +204,10 @@ class Commands(commands.Cog):
                         embed.add_field(name=fieldlist[0], value=fieldlist[1], inline=False)
                         await preview.edit(embed=embed)
                         await fieldbotmsg.delete()
-                        await edit.remove_reaction("🇦", ctx.author)
+                        try:
+                            await edit.remove_reaction("🇦", ctx.author)
+                        except discord.Forbidden:
+                            pass
 
                     if str(reaction.emoji) == "🇫":
                         footerbotmsg = await ctx.send("Send a message to make it the **Footer**!")
@@ -206,8 +215,10 @@ class Commands(commands.Cog):
                         embed.set_footer(text=usermsg.content)
                         await preview.edit(embed=embed)
                         await footerbotmsg.delete()
-                        await edit.clear_reaction("🇫")
-
+                        try:
+                            await edit.clear_reaction("🇫")
+                        except discord.Forbidden:
+                            pass
                     if str(reaction.emoji) == "🇮":
                         imagebotmsg = await ctx.send("Now send an image or link to add that **Image** to the embed!")
                         usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=30.0)   
@@ -216,24 +227,52 @@ class Commands(commands.Cog):
                                 embed.set_image(url=usermsg.attachments[0].url)
                                 await preview.edit(embed=embed)
                                 await thumbnailbotmsg.delete()
-                                edit.clear_reaction("🇮")
+                                try:
+                                    edit.clear_reaction("🇮")
+                                except discord.Forbidden:
+                                    pass
                             else:
                                 embed.set_image(url=usermsg.content)
                                 await preview.edit(embed=embed)
                                 await imagebotmsg.delete()
-                                await edit.clear_reaction("🇮")
+                                try:
+                                    await edit.clear_reaction("🇮")
+                                except discord.Forbidden:
+                                    pass
                         except:
                             await ctx.send("Invalid image, either use a url or send the image")
-                            await edit.remove_reaction("🇮", ctx.author)
+                            try:
+                                await edit.remove_reaction("🇮", ctx.author)
+                            except discord.Forbidden:
+                                pass
 
                     if str(reaction.emoji) == "🇺":
                         embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
                         await preview.edit(embed=embed)
-                        await edit.clear_reaction("🇺")
+                        try:
+                            await edit.clear_reaction("🇺")
+                        except discord.Forbidden:
+                            pass
 
             except asyncio.TimeoutError:
-                    await preview.clear_reactions()
-                    await ctx.send("You took too long ;-;")
+                    try:
+                        await preview.clear_reactions()
+                    except discord.Forbidden:
+                        pass
+                    botmsg = await ctx.send(embed=discord.Embed(
+                        title="You took too long :(", 
+                        description=f"Do you think this was too fast for auto cancelling? React to the {var.E_ACCEPT} emoji below to send a quick auto report in the [Support Server](https://discord.gg/Rzz5WS9jXW) so that embed time can be increased",
+                        color=var.C_RED
+                        ))
+                    await botmsg.add_reaction(var.E_ACCEPT)
+                    def reactioncheck(reaction, user):
+                        if str(reaction.emoji) == var.E_ACCEPT:
+                            return user == ctx.author and reaction.message == botmsg
+
+                    reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+                    supportchannel = self.bot.get_channel(843787754752311316)
+                    await supportchannel.send(embed=discord.Embed(description=f"**{ctx.author}** from **{ctx.guild.name}**says that timeout for embed creation should be longer", color=var.C_MAIN))
+                    await ctx.send(f"Successfully sent the report, thanks for helping me improve {ctx.author}!")
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
 

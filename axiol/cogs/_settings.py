@@ -56,7 +56,10 @@ class Settings(commands.Cog):
             try:
                 reaction, user = await self.bot.wait_for('reaction_add', check=reactioncheck, timeout=60.0)
                 GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-                await botmsg.clear_reactions()
+                try:
+                    await botmsg.clear_reactions()
+                except discord.Forbidden:
+                    pass
                 plugin_type = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
 
                 embed = discord.Embed(
@@ -78,7 +81,10 @@ class Settings(commands.Cog):
                     embed.description=f"{var.E_DISABLE} {plugin_type} extension has been disabled"
                     embed.color=var.C_RED
                     await enabledbotmsg.edit(embed=embed)
-                    await enabledbotmsg.clear_reactions()
+                    try:
+                        await enabledbotmsg.clear_reactions()
+                    except discord.Forbidden:
+                        pass
 
                 else:
                     embed.description=f"{var.E_DISABLE} {plugin_type} is currently disabled"
@@ -96,7 +102,10 @@ class Settings(commands.Cog):
                     embed.description=f"{var.E_ENABLE} {plugin_type} extension has been enabled"
                     embed.color=var.C_GREEN
                     await enabledbotmsg.edit(embed=embed)
-                    await enabledbotmsg.clear_reactions()
+                    try:
+                        await enabledbotmsg.clear_reactions()
+                    except discord.Forbidden:
+                        pass
 
                     #Since welcome and verification is not enabled by default ->
                     #The time plugin is enabled, there is no information available in the db ->
@@ -108,8 +117,10 @@ class Settings(commands.Cog):
                         await ctx.invoke(self.bot.get_command('verifysetup'))
                        
             except asyncio.TimeoutError:
-                await botmsg.clear_reactions()
-                
+                try:
+                    await botmsg.clear_reactions()
+                except discord.Forbidden:
+                    pass
 
 
     @commands.command()

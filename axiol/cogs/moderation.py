@@ -254,7 +254,7 @@ class Moderation(commands.Cog):
             )
     @purge.error
     async def purge_error(self, ctx, error):
-        if isinstance(error, discord.Forbidden):
+        if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
                 description=f"{var.E_ERROR} I don't have permissions to delete messages",

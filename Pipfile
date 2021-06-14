@@ -11,6 +11,7 @@ youtube-dl = "*"
 pynacl = "*"
 nltk = "*"
 torch = "*"
+requests = "*"
 
 [dev-packages]
 

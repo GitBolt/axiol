@@ -407,16 +407,18 @@ class Leveling(commands.Cog):
 
                     if levelnow > initlvl and GuildLevelDoc.find_one({"_id":0}).get("alerts") == True:
                         ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0}).get("alertchannel"))
-                        if ch is not None:
-                            await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
-                        else:
-                            embed = discord.Embed(
-                            title="You leveled up!",
-                            description=f"{var.E_ACCEPT} You are now level {levelnow}!",
-                            color=var.C_MAIN
-                            )
-                            await message.channel.send(content=message.author.mention, embed=embed)
-
+                        try:
+                            if ch is not None:
+                                await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                            else:
+                                embed = discord.Embed(
+                                title="You leveled up!",
+                                description=f"{var.E_ACCEPT} You are now level {levelnow}!",
+                                color=var.C_MAIN
+                                )
+                                await message.channel.send(content=message.author.mention, embed=embed)
+                        except discord.Forbidden:
+                            pass
 
 def setup(bot):
     bot.add_cog(Leveling(bot))

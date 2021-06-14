@@ -8,7 +8,7 @@ class BarGraph(commands.Cog):
     def __init__(self, bot):
         self.bot=bot
 
-    @commands.command()
+    @commands.command(aliases=["levelgraph"])
     async def levelchart(self, ctx, limit:int=10):
         if limit > 30:
             await ctx.send(embed=discord.Embed(
@@ -16,10 +16,10 @@ class BarGraph(commands.Cog):
                         color=var.C_RED
                         ))
         else:
-            await ctx.send("Fetching data... Just a sec!")
+            botmsg = await ctx.send(f"Fetching data {var.E_LOADING} Just a second!")
             res = requests.get(f"https://axiol.up.railway.app/bargraph/leaderboard/{ctx.guild.id}?limit={limit}")
             await ctx.send(res.json()["message"])
-
+            await botmsg.delete()
     
 def setup(bot):
     bot.add_cog(BarGraph(bot))

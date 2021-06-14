@@ -84,7 +84,7 @@ class Leveling(commands.Cog):
 
         embed = discord.Embed(
         title=f"Leaderboard", 
-        description="◀️ First page\n⬅️ Previous page\n➡️ Next page\n▶️ Last page\n",
+        description="◀️ First page\n⬅️ Previous page\n<:leveling:854068306285428767> Bar graph of top 10 users\n➡️ Next page\n▶️ Last page\n",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
         )
@@ -106,12 +106,12 @@ class Leveling(commands.Cog):
         botmsg = await ctx.send(embed=embed)
         await botmsg.add_reaction("◀️")
         await botmsg.add_reaction("⬅️")
+        await botmsg.add_reaction("<:leveling:854068306285428767>")
         await botmsg.add_reaction("➡️")
         await botmsg.add_reaction("▶️")
 
         def reactioncheck(reaction, user):
-            if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
-                return user == ctx.author and reaction.message == botmsg
+            return user == ctx.author and reaction.message == botmsg
         
         current_page = 0
         while True:
@@ -123,13 +123,26 @@ class Leveling(commands.Cog):
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "➡️":
-                await botmsg.remove_reaction("➡️", ctx.author)
+                try:
+                    await botmsg.remove_reaction("➡️", ctx.author)
+                except discord.Forbidden:
+                    pass
                 current_page += 1
                 await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
+            if str(reaction.emoji) == "<:leveling:854068306285428767>":
+                try:
+                    await botmsg.clear_reactions()
+                except discord.Forbidden:
+                    pass
+                await ctx.invoke(self.bot.get_command('levelchart'))
+
             if str(reaction.emoji) == "⬅️":
-                await botmsg.remove_reaction("⬅️", ctx.author)
+                try:
+                    await botmsg.remove_reaction("⬅️", ctx.author)
+                except discord.Forbidden:
+                    pass
                 current_page -= 1
                 if current_page < 0:
                     current_page += 1
@@ -137,7 +150,10 @@ class Leveling(commands.Cog):
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "▶️":
-                await botmsg.remove_reaction("▶️", ctx.author)
+                try:
+                    await botmsg.remove_reaction("▶️", ctx.author)
+                except discord.Forbidden:
+                    pass
                 current_page = all_pages-1
                 await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)

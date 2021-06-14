@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, pagination
+from functions import getprefix, leaderboardpagination
 
 
 class Leveling(commands.Cog):
@@ -80,7 +80,7 @@ class Leveling(commands.Cog):
             exactpages = 1
         else:
             exactpages = rankings.count() / 10
-        all_pages = int(exactpages)
+        all_pages = round(exactpages)
 
         embed = discord.Embed(
         title=f"Leaderboard", 
@@ -119,13 +119,13 @@ class Leveling(commands.Cog):
             if str(reaction.emoji) == "◀️":
                 await botmsg.remove_reaction("◀️", ctx.author)
                 current_page = 0
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "➡️":
                 await botmsg.remove_reaction("➡️", ctx.author)
                 current_page += 1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "⬅️":
@@ -133,13 +133,13 @@ class Leveling(commands.Cog):
                 current_page -= 1
                 if current_page < 0:
                     current_page += 1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "▶️":
                 await botmsg.remove_reaction("▶️", ctx.author)
                 current_page = all_pages-1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
 

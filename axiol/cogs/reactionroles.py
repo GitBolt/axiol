@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix
+from functions import getprefix, reactionrolespagination
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -69,16 +69,18 @@ class ReactionRoles(commands.Cog):
                 else:
                     await ctx.send(embed=discord.Embed(
                         title="Role position error",
-                        description=f"The role {role.mention} is above my role ({ bot_member.roles[1].mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your reaction role as shown below\n\n **Server Settings > Roles > Click on the {bot_member.roles[1].mention} Role > Drag it above the {role.mention} Role **(Shown as the Developer role in the image below)",
+                        description=f"The role {role.mention} is above my role ({ botrole.mention}), in order for me to update any role (reaction roles) my role needs to be above that role, just move my role above your reaction role as shown below\n\n **Server Settings > Roles > Click on the {botrole.mention} Role > Drag it above the {role.mention} Role **(Shown as the Developer role in the image below)",
                         color=var.C_RED
                     ).set_image(url="https://cdn.discordapp.com/attachments/843519647055609856/850711272726986802/unknown.png")
                     )
+
             except:
                 await ctx.send(embed=discord.Embed(
                             title="Invalid Message ID",
                             description=f"There are no messages with the ID **{msgid}** in {channel.mention}",
                             color=var.C_RED
                 ))
+
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the channel, message, role and emoji all three to add a reaction role",
@@ -137,19 +139,72 @@ class ReactionRoles(commands.Cog):
     @commands.command(aliases=['rrall'])
     async def allrr(self, ctx):
 
-        embed = discord.Embed(
-        title="All active reaction roles", 
-        color=var.C_MAIN
-        )
-        GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
-
+        Guild = self.bot.get_guild(ctx.guild.id)
+        GuildDoc = db.REACTIONROLES.find_one({"_id": Guild.id})
         if GuildDoc is not None:
+
+            rramount = len(GuildDoc.get("reaction_roles"))
+            if rramount <= 10:
+                exactpages = 1
+            else:
+                exactpages = rramount / 10
+            all_pages = round(exactpages)
+
+            embed = discord.Embed(
+            title="All active reaction roles", 
+            color=var.C_MAIN
+            )
+            
+            rrcount = 0
             for i in GuildDoc["reaction_roles"]:
-                guild = self.bot.get_guild(ctx.guild.id)
-                role = guild.get_role(i.get("roleid"))
+                rrcount += 1
+                
+                role = Guild.get_role(i.get("roleid"))
                 emoji = i.get("emoji")
                 embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n", inline=False)
-            await ctx.send(embed=embed)
+                if rrcount == 10:
+                    break
+
+            embed.set_footer(text=f"Page 1/{all_pages}")
+            botmsg = await ctx.send(embed=embed)
+            await botmsg.add_reaction("◀️")
+            await botmsg.add_reaction("⬅️")
+            await botmsg.add_reaction("➡️")
+            await botmsg.add_reaction("▶️")
+
+            def reactioncheck(reaction, user):
+                if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
+                    return user == ctx.author and reaction.message == botmsg
+            
+            current_page = 0
+            while True:
+                reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+                if str(reaction.emoji) == "◀️":
+                    await botmsg.remove_reaction("◀️", ctx.author)
+                    current_page = 0
+                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "➡️":
+                    await botmsg.remove_reaction("➡️", ctx.author)
+                    current_page += 1
+                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "⬅️":
+                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    current_page -= 1
+                    if current_page < 0:
+                        current_page += 1
+                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "▶️":
+                    await botmsg.remove_reaction("▶️", ctx.author)
+                    current_page = all_pages-1
+                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await botmsg.edit(embed=embed)
+
         else:
             await ctx.send("This server does not have any active reaction roles right now")
     

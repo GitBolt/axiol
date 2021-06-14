@@ -158,9 +158,12 @@ class Help(commands.Cog):
 
                     helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
                     await helpmsg.edit(embed=HelpDict.get(helptype)(ctx))
-                    await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
+                    try:
+                        await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
+                    except:
+                        pass
                 
-                #Since extra help is always there
+                #Since extra help and plugin is always there
                 if str(reaction.emoji) == var.E_CONTINUE:
                     await helpmsg.edit(embed=extrahelp(ctx))
                     await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)

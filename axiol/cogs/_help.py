@@ -160,15 +160,21 @@ class Help(commands.Cog):
                     await helpmsg.edit(embed=HelpDict.get(helptype)(ctx))
                     try:
                         await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
-                    except:
+                    except discord.Forbidden:
                         pass
                 
                 #Since extra help and plugin is always there
                 if str(reaction.emoji) == var.E_CONTINUE:
                     await helpmsg.edit(embed=extrahelp(ctx))
-                    await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+                    try:
+                        await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+                    except discord.Forbidden:
+                        pass
                 if str(reaction.emoji) == var.E_PLUGINS:
-                    await helpmsg.clear_reactions()
+                    try:
+                        await helpmsg.clear_reactions()
+                    except discord.Forbidden:
+                        pass
                     await ctx.invoke(self.bot.get_command('plugins'))
 
         except asyncio.TimeoutError:
@@ -288,7 +294,10 @@ class Help(commands.Cog):
                 return user == ctx.author and reaction.message == botmsg
 
         await self.bot.wait_for('reaction_add', check=reactioncheck)
-        await botmsg.clear_reactions()
+        try:
+            await botmsg.clear_reactions()
+        except discord.Forbidden:
+            pass
         embed = discord.Embed(
                     title="Rank data deletion",
                     description=f"Keep in mind that this action is irreversable",

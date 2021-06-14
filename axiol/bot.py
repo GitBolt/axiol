@@ -28,7 +28,10 @@ async def on_ready():
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
-
+#Loading visual pogs
+for filename in os.listdir('./visuals'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'visuals.{filename[:-3]}')
 #Loading custom pogs
 for filename in os.listdir('./customcogs'):
     if filename.endswith('.py'):

@@ -153,7 +153,7 @@ class Help(commands.Cog):
 
         try:
             while True:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
+                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=10.0)
                 if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
 
                     helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
@@ -172,7 +172,14 @@ class Help(commands.Cog):
                     await ctx.invoke(self.bot.get_command('plugins'))
 
         except asyncio.TimeoutError:
-            await helpmsg.clear_reactions()
+            try:
+                await helpmsg.clear_reactions()
+            except discord.Forbidden:
+                await helpmsg.add_reaction(var.E_PLUGINS)
+                for i in GuildDoc:
+                    if GuildDoc.get(i) == True:
+                        await helpmsg.remove_reaction(var.DICT_PLUGINEMOJIS.get(i), self.bot.user)
+                await helpmsg.add_reaction(var.E_CONTINUE)
 
 
            

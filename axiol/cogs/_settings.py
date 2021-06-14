@@ -133,7 +133,10 @@ class Settings(commands.Cog):
                     color=var.C_ORANGE
                     ).set_footer(text="Automatic cancellation after 1 minute")
                     )
-        await botmsg.clear_reactions()
+        try:
+            await botmsg.clear_reactions()
+        except discord.Forbidden:
+            pass
 
         def messagecheck(message):
             return message.author == ctx.author and message.channel.id == ctx.channel.id

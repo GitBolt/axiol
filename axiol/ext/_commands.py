@@ -114,7 +114,7 @@ class Commands(commands.Cog):
 
             try:
                 while True:
-                    reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=4.0)
+                    reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=20.0)
                     if str(reaction.emoji) == var.E_CONTINUE:
                         break
 
@@ -271,7 +271,7 @@ class Commands(commands.Cog):
 
                     reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
                     supportchannel = self.bot.get_channel(843787754752311316)
-                    await supportchannel.send(embed=discord.Embed(description=f"**{ctx.author}** from **{ctx.guild.name}**says that timeout for embed creation should be longer", color=var.C_MAIN))
+                    await supportchannel.send(embed=discord.Embed(description=f"**{ctx.author}** from **{ctx.guild.name}** says that timeout for embed creation should be longer", color=var.C_MAIN))
                     await ctx.send(f"Successfully sent the report, thanks for helping me improve {ctx.author}!")
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")

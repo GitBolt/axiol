@@ -182,11 +182,11 @@ class Help(commands.Cog):
             try:
                 await helpmsg.clear_reactions()
             except discord.Forbidden:
-                await helpmsg.add_reaction(var.E_PLUGINS)
+                await helpmsg.remove_reaction(var.E_PLUGINS)
                 for i in GuildDoc:
                     if GuildDoc.get(i) == True:
                         await helpmsg.remove_reaction(var.DICT_PLUGINEMOJIS.get(i), self.bot.user)
-                await helpmsg.add_reaction(var.E_CONTINUE)
+                await helpmsg.remove_reaction(var.E_CONTINUE)
 
 
            

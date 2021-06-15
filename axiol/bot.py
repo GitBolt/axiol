@@ -24,18 +24,23 @@ async def on_ready():
     print("I woke up 🌥️")
 
 
-#Loading pogs
-for filename in os.listdir('./cogs'):
+#Loading pogs 
+for filename in os.listdir('./custom'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'custom.{filename[:-3]}')
+
+for filename in os.listdir('./ext'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'ext.{filename[:-3]}')
+
+for filename in os.listdir('./plugins'):
     if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
-#Loading visual pogs
+
 for filename in os.listdir('./visuals'):
     if filename.endswith('.py'):
         bot.load_extension(f'visuals.{filename[:-3]}')
-#Loading custom pogs
-for filename in os.listdir('./customcogs'):
-    if filename.endswith('.py'):
-        bot.load_extension(f'customcogs.{filename[:-3]}')
+
 
 
 @bot.event
@@ -44,8 +49,8 @@ async def on_guild_join(guild):
     if not db.PLUGINS.count_documents({"_id": guild.id}, limit=1):
         db.PLUGINS.insert_one({
 
-            "_id":guild.id,
-            "Leveling":True,
+            "_id": guild.id,
+            "Leveling": False,
             "Moderation": True,
             "Reaction Roles": True,
             "Welcome": False,
@@ -69,7 +74,7 @@ async def on_guild_join(guild):
     #Support server Log
     embed = discord.Embed(
     title="I just joined a new server!",
-    description=f"Thanks to this kind person for inviting me to **{guild.name}** :D",
+    description=f"Thanks to this kind person for inviting me to `{guild.name}` :D",
     color=var.C_GREEN
     ).add_field(name="Member count", value=guild.member_count
     )
@@ -80,7 +85,7 @@ async def on_guild_join(guild):
 async def on_guild_remove(guild):
     embed = discord.Embed(
     title="I just got removed from a server",
-    description=f"Someone removed me from **{guild.name}** :(",
+    description=f"Someone removed me from `{guild.name}` :(",
     color=var.C_RED
     ).add_field(name="Member count", value=guild.member_count
     )

@@ -91,13 +91,13 @@ def updatedb(serverid):
         PLUGINS.insert_one({
 
                     "_id":serverid,
-                    "Leveling":True,
-                    "Moderation": True,
-                    "Reaction Roles": True,
+                    "Leveling":False,
+                    "Moderation": False,
+                    "Reaction Roles": False,
                     "Welcome": False,
                     "Verification": False,
                     "Chatbot": False,
-                    "Music": True
+                    "Music": False
                 })
         print(f"Added Plugins {serverid}")
 

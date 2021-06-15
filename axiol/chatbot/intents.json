@@ -48,7 +48,8 @@
         "Sup",
         "Wassup",
         "Oi",
-        "What's up"
+        "What's up",
+        "Hoi"
       ],
       "responses": [
         "Heyyyy",
@@ -197,7 +198,10 @@
         "You are useless",
         "Piece of shit",
         "moron",
-        "dumbfuck"
+        "dumbfuck",
+        "shut up",
+        "shut",
+        "keep quiet"
       ],
       "responses":[
         "Ouch, that hurted...",
@@ -254,7 +258,12 @@
         "you are nice",
         "i like you",
         "you are smart",
-        "You are epic"
+        "You are epic",
+        "u r genius",
+        "you are genius",
+        "you are intelligent",
+        "you are clever",
+        "you r genius"
       ],
       "responses":[
         "Thanks haha",
@@ -391,7 +400,9 @@
         "Do you have feelings?",
         "do you feel?",
         "Do you like potatoes?",
-        "Are you my friend?"
+        "Are you my friend?",
+        "True"
+
       ],
       "responses":[
         "Maybe :eyes:",
@@ -412,17 +423,21 @@
         "no",
         "why",
         "huh",
+        "Bruh",
         "what do you mean",
         "wdym",
         "How did you do that",
-        "Why do you stop working"
+        "Why do you stop working",
+        "doubt",
+        "thats what a bot would say"
       ],
       "responses":[
         ":eyes:",
         ":p",
         ":shrug:",
         "hehe :eyes:",
-        "¯\\_(ツ)_//¯"
+        "¯\\_(ツ)_/¯"
+        
       ]
     },
     {
@@ -503,6 +518,22 @@
         "no u <:7689_unoreversecard:850800438160392212>",
         "No you *pulls out uno reverse card*"
       ]
+    },
+    {
+      "tag": "me",
+      "patterns":[
+        "which is the best discord bot",
+        "best discord bot",
+        "are you the best bot?"
+      ],
+      "responses":[
+        "Ofc me",
+        "Me :sunglasses:",
+        "The one you are using rn ;)",
+        "I thought it's obvious, me :D",
+        "I am hehe"
+      ]
+    
     }
   ]
 }

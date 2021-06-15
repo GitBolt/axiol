@@ -35,7 +35,7 @@ for filename in os.listdir('./ext'):
 
 for filename in os.listdir('./plugins'):
     if filename.endswith('.py'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
+        bot.load_extension(f'plugins.{filename[:-3]}')
 
 for filename in os.listdir('./visuals'):
     if filename.endswith('.py'):

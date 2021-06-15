@@ -203,17 +203,26 @@ class Music(commands.Cog):
         if search is not None:
 
             await ctx.trigger_typing()
-
             vc = ctx.voice_client
 
-            if not vc:
-                await ctx.invoke(self.connect)
+            if vc:
+                player = self.get_player(ctx)
+                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
+                await player.queue.put(source)
 
-            player = self.get_player(ctx)
+            else:
+                try:
+                    await ctx.author.voice.channel.connect()
+                    player = self.get_player(ctx)
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
+                    await player.queue.put(source)
+                except:
+                    await ctx.send("You are not in any VC, how would I know where to play? :sweat_smile:")
+                    vc_status = False
+                    return vc_status
+            
 
-            source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop, download=False)
 
-            await player.queue.put(source)
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define your search too!",
@@ -221,6 +230,20 @@ class Music(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}play <search>`"
             ).set_footer(text="For search either any YouTube link can be used or any related search query")
             )
+
+
+    @commands.command()
+    async def activeplayers(self, ctx):
+        if ctx.author.id == 791950104680071188:
+            embed = discord.Embed(description="Live players", color=var.C_MAIN)
+            servers = list(self.players.keys())
+            objects = list(self.players.values())
+            
+            for i in servers:
+                obj = objects[servers.index(i)]
+                embed.add_field(name=i, value=f"{obj._guild} - {obj._channel}")
+
+            await ctx.send(embed=embed)
 
 
     @commands.command()

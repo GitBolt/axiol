@@ -154,7 +154,7 @@ class Help(commands.Cog):
 
         try:
             while True:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=10.0)
+                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
                 if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
 
                     helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]

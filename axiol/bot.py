@@ -50,7 +50,7 @@ async def on_guild_join(guild):
             "Reaction Roles": True,
             "Welcome": False,
             "Verification": False,
-            "Chatbot": False,
+            "Chatbot": True,
             "Music": True
         })
 

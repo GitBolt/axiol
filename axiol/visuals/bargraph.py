@@ -17,6 +17,7 @@ class BarGraph(commands.Cog):
                         ))
         else:
             botmsg = await ctx.send(f"Fetching data {var.E_LOADING} Just a second!")
+            await ctx.trigger_typing()
             res = requests.get(f"https://axiol.up.railway.app/bargraph/leaderboard/{ctx.guild.id}?limit={limit}")
             await ctx.send(res.json()["message"])
             await botmsg.delete()

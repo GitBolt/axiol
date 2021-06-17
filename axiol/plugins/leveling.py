@@ -394,7 +394,7 @@ class Leveling(commands.Cog):
             )
 
 
-    @commands.command()
+    @commands.command(aliases=["addreward"])
     async def reward(self, ctx, level:str=None, role:discord.Role=None):
         if level and role is not None and level.isnumeric():
 
@@ -420,9 +420,42 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the level and role both to add a reward!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}addreward <level> <role>`"
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}reward <level> <role>`"
             ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}reward 2 @somerole\nNot {getprefix(ctx)}reward level2 @somerole")
             )
+
+    @commands.command()
+    async def removereward(self, ctx, level:str=None):
+        if level is not None:
+
+            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            settings = GuildCol.find_one({"_id": 0})
+
+            existingdata = settings.get("rewards")
+
+            newdict = existingdata.copy()
+
+            role = ctx.guild.get_role(newdict.get(level))
+            newdict.pop(level)
+            
+            newdata = {"$set":{
+                "rewards":newdict
+            }}
+
+            GuildCol.update_one(settings, newdata)
+            await ctx.send(embed=discord.Embed(
+                        description=f"Successfully removed {role.mention} as the reward from Level {level}!",
+                        color=var.C_GREEN)
+                        )
+
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the level to remove it's reward!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}removereward <level>`"
+            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}removereward 2 \nNot {getprefix(ctx)}removereward level2 ")
+            )
+
 
 
 

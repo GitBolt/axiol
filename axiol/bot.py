@@ -59,18 +59,6 @@ async def on_guild_join(guild):
             "Music": True
         })
 
-    #Inserting leveling data because this is enabled by default 
-    if not str(guild.id) in db.LEVELDATABASE.list_collection_names():
-        GuildDoc = db.LEVELDATABASE.create_collection(str(guild.id))
-        GuildDoc.insert_one({
-
-            "_id": 0,
-            "xprange": [15, 25],
-            "alertchannel": None,
-            "blacklistedchannels": [],
-            "alerts": True
-            })    
-
     #Support server Log
     embed = discord.Embed(
     title="I just joined a new server!",
@@ -79,6 +67,7 @@ async def on_guild_join(guild):
     ).add_field(name="Member count", value=guild.member_count
     )
     await bot.get_channel(848207106821980213).send(embed=embed)           
+
 
 #Support server Log
 @bot.event

@@ -13,7 +13,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"rankgraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default, max amount is 30", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
-    #).add_field(name=getprefix(ctx)+"award", value="Setup awards for reaching certain amount of xp!", inline=False
+    ).add_field(name=getprefix(ctx)+"award `<level>` `<role>`", value="Setup awards for reaching certain level! For level only use the number", inline=False
     ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings!", inline=False
     ).add_field(name=getprefix(ctx)+"levelconfig", value=f"Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")

@@ -374,10 +374,42 @@ class Leveling(commands.Cog):
             )
 
 
+    @commands.command()
+    async def reward(self, ctx, level:str=None, role:discord.Role=None):
+        if level and role is not None and level.isnumeric():
+
+            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            settings = GuildCol.find_one({"_id": 0})
+
+            existingdata = settings.get("rewards")
+
+            newdict = existingdata.copy()
+
+            newdict.update({level: role.id})
+            newdata = {"$set":{
+                "rewards":newdict
+            }}
+
+            GuildCol.update_one(settings, newdata)
+            await ctx.send(embed=discord.Embed(
+                        description=f"Successfully added {role.mention} as the reward to Level {level}!",
+                        color=var.C_GREEN)
+                        )
+
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the level and role both to add a reward!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}addreward <level> <role>`"
+            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}reward 2 @somerole\nNot {getprefix(ctx)}reward level2 @somerole")
+            )
+
+
+
+
     @commands.Cog.listener()
     async def on_message(self, message):
         
-        #Leveling stuff
         GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
         if GuildPluginLevelingDoc.get("Leveling") == True and message.author.bot == False:
@@ -408,18 +440,25 @@ class Leveling(commands.Cog):
 
                     if levelnow > initlvl and GuildLevelDoc.find_one({"_id":0}).get("alerts") == True:
                         ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0}).get("alertchannel"))
+                        embed = discord.Embed(
+                        title="You leveled up!",
+                        description=f"{var.E_ACCEPT} You are now level {levelnow}!",
+                        color=var.C_MAIN
+                        )
                         try:
                             if ch is not None:
-                                await ch.send(f"{message.author.mention} you leveled up to level {levelnow}!")
+                                await ch.send(content=message.author.mention, embed=embed)
                             else:
-                                embed = discord.Embed(
-                                title="You leveled up!",
-                                description=f"{var.E_ACCEPT} You are now level {levelnow}!",
-                                color=var.C_MAIN
-                                )
                                 await message.channel.send(content=message.author.mention, embed=embed)
                         except discord.Forbidden:
                             pass
+
+                    rewards = GuildLevelDoc.find_one({"_id":0}).get("rewards")
+                    if str(levelnow) in rewards.keys():
+                        roleid = rewards.get(str(levelnow))
+                        role = message.guild.get_role(roleid)
+                        if role not in message.author.roles:
+                            await message.author.add_roles(role)
 
 def setup(bot):
     bot.add_cog(Leveling(bot))

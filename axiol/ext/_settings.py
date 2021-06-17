@@ -117,15 +117,16 @@ class Settings(commands.Cog):
                     if str(reaction.emoji) =="✅" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
                         await ctx.invoke(self.bot.get_command('verifysetup'))
 
-                    if str(reaction.emoji) == var.LEVELING and str(ctx.guild.id) not in db.LEVELDATABASE.list_collection_names():
-                        GuildDoc = db.LEVELDATABASE.create_collection(str(guild.id))
+                    if str(reaction.emoji) == var.E_LEVELING and str(ctx.guild.id) not in db.LEVELDATABASE.list_collection_names():
+                        GuildDoc = db.LEVELDATABASE.create_collection(str(ctx.guild.id))
                         GuildDoc.insert_one({
 
                             "_id": 0,
                             "xprange": [15, 25],
                             "alertchannel": None,
                             "blacklistedchannels": [],
-                            "alerts": True
+                            "alerts": True,
+                            "rewards": {}
                             })   
                                     
             except asyncio.TimeoutError:

@@ -13,7 +13,6 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"rankgraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default, max amount is 30", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP! For user either user can be mentioned or ID can be used", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP! For user either user can be mentioned or ID can be used", inline=False
-    ).add_field(name=getprefix(ctx)+"award `<level>` `<role>`", value="Setup awards for reaching certain level! For level only use the number", inline=False
     ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings!", inline=False
     ).add_field(name=getprefix(ctx)+"levelconfig", value=f"Configure leveling settings!", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
@@ -283,46 +282,11 @@ class Help(commands.Cog):
         ).add_field(name=getprefix(ctx)+"whitelist `<#channel>`",value=f"Whitelist an xp blacklisted channel.", inline=False
         ).add_field(name=getprefix(ctx)+"alertchannel `<#channel>`", value="Define the channel where alerts will be sent for level ups!", inline=False
         ).add_field(name=getprefix(ctx)+"togglealerts", value="Disable or Enable alert message for level ups!", inline=False
-        ).add_field(name="Reset data", value=f"React to {var.E_DECLINE}", inline=False
-        ).set_footer(text=f"Leveling is a plugin so to disable it, use the command {getprefix(ctx)}plugins and click on the leveling emoji")
+        ).add_field(name=getprefix(ctx)+"award `<level>` `<role>`", value="Setup awards for reaching certain level! For level only use the number", inline=False
+        ).set_footer(text=f"Leveling is a plugin so to disable it, use the command {getprefix(ctx)}plugins and click on the leveling emoji to toggle")
         #).add_field(name=getprefix(ctx)+"maxlevel `<amount>`", value="Define the max level which can be achieved by a user", inline=False
         #).add_field(name=getprefix(ctx)+"alertmessage `<message>`", value=f"Change the alert message! Use these values in between:\n[user] [xp] [level]\n Make sure to put them between square brackets!", inline=False
-        botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction(var.E_DECLINE)
-
-        def reactioncheck(reaction, user):
-            if str(reaction.emoji) == var.E_DECLINE:
-                return user == ctx.author and reaction.message == botmsg
-
-        await self.bot.wait_for('reaction_add', check=reactioncheck)
-        try:
-            await botmsg.clear_reactions()
-        except discord.Forbidden:
-            pass
-        embed = discord.Embed(
-                    title="Rank data deletion",
-                    description=f"Keep in mind that this action is irreversable",
-                    color=var.C_ORANGE
-        ).add_field(name="Confirm Delete", value=var.E_ACCEPT
-        ).add_field(name="Cancel", value=var.E_DECLINE
-        )
-        botdeletemsg = await ctx.send(embed=embed)
-        await botdeletemsg.add_reaction(var.E_ACCEPT)
-        await botdeletemsg.add_reaction(var.E_DECLINE)
-
-        def deletereaction_check(reaction, user):
-            return user == ctx.author and reaction.message == botdeletemsg
-        
-        reaction, user = await self.bot.wait_for('reaction_add', check=deletereaction_check, timeout=60.0)
-        if str(reaction.emoji) == var.E_ACCEPT:
-            db.LEVELDATABASE.get_collection(str(ctx.guild.id)).remove({ "_id" : { "$ne": 0 } })
-            await ctx.send(embed=discord.Embed(
-                        title="Leveling removed", 
-                        description="Leveling have been removed from this server, that means all the rank data has been deleted", 
-                        color=var.C_ORANGE)
-                        )
-        if str(reaction.emoji) == var.E_DECLINE:
-            await ctx.send("Woosh that was close, cancelled leveling data deletion.")
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

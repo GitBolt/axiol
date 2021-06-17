@@ -178,6 +178,8 @@ class Leveling(commands.Cog):
                 alertchannel = None
             return alertchannel
         status = "Enabled" if GuildDoc.get("alerts") == True else "Disabled" 
+        rewards = GuildDoc.get("rewards")
+        
         embed = discord.Embed(
         title="Server leveling information",
         color=var.C_BLUE
@@ -187,9 +189,27 @@ class Leveling(commands.Cog):
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
         ).add_field(name="Alert Status", value=status
         ).add_field(name="Alert channel", value=getalertchannel(), inline=False
-        )
+        ).add_field(name="Level Rewards", value=f"React to {var.E_CONTINUE}")
 
-        await ctx.send(embed=embed)
+        botmsg = await ctx.send(embed=embed)
+        await botmsg.add_reaction(var.E_CONTINUE)
+
+        def reactioncheck(reaction, user):
+            if str(reaction.emoji) == var.E_CONTINUE:
+                return user == ctx.author and reaction.message == botmsg
+
+        reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+        try:
+            await botmsg.clear_reactions()
+        except:
+            pass
+        rewards = GuildDoc.get("rewards")
+        embed.title = "Level rewards"
+        embed.clear_fields()
+        for i in rewards:
+            role = ctx.guild.get_role(rewards.get(i))
+            embed.add_field(name=f"Level {i}", value=role.mention, inline=False)
+        await botmsg.edit(embed=embed)
 
 
     @commands.command()

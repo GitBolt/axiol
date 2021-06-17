@@ -3,6 +3,8 @@ import discord
 from discord.ext import commands
 import variables as var
 from functions import getprefix
+import database as db
+
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -83,8 +85,19 @@ class Commands(commands.Cog):
         embed.add_field(name="Voice Channels", value=len(ctx.guild.voice_channels), inline=False)
         embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=False)
         embed.add_field(name="Boost Level", value=ctx.guild.premium_tier, inline=False)
-        embed.add_field(name="Created at", value=ctx.guild.created_at , inline=False)
+        embed.add_field(name="Created at", value=str(ctx.guild.created_at.strftime("%Y - %m - %d")) , inline=False)
         embed.set_thumbnail(url = ctx.guild.icon_url)
+
+        GuildVerifyDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+        if GuildVerifyDoc is not None:
+            role = ctx.guild.get_role(GuildVerifyDoc.get("roleid"))
+        
+            count = 0
+            for member in ctx.guild.members:
+                if role in member.roles:
+                    count += 1
+            embed.add_field(name="Non Verified Members", value=count)
+
         await ctx.send(embed=embed)
 
 

@@ -1,6 +1,8 @@
 import discord
-from discord.ext import commands
-
+from discord.ext import commands, tasks
+import string
+import requests
+import variables as var
 
 #Custom cog for Logically Answered discord server | 751491708465840159
 class LogicallyAnswered(commands.Cog):
@@ -34,11 +36,25 @@ class LogicallyAnswered(commands.Cog):
         elif not role in ctx.author.roles:
             await ctx.send("You don't have level 30+ role yet, you can't use the command right now.")
 
+        
+    @commands.command()
+    async def storystart(self, ctx):
+        onewordstory.start(self, ctx)
+
+    @commands.command()
+    async def stortstop(self, ctx):
+        onewordstory.stop(self, ctx)
+    
 
 
     #Soon gonna add auto reactions too
     @commands.Cog.listener()
     async def on_message(self, message):
+        
+        def messagecheck(msg):
+            allowed = list(string.ascii_lowercase + string.digits)
+            return msg <= allowed
+            
         if message.guild.id == 751491708465840159:
 
             if str(message.channel) == '💡〢suggestions':
@@ -56,17 +72,41 @@ class LogicallyAnswered(commands.Cog):
                 await message.add_reaction('✅')
                 await message.add_reaction('❌')
 
-            if str(message.channel) == '📝〢one-word-story' and message.author.bot == False:
-                for i in message.content:
+            if (str(message.channel) == '📝〢one-word-story' and 
+                message.author.bot == False and message.author.id != 791950104680071188):
+                last_message = await message.channel.history(limit=2).flatten()
+                last_message_author = last_message[1].author
 
-                    if ' ' in i:
+                if last_message_author == message.author:
+                    await message.channel.send(f"{message.author.mention} You can't send two messages in a row! Wait for someone else to send a message first", delete_after=5)
+                if (not list(message.content) <= list(string.ascii_lowercase + string.digits)or
+                    last_message_author == message.author):
+                    try:
                         await message.delete()
-                    elif '-' in i:
-                        await message.delete()
-                    elif '_' in i:
-                        await message.delete()
+                    except:
+                        pass
 
 
 
+@tasks.loop(seconds=10)
+async def onewordstory(self, ctx):
+    channel = self.bot.get_channel(803308171577393172)
+    botmsg = await channel.history().find(lambda m: m.author == self.bot.user)
+
+    storymessages = await channel.history(after=botmsg).flatten()
+    wholestory = ""
+    for msg in storymessages:
+        wholestory += msg.content + ' '
+
+    word = requests.get("https://random-word-api.herokuapp.com/word?number=1")
+
+    embed = discord.Embed(
+            title=f"New word: {word.json()[0]}",
+            description=f"Previous story: `{wholestory}`",
+            color=var.C_MAIN
+    ).set_footer(text='After 12 hours I will combine all the words and form a story and then send a new word to start a new story!')
+
+    await channel.send(embed=embed)
+        
 def setup(bot):
     bot.add_cog(LogicallyAnswered(bot))

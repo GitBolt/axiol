@@ -88,7 +88,7 @@ class LogicallyAnswered(commands.Cog):
 
 
 
-@tasks.loop(seconds=10)
+@tasks.loop(hours=12)
 async def onewordstory(self, ctx):
     channel = self.bot.get_channel(803308171577393172)
     botmsg = await channel.history().find(lambda m: m.author == self.bot.user)

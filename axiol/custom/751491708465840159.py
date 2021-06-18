@@ -44,7 +44,7 @@ class LogicallyAnswered(commands.Cog):
 
     @commands.command()
     async def storystop(self, ctx):
-        onewordstory.stop()
+        onewordstory.cancel()
         await ctx.send(f"{var.E_DISABLE} Stopped the background proccess for one word story")
 
 

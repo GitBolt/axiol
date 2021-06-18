@@ -40,11 +40,11 @@ class LogicallyAnswered(commands.Cog):
     @commands.command()
     async def storystart(self, ctx):
         onewordstory.start(self, ctx)
-    await ctx.send(f"{var.E_ENABLE} Started the background proccess for one word story")
+        await ctx.send(f"{var.E_ENABLE} Started the background proccess for one word story")
 
     @commands.command()
     async def storystop(self, ctx):
-        onewordstory.stop(self, ctx)
+        onewordstory.stop()
         await ctx.send(f"{var.E_DISABLE} Stopped the background proccess for one word story")
 
 

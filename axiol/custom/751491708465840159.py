@@ -73,7 +73,7 @@ class LogicallyAnswered(commands.Cog):
                 await message.add_reaction('✅')
                 await message.add_reaction('❌')
 
-            if (str(message.channel) == 'test' and 
+            if (str(message.channel) == '📝〢one-word-story' and 
             message.author.bot == False):
                 
                 last_message = await message.channel.history(limit=2).flatten()

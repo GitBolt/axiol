@@ -74,19 +74,29 @@ class LogicallyAnswered(commands.Cog):
                 await message.add_reaction('❌')
 
             if (str(message.channel) == 'lolstory' and 
-                message.author.bot == False):
+            message.author.bot == False):
                 
                 last_message = await message.channel.history(limit=2).flatten()
                 last_message_author = last_message[1].author
                 if last_message_author == message.author:
-                    await message.channel.send(f"{message.author.mention} You can't send two messages in a row! Wait for someone else to send a message first", delete_after=5)
+                    await message.channel.send(f"{message.author.mention} You can't send two messages in a row! Wait for someone else to send a message first", delete_after=3)
                 if (not list(message.content) <= list(string.ascii_lowercase + string.digits + "?" + "!")or
                     last_message_author == message.author):
                     try:
                         await message.delete()
                     except:
                         pass
+            if (str(message.channel) == "💯〢counting-to-420k" and 
+            message.author.bot == False):
 
+                fetch = await message.channel.history(limit=2).flatten()
+                last_message = fetch[1].content
+
+                increment = int(last_message) + 1
+
+                if message.content != str(increment):
+                    await message.delete()
+                    await message.channel.send(f"{message.author.mention} The number you sent is not the correct increment of previous one!", delete_after=2)
 
 
 @tasks.loop(hours=12)

@@ -73,14 +73,14 @@ class LogicallyAnswered(commands.Cog):
                 await message.add_reaction('✅')
                 await message.add_reaction('❌')
 
-            if (str(message.channel) == '📝〢one-word-story' and 
-                message.author.bot == False and message.author.id != 791950104680071188):
+            if (str(message.channel) == 'lolstory' and 
+                message.author.bot == False):
+                
                 last_message = await message.channel.history(limit=2).flatten()
                 last_message_author = last_message[1].author
-
                 if last_message_author == message.author:
                     await message.channel.send(f"{message.author.mention} You can't send two messages in a row! Wait for someone else to send a message first", delete_after=5)
-                if (not list(message.content) <= list(string.ascii_lowercase + string.digits)or
+                if (not list(message.content) <= list(string.ascii_lowercase + string.digits + "?" + "!")or
                     last_message_author == message.author):
                     try:
                         await message.delete()

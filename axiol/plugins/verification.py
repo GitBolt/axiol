@@ -47,40 +47,8 @@ class Verification(commands.Cog):
             ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
             )
 
-        if discord.utils.get(ctx.guild.roles, name="Not Verified"):
-            alertbotmsg = await ctx.send(embed=discord.Embed(
-                        title="**Not Verified** role found",
-                        description="I have found a role named 'Not Verified' in this guild, do you want me to use this existing one or let me create a new one with proper permissions?",
-                        color=var.C_BLUE
-            ).add_field(name="Reuse", value=f"{var.E_RECYCLE} Use the existing role without creating any new", inline=False
-            ).add_field(name="Create", value=f"{var.E_ACCEPT} Create a new one and use it while keeping the existing one", inline=False
-            ).add_field(name="Update", value=f"{var.E_CONTINUE} Replace a new one with the existing one", inline=False
-            ))
-            await alertbotmsg.add_reaction(var.E_RECYCLE)
-            await alertbotmsg.add_reaction(var.E_ACCEPT)
-            await alertbotmsg.add_reaction(var.E_CONTINUE)
-
-            def alertreactioncheck(reaction, user):
-                return user == ctx.author and reaction.message == alertbotmsg
-            reaction, user = await self.bot.wait_for("reaction_add", check=alertreactioncheck)
-            await alertbotmsg.clear_reactions()
-            ExistingNVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
-
-            if str(reaction.emoji) == var.E_RECYCLE:
-                await botmsg.clear_reactions()
-                db.VERIFY.insert_one({
-                    
-                    "_id":ctx.guild.id,
-                    "type": "command",
-                    "channel": chid, 
-                    "roleid": ExistingNVerified.id,
-                    "assignrole": None
-                })
-
-            if str(reaction.emoji) == var.E_CONTINUE: 
-                await ExistingNVerified.delete()
-
-            if str(reaction.emoji) == var.E_ACCEPT or str(reaction.emoji) == var.E_CONTINUE: #This will run the statement two times for continue, first one to delete it
+        async def setup():
+            try:    
                 NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
                 embed.title="Processing..."
                 embed.description="Setting up everything, just a second"
@@ -99,35 +67,82 @@ class Verification(commands.Cog):
                     "roleid": NVerified.id,
                     "assignrole": None
                 })
+
+                successembed = discord.Embed(
+                title="Verification successfully setted up",
+                description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
+                color=var.C_GREEN
+                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                ).set_footer(text="Default verification type is command")
                 
+                await ctx.send(embed=successembed)
+
+            except:
+                db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                await ctx.send(embed=discord.Embed(
+                            title="Missing Permissions",
+                            description=f"{var.E_ERROR} I don't have permissions to create and set permissions for roles",
+                            color=var.C_RED
+                ))
+
+        if discord.utils.get(ctx.guild.roles, name="Not Verified"):
+            alertbotmsg = await ctx.send(embed=discord.Embed(
+                        title="**Not Verified** role found",
+                        description="I have found a role named 'Not Verified' in this guild, do you want me to use this existing one or let me create a new one with proper permissions?",
+                        color=var.C_BLUE
+            ).add_field(name="Reuse", value=f"{var.E_RECYCLE} Use the existing role without creating any new", inline=False
+            ).add_field(name="Create", value=f"{var.E_ACCEPT} Create a new one and use it while keeping the existing one", inline=False
+            ).add_field(name="Update", value=f"{var.E_CONTINUE} Replace a new one with the existing one (Hence deleting the existing one)", inline=False
+            ))
+            await alertbotmsg.add_reaction(var.E_RECYCLE)
+            await alertbotmsg.add_reaction(var.E_ACCEPT)
+            await alertbotmsg.add_reaction(var.E_CONTINUE)
+
+            def alertreactioncheck(reaction, user):
+                return user == ctx.author and reaction.message == alertbotmsg
+
+            reaction, user = await self.bot.wait_for("reaction_add", check=alertreactioncheck)
+            try:
+                await alertbotmsg.clear_reactions()
+            except:
+                pass
+            ExistingNVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
+
+            if str(reaction.emoji) == var.E_RECYCLE:
+                db.VERIFY.insert_one({
+                    
+                    "_id":ctx.guild.id,
+                    "type": "command",
+                    "channel": chid, 
+                    "roleid": ExistingNVerified.id,
+                    "assignrole": None
+                })
+                successembed = discord.Embed(
+                title="Verification successfully setted up",
+                description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
+                color=var.C_GREEN
+                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                ).set_footer(text="Default verification type is command")
+                
+                await ctx.send(embed=successembed)
+                
+            if str(reaction.emoji) == var.E_CONTINUE: 
+                try:
+                    await ExistingNVerified.delete()
+                except discord.Forbidden:
+                    db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                    await ctx.send(embed=discord.Embed(
+                                title="Missing Permissions",
+                                description=f"{var.E_ERROR} I don't have permissions to delete the existing role",
+                                color=var.C_RED
+                    ))
+            if str(reaction.emoji) == var.E_CONTINUE or str(reaction.emoji) == var.E_ACCEPT:
+                await setup()
         else:
-            NVerified = await ctx.guild.create_role(name="Not Verified", colour=discord.Colour(0xa8a8a8))
-            embed.title="Processing..."
-            embed.description="Setting up everything, just a second"
-            embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
-            await botmsg.edit(embed=embed)
-            for i in ctx.guild.text_channels:
-                await i.set_permissions(NVerified, view_channel=False)
-            await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
-            await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+            await setup()
 
-            db.VERIFY.insert_one({
-                
-                "_id":ctx.guild.id,
-                "type": "command",
-                "channel": chid, 
-                "roleid": NVerified.id,
-                "assignrole": None
-            })
 
-        successembed = discord.Embed(
-        title="Verification successfully setted up",
-        description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
-        color=var.C_GREEN
-        ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
-        ).set_footer(text="Default verification type is command")
-        
-        await ctx.send(embed=successembed)
+
 
 
     @commands.command()
@@ -325,9 +340,8 @@ class Verification(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
 
-        if db.PLUGINS.find_one({"_id": message.guild.id}).get("Verification") == True:
-            GuildVerifyDoc = db.VERIFY.find_one({"_id": message.guild.id})
-
+        GuildVerifyDoc = db.VERIFY.find_one({"_id": message.guild.id})
+        if GuildVerifyDoc is not None:
             if (message.channel.id == GuildVerifyDoc.get("channel") and 
                 message.content != f"{getprefix(message)}verify" and 
                 message.author != self.bot.user):

@@ -3,6 +3,7 @@ import os
 #Config
 TOKEN = os.environ.get("TOKEN")
 DEFAULT_PREFIX = "."
+YTAPI_KEY = os.environ.get("YTAPI_KEY")
 
 #Colours
 C_MAIN = 0xFF006A #Everything

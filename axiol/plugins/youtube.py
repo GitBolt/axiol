@@ -69,6 +69,7 @@ class YouTube(commands.Cog):
             )
             )
 
+
     @commands.command()
     async def ytremove(self, ctx, ytchannel:str=None):
         if ytchannel is not None:
@@ -103,9 +104,13 @@ class YouTube(commands.Cog):
             pass
 
 
-# @tasks.loop(minutes=5)
-# async def uploadcheck():
-#     pass
+@tasks.loop(minutes=2)
+async def uploadcheck():
+
+    uploads = db.YOUTUBE.find({})
+    for i in uploads:
+        print(i)
+        #res = requests.get(f"https://www.googleapis.com/youtube/v3/search?key={var.YTAPI_KEY}&channelId={channel}&part=id&order=date&maxResults=2").json()
         
 
 

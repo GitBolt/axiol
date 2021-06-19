@@ -7,7 +7,7 @@ MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL")) #Client
 #Databases
 DATABASE = MONGOCLIENT["Axiol"] #Main DB
 LEVELDATABASE = MONGOCLIENT["Leveling"]
-
+CUSTOMDATABASE = MONGOCLIENT["Custom"]
 
 #Collections
 PLUGINS = DATABASE["Plugins"]

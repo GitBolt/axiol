@@ -36,6 +36,7 @@ E_ORANGE = "<:orange:846068023814914059>"
 E_YELLOW = "<:yellow:846068023675846688>"
 E_RECYCLE = "<:recycle:853300271944695858>"
 
+
 DICT_PLUGINEMOJIS = {
     "Leveling": E_LEVELING,
     "Moderation": "🔨",
@@ -44,5 +45,6 @@ DICT_PLUGINEMOJIS = {
     "Verification": "✅",
     "Chatbot": "🤖",
     "Music": "🎵",
+    "YouTube": "🔔",
 }
 

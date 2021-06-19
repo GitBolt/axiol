@@ -56,7 +56,8 @@ async def on_guild_join(guild):
             "Welcome": False,
             "Verification": False,
             "Chatbot": True,
-            "Music": True
+            "Music": True,
+            "YouTube": False
         })
 
     #Support server Log

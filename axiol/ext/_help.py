@@ -65,8 +65,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def chatbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="🤖 Chatbot", description="Oh yeah chat with me :flushed:" ,color=var.C_MAIN,
-    description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!"
+    embed = discord.Embed(title="🤖 Chatbot", description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Make a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Remove a chatbot channel (if added)", inline=False
     ).add_field(name=getprefix(ctx)+"chatbotchannels", value="View all channels where chat bot is enabled!", inline=False

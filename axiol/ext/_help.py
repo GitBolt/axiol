@@ -7,7 +7,7 @@ import asyncio
 
 
 def levelhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Ah yes leveling, MEE6 who?", color=var.C_MAIN
+    embed = discord.Embed(title=f"{var.E_LEVELING}  Leveling", description="Ah yes leveling, MEE6 who?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user, user ID or user mention can be used to check ranks, user field is optional for checking rank of yourself.", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows server leaderboard!", inline=False
     ).add_field(name=getprefix(ctx)+"rankgraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default, max amount is 30", inline=False
@@ -19,7 +19,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def modhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="What's better than entering a sweet little ban command?", description="For all fields which require `user`, either the User ID or User Mention can be used. Reason everywhere is optional :ok_hand:", color=var.C_MAIN
+    embed = discord.Embed(title="🔨 Moderation", description="For all fields which require `user`, either the User ID or User Mention can be used. Reason everywhere is optional :ok_hand:", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
     ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans a any already banned user", inline=False
     ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server", inline=False
@@ -31,7 +31,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def rrhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Reaction Roles", description="For roles either the Role ID (to not disturb users in case they have the role) or Role mention can be used", color=var.C_MAIN
+    embed = discord.Embed(title="✨ Reaction Roles", description="For roles either the Role ID (to not disturb users in case they have the role) or Role mention can be used", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Setup reaction roles in your server!", inline=False
     ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Remove any existing reaction role", inline=False
     ).add_field(name=getprefix(ctx)+"allrr", value="View all active reaction roles in the server!", inline=False
@@ -41,7 +41,7 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def welcomehelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Welcome Greetings", color=var.C_MAIN
+    embed = discord.Embed(title="👋 Welcome", description="Greet new members with a nice welcome :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"welcomecard", value="See your server's welcome card!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel `<#channel>`", value="Change welcome channel!", inline=False
     ).add_field(name=getprefix(ctx)+"welcomemessage", value="Change welcome message!", inline=False
@@ -53,7 +53,7 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def verifyhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Verification", color=var.C_MAIN
+    embed = discord.Embed(title="✅ Verification", description="Keep the server safe from raiders and bots!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"verifyinfo", value="Get information current server verification setup!", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Change the verification channel!", inline=False
     ).add_field(name=getprefix(ctx)+"verifyswitch", value="Switch between verification type", inline=False
@@ -65,7 +65,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def chatbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Chatbot", color=var.C_MAIN,
+    embed = discord.Embed(title="🤖 Chatbot", description="Oh yeah chat with me :flushed:" ,color=var.C_MAIN,
     description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!"
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Make a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Remove a chatbot channel (if added)", inline=False
@@ -75,8 +75,7 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def musicbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Music", color=var.C_MAIN,
-    description="🎧 Let's vibe to some music! For Voice Channels either their Name or ID can be used since they can't be mentioned using `#` like Text Channels"
+    embed = discord.Embed(title="🎵 Music", description="Let's vibe to some music ay! For Voice Channels either their ID or Name can be used since they can't be mentioned using `#` like Text Channels", color=var.C_MAIN 
     ).add_field(name=getprefix(ctx)+"connect `<voicechannel>`", value="Joins a voice channel! Voice Channel field is optional if you want me to join the same VC inside which you are in :D", 
     ).add_field(name=getprefix(ctx)+"play `<search>`", value="Search for music to play on YouTube! You can also use the video URL",inline=False 
     ).add_field(name=getprefix(ctx)+"pause", value="Pauses the currently playing music", inline=False 
@@ -88,6 +87,13 @@ def musicbothelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"volume `<1-100 value>`", value="Change the music volume! The limit is from 0 to 100",
     ).add_field(name=getprefix(ctx)+"leave", value="Stops playing the music and leaves the VC",inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
+def youtubehelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="🔔 YouTube", description="Get updated with your favourite YouTuber's uploads :D", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"ytadd `<#channel>` `<youtube_channel_id>`", value="Get updated with new video uploads from a YouTube channel! Don't get confused between discord text channel and youtube channel haha", inline=False
+    ).add_field(name=getprefix(ctx)+"ytremove `<youtube_channel_id>`", value="Remove upload notifications from a YouTube channel", inline=False
+    ).add_field(name=getprefix(ctx)+"ytmessage `<message>`", value="Change the notification message! Use the variables `[link]` (with the square brackets) in your message to add the uploaded video link!",inline=False)
     return embed
 
 def extrahelp(ctx: commands.Context) -> discord.Embed:
@@ -148,7 +154,8 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            "Music": musicbothelp
+            "Music": musicbothelp,
+            "YouTube": youtubehelp,
         }
 
         try:
@@ -263,6 +270,17 @@ class Help(commands.Cog):
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Music plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def youtube(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("YouTube") == True:
+            await ctx.send(embed=musicbothelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The YouTube plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
 

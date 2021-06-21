@@ -92,7 +92,7 @@ class ReactionRoles(commands.Cog):
 
             
     @commands.command()
-    async def removerr(self, ctx, msg:discord.Message=None, emoji=None):
+    async def removerr(self, ctx, msg:discord.Message=None, emoji:str=None):
 
         if msg and emoji is not None:
             GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
@@ -100,9 +100,10 @@ class ReactionRoles(commands.Cog):
             def rr_exists():
                 try:
                     for i in GuildDoc["reaction_roles"]:
-                        if msg.id == i.get("messageid") and str(emoji) == i.get("emoji"):
+                        if msg.id == i.get("messageid") and emoji == i.get("emoji"):
                             return True
-                        return False
+                        else:
+                            return False
                 except AttributeError:
                     return False
 

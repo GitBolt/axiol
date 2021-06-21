@@ -110,13 +110,15 @@ class ReactionRoles(commands.Cog):
             if rr_exists() == False:
                 await ctx.send("This reaction role does not exist")
             else:
+                def getpair(lst):
+                    for rrpairs in lst:
+                        if  msg.id == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
+                            return rrpairs
+
                 rrlist = GuildDoc["reaction_roles"]
                 newlist = rrlist.copy()
-                for rrpairs in newlist:
-                    if  msg.id == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
-                        return rrpairs
-                
-                newlist.remove(rrpairs)
+
+                newlist.remove(getpair(newlist))
                 newdata = {"$set":{
                     "reaction_roles": newlist
                 }}

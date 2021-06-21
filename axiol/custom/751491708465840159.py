@@ -119,7 +119,7 @@ async def onewordstory(self, ctx):
 
     embed = discord.Embed(
             title=f"New word: {word.json()[0]}",
-            description=f"Previous story: `{wholestory}`",
+            description=f"Previous story: `{botmsg.content} {wholestory}`",
             color=var.C_MAIN
     ).set_footer(text='After 12 hours I will combine all the words and form a story and then send a new word to start a new story!')
 

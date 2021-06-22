@@ -93,23 +93,19 @@ class ReactionRoles(commands.Cog):
             
     @commands.command()
     async def removerr(self, ctx, msg:discord.Message=None, emoji:str=None):
-
+        
         if msg and emoji is not None:
             GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
-
+            
             def rr_exists():
                 try:
                     for i in GuildDoc["reaction_roles"]:
-                        if msg.id == i.get("messageid") and emoji == i.get("emoji"):
+                        if i.get("messageid") == msg.id and i.get("emoji") == emoji:
                             return True
-                        else:
-                            return False
                 except AttributeError:
                     return False
 
-            if rr_exists() == False:
-                await ctx.send("This reaction role does not exist")
-            else:
+            if rr_exists():
                 def getpair(lst):
                     for rrpairs in lst:
                         if  msg.id == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
@@ -129,6 +125,8 @@ class ReactionRoles(commands.Cog):
                             description=f"Reaction role with {emoji} on [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id}) was removed",
                             color=var.C_GREEN)
                             )
+            elif not rr_exists():
+                await ctx.send("This reaction role does not exist")
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the message  and emoji both to remove a reaction role",
@@ -136,6 +134,7 @@ class ReactionRoles(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removerr <messageid> <emoji>`"
             )
             )
+        
         
 
 
@@ -161,10 +160,10 @@ class ReactionRoles(commands.Cog):
             rrcount = 0
             for i in GuildDoc["reaction_roles"]:
                 rrcount += 1
-                
+                messageid = i.get("messageid")
                 role = Guild.get_role(i.get("roleid"))
                 emoji = i.get("emoji")
-                embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n", inline=False)
+                embed.add_field(name="** **", value=f"{emoji} for {role.mention} in message ID `{messageid}`", inline=False)
                 if rrcount == 10:
                     break
 

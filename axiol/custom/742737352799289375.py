@@ -19,24 +19,32 @@ class ChemHelp(commands.Cog):
 
     #Simple check to make sure this custom cog only runs on this server
     def cog_check(self, ctx):
-        return ctx.guild.id == 742737352799289375
+        return ctx.guild.id == 742737352799289375 or 807140294276415510
 
 
     @commands.command()
-    async def addmsg(self, ctx, msg:str=None, response:str=None):
-        if msg and response is not None:
+    async def addmsg(self, ctx, *, msg:str=None):
+        if msg is not None:
             GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
 
             data = GuildCol.find_one({"_id": 0})
             if data is None:
+                trigger = msg.split("|")[0].remove(" ")
+                response = msg.split("|")[1].remove(" ")
                 GuildCol.insert_one({
                     "_id": 0,
-                    msg: response
+                   trigger: response
                 })
-                await ctx.send(embed=discord.Embed(description=f"Added the message **{msg}** with response **{response}**"))
+                await ctx.send(embed=discord.Embed(description=f"Added the message **{msg}** with response **{response}**", color=var.C_BLUE))
             else:
-                GuildCol.update({}, {"$set": {msg: response}})
-                await ctx.send(embed=discord.Embed(description=f"Added the message **{msg}** with response **{response}**"))
+                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ')
+                response = msg.split("|")[1].lstrip(' ').rstrip(' ')
+
+                print(trigger)
+                print(response)
+
+                GuildCol.update({}, {"$set": {trigger: response}})
+                await ctx.send(embed=discord.Embed(description=f"Added the message **{trigger}** with response **{response}**", color=var.C_BLUE))
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define both the message and it's response",
@@ -48,10 +56,11 @@ class ChemHelp(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
 
-        if message.channel.id in [742849666256732170, 742849666256732170]:
+        if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383]:
             GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
             data = GuildCol.find_one({"_id": 0})
             if data is not None:
+                print(data.keys())
                 if message.content in data.keys():
                     await message.channel.send(data.get(message.content))
 

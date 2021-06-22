@@ -51,9 +51,10 @@ async def reactionrolespagination(current_page, all_pages, embed, Guild, GuildDo
 
     for i in GuildDoc["reaction_roles"][rr_amount:]:
         rrcount += 1
+        messageid = i.get("messageid")
         role = Guild.get_role(i.get("roleid"))
         emoji = i.get("emoji")
-        embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\n", inline=False)
+        embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\nMessageID: `{messageid}`", inline=False)
 
         if rrcount == (current_page)*10 + 10:
             break

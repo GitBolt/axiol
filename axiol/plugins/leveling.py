@@ -252,14 +252,20 @@ class Leveling(commands.Cog):
     @commands.command()
     async def removexp(self, ctx, user:discord.Member=None, amount:int=None):
         if user and amount is not None:
-            GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-            data = GuildCol.find_one({"_id": user.id})
+            if amount > 10000000 :
+                await ctx.send(embed=discord.Embed(
+                    description=f"{var.E_ERROR} Ayo that's too much",
+                    color=var.C_RED
+                ))
+            else:
+                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                data = GuildCol.find_one({"_id": user.id})
 
-            newdata = {"$set":{
-                        "xp": data.get("xp") - amount
-                    }}
-            GuildCol.update_one(data, newdata)
-            await ctx.send(f"Successfully removed {amount} xp from {user}!")
+                newdata = {"$set":{
+                            "xp": data.get("xp") - amount
+                        }}
+                GuildCol.update_one(data, newdata)
+                await ctx.send(f"Successfully removed {amount} xp from {user}!")
         else:
             await ctx.send(embed=discord.Embed(
             description=f"{var.E_ERROR} You need to define the member and the amount to remove their xp",

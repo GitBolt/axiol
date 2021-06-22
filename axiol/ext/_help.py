@@ -276,7 +276,7 @@ class Help(commands.Cog):
     async def youtube(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("YouTube") == True:
-            await ctx.send(embed=musicbothelp(ctx))
+            await ctx.send(embed=youtubehelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The YouTube plugin is disabled in this server",

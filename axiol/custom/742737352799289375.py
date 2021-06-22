@@ -42,7 +42,7 @@ class ChemHelp(commands.Cog):
                 await ctx.send(embed=discord.Embed(description=f"Added the message **{msg}** with response **{response}**", color=var.C_BLUE))
             else:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
+                response = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
                 GuildCol.update(data, {"$set": {trigger: response}})
                 await ctx.send(embed=discord.Embed(description=f"Added the message **{trigger}** with response **{response}**", color=var.C_BLUE))
@@ -62,7 +62,7 @@ class ChemHelp(commands.Cog):
             data = GuildCol.find_one({"_id": 1})
             if data is None:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
+                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
                 try:
                     await ctx.message.add_reaction(emoji)
@@ -76,7 +76,7 @@ class ChemHelp(commands.Cog):
                 })
             else:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
+                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
                 try:
                     await ctx.message.add_reaction(emoji)
@@ -98,20 +98,18 @@ class ChemHelp(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
 
-        if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383]:
+        if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383] and message.author.bot == False:
 
             GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
             msgdata = GuildCol.find_one({"_id": 0})
             reactiondata = GuildCol.find_one({"_id": 1})
             if msgdata is not None:
-                for trigger in msgdata.keys():
-                    if trigger in message.content.lower():
-                        await message.channel.send(msgdata.get(trigger))
+                if message.content.lower() in msgdata.keys():
+                    await message.channel.send(msgdata.get(message.content.lower()))
 
             if reactiondata is not None:
-                for trigger in reactiondata.keys():
-                    if trigger in message.content.lower():
-                        await message.add_reaction(reactiondata.get(trigger))      
+                if message.content.lower() in reactiondata.keys():
+                    await message.add_reaction(reactiondata.get(message.content.lower()))      
 
     
 def setup(bot):

@@ -164,40 +164,41 @@ class GlobalAdvertisement(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
-        settings = GuildCol.find_one({"_id": 0})
+        if message.guild.id == 855796269204242432:
+            GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
+            settings = GuildCol.find_one({"_id": 0})
 
-        if settings is not None and message.author.bot == False:
-            if not message.channel.id in settings.get("blacklist"):
-                userdata = GuildCol.find_one({"_id": message.author.id})
-                if userdata is None:
-                    GuildCol.insert_one({"_id": message.author.id, "imgcount": 0})
-                else:
-                    existingcount = userdata.get("imgcount")
-                    newcount = existingcount
-                    newcount += 1
-                    newdata = {"$set":{
-                        "imgcount": newcount
-                    }}
-                    GuildCol.update_one(userdata, newdata)
-                    if str(userdata.get("imgcount")) in GuildCol.find_one({"_id":0}).get("rewards").keys():
-                        rewards = GuildCol.find_one({"_id":0}).get("rewards")
-                        roleid = rewards.get(str(userdata.get("imgcount")))
-                        role = message.guild.get_role(roleid)
-                        
-                        prev_key = list(rewards)[list(rewards).index(str(userdata.get("imgcount")))-1]
-                        
-                        remroleid = rewards.get(prev_key)
-                        remrole = message.guild.get_role(int(remroleid))
+            if settings is not None and message.author.bot == False:
+                if not message.channel.id in settings.get("blacklist"):
+                    userdata = GuildCol.find_one({"_id": message.author.id})
+                    if userdata is None:
+                        GuildCol.insert_one({"_id": message.author.id, "imgcount": 0})
+                    else:
+                        existingcount = userdata.get("imgcount")
+                        newcount = existingcount
+                        newcount += 1
+                        newdata = {"$set":{
+                            "imgcount": newcount
+                        }}
+                        GuildCol.update_one(userdata, newdata)
+                        if str(userdata.get("imgcount")) in GuildCol.find_one({"_id":0}).get("rewards").keys():
+                            rewards = GuildCol.find_one({"_id":0}).get("rewards")
+                            roleid = rewards.get(str(userdata.get("imgcount")))
+                            role = message.guild.get_role(roleid)
+                            
+                            prev_key = list(rewards)[list(rewards).index(str(userdata.get("imgcount")))-1]
+                            
+                            remroleid = rewards.get(prev_key)
+                            remrole = message.guild.get_role(int(remroleid))
 
-                        await message.channel.send(content=message.author.mention, embed=discord.Embed(description=f"You just earned {role.mention}!", color=var.C_GREEN))
-                        if role not in message.author.roles:
-                            await message.author.add_roles(role)   
-                            try:
-                                if not str(list(rewards.keys())[0]) == str(userdata.get("imgcount")):
-                                    await message.author.remove_roles(remrole)
-                            except:
-                                pass
+                            await message.channel.send(content=message.author.mention, embed=discord.Embed(description=f"You just earned {role.mention}!", color=var.C_GREEN))
+                            if role not in message.author.roles:
+                                await message.author.add_roles(role)   
+                                try:
+                                    if not str(list(rewards.keys())[0]) == str(userdata.get("imgcount")):
+                                        await message.author.remove_roles(remrole)
+                                except:
+                                    pass
 
 
 

@@ -1,33 +1,32 @@
-import json
-import torch
 import discord
 from discord.ext import commands
+from discord.ext.commands import check, Context
 import database as db
 import variables as var
 from functions import getprefix
-from discord.ext.commands import check, Context
-from chatbot.model import NeuralNet
-from chatbot.utils import bag_of_words, tokenize
 
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
+def is_user(*userids):
+    async def predicate(ctx: Context):
+        return ctx.author.id in userids
+    return check(predicate)
 
 
 #Custom cog for Chemistry Help discord server | 742737352799289375
-class ChemHelp(commands.Cog):
+class ChemistryHelp(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #Simple check to make sure this custom cog only runs on this server
+    #Simple check to make sure this custom cog only runs on this server and test server
     def cog_check(self, ctx):
         return ctx.guild.id == 742737352799289375 or 807140294276415510
 
 
     @commands.command()
-    async def addmsg(self, ctx, *, msg:str=None):
-        if ctx.author.id in [565059698399641600, 791950104680071188] and msg is not None:
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_addmsg(self, ctx, *, msg:str=None):
+        if msg is not None:
 
             GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
 
@@ -55,8 +54,9 @@ class ChemHelp(commands.Cog):
 
 
     @commands.command()
-    async def addreaction(self, ctx, *, msg:str=None):
-        if ctx.author.id in [565059698399641600, 791950104680071188] and msg is not None:
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_addreact(self, ctx, *, msg:str=None):
+        if msg is not None:
             GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
 
             data = GuildCol.find_one({"_id": 1})
@@ -94,6 +94,105 @@ class ChemHelp(commands.Cog):
 
 
 
+    @commands.command()
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_removereact(self, ctx, *, msg:str=None):
+        if msg is not None:
+            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+            data = GuildCol.find_one({"_id":1})
+            if data is not None:
+                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
+                if trigger in data.keys():
+                    GuildCol.update(data, {"$unset": {trigger: emoji}})
+                    await ctx.send(f"Successfully removed {emoji} reaction from **{trigger}** message")
+                else:
+                    await ctx.send("This message and emoji combination does not exist")
+            else:
+                await ctx.send("You haven't setted up any reaction yet...")
+
+                    
+
+    @commands.command()
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_allreacts(self, ctx):
+        GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+        data = GuildCol.find_one({"_id":1})
+        if data is not None:
+            rramount = len(data)
+            if rramount <= 10:
+                exactpages = 1
+            else:
+                exactpages = rramount / 10
+            all_pages = round(exactpages)
+
+            embed = discord.Embed(
+            title="All Chemistry message reactions", 
+            color=var.C_MAIN
+            )
+            async def pagination(current_page, all_pages, embed):
+                pagern = current_page + 1
+                embed.set_footer(text=f"Page {pagern}/{all_pages}")
+                embed.clear_fields()
+
+                rrcount = (current_page)*10
+                rr_amount = current_page*10
+                for i in list(data.items())[rr_amount:]:
+                    rrcount += 1
+                    embed.add_field(name=i[0], value=i[1], inline=False)
+                    if rrcount == (current_page)*10 + 10:
+                        break
+
+            rrcount = 0
+            for i in data:
+                rrcount += 1
+                embed.add_field(name=i, value=data.get(i), inline=False)
+                if rrcount == 10:
+                    break
+
+            embed.set_footer(text=f"Page 1/{all_pages}")
+            botmsg = await ctx.send(embed=embed)
+            await botmsg.add_reaction("◀️")
+            await botmsg.add_reaction("⬅️")
+            await botmsg.add_reaction("➡️")
+            await botmsg.add_reaction("▶️")
+
+            def reactioncheck(reaction, user):
+                if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
+                    return user == ctx.author and reaction.message == botmsg
+            
+            current_page = 0
+            while True:
+                reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+                if str(reaction.emoji) == "◀️":
+                    await botmsg.remove_reaction("◀️", ctx.author)
+                    current_page = 0
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "➡️":
+                    await botmsg.remove_reaction("➡️", ctx.author)
+                    current_page += 1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "⬅️":
+                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    current_page -= 1
+                    if current_page < 0:
+                        current_page += 1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "▶️":
+                    await botmsg.remove_reaction("▶️", ctx.author)
+                    current_page = all_pages-1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+        else:
+            await ctx.send("There are no message reactions yet")
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -113,4 +212,4 @@ class ChemHelp(commands.Cog):
 
     
 def setup(bot):
-    bot.add_cog(ChemHelp(bot))
+    bot.add_cog(ChemistryHelp(bot))

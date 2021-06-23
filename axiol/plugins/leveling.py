@@ -80,7 +80,10 @@ class Leveling(commands.Cog):
             exactpages = 1
         else:
             exactpages = rankings.count() / 10
-        all_pages = round(exactpages)
+        if type(exactpages) != int:
+            all_pages = round(exactpages) + 1
+        else:
+            all_pages = exactpages
 
         embed = discord.Embed(
         title=f"Leaderboard", 
@@ -128,6 +131,8 @@ class Leveling(commands.Cog):
                 except discord.Forbidden:
                     pass
                 current_page += 1
+                if current_page > all_pages:
+                    current_page -= 1
                 await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 

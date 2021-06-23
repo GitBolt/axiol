@@ -61,7 +61,7 @@ class ChemistryHelp(commands.Cog):
             if data is not None:
                 if msg.lower() in data.keys():
                     res = data.get(msg.lower())
-                    GuildCol.update_one(data, {"$unset": {msg: ""}})
+                    GuildCol.update_one(data, {"$unset": {msg.lower(): ""}})
                     await ctx.send(f"Successfully removed the message **msg** which was having the response **{res}**")
                 else:
                     await ctx.send("This message has no responses setted up")
@@ -124,19 +124,28 @@ class ChemistryHelp(commands.Cog):
             while True:
                 reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
                 if str(reaction.emoji) == "◀️":
-                    await botmsg.remove_reaction("◀️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("◀️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = 0
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "➡️":
-                    await botmsg.remove_reaction("➡️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("➡️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page += 1
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "⬅️":
-                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("⬅️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page -= 1
                     if current_page < 0:
                         current_page += 1
@@ -144,7 +153,10 @@ class ChemistryHelp(commands.Cog):
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "▶️":
-                    await botmsg.remove_reaction("▶️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("▶️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = all_pages-1
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)
@@ -203,7 +215,7 @@ class ChemistryHelp(commands.Cog):
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
                 if trigger in data.keys():
-                    GuildCol.update(data, {"$unset": {trigger: emoji}})
+                    GuildCol.update(data, {"$unset": {trigger.lower(): emoji}})
                     await ctx.send(f"Successfully removed {emoji} reaction from **{trigger}** message")
                 else:
                     await ctx.send("This message and emoji combination does not exist")
@@ -267,19 +279,28 @@ class ChemistryHelp(commands.Cog):
             while True:
                 reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
                 if str(reaction.emoji) == "◀️":
-                    await botmsg.remove_reaction("◀️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("◀️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = 0
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "➡️":
-                    await botmsg.remove_reaction("➡️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("➡️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page += 1
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "⬅️":
-                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("⬅️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page -= 1
                     if current_page < 0:
                         current_page += 1
@@ -287,7 +308,10 @@ class ChemistryHelp(commands.Cog):
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "▶️":
-                    await botmsg.remove_reaction("▶️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("▶️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = all_pages-1
                     await pagination(current_page, all_pages, embed)
                     await botmsg.edit(embed=embed)

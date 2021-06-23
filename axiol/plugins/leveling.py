@@ -120,7 +120,10 @@ class Leveling(commands.Cog):
         while True:
             reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
             if str(reaction.emoji) == "◀️":
-                await botmsg.remove_reaction("◀️", ctx.author)
+                try:
+                    await botmsg.remove_reaction("◀️", ctx.author)
+                except discord.Forbidden:
+                    pass
                 current_page = 0
                 await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)

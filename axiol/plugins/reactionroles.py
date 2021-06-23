@@ -182,19 +182,28 @@ class ReactionRoles(commands.Cog):
             while True:
                 reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
                 if str(reaction.emoji) == "◀️":
-                    await botmsg.remove_reaction("◀️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("◀️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = 0
                     await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "➡️":
-                    await botmsg.remove_reaction("➡️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("➡️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page += 1
                     await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "⬅️":
-                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("⬅️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page -= 1
                     if current_page < 0:
                         current_page += 1
@@ -202,7 +211,10 @@ class ReactionRoles(commands.Cog):
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "▶️":
-                    await botmsg.remove_reaction("▶️", ctx.author)
+                    try:
+                        await botmsg.remove_reaction("▶️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page = all_pages-1
                     await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
                     await botmsg.edit(embed=embed)

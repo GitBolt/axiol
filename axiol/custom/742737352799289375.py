@@ -52,6 +52,105 @@ class ChemistryHelp(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}addmsg <msg> | <response>`"))
 
 
+    @commands.command()
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_removemsg(self, ctx, *, msg:str=None):
+        if msg is not None:
+            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+            data = GuildCol.find_one({"_id":0})
+            if data is not None:
+                if msg.lower() in data.keys():
+                    res = data.get(msg.lower())
+                    GuildCol.update_one(data, {"$unset": {msg: ""}})
+                    await ctx.send(f"Successfully removed the message **msg** which was having the response **{res}**")
+                else:
+                    await ctx.send("This message has no responses setted up")
+            else:
+                await ctx.send("You haven't setted up any message yet...")
+
+
+    @commands.command()
+    @is_user(565059698399641600, 791950104680071188)
+    async def chem_allmsgs(self, ctx):
+        GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+        data = GuildCol.find_one({"_id":0})
+        if data is not None:
+            rramount = len(data)
+            if rramount <= 10:
+                exactpages = 1
+            else:
+                exactpages = rramount / 10
+            if type(exactpages) != int:
+                all_pages = round(exactpages) + 1
+            else:
+                all_pages = exactpages
+
+            embed = discord.Embed(
+            title="All message responses", 
+            color=var.C_MAIN
+            )
+            async def pagination(current_page, all_pages, embed):
+                pagern = current_page + 1
+                embed.set_footer(text=f"Page {pagern}/{all_pages}")
+                embed.clear_fields()
+
+                rrcount = (current_page)*10
+                rr_amount = current_page*10
+                for i in list(data.items())[rr_amount:]:
+                    rrcount += 1
+                    embed.add_field(name=i[0], value=i[1], inline=False)
+                    if rrcount == (current_page)*10 + 10:
+                        break
+
+            rrcount = 0
+            for i in data:
+                rrcount += 1
+                embed.add_field(name=i, value=data.get(i), inline=False)
+                if rrcount == 10:
+                    break
+
+            embed.set_footer(text=f"Page 1/{all_pages}")
+            botmsg = await ctx.send(embed=embed)
+            await botmsg.add_reaction("◀️")
+            await botmsg.add_reaction("⬅️")
+            await botmsg.add_reaction("➡️")
+            await botmsg.add_reaction("▶️")
+
+            def reactioncheck(reaction, user):
+                if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
+                    return user == ctx.author and reaction.message == botmsg
+            
+            current_page = 0
+            while True:
+                reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+                if str(reaction.emoji) == "◀️":
+                    await botmsg.remove_reaction("◀️", ctx.author)
+                    current_page = 0
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "➡️":
+                    await botmsg.remove_reaction("➡️", ctx.author)
+                    current_page += 1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "⬅️":
+                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    current_page -= 1
+                    if current_page < 0:
+                        current_page += 1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+                if str(reaction.emoji) == "▶️":
+                    await botmsg.remove_reaction("▶️", ctx.author)
+                    current_page = all_pages-1
+                    await pagination(current_page, all_pages, embed)
+                    await botmsg.edit(embed=embed)
+
+        else:
+            await ctx.send("There are no message reactions yet")
 
     @commands.command()
     @is_user(565059698399641600, 791950104680071188)
@@ -124,10 +223,13 @@ class ChemistryHelp(commands.Cog):
                 exactpages = 1
             else:
                 exactpages = rramount / 10
-            all_pages = round(exactpages)
+            if type(exactpages) != int:
+                all_pages = round(exactpages) + 1
+            else:
+                all_pages = exactpages
 
             embed = discord.Embed(
-            title="All Chemistry message reactions", 
+            title="All message reactions", 
             color=var.C_MAIN
             )
             async def pagination(current_page, all_pages, embed):

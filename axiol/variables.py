@@ -6,12 +6,12 @@ DEFAULT_PREFIX = "."
 YTAPI_KEY = os.environ.get("YTAPI_KEY")
 
 #Colours
-C_MAIN = 0xFF006A #Everything
+C_MAIN = 0xFF006A #Everything Bot Related
 C_GREEN = 0x15ff00 #Success
 C_RED = 0xFF0000 #Error
 C_ORANGE = 0xFF4400 #Warning
-C_BLUE = 0x00AEFF #Data
-C_TEAL = 0x00EEFF #Data
+C_BLUE = 0x00AEFF #Showing data
+C_TEAL = 0x00EEFF #Everything else
 
 #Emojis
 E_LOGO = "<:Logo:845663121477206036>"

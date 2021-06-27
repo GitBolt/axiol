@@ -76,18 +76,6 @@ def updateplugins(plugin):
 #updating leveling and plugin data
 def updatedb(serverid):
 
-    if not str(serverid) in LEVELDATABASE.list_collection_names():
-        GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
-        GuildLevelDB.insert_one({
-
-            "_id": 0,
-            "xprange": [15, 25],
-            "alertchannel": None,
-            "blacklistedchannels": [],
-            "alerts": True
-            }) 
-        print(f"Added Leveling {serverid}")
-
     if not PLUGINS.count_documents({"_id": serverid}, limit=1):
         PLUGINS.insert_one({
 
@@ -102,6 +90,18 @@ def updatedb(serverid):
                 })
         print(f"Added Plugins {serverid}")
 
+    if PLUGINS.find_one({"_id": serverid}).get("Leveling"):
+        GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
+        GuildLevelDB.insert_one({
+
+            "_id": 0,
+            "xprange": [15, 25],
+            "alertchannel": None,
+            "blacklistedchannels": [],
+            "alerts": True
+            }) 
+        print(f"Added Leveling {serverid}")
+        
     try:
         PREFIXES.insert_one({
             "_id": serverid,
@@ -110,10 +110,10 @@ def updatedb(serverid):
         print(f"Added prefix {serverid}")
 
     except:
-        print(f"Already there {serverid}")
+        print(f"Already there prefix {serverid}")
 
 
 serveridlist = []
 #for i in serveridlist:
     #updatedb(i)
-#updateplugins("YouTube")
+updateplugins("YouTube")

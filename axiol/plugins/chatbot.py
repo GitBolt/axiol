@@ -101,13 +101,23 @@ class Chatbot(commands.Cog):
             title="All chatbot channels in this server",
             color=var.C_TEAL
         )
-        if GuildDoc.get("channels") != []:
+        if GuildDoc is not None and GuildDoc.get("channels") != []:
             for i in GuildDoc.get("channels"):
                 embed.add_field(name="** **", value=self.bot.get_channel(i).mention)
             await ctx.send(embed=embed)
         else:
             await ctx.send("This server does not have any chat bot channel")
 
+    @commands.command()
+    async def chatbotreport(self, ctx, *, desc):
+        channel = self.bot.get_channel(843548616505294848) #Support server suggestions channel
+        await channel.send(embed=discord.Embed(
+            title="Chatbot suggestion",
+            description=desc,
+            color=var.C_MAIN
+        ).add_field(name="By", value=ctx.author
+        ).add_field(name="From Server", value=ctx.guild.name)
+        )
 
     @commands.Cog.listener()
     async def on_message(self, message):

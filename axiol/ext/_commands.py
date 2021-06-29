@@ -290,6 +290,18 @@ class Commands(commands.Cog):
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
 
-        
+    @commands.command()
+    async def avatar(self, ctx, user:discord.User=None):
+        if user is not None:
+            avatar = user.avatar_url
+            embed = discord.Embed(
+                    title=f"Avatar of **{user}**",
+                    color=var.C_TEAL
+                    ).set_image(url=avatar)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f"You need to define the user too! Follow this format:\n```{getprefix(ctx)}avatar <user>```\nFor user either user ID or mention can be used`")
+
+
 def setup(bot):
     bot.add_cog(Commands(bot))

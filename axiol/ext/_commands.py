@@ -1,5 +1,7 @@
+import re
 import asyncio
 import discord
+from discord import file
 from discord.ext import commands
 import variables as var
 from functions import getprefix
@@ -107,7 +109,7 @@ class Commands(commands.Cog):
 
             embed = discord.Embed(
             title="Create an embed",
-            description=f"React to the emojis below to choose your color! When you are done press the {var.E_CONTINUE} emoji to continue editing",
+            description=f"React to the colour circle emojis below to quickly choose an embed colour! To add a custom hex color react to 🖌️\n When you are done selecting embed colour press the {var.E_CONTINUE} emoji to continue editing",
             color=var.C_MAIN
             ).set_footer(text="This message will become the live preview of the embed you are creating!"
             )
@@ -115,6 +117,7 @@ class Commands(commands.Cog):
             emojis = [var.E_RED,var.E_PINK,var.E_GREEN,var.E_BLUE,var.E_ORANGE,var.E_YELLOW]
             colors = [0xFF0000, 0xFF58BC, 0x24FF00, 0x00E0FF, 0xFF5C00, 0xFFC700]
 
+            await preview.add_reaction("🖌️")
             for i in emojis:
                 await preview.add_reaction(i)
             await preview.add_reaction(var.E_CONTINUE)
@@ -128,21 +131,35 @@ class Commands(commands.Cog):
             try:
                 while True:
                     reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=20.0)
-                    if str(reaction.emoji) == var.E_CONTINUE:
-                        break
+                    if str(reaction.emoji) == "🖌️":
+                        await ctx.send("Send a hex colour code to make it the embed colour! You can use either 3 or 6 hex characters")
+                        usermsg = await self.bot.wait_for('message', check=msgcheck)
+                        match = re.search(r'^#(?:[0-9a-fA-F]{3}){1,2}$', usermsg.content.lower())
+                        if match:
+                            hexed = int(hex(int(usermsg.content.replace("#", ""), 16)), 0)
+                            embed.color = hexed
+                            await preview.edit(embed=embed)
+                        else:
+                            try:
+                                await preview.remove_reaction("🖌️", ctx.author)
+                            except discord.Forbidden:
+                                pass
+                            await ctx.send("Invalid hex code, try again")
 
-                    index = emojis.index(str(reaction))
-                    embed.color=colors[index]
-                    try:
-                        await preview.remove_reaction(emojis[index], ctx.author)
-                    except discord.Forbidden:
-                        pass
-                    await preview.edit(embed=embed)
+                    elif str(reaction.emoji) == var.E_CONTINUE:
+                        break
+                    else:
+                        index = emojis.index(str(reaction))
+                        embed.color=colors[index]
+                        try:
+                            await preview.remove_reaction(emojis[index], ctx.author)
+                        except discord.Forbidden:
+                            pass
+                        await preview.edit(embed=embed)
                 try:
                     await preview.clear_reactions()    
                 except discord.Forbidden:
                     pass
-
                 titlebotmsg = await ctx.send(embed=discord.Embed(
                 title="Title",
                 description=f"Now send a message to make it the title of the [embed](https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})",

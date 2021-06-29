@@ -221,6 +221,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def givexp(self, ctx, user:discord.Member=None, amount:int=None):
 
         if user and amount is not None:
@@ -258,6 +259,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def removexp(self, ctx, user:discord.Member=None, amount:int=None):
         if user and amount is not None:
             if amount > 10000000 :
@@ -284,6 +286,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def xprange(self, ctx, minval:int=None, maxval:int=None):
         if minval and maxval is not None:
             GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
@@ -307,6 +310,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def blacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
@@ -333,6 +337,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def whitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
@@ -363,6 +368,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command(aliases=["removealerts"])
+    @commands.has_permissions(administrator=True)
     async def togglealerts(self, ctx):
         GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
         GuildConfig = GuildCol.find_one({"_id": 0})
@@ -386,6 +392,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def alertchannel(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
@@ -409,6 +416,7 @@ class Leveling(commands.Cog):
 
 
     @commands.command(aliases=["addreward"])
+    @commands.has_permissions(administrator=True)
     async def reward(self, ctx, level:str=None, role:discord.Role=None):
         if level and role is not None and level.isnumeric():
 
@@ -439,6 +447,7 @@ class Leveling(commands.Cog):
             )
 
     @commands.command()
+    @commands.has_permissions(administrator=True)
     async def removereward(self, ctx, level:str=None):
         if level is not None:
 

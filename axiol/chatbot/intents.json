@@ -365,7 +365,8 @@
         "Do you agree",
         "Nice",
         "Alright",
-        "Really?"
+        "Really?",
+        "Are you intelligent"
       ],
       "responses":[
         "Yup",
@@ -404,7 +405,8 @@
         "do you feel?",
         "Do you like potatoes?",
         "Are you my friend?",
-        "True"
+        "True",
+        "Is the right?"
 
       ],
       "responses":[
@@ -537,6 +539,19 @@
         "I am hehe"
       ]
     
+    },
+    {
+      "tag": "Ido",
+      "patterns":[
+        "Who cares",
+        "Do you know",
+        "Do you like me?"
+      ],
+      "responses":[
+        "I do",
+        "I do :D",
+        "Yes, I do."
+      ]
     }
   ]
 }

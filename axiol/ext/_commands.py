@@ -176,16 +176,17 @@ class Commands(commands.Cog):
                 ).add_field(name="** **", value="Type `skip` if you don't want to set this")
                 )
                 usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=200.0)
-                if usermsg.attachments:
+                if usermsg.content.lower() in ["skip", "`skip`", "```skip```"]:
+                    await thumbnailbotmsg.delete()
+                elif usermsg.attachments:
                     embed.set_thumbnail(url=usermsg.attachments[0].url)
                     await preview.edit(embed=embed)
                     await thumbnailbotmsg.delete()
-                elif usermsg.content == "skip" or usermsg.content == "`skip`":
+                elif usermsg.content.lower().startswith("https"):
+                    embed.set_thumbnail(url=usermsg.content)
                     await thumbnailbotmsg.delete()
                 else:
-                    embed.set_thumbnail(url=usermsg.content)
-                    await preview.edit(embed=embed)
-                    await thumbnailbotmsg.delete()
+                    await ctx.send("Uh oh it looks like the message you sent is not any link or image")
                 
                 embed.set_footer(text="")
                 await preview.edit(embed=embed)

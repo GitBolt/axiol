@@ -98,6 +98,7 @@ def youtubehelp(ctx: commands.Context) -> discord.Embed:
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Get avatar of any user! Either the user ID or mention can be used", inline=False
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics!", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False

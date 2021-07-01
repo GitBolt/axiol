@@ -5,9 +5,10 @@ import variables as var
 from functions import getprefix
 
 
-
-def has_command_permission(plugin_name, cmd_name):
+def has_command_permission():
     async def predicate(ctx: commands.Context):
+        plugin_name = ctx.cog.__cog_name__
+        cmd_name = ctx.command
         roleids = []
         for i in ctx.author.roles:
             roleids.append(i.id)
@@ -31,7 +32,8 @@ class Permissions(commands.Cog):
         self.bot = bot
 
 
-    @commands.command()
+    @commands.command(aliases=["setpermission", "allowpermission"])
+    @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
 
         if plugin is not None and plugin.lower() in [i.lower() for i in var.DICT_PLUGINEMOJIS]:
@@ -115,6 +117,10 @@ class Permissions(commands.Cog):
             ).set_footer(text=f"You can view all plugins by using the command {getprefix(ctx)}plugins")
             )
 
+    @commands.command(aliases=["removepermission", "disablepermission"])
+    @commands.has_permissions(administrator=True)
+    async def removeperm(self, ctx, cmd=None, role:discord.Role=None):
+        pass
 
 def setup(bot):
     bot.add_cog(Permissions(bot))

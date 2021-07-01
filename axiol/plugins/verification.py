@@ -38,7 +38,7 @@ class Verification(commands.Cog):
 
         usermsg = await self.bot.wait_for('message', check=messagecheck)
         try:
-            chid = int(usermsg.content.strip("<>#"))
+            ch = self.bot.get_channel(int(usermsg.content.strip("<>#")))
         except:
             await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
@@ -54,28 +54,45 @@ class Verification(commands.Cog):
                 embed.description="Setting up everything, just a second"
                 embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
                 await botmsg.edit(embed=embed)
-                for i in ctx.guild.text_channels:
-                    await i.set_permissions(NVerified, view_channel=False)
-                await self.bot.get_channel(chid).set_permissions(NVerified, view_channel=True, read_message_history=True)
-                await self.bot.get_channel(chid).set_permissions(ctx.guild.default_role, view_channel=False)
+                try:
+                    await ch.set_permissions(NVerified, view_channel=True, read_message_history=True)
 
-                db.VERIFY.insert_one({
+                    for i in ctx.guild.text_channels:
+                        try:
+                            await i.set_permissions(NVerified, view_channel=False)
+                        except discord.Forbidden:
+                            await ctx.send(embed=discord.Embed(
+                                        description=f"Skipping {i.mention} since I don't have access to that channel",
+                                        color=var.C_ORANGE
+                            ))
+                    await ch.set_permissions(NVerified, view_channel=True, read_message_history=True)
+                    await ch.set_permissions(ctx.guild.default_role, view_channel=False)
+
+                    db.VERIFY.insert_one({
+                        
+                        "_id":ctx.guild.id,
+                        "type": "command",
+                        "channel": ch.id, 
+                        "roleid": NVerified.id,
+                        "assignrole": None
+                    })
+
+                    successembed = discord.Embed(
+                    title="Verification successfully setted up",
+                    description=f"{var.E_ACCEPT} New members would need to verify in {ch.mention} to access other channels!",
+                    color=var.C_GREEN
+                    ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                    ).set_footer(text="Default verification type is command")
                     
-                    "_id":ctx.guild.id,
-                    "type": "command",
-                    "channel": chid, 
-                    "roleid": NVerified.id,
-                    "assignrole": None
-                })
+                    await ctx.send(embed=successembed)
 
-                successembed = discord.Embed(
-                title="Verification successfully setted up",
-                description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
-                color=var.C_GREEN
-                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
-                ).set_footer(text="Default verification type is command")
-                
-                await ctx.send(embed=successembed)
+                except discord.Forbidden:
+                    db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                    await ctx.send(embed=discord.Embed(
+                                title="Missing access",
+                                description=f"I don't have access or change role permissions in {ch.mention} to make it a verification channel",
+                                color=var.C_RED
+                    ))
 
             except:
                 db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
@@ -113,13 +130,13 @@ class Verification(commands.Cog):
                     
                     "_id":ctx.guild.id,
                     "type": "command",
-                    "channel": chid, 
+                    "channel": ch.id, 
                     "roleid": ExistingNVerified.id,
                     "assignrole": None
                 })
                 successembed = discord.Embed(
                 title="Verification successfully setted up",
-                description=f"{var.E_ACCEPT} New members would need to verify in {self.bot.get_channel(chid).mention} to access other channels!",
+                description=f"{var.E_ACCEPT} New members would need to verify in {ch.mention} to access other channels!",
                 color=var.C_GREEN
                 ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
                 ).set_footer(text="Default verification type is command")
@@ -133,7 +150,7 @@ class Verification(commands.Cog):
                     db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                     await ctx.send(embed=discord.Embed(
                                 title="Missing Permissions",
-                                description=f"{var.E_ERROR} I don't have permissions to delete the existing role",
+                                description=f"{var.E_ERROR} I don't have permissions to delete the existing role, due to this error verification plugin has been disabled again",
                                 color=var.C_RED
                     ))
             if str(reaction.emoji) == var.E_CONTINUE or str(reaction.emoji) == var.E_ACCEPT:
@@ -292,7 +309,7 @@ class Verification(commands.Cog):
                 roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                 role = ctx.guild.get_role(roleid)
 
-                await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
+                await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
                 await ctx.author.remove_roles(role)
                 if assignrole is not None:
                     await ctx.author.add_roles(ctx.guild.get_role(assignrole))
@@ -325,7 +342,7 @@ class Verification(commands.Cog):
                 if usermsg.content == code:
                     roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                     role = ctx.guild.get_role(roleid)
-                    await ctx.send(f"Verification successful {var.E_ACCEPT} - **{ctx.author}**", delete_after=1)
+                    await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
                     await ctx.author.remove_roles(role)
                     if assignrole is not None:
                         await ctx.author.add_roles(ctx.guild.get_role(assignrole))

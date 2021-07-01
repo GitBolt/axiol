@@ -1,7 +1,6 @@
 import re
 import asyncio
 import discord
-from discord import file
 from discord.ext import commands
 import variables as var
 from functions import getprefix
@@ -306,6 +305,7 @@ class Commands(commands.Cog):
                     await ctx.send(f"Successfully sent the report, thanks for helping me improve {ctx.author}!")
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
+
 
     @commands.command()
     async def avatar(self, ctx, user:discord.User=None):

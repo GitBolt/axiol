@@ -8,11 +8,7 @@ from functions import getprefix
 def has_command_permission():
     async def predicate(ctx: commands.Context):
         plugin_name = ctx.cog.__cog_name__
-        cmd_name = ctx.command
-        roleids = []
-        for i in ctx.author.roles:
-            roleids.append(i.id)
-
+        cmd_name = ctx.command.name
         GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
         try:
             permitted_roles = [i for i in GuildDoc[plugin_name][cmd_name]]
@@ -31,12 +27,12 @@ class Permissions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(aliases=["setpermission", "allowpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
+        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands']
 
-        if plugin is not None and plugin.lower() in [i.lower() for i in var.DICT_PLUGINEMOJIS]:
+        if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
             embed = discord.Embed(
                 title=f"All commands for {plugin}",
                 color=var.C_GREEN

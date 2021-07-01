@@ -70,7 +70,7 @@ async def on_guild_join(guild):
             "Welcome": {},
             "Verification": {},
             "Chatbot": {},
-            "Music": {},
+            "Commands": {},
         })
 
     #Support server Log

@@ -59,6 +59,20 @@ async def on_guild_join(guild):
             "Music": True,
         })
 
+    #Inserting plugin configs if it does not exist (incase of re-inviting)
+    if not db.PERMISSIONS.count_documents({"_id": guild.id}, limit=1):
+        db.PERMISSIONS.insert_one({
+
+            "_id": guild.id,
+            "Leveling": {},
+            "Moderation": {},
+            "Reaction Roles": {},
+            "Welcome": {},
+            "Verification": {},
+            "Chatbot": {},
+            "Music": {},
+        })
+
     #Support server Log
     embed = discord.Embed(
     title="I just joined a new server!",

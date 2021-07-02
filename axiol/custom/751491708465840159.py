@@ -109,7 +109,10 @@ class LogicallyAnswered(commands.Cog):
 async def onewordstory(self, ctx):
     channel = self.bot.get_channel(803308171577393172)
     botmsg = await channel.history().find(lambda m: m.author == self.bot.user)
-
+    unfiltered = []
+    for i in botmsg.embeds:
+        unfiltered.append(i.to_dict())
+    firstword = unfiltered[0]["title"]
     storymessages = await channel.history(after=botmsg).flatten()
     wholestory = ""
     for msg in storymessages:
@@ -118,10 +121,11 @@ async def onewordstory(self, ctx):
     word = requests.get("https://random-word-api.herokuapp.com/word?number=1")
 
     embed = discord.Embed(
-            title=f"New word: {word.json()[0]}",
-            description=f"Previous story: `{botmsg.content} {wholestory}`",
+            title=f"`{word.json()[0]}`",
             color=var.C_MAIN
-    ).set_footer(text='After 12 hours I will combine all the words and form a story and then send a new word to start a new story!')
+    ).add_field(name="Previous story", value=f"**{firstword}** {wholestory}"
+    ).set_footer(text='After 12 hours I will combine all the words and form a story and then send a new word to start a new story!'
+    )
 
     await channel.send(embed=embed)
         

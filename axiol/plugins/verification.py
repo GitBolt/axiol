@@ -4,7 +4,7 @@ import variables as var
 import database as db
 from functions import getprefix
 import random
-
+from ext.permissions import has_command_permission
 
 class Verification(commands.Cog):
     def __init__(self, bot):
@@ -163,6 +163,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def verifyinfo(self, ctx):
         GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
         verifytype = GuildDoc.get("type")
@@ -193,6 +194,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def verifychannel(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})  
@@ -221,6 +223,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def verifyswitch(self, ctx):
         GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
         if GuildDoc.get("type") == "command":
@@ -240,6 +243,7 @@ class Verification(commands.Cog):
     
 
     @commands.command()
+    @has_command_permission()
     async def verifyrole(self, ctx, role:discord.Role=None):
         if role is not None:
             GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
@@ -262,6 +266,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def verifyroleremove(self, ctx):
         GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("assignrole") is not None:
@@ -286,6 +291,7 @@ class Verification(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def verifyremove(self, ctx):
         GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
         db.VERIFY.delete_one(GuildDoc)

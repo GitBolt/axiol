@@ -5,7 +5,7 @@ from discord.ext import commands
 import variables as var
 from functions import getprefix
 import database as db
-
+from ext.permissions import has_command_permission
 
 class Commands(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +13,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def source(self, ctx):
         embed = discord.Embed(
         title="My Github Source Code Woohoo", 
@@ -24,6 +25,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def invite(self, ctx):
         embed = discord.Embed(
         title="My invite link!",
@@ -35,6 +37,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def suggest(self, ctx, *, desc=None):
         if desc is not None:
             channel = self.bot.get_channel(843548616505294848) #Support server suggestion channel
@@ -54,6 +57,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def about(self, ctx):
         guildcount = 0
         membercount = 0
@@ -76,6 +80,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def stats(self, ctx):
         embed = discord.Embed(
         title=f"{ctx.guild.name}", 
@@ -103,6 +108,7 @@ class Commands(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def embed(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
 

@@ -4,6 +4,8 @@ from discord.ext import commands
 import variables as var
 import database as db
 from functions import getprefix
+from ext.permissions import has_command_permission
+
 
 class Moderation(commands.Cog):
     def __init__(self, bot):
@@ -24,6 +26,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
+    @has_command_permission()
     async def ban(self, ctx, user:discord.User=None, *, reason="No reason given"):
         if user is not None and user != ctx.author:
 
@@ -64,6 +67,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
+    @has_command_permission()
     async def unban(self, ctx, user:discord.User=None):
         if user is not None and user != ctx.author:
 
@@ -103,6 +107,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
+    @has_command_permission()
     async def mute(self, ctx, member:discord.Member=None):
         if member is not None:
 
@@ -136,6 +141,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(manage_roles=True)
+    @has_command_permission()
     async def unmute(self, ctx, member:discord.Member=None):
         if member is not None:
 
@@ -167,6 +173,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(kick_members=True)
+    @has_command_permission()
     async def kick(self, ctx, member:discord.Member=None, *, reason="No reason provided"):
         if member is not None and member != ctx.author:  
 
@@ -205,6 +212,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=["nickname", "changenick"])
     @commands.has_permissions(change_nickname=True)
+    @has_command_permission()
     async def nick(self, ctx, member: discord.Member=None, *,nick=None):
         if member and nick is not None:
             await member.edit(nick=nick)
@@ -235,6 +243,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=["clean", "clear"])
     @commands.has_permissions(manage_messages=True)
+    @has_command_permission()
     async def purge(self, ctx, limit:int=None):
         if limit is not None:
             await ctx.channel.purge(limit=limit+1)

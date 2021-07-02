@@ -5,7 +5,7 @@ import variables as var
 import database as db
 from functions import getprefix
 from greetings import greeting
-
+from ext.permissions import has_command_permission
 
 class Welcome(commands.Cog):
     def __init__(self, bot):
@@ -25,6 +25,7 @@ class Welcome(commands.Cog):
 
     #This command isn't really used, just putted this here to invoke on first welcome plugin enable
     @commands.command()
+    @has_command_permission()
     async def welcomesetup(self, ctx):
         embed = discord.Embed(
         title="Send the welcome channel where I can greet members!",
@@ -65,6 +66,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomecard(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
         
@@ -85,6 +87,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomechannel(self, ctx, channel:discord.TextChannel=None):
         GuildDoc = db.WELCOME.find_one({"_id":ctx.guild.id})
 
@@ -107,6 +110,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomemessage(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
 
@@ -142,6 +146,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomegreeting(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
 
@@ -176,6 +181,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomeimage(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
 
@@ -223,6 +229,7 @@ class Welcome(commands.Cog):
                 
 
     @commands.command()
+    @has_command_permission()
     async def welcomerole(self, ctx, role:discord.Role=None):
         GuildDoc = db.WELCOME.find_one({"_id":ctx.guild.id})
         if role is not None:
@@ -249,6 +256,7 @@ class Welcome(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def welcomereset(self, ctx):
         GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
         newdata = {"$set":{

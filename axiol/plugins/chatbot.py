@@ -8,7 +8,7 @@ import variables as var
 from functions import getprefix
 from chatbot.model import NeuralNet
 from chatbot.utils import bag_of_words, tokenize
-
+from ext.permissions import has_command_permission
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -35,6 +35,7 @@ class Chatbot(commands.Cog):
             ))
 
     @commands.command(aliases=["enablechatbot"])
+    @has_command_permission()
     async def setchatbot(self, ctx, channel:discord.TextChannel=None):
 
         if db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
@@ -65,6 +66,7 @@ class Chatbot(commands.Cog):
 
     
     @commands.command(aliases=["disablechatbot"])
+    @has_command_permission()
     async def removechatbot(self, ctx, channel:discord.TextChannel=None):
 
         if db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
@@ -95,6 +97,7 @@ class Chatbot(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def chatbotchannels(self, ctx):
         GuildDoc = db.CHATBOT.find_one({"_id": ctx.guild.id})
         embed = discord.Embed(
@@ -109,6 +112,7 @@ class Chatbot(commands.Cog):
             await ctx.send("This server does not have any chat bot channel")
 
     @commands.command()
+    @has_command_permission()
     async def chatbotreport(self, ctx, *, desc):
         channel = self.bot.get_channel(843548616505294848) #Support server suggestions channel
         await channel.send(embed=discord.Embed(

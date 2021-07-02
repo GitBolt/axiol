@@ -1,3 +1,4 @@
+from re import L
 import discord
 from discord.ext import commands
 import database as db
@@ -116,7 +117,55 @@ class Permissions(commands.Cog):
     @commands.command(aliases=["removepermission", "disablepermission"])
     @commands.has_permissions(administrator=True)
     async def removeperm(self, ctx, cmd=None, role:discord.Role=None):
-        pass
+        if cmd and role is not None:
+            GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id}, {"_id":0})
+            all_perm_commmands = [x for i in GuildDoc.values() for x in i]
+
+            if cmd not in all_perm_commmands:
+                await ctx.send(embed=discord.Embed(
+                            title="Invalid command",
+                            description="This command has no permissions setted up",
+                            color=var.C_RED
+                ))
+            else:
+                plugin_name = [x for x in GuildDoc if cmd in GuildDoc[x].keys()][0]
+                print(plugin_name)
+                plugin_dict = GuildDoc[plugin_name]
+                newdict = plugin_dict.copy()
+                rolelist = plugin_dict[cmd]
+                newlist = rolelist.copy()
+
+                try:
+                    newlist.remove(role.id)
+                    newdict.update({cmd:newlist})
+
+                    newdata = {"$set":{
+                        plugin_name: newdict
+                    }}
+                    db.PERMISSIONS.update_one(GuildDoc, newdata)
+
+                    await ctx.send(embed=discord.Embed(
+                        title="Successfully removed permission",
+                        description=f"{var.E_ACCEPT} Members with {role.mention} role can't use **{cmd}** command anymore",
+                        color=var.C_GREEN
+                    ).add_field(name="To add new command permission", value=f"```{getprefix(ctx)}addperm <plugin>```")
+                    )
+                    
+                except ValueError:
+                    await ctx.send(embed=discord.Embed(
+                        title="Invalid combination",
+                        description=f"The command {cmd} has no permissions setted up with role {ctx.guild.get_role(role.id).mention}",
+                        color=var.C_RED
+                    ))
+
+        else:
+            await ctx.send(embed=discord.Embed(
+            description=f"{var.E_ERROR} You need to define the command name and the role",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}removeperm <command> <role>`"
+            ).set_footer(text=f"You can view all plugins by using the permissions setted up using {getprefix(ctx)}allperms")
+            )
+
 
 def setup(bot):
     bot.add_cog(Permissions(bot))

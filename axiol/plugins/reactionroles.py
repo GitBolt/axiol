@@ -3,6 +3,8 @@ from discord.ext import commands
 import variables as var
 import database as db
 from functions import getprefix, reactionrolespagination
+from ext.permissions import has_command_permission
+
 
 class ReactionRoles(commands.Cog):
     def __init__(self, bot):
@@ -21,6 +23,7 @@ class ReactionRoles(commands.Cog):
             ))
 
     @commands.command()
+    @has_command_permission()
     async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji=None):
         bot_member = ctx.guild.get_member(self.bot.user.id)
         try:
@@ -92,6 +95,7 @@ class ReactionRoles(commands.Cog):
 
             
     @commands.command()
+    @has_command_permission()
     async def removerr(self, ctx, msg:discord.Message=None, emoji:str=None):
         
         if msg and emoji is not None:
@@ -139,6 +143,7 @@ class ReactionRoles(commands.Cog):
 
 
     @commands.command(aliases=['rrall'])
+    @has_command_permission()
     async def allrr(self, ctx):
 
         Guild = self.bot.get_guild(ctx.guild.id)
@@ -225,7 +230,7 @@ class ReactionRoles(commands.Cog):
 
 
     @commands.command()
-    @commands.has_permissions(administrator=True)
+    @has_command_permission()
     async def uniquerr(self, ctx, msg:discord.Message=None):
         
         if msg is not None:
@@ -265,6 +270,7 @@ class ReactionRoles(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def removeunique(self, ctx, msg:discord.Message=None):
         
         if msg is not None:

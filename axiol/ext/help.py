@@ -73,28 +73,6 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def musicbothelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="🎵 Music", description="Let's vibe to some music ay! For Voice Channels either their ID or Name can be used since they can't be mentioned using `#` like Text Channels", color=var.C_MAIN 
-    ).add_field(name=getprefix(ctx)+"connect `<voicechannel>`", value="Joins a voice channel! Voice Channel field is optional if you want me to join the same VC inside which you are in :D", 
-    ).add_field(name=getprefix(ctx)+"play `<search>`", value="Search for music to play on YouTube! You can also use the video URL",inline=False 
-    ).add_field(name=getprefix(ctx)+"pause", value="Pauses the currently playing music", inline=False 
-    ).add_field(name=getprefix(ctx)+"resume", value="Resumes the paused music", inline=False 
-    ).add_field(name=getprefix(ctx)+"np", value="Shows the current playing song, NP is short for Now Playing!",inline=False
-    ).add_field(name=getprefix(ctx)+"queue", value="Shows all the upcoming songs in the queue!",inline=False 
-    ).add_field(name=getprefix(ctx)+"remove `<position>`", value=f"Removes a song from it's given queue position!", 
-    ).add_field(name=getprefix(ctx)+"skip", value="Skips the currently playing song", 
-    ).add_field(name=getprefix(ctx)+"volume `<1-100 value>`", value="Change the music volume! The limit is from 0 to 100",
-    ).add_field(name=getprefix(ctx)+"leave", value="Stops playing the music and leaves the VC",inline=False
-    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
-    return embed
-
-def youtubehelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="🔔 YouTube", description="Get updated with your favourite YouTuber's uploads :D", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"ytadd `<#channel>` `<youtube_channel_id>`", value="Get updated with new video uploads from a YouTube channel! Don't get confused between discord text channel and youtube channel haha", inline=False
-    ).add_field(name=getprefix(ctx)+"ytremove `<youtube_channel_id>`", value="Remove upload notifications from a YouTube channel", inline=False
-    ).add_field(name=getprefix(ctx)+"ytmessage `<message>`", value="Change the notification message! Use the variables `[link]` (with the square brackets) in your message to add the uploaded video link!",inline=False)
-    return embed
-
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
@@ -154,8 +132,6 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            "Music": musicbothelp,
-            "YouTube": youtubehelp,
         }
 
         try:
@@ -259,28 +235,6 @@ class Help(commands.Cog):
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Chatbot plugin is disabled in this server",
-                color=var.C_ORANGE
-            ))
-
-    @help.command()
-    async def music(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Music") == True:
-            await ctx.send(embed=musicbothelp(ctx))
-        else:
-            await ctx.send(embed=discord.Embed(
-                description=f"{var.E_DISABLE} The Music plugin is disabled in this server",
-                color=var.C_ORANGE
-            ))
-
-    @help.command()
-    async def youtube(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("YouTube") == True:
-            await ctx.send(embed=youtubehelp(ctx))
-        else:
-            await ctx.send(embed=discord.Embed(
-                description=f"{var.E_DISABLE} The YouTube plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
 

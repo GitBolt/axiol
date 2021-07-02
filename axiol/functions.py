@@ -1,5 +1,5 @@
 from variables import DEFAULT_PREFIX, E_ERROR
-from database import PREFIXES, LEVELDATABASE, PLUGINS
+from database import PREFIXES, LEVELDATABASE, PLUGINS, PERMISSIONS
 
 def getprefix(ctx):
     try:
@@ -73,7 +73,8 @@ def updateplugins(plugin):
             }
     )
 
-#updating leveling and plugin data
+
+#updating leveling, plugin and permission data
 def updatedb(serverid):
 
     if not PLUGINS.count_documents({"_id": serverid}, limit=1):
@@ -86,34 +87,51 @@ def updatedb(serverid):
                     "Welcome": False,
                     "Verification": False,
                     "Chatbot": False,
-                    "Music": False
                 })
-        print(f"Added Plugins {serverid}")
+        print(f"✅{serverid} - Plugins 🔧")
+
+    
+    if not PERMISSIONS.count_documents({"_id": serverid}, limit=1):
+        PERMISSIONS.insert_one({
+            "_id": serverid,
+            "Leveling": {},
+            "Moderation": {},
+            "Reaction Roles": {},
+            "Welcome": {},
+            "Verification": {},
+            "Chatbot": {},
+            "Commands": {},
+        })
+        print(f"✅{serverid} - Permissions 🔨")
+
 
     if PLUGINS.find_one({"_id": serverid}).get("Leveling"):
-        GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
-        GuildLevelDB.insert_one({
+        try:
+            GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
+            GuildLevelDB.insert_one({
 
-            "_id": 0,
-            "xprange": [15, 25],
-            "alertchannel": None,
-            "blacklistedchannels": [],
-            "alerts": True
-            }) 
-        print(f"Added Leveling {serverid}")
-        
+                "_id": 0,
+                "xprange": [15, 25],
+                "alertchannel": None,
+                "blacklistedchannels": [],
+                "alerts": True
+                }) 
+            print(f"✅{serverid} - Leveling 📊")
+        except:
+            print(f"❌{serverid} - Leveling 📊")
+    
     try:
         PREFIXES.insert_one({
             "_id": serverid,
             "prefix": "ax"
         })
-        print(f"Added prefix {serverid}")
+        print(f"✅{serverid} - Prefix ⚪")
 
     except:
-        print(f"Already there prefix {serverid}")
+        print(f"❌{serverid} - Prefix ⚪")
 
 
-serveridlist = []
-#for i in serveridlist:
-    #updatedb(i)
+serveridlist = [831074672946053120, 847589361813946458, 859460935256637450, 803705583693725706, 110373943822540800, 740885812182384671, 854999153410965534, 851770403236085771, 859028501226061854, 823210634237444159, 847819385447120907, 859906699807424592, 859711350853730304, 857357938619711518, 749054659015999520, 812560533428502528, 844849869810040833, 853096402452086814, 855307787273371678, 860026138285703199, 367365697011187714, 843891160287936543, 808565934385659915, 845726630231932980, 855796269204242432, 860122748347744286, 859210228537360405, 854720573187162154, 847958880205668352, 829347531930468402, 851450607742877715, 808213947638874163, 734275069630742610, 518022345244540929, 851151576226725888, 807140294276415510, 669635456132055052, 859826914981445652, 836218450560417792, 712515822869938196, 859955068458369084, 847861960963784725, 852906267223523358, 742737352799289375, 843516084266729512, 751491708465840159, 844429545574760449, 824359173100797952, 859456295546912798]
+for i in serveridlist:
+    updatedb(i)
 #updateplugins("")

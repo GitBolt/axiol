@@ -552,6 +552,20 @@
         "I do :D",
         "Yes, I do."
       ]
+    },
+    {
+      "tag": "l",
+      "patterns":[
+        "ily",
+        "I love you",
+        "ilysm",
+        "i love you a lot"
+      ],
+      "responses":[
+        "<3",
+        ":heart:",
+        "ilyt :))"
+      ]
     }
   ]
 }

@@ -44,4 +44,3 @@ DICT_PLUGINEMOJIS = {
     "Verification": "✅",
     "Chatbot": "🤖",
 }
-

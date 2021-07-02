@@ -202,4 +202,3 @@ class Chatbot(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Chatbot(bot))
-

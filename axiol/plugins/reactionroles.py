@@ -352,5 +352,3 @@ class ReactionRoles(commands.Cog):
 
 def setup(bot):
     bot.add_cog(ReactionRoles(bot))
-
-    

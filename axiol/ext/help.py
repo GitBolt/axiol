@@ -73,6 +73,14 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
+def permshelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="Permissions", description="Setup permissions for commands so that users having a particular role would be able to use it!", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Set permissions of a command from the particular plugin@", inline=False
+    ).add_field(name=getprefix(ctx)+"removeperm `<command>` `<role>`", value="Remove any role from a command permission!", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
+
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
@@ -100,7 +108,7 @@ class Help(commands.Cog):
         description=f"Help commands for the plugins which are enabled!",
         color=var.C_MAIN
         ).add_field(name=getprefix(ctx)+"prefix", value="Change prefix", inline=False
-        ).add_field(name=getprefix(ctx)+"plugins", value=f"Configure plugins {var.E_PLUGINS}", inline=False
+        ).add_field(name=getprefix(ctx)+"help permissions", value="Manage command permissions", inline=False
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
 
@@ -109,18 +117,18 @@ class Help(commands.Cog):
                 helpname = i.lower()
                 if i.lower() == "reaction roles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
-                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{i} Help {var.DICT_PLUGINEMOJIS.get(i)}", inline=False)
+                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{var.DICT_PLUGINEMOJIS.get(i)} {i} Help", inline=False)
 
-        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"Non plugin commands {var.E_CONTINUE}️ ", inline=False)
+        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"▶️ Non plugin commands", inline=False)
+        embed.add_field(name=f"{getprefix(ctx)}plugins", value=f"{var.E_PLUGINS} Configure plugins", inline=False)
         helpmsg = await ctx.send(embed=embed)
 
-
-        await helpmsg.add_reaction(var.E_PLUGINS)
         for i in GuildDoc:
             if GuildDoc.get(i) == True:
                 await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
-        await helpmsg.add_reaction(var.E_CONTINUE)
-
+        await helpmsg.add_reaction("▶️")
+        await helpmsg.add_reaction(var.E_PLUGINS)
+        
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
 
@@ -241,6 +249,10 @@ class Help(commands.Cog):
     @help.command()
     async def extras(self, ctx):
         await ctx.send(embed=extrahelp(ctx))
+    
+    @help.command()
+    async def permissions(self, ctx):
+        await ctx.send(embed=permshelp(ctx))
 
 
     @commands.command()

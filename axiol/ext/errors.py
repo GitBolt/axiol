@@ -2,7 +2,7 @@ import sys
 import traceback
 import discord
 from discord.ext import commands
-from variables import E_ERROR, C_RED
+from variables import C_RED
 
 
 class Errors(commands.Cog):
@@ -17,7 +17,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.ChannelNotFound):
             await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
-                    description=f"{E_ERROR} Are you sure the channel ID or channel mention was correct?",
+                    description="🚫 Are you sure the channel ID or channel mention was correct?",
                     color=C_RED
             ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
             )
@@ -26,7 +26,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(
                         title="Missing Permissions",
-                        description=f"{E_ERROR} You don't have permissions to do that {ctx.author.name} ",
+                        description=f"🚫 You don't have permissions to do that {ctx.author.name} ",
                         color=C_RED
             ))
 
@@ -34,7 +34,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MemberNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Member not found",
-                description=f"{E_ERROR} You sure the mention/ID is correct? Or maybe they left? Maybe they don't even exist? [SpongoBob?](https://youtu.be/wjXBqelv4GM)",
+                description=f"🚫 You sure the mention/ID is correct? Or maybe they left? Maybe they don't even exist? [SpongoBob?](https://youtu.be/wjXBqelv4GM)",
                 color=C_RED
             ))
 
@@ -42,7 +42,7 @@ class Errors(commands.Cog):
         if isinstance(error, commands.UserNotFound):
             await ctx.send(embed=discord.Embed(
                 title="User not found",
-                description=f"{E_ERROR} Make sure the User ID is correct, if you are sure it's correct then perhaps the User deleted their account?",
+                description="🚫 Make sure the User ID is correct, if you are sure it's correct then perhaps the User deleted their account?",
                 color=C_RED
             ))
 
@@ -50,14 +50,14 @@ class Errors(commands.Cog):
         if isinstance(error, commands.MessageNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Message not found",
-                description=f"{E_ERROR} Are you sure that the message ID belongs to this server and is valid?",
+                description="🚫 Are you sure that the message ID belongs to this server and is valid?",
                 color=C_RED
             ))
 
         if isinstance(error, commands.RoleNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Role not found",
-                description=f"{E_ERROR} Make sure that the ID or mention is correct. Maybe you pinged any member instead of the role? Maybe you copied the wrong ID?",
+                description="🚫 Make sure that the ID or mention is correct. Maybe you pinged any member instead of the role? Maybe you copied the wrong ID?",
                 color=C_RED
             ))
 

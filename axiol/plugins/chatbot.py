@@ -58,7 +58,7 @@ class Chatbot(commands.Cog):
             await ctx.send(f"Enabled Chatbot for {channel.mention}")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel in order to make it bot chat",
+            description="🚫 You need to define the channel in order to make it bot chat",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}setchatbot <#channel>`"
             )
@@ -89,7 +89,7 @@ class Chatbot(commands.Cog):
                 await ctx.send("This channel is not a bot chatting channel")
         else:   
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel in order to remove bot chat",
+            description="🚫 You need to define the channel in order to remove bot chat",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removechatbot <#channel>`"
             )

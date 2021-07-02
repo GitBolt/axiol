@@ -6,7 +6,6 @@ import variables as var
 from functions import getprefix
 
 
-
 def is_user(*userids):
     async def predicate(ctx: Context):
         return ctx.author.id in userids
@@ -47,7 +46,7 @@ class ChemistryHelp(commands.Cog):
                 await ctx.send(embed=discord.Embed(description=f"Added the message **{trigger}** with response **{response}**", color=var.C_BLUE))
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define both the message and it's response",
+            description="🚫 You need to define both the message and it's response",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}addmsg <msg> | <response>`"))
 
@@ -199,7 +198,7 @@ class ChemistryHelp(commands.Cog):
                 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define both the message and it's reaction",
+            description="🚫 You need to define both the message and it's reaction",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}addreaction <msg> <emoji>`"))
 

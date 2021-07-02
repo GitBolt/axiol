@@ -42,7 +42,7 @@ class Verification(commands.Cog):
         except:
             await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
-                    description=f"{var.E_ERROR} I was not able to find the channel which you entered",
+                    description="🚫 I was not able to find the channel which you entered",
                     color=var.C_RED
             ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
             )
@@ -98,7 +98,7 @@ class Verification(commands.Cog):
                 db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                 await ctx.send(embed=discord.Embed(
                             title="Missing Permissions",
-                            description=f"{var.E_ERROR} I don't have permissions to create and set permissions for roles",
+                            description="🚫 I don't have permissions to create and set permissions for roles",
                             color=var.C_RED
                 ))
 
@@ -150,7 +150,7 @@ class Verification(commands.Cog):
                     db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                     await ctx.send(embed=discord.Embed(
                                 title="Missing Permissions",
-                                description=f"{var.E_ERROR} I don't have permissions to delete the existing role, due to this error verification plugin has been disabled again",
+                                description="🚫 I don't have permissions to delete the existing role, due to this error verification plugin has been disabled again",
                                 color=var.C_RED
                     ))
             if str(reaction.emoji) == var.E_CONTINUE or str(reaction.emoji) == var.E_ACCEPT:
@@ -216,7 +216,7 @@ class Verification(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the verification channel to change it",
+            description="🚫 You need to define the verification channel to change it",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifychannel <#channel>`"))
 
@@ -258,7 +258,7 @@ class Verification(commands.Cog):
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the role too!",
+            description="🚫 You need to define the role too!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyrole <role>`"
             ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
@@ -283,7 +283,7 @@ class Verification(commands.Cog):
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the role too!",
+            description="🚫 You need to define the role too!",
             color=var.C_RED
              ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyroleremove <role>`"
             ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")

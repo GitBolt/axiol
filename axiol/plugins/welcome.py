@@ -42,7 +42,7 @@ class Welcome(commands.Cog):
         except:
             await ctx.send(embed=discord.Embed(
                         title="Invalid Channel",
-                        description=f"{var.E_ERROR} I was not able to find the channel which you entered",
+                        description="🚫 I was not able to find the channel which you entered",
                         color=var.C_RED
                     ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                     )
@@ -104,7 +104,7 @@ class Welcome(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the greeting channel to change it",
+            description="🚫 You need to define the greeting channel to change it",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomechannel <#channel>`"))
 
@@ -248,7 +248,7 @@ class Welcome(commands.Cog):
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the role",
+            description="🚫 You need to define the role",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomerole <role>`"
             ).set_footer(text="For role either role ID or role mention can be used")

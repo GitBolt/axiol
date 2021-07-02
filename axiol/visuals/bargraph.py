@@ -12,7 +12,7 @@ class BarGraph(commands.Cog):
     async def rankgraph(self, ctx, limit:int=10):
         if limit > 30:
             await ctx.send(embed=discord.Embed(
-                        description=f"{var.E_ERROR} You cannot view more than 30 users in a bar graph, that's way to much haha",
+                        description="🚫 You cannot view more than 30 users in a bar graph, that's way to much haha",
                         color=var.C_RED
                         ))
         else:

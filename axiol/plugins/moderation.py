@@ -48,7 +48,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the user to ban them, reason is optional",
+            description="🚫 You need to define the user to ban them, reason is optional",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}ban <user> <reason>`"
             ).set_footer(text="For user either User mention or User ID can be used")
@@ -58,7 +58,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
                 await ctx.send(embed=discord.Embed(
                     title="Permission error",
-                    description=f"{var.E_ERROR} I don't have permissions to ban the user, make sure that my I have ban members permission and role is placed above the highest role which the user has",
+                    description="🚫 I don't have permissions to ban the user, make sure that my I have ban members permission and role is placed above the highest role which the user has",
                     color=var.C_RED
                 )
                 )
@@ -89,7 +89,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the user to unban them",
+            description="🚫 You need to define the user to unban them",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}unban <user>`"
             ).set_footer(text="For user either User mention or User ID can be used")
@@ -98,7 +98,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to unban the user, make sure that I have ban members permission and my role is placed above the highest role which the user has",
+                description="🚫 I don't have permissions to unban the user, make sure that I have ban members permission and my role is placed above the highest role which the user has",
                 color=var.C_RED
             )
             )
@@ -122,7 +122,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define member in order to mute them",
+            description="🚫 You need to define member in order to mute them",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}mute <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
@@ -132,7 +132,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to mute the member, make sure that I have manage roles permission and my role is placed above the highest role which the member has",
+                description="🚫 I don't have permissions to mute the member, make sure that I have manage roles permission and my role is placed above the highest role which the member has",
                 color=var.C_RED
             )
             )
@@ -154,7 +154,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the member to unmute them",
+            description="🚫 You need to define the member to unmute them",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}unmute <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
@@ -164,7 +164,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to unmute the user, make sure that I have manage roles permission and my role is placed above the highest role which the user has",
+                description="🚫 I don't have permissions to unmute the user, make sure that I have manage roles permission and my role is placed above the highest role which the user has",
                 color=var.C_RED
             )
             )
@@ -194,7 +194,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the member to kick them",
+            description="🚫 You need to define the member to kick them",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}kick <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
@@ -204,7 +204,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to kick the member, make sure that I have kick members permission and my role is placed above the highest role which the member has",
+                description="🚫 I don't have permissions to kick the member, make sure that I have kick members permission and my role is placed above the highest role which the member has",
                 color=var.C_RED
             )
             )
@@ -223,7 +223,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define both the member and their new nick",
+            description="🚫 You need to define both the member and their new nick",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}nick <member> <new nick>`"
             ).set_footer(text="For Member either mention or Member ID can be used")
@@ -233,7 +233,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to change the nickname of the member, make sure that I have change nickname permission and my role is placed above the highest role which the member has",
+                description="🚫 I don't have permissions to change the nickname of the member, make sure that I have change nickname permission and my role is placed above the highest role which the member has",
                 color=var.C_RED
             )
             )
@@ -256,7 +256,7 @@ class Moderation(commands.Cog):
             await info.delete()
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the amount to delete messages too!",
+            description="🚫 You need to define the amount to delete messages too!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}purge <amount>`"
             )
@@ -266,7 +266,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
-                description=f"{var.E_ERROR} I don't have permissions to delete messages",
+                description="🚫 I don't have permissions to delete messages",
                 color=var.C_RED
             )
             )   

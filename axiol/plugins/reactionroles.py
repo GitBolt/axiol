@@ -86,7 +86,7 @@ class ReactionRoles(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel, message, role and emoji all three to add a reaction role",
+            description="🚫 You need to define the channel, message, role and emoji all three to add a reaction role",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}rr <#channel> <messageid> <role> <emoji>`"
             ).set_footer(text="You can use either role ID or mention it (use ID if you don't want to disturb everyone having the role)")
@@ -133,7 +133,7 @@ class ReactionRoles(commands.Cog):
                 await ctx.send("This reaction role does not exist")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the message  and emoji both to remove a reaction role",
+            description="🚫 You need to define the message  and emoji both to remove a reaction role",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removerr <messageid> <emoji>`"
             )
@@ -261,7 +261,7 @@ class ReactionRoles(commands.Cog):
                 await ctx.send("Cannot mark that message with unique reactions since this server does not have any reaction roles yet :(")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the message in order to mark it with unique reactions",
+            description="🚫 You need to define the message in order to mark it with unique reactions",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}uniquerr <messageid>`"
             )
@@ -300,7 +300,7 @@ class ReactionRoles(commands.Cog):
                 await ctx.send("Cannot remove the unique mark from that message since you don't have any reaction roles yet :(")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the message in order to unmark it with unique reactions",
+            description="🚫 You need to define the message in order to unmark it with unique reactions",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}uniquerr <messageid>`"
             )

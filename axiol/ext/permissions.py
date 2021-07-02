@@ -108,7 +108,7 @@ class Permissions(commands.Cog):
                         break
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define a valid plugin!",
+            description="🚫 You need to define a valid plugin!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}setperm <plugin>`"
             ).set_footer(text=f"You can view all plugins by using the command {getprefix(ctx)}plugins")
@@ -160,7 +160,7 @@ class Permissions(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the command name and the role",
+            description="🚫 You need to define the command name and the role",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removeperm <command> <role>`"
             ).set_footer(text=f"You can view all plugins by using the permissions setted up using {getprefix(ctx)}allperms")

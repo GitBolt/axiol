@@ -1,4 +1,4 @@
-from variables import DEFAULT_PREFIX, E_ERROR
+from variables import DEFAULT_PREFIX
 from database import PREFIXES, LEVELDATABASE, PLUGINS, PERMISSIONS
 
 def getprefix(ctx):
@@ -33,7 +33,7 @@ async def leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages):
         getuser = ctx.guild.get_member(i.get("_id"))
         xp = i.get("xp")
         if getuser == None:
-            user = f"{E_ERROR} This user has left the server"
+            user = "🚫 This user has left the server"
         else:
             user = getuser
         embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)

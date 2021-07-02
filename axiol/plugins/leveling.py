@@ -89,7 +89,7 @@ class Leveling(commands.Cog):
 
         embed = discord.Embed(
         title=f"Leaderboard", 
-        description="◀️ First page\n⬅️ Previous page\n<:leveling:854068306285428767> Bar graph of top 10 users\n➡️ Next page\n▶️ Last page\n",
+        description="◀️ First page\n⬅️ Previous page\n<:RankChart:854068306285428767> Bar graph of top 10 users\n➡️ Next page\n▶️ Last page\n",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
         )
@@ -111,7 +111,7 @@ class Leveling(commands.Cog):
         botmsg = await ctx.send(embed=embed)
         await botmsg.add_reaction("◀️")
         await botmsg.add_reaction("⬅️")
-        await botmsg.add_reaction("<:leveling:854068306285428767>")
+        await botmsg.add_reaction("<:RankChart:854068306285428767>")
         await botmsg.add_reaction("➡️")
         await botmsg.add_reaction("▶️")
 
@@ -141,7 +141,7 @@ class Leveling(commands.Cog):
                 await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
                 await botmsg.edit(embed=embed)
 
-            if str(reaction.emoji) == "<:leveling:854068306285428767>":
+            if str(reaction.emoji) == "<:RankChart:854068306285428767>":
                 try:
                     await botmsg.clear_reactions()
                 except discord.Forbidden:
@@ -231,7 +231,7 @@ class Leveling(commands.Cog):
 
             if amount > 10000000 :
                 await ctx.send(embed=discord.Embed(
-                    description=f"{var.E_ERROR} Ayo that's too much",
+                    description="🚫 Ayo that's too much",
                     color=var.C_RED
                 ))
             else:
@@ -243,7 +243,7 @@ class Leveling(commands.Cog):
                     
                 elif data.get("xp") > 10000000:
                     await ctx.send(embed=discord.Embed(
-                        description=f"{var.E_ERROR} Cannot give more xp to the user, they are too rich already",
+                        description="🚫 Cannot give more xp to the user, they are too rich already",
                         color=var.C_RED
                     ))
                 else:
@@ -254,7 +254,7 @@ class Leveling(commands.Cog):
                     await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the member and the amount to give them xp",
+            description="🚫 You need to define the member and the amount to give them xp",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}givexp <user> <amount>`"
             ).set_footer(text="For user either user mention or user ID can be used")
@@ -267,7 +267,7 @@ class Leveling(commands.Cog):
         if user and amount is not None:
             if amount > 10000000 :
                 await ctx.send(embed=discord.Embed(
-                    description=f"{var.E_ERROR} Ayo that's too much",
+                    description="🚫 Ayo that's too much",
                     color=var.C_RED
                 ))
             else:
@@ -281,7 +281,7 @@ class Leveling(commands.Cog):
                 await ctx.send(f"Successfully removed {amount} xp from {user}!")
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the member and the amount to remove their xp",
+            description="🚫 You need to define the member and the amount to remove their xp",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removexp <user> <amount>`"
             ).set_footer(text="For user either user mention or user ID can be used")
@@ -305,7 +305,7 @@ class Leveling(commands.Cog):
             )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the xp range",
+            description="🚫 You need to define the xp range",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}xprange <min_xp> <max_xp>`"
             )
@@ -332,7 +332,7 @@ class Leveling(commands.Cog):
                         )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel to blacklist it",
+            description="🚫 You need to define the channel to blacklist it",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}blacklist <#channel>`"
             )
@@ -363,7 +363,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel to whitelist it",
+            description="🚫 You need to define the channel to whitelist it",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}whitelist <#channel>`"
             )
@@ -411,7 +411,7 @@ class Leveling(commands.Cog):
                         )
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the channel to make it the alert channel",
+            description="🚫 You need to define the channel to make it the alert channel",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
             )
@@ -443,7 +443,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the level and role both to add a reward!",
+            description="🚫 You need to define the level and role both to add a reward!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}reward <level> <role>`"
             ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}reward 2 @somerole\nNot {getprefix(ctx)}reward level2 @somerole")
@@ -476,13 +476,11 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(embed=discord.Embed(
-            description=f"{var.E_ERROR} You need to define the level to remove it's reward!",
+            description="🚫 You need to define the level to remove it's reward!",
             color=var.C_RED
             ).add_field(name="Format", value=f"`{getprefix(ctx)}removereward <level>`"
             ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}removereward 2 \nNot {getprefix(ctx)}removereward level2 ")
             )
-
-
 
 
 

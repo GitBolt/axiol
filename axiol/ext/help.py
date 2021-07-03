@@ -155,10 +155,10 @@ class Help(commands.Cog):
                         pass
                 
                 #Since extra help and plugin is always there
-                if str(reaction.emoji) == var.E_CONTINUE:
+                if str(reaction.emoji) == "▶️":
                     await helpmsg.edit(embed=extrahelp(ctx))
                     try:
-                        await helpmsg.remove_reaction(var.E_CONTINUE, ctx.author)
+                        await helpmsg.remove_reaction("▶️", ctx.author)
                     except discord.Forbidden:
                         pass
                 if str(reaction.emoji) == var.E_PLUGINS:

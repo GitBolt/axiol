@@ -65,9 +65,9 @@ class Verification(commands.Cog):
                                         description=f"Skipping {i.mention} since I don't have access to that channel",
                                         color=var.C_ORANGE
                             ))
-                    await ch.set_permissions(NVerified, view_channel=True, read_message_history=True)
+                    await ch.set_permissions(self.bot.user, view_channel=True)
                     await ch.set_permissions(ctx.guild.default_role, view_channel=False)
-
+                    
                     db.VERIFY.insert_one({
                         
                         "_id":ctx.guild.id,

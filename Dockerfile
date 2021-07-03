@@ -4,7 +4,6 @@ COPY /axiol /main
 
 WORKDIR /main
 
-RUN pip install discord.py pymongo dnspython youtube_dl pynacl nltk torch  requests numpy
-RUN apt-get update &&  apt-get install -y ffmpeg
+RUN pip install discord.py pymongo dnspython nltk torch  requests numpy
 
 CMD ["python3", "bot.py"]

@@ -219,7 +219,7 @@ class Commands(commands.Cog):
                 ).add_field(name="Add field", value="React to 🇦", inline=False
                 ).add_field(name="Footer", value="React to 🇫", inline=False
                 ).add_field(name="Image", value="React to 🇮", inline=False
-                ).add_field(name="Set Author (yourself)", value="React to 🇺", inline=False)
+                ).add_field(name="Set Author", value="React to 🇺", inline=False)
                 )
                 def editreactioncheck(reaction, user):
                     return user == ctx.author and reaction.message == edit or reaction.message == preview
@@ -256,39 +256,58 @@ class Commands(commands.Cog):
                         except discord.Forbidden:
                             pass
                     if str(reaction.emoji) == "🇮":
-                        imagebotmsg = await ctx.send("Now send an image or link to add that **Image** to the embed!")
-                        usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=30.0)   
-                        try:   
-                            if usermsg.attachments:
-                                embed.set_image(url=usermsg.attachments[0].url)
-                                await preview.edit(embed=embed)
-                                await thumbnailbotmsg.delete()
-                                try:
-                                    edit.clear_reaction("🇮")
-                                except discord.Forbidden:
-                                    pass
-                            else:
-                                embed.set_image(url=usermsg.content)
-                                await preview.edit(embed=embed)
-                                await imagebotmsg.delete()
-                                try:
-                                    await edit.clear_reaction("🇮")
-                                except discord.Forbidden:
-                                    pass
-                        except:
-                            await ctx.send("Invalid image, either use a url or send the image")
+                        while True:
+                            imagebotmsg = await ctx.send("Now send an image or link to add that **Image** to the embed!\nType `skip` if you don't want to set this")
+                            usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=30.0)   
                             try:
-                                await edit.remove_reaction("🇮", ctx.author)
-                            except discord.Forbidden:
-                                pass
+                                if usermsg.content in ["skip", "`skip`", "```skip```"]:
+                                    break   
+                                elif usermsg.attachments:
+                                    embed.set_image(url=usermsg.attachments[0].url)
+                                    await preview.edit(embed=embed)
+                                    await thumbnailbotmsg.delete()
+                                    try:
+                                        edit.clear_reaction("🇮")
+                                    except discord.Forbidden:
+                                        pass
+                                    break
+                                else:
+                                    embed.set_image(url=usermsg.content)
+                                    await preview.edit(embed=embed)
+                                    await imagebotmsg.delete()
+                                    try:
+                                        await edit.clear_reaction("🇮")
+                                    except discord.Forbidden:
+                                        pass
+                                    break
+                            except:
+                                await ctx.send(embed=discord.Embed(title="Invalid image", description="Send the image file or link again", color=var.C_RED
+                                ).set_footer(text="Make sure your message contains only the image, nothing else")
+                                )
 
                     if str(reaction.emoji) == "🇺":
-                        embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-                        await preview.edit(embed=embed)
-                        try:
-                            await edit.clear_reaction("🇺")
-                        except discord.Forbidden:
-                            pass
+                        while True:
+                            if usermsg.content in ["skip", "`skip`", "```skip```"]:
+                                break   
+                            else:
+                                authorbotmsg = await ctx.send("Now send userID or member mention to set them as the **author** of the embed\n Type `skip` if you dont't want to set this")
+                                usermsg = await self.bot.wait_for("message", check=msgcheck, timeout=30.0)
+                                userid = usermsg.content.strip("!@<>")
+                                try:
+                                    authoruser = await self.bot.fetch_user(userid)
+                                    embed.set_author(name=authoruser, icon_url=authoruser.avatar_url)
+                                    await authorbotmsg.delete()
+                                    try:
+                                        await edit.clear_reaction("🇺")
+                                    except discord.Forbidden:
+                                        pass
+                                    await preview.edit(embed=embed)
+                                    break
+                                except:
+                                    await ctx.send(embed=discord.Embed(title="Invalid user", description="Send the userID or mention again", color=var.C_RED
+                                    ).set_footer(text="Make sure your message contains only the user, nothing else")
+                                    )
+
 
             except asyncio.TimeoutError:
                     try:

@@ -272,6 +272,156 @@ class Moderation(commands.Cog):
             )   
 
 
+    @commands.command(aliases=["giverole"])
+    async def addrole(self, ctx, member:discord.Member=None, role:discord.Role=None):
+        if member and role is not None:
+            try:
+                await member.add_roles(role)
+                await ctx.send(embed=discord.Embed(
+                    description=f"Successfully updated {member.mention} with {role.mention} role",
+                    color=var.C_GREEN
+                    )
+                    )
+            except discord.Forbidden:
+                await ctx.send(embed=discord.Embed(
+                    title="Missing permissions",
+                    description=f"I don't have permissions to update the roles of {member.mention}, either I don't have the permission or the member is above me",
+                    color=var.C_RED
+
+                    ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both member and role",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}giverole <member> <role>```"
+                ).set_footer(text="For both member and role, either ping or ID can be used"
+                ))
+
+    @commands.command()
+    async def removerole(self, ctx, member:discord.Member=None, role:discord.Role=None):
+        if member and role is not None:
+            try:
+                await member.remove_roles(role)
+                await ctx.send(embed=discord.Embed(
+                    description=f"Successfully updated {member.mention} by removing {role.mention} role",
+                    color=var.C_GREEN
+                    )
+                    )
+            except discord.Forbidden:
+                await ctx.send(embed=discord.Embed(
+                    title="Missing permissions",
+                    description=f"I don't have permissions to update the roles of {member.mention}, either I don't have the permission or the member is above me",
+                    color=var.C_RED
+
+                    ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both member and role",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}giverole <member> <role>```"
+                ).set_footer(text="For both member and role, either ping or ID can be used"
+                ))
+
+    @commands.command()
+    async def massrole(self, ctx, role:discord.Role=None, role2:discord.Role=None):
+        if role and role2 is not None:
+            botmsg = await ctx.send(embed=discord.Embed(
+                title="Confirmation",
+                description=f"Are you sure you want to update all members with the role {role.mention} with {role2.mention}?",
+                color=var.C_BLUE
+            ).add_field(name="React to the respective emoji", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
+            )
+            )
+            await botmsg.add_reaction(var.E_ACCEPT)
+            await botmsg.add_reaction(var.E_ENABLE)
+            await botmsg.add_reaction(var.E_DECLINE)
+            def reactioncheck(reaction, user):
+                return user == ctx.author and reaction.message == botmsg
+
+            reaction, member =await self.bot.wait_for("reaction_add", check=reactioncheck)
+            try:
+                await botmsg.clear_reactions()
+            except:
+                pass
+            if str(reaction.emoji) == var.E_DECLINE:
+                await ctx.send("Cancelled mass role update")
+
+            if str(reaction.emoji) == var.E_ENABLE:
+                updates = True
+            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:             
+                for member in ctx.guild.members:
+                    if role in member.roles:
+                        try:
+                            await member.add_roles(role2)
+                            try:
+                                if updates:
+                                    await ctx.send(f"{member} updated")
+                            except UnboundLocalError: #Fuckoff
+                                pass
+                        except discord.Forbidden:
+                            await ctx.send(embed=discord.Embed(
+                                description=f"Error giving role to {member.mention}",
+                                color=var.C_ORANGE
+                            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both Role 1 and Role 2\n`role1` are the members having that role and `role2` is the one to be given to them",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}massrole <role1> <role2>```"
+                ).set_footer(text="For role, either ping or ID can be used"))
+
+
+    @commands.command()
+    async def massroleremove(self, ctx, role:discord.Role=None, role2:discord.Role=None):
+        if role and role2 is not None:
+            botmsg = await ctx.send(embed=discord.Embed(
+                title="Confirmation",
+                description=f"Are you sure you want to update all members with the role {role.mention} by removing {role2.mention}?",
+                color=var.C_BLUE
+            ).add_field(name="React to the respective emoji", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
+            )
+            )
+            await botmsg.add_reaction(var.E_ACCEPT)
+            await botmsg.add_reaction(var.E_ENABLE)
+            await botmsg.add_reaction(var.E_DECLINE)
+            def reactioncheck(reaction, user):
+                return user == ctx.author and reaction.message == botmsg
+
+            reaction, member =await self.bot.wait_for("reaction_add", check=reactioncheck)
+            try:
+                await botmsg.clear_reactions()
+            except:
+                pass
+            if str(reaction.emoji) == var.E_DECLINE:
+                await ctx.send("Cancelled mass role removal")
+
+            if str(reaction.emoji) == var.E_ENABLE:
+                updates = True
+            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:             
+                for member in ctx.guild.members:
+                    if role in member.roles:
+                        try:
+                            await member.remove_roles(role2)
+                            try:
+                                if updates:
+                                    await ctx.send(f"{member} updated")
+                            except UnboundLocalError: #Fuckoff
+                                pass
+                        except discord.Forbidden:
+                            await ctx.send(embed=discord.Embed(
+                                description=f"Error removing role from {member.mention}",
+                                color=var.C_ORANGE
+                            ))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both Role 1 and Role 2\n`role1` are the members having that role and `role2` is the one to be removed from them",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}massroleremove <role1> <role2>```"
+                ).set_footer(text="For role, either ping or ID can be used"))
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

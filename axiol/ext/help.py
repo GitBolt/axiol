@@ -73,21 +73,26 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def permshelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Permissions", description="Setup permissions for commands so that users having a particular role would be able to use it!", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Set permissions of a command from the particular plugin@", inline=False
-    ).add_field(name=getprefix(ctx)+"removeperm `<command>` `<role>`", value="Remove any role from a command permission!", inline=False
-    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+
+def settingshelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"plugins",value="Manage your plugins", inline=False
+    ).add_field(name=getprefix(ctx)+"prefix", value="View or change my prefix", inline=False
+    ).add_field(name=getprefix(ctx)+"permissions",value="Change the permissions for commands", inline=False)
     return embed
 
 
 def extrahelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="Extras", description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
+    embed = discord.Embed(title="▶️ Extras", 
+    description="[Vote](https://top.gg/bot/843484459113775114) "+
+    "[Invite](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot) "+
+    "[Support Server](https://discord.gg/hxc73psNsB) \n"+
+    "Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
     ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Get avatar of any user! Either the user ID or mention can be used", inline=False
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics!", inline=False
-    ).add_field(name=getprefix(ctx)+"about", value="Information about me :sunglasses:", inline=False
-    ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be sent in the official [Axiol Support Server](https://discord.gg/KTn4TgwkUT)!", inline=False
+    ).add_field(name=getprefix(ctx)+"about", value="Some information about me", inline=False
+    ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Suggest an idea which will be directly sent in the official support server!", inline=False
     ).add_field(name=getprefix(ctx)+"invite",value="My bot invite link!", inline=False
     ).add_field(name=getprefix(ctx)+"source", value="Link to my Github repository since I am open source :D", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
@@ -105,10 +110,8 @@ class Help(commands.Cog):
 
         embed = discord.Embed(
         title="Axiol Help",
-        description=f"Help commands for the plugins which are enabled!",
+        description=f"Help subcommands for all **enabled plugins**",
         color=var.C_MAIN
-        ).add_field(name=getprefix(ctx)+"prefix", value="Change prefix", inline=False
-        ).add_field(name=getprefix(ctx)+"help permissions", value="Manage command permissions", inline=False
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
 
@@ -120,14 +123,14 @@ class Help(commands.Cog):
                 embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{var.DICT_PLUGINEMOJIS.get(i)} {i} Help", inline=False)
 
         embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"▶️ Non plugin commands", inline=False)
-        embed.add_field(name=f"{getprefix(ctx)}plugins", value=f"{var.E_PLUGINS} Configure plugins", inline=False)
+        embed.add_field(name=f"{getprefix(ctx)}help settings", value=f"{var.E_SETTINGS} Configure settings", inline=False)
         helpmsg = await ctx.send(embed=embed)
 
         for i in GuildDoc:
             if GuildDoc.get(i) == True:
                 await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
         await helpmsg.add_reaction("▶️")
-        await helpmsg.add_reaction(var.E_PLUGINS)
+        await helpmsg.add_reaction(var.E_SETTINGS)
         
         def check(reaction, user):
             return user == ctx.author and reaction.message == helpmsg
@@ -161,22 +164,22 @@ class Help(commands.Cog):
                         await helpmsg.remove_reaction("▶️", ctx.author)
                     except discord.Forbidden:
                         pass
-                if str(reaction.emoji) == var.E_PLUGINS:
+                if str(reaction.emoji) == var.E_SETTINGS:
+                    await helpmsg.edit(embed=settingshelp(ctx))
                     try:
-                        await helpmsg.clear_reactions()
+                        await helpmsg.remove_reaction(var.E_SETTINGS, ctx.author)
                     except discord.Forbidden:
                         pass
-                    await ctx.invoke(self.bot.get_command('plugins'))
 
         except asyncio.TimeoutError:
             try:
                 await helpmsg.clear_reactions()
             except discord.Forbidden:
-                await helpmsg.remove_reaction(var.E_PLUGINS, self.bot.user)
+                await helpmsg.remove_reaction(var.E_SETTINGS, self.bot.user)
                 for i in GuildDoc:
                     if GuildDoc.get(i) == True:
                         await helpmsg.remove_reaction(var.DICT_PLUGINEMOJIS.get(i), self.bot.user)
-                await helpmsg.remove_reaction(var.E_CONTINUE, self.bot.user)
+                await helpmsg.remove_reaction("▶️", self.bot.user)
 
 
            
@@ -251,8 +254,8 @@ class Help(commands.Cog):
         await ctx.send(embed=extrahelp(ctx))
     
     @help.command()
-    async def permissions(self, ctx):
-        await ctx.send(embed=permshelp(ctx))
+    async def settings(self, ctx):
+        await ctx.send(embed=settingshelp(ctx))
 
 
     @commands.command()

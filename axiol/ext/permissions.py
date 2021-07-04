@@ -28,6 +28,16 @@ class Permissions(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+
+    @commands.command()
+    async def permissions(self, ctx):
+        embed = discord.Embed(title=f"{var.E_PERMISSIONS} Command role permissions", color=var.C_MAIN)
+        GuildDoc = db.PERMISSIONS.find_one({"_id":ctx.guild.id}, {"_id":0})
+        for i in GuildDoc:
+            embed.add_field(name=i, value=GuildDoc[i], inline=False)
+        await ctx.send(embed=embed)
+
+
     @commands.command(aliases=["setpermission", "allowpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):

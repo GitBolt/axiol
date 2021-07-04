@@ -237,9 +237,12 @@ class Commands(commands.Cog):
                         fieldbotmsg = await ctx.send("Send a message and seperate your **Field name and value** with `|`\nFor example: This is my field name | This is the field value!")
                         usermsg = await self.bot.wait_for('message', check=msgcheck, timeout=120.0)
                         fieldlist = usermsg.content.split("|")
-                        embed.add_field(name=fieldlist[0], value=fieldlist[1], inline=False)
-                        await preview.edit(embed=embed)
-                        await fieldbotmsg.delete()
+                        if len(fieldlist) != 2:
+                            await ctx.send("Invalid format, make sure to add `|` between your field name and value")
+                        else:
+                            embed.add_field(name=fieldlist[0], value=fieldlist[1], inline=False)
+                            await preview.edit(embed=embed)
+                            await fieldbotmsg.delete()
                         try:
                             await edit.remove_reaction("🇦", ctx.author)
                         except discord.Forbidden:

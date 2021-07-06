@@ -31,7 +31,7 @@ class Permissions(commands.Cog):
 
     @commands.command()
     async def permissions(self, ctx):
-        embed = discord.Embed(title=f"{var.E_PERMISSIONS} Command role permissions", color=var.C_MAIN)
+        embed = discord.Embed(title=f"Command role permissions", color=var.C_MAIN)
         GuildDoc = db.PERMISSIONS.find_one({"_id":ctx.guild.id}, {"_id":0})
         for i in GuildDoc:
             embed.add_field(name=i, value=GuildDoc[i], inline=False)

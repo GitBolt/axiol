@@ -77,6 +77,14 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
+def automodhelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title=f"{var.E_AUTOMOD} Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
+    ).add_field(name=getprefix(ctx)+"filters", value="Shows all avaiable Auto-Moderation", inline=False
+    ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
+    ).add_field(name=getprefix(ctx)+"automodwhitelist", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
+    ).add_field(name=getprefix(ctx)+"ignorebot", value="Toggles between whether bots should be affect or not", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
 
 def settingshelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
@@ -114,7 +122,7 @@ class Help(commands.Cog):
 
         embed = discord.Embed(
         title="Axiol Help",
-        description=f"Help subcommands for all **enabled plugins**\n For all users, members, roles and channels either their ID or ping can be used.",
+        description=f"Help subcommands for all **enabled plugins**\n For all users, members, roles and channels either their ID or mention can be used.",
         color=var.C_MAIN
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
@@ -147,6 +155,8 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
+            "AutoModeration": automodhelp
+            
         }
 
         try:
@@ -250,6 +260,17 @@ class Help(commands.Cog):
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Chatbot plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def automoderation(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("AutoModeration") == True:
+            await ctx.send(embed=automodhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Auto-Moderation plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
 

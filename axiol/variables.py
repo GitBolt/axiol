@@ -20,7 +20,7 @@ E_ENABLE = "<:Enable:847850083819323442>"
 E_DISABLE = "<:Disable:847850081700020254>"
 E_SETTINGS = "<:Settings:860554043284914218>"
 E_PLUGINS = "<:Plugins:860556457615294474>"
-E_PERMISSIONS = "<:Permissions:860554045088595991>"
+E_AUTOMOD = "<:AutoModeration:862001781595963394>"
 E_CONTINUE = "<:Continue:847850081587167234>"
 #Extra Emoji
 E_LOADING = "<a:Loading:854065859667165235>"
@@ -43,4 +43,5 @@ DICT_PLUGINEMOJIS = {
     "Welcome": "👋",
     "Verification": "✅",
     "Chatbot": "🤖",
+    "AutoModeration": E_AUTOMOD
 }

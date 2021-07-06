@@ -78,7 +78,7 @@ class Settings(commands.Cog):
                     db.PLUGINS.update_one(GuildDoc, newdata)
 
                     embed.title=f"{plugin_type} disabled"
-                    embed.description=f"{var.E_DISABLE} {plugin_type} extension has been disabled"
+                    embed.description=f"{var.E_DISABLE} {plugin_type} plugin has been disabled"
                     embed.color=var.C_RED
                     await enabledbotmsg.edit(embed=embed)
                     try:
@@ -128,7 +128,29 @@ class Settings(commands.Cog):
                             "alerts": True,
                             "rewards": {}
                             })   
-                                    
+
+                    if str(reaction.emoji) == var.E_AUTOMOD and db.AUTOMODERATION.find_one({"_id":ctx.guild.id}) is None:
+                        db.AUTOMODERATION.insert_one({
+                            "_id": ctx.guild.id,
+                            "BadWords":{
+                                "status": True,
+                                "words": [],
+                                "response": "You aren't allowed to say that"
+                            },
+                            "Invites": {
+                                "status": True,
+                                "response": "You can't send invites here"
+                            },
+                            "Links": {
+                                "status": True,
+                                "response": "You can't send invites here"
+                            },
+                            "Mentions": {
+                                "status": False,
+                                "response": "You can't mention so many people"
+                            },
+                            "IgnoreBots": False
+                        })         
             except asyncio.TimeoutError:
                 try:
                     await botmsg.clear_reactions()

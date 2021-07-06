@@ -56,6 +56,7 @@ async def on_guild_join(guild):
             "Welcome": False,
             "Verification": False,
             "Chatbot": True,
+            "AutoModeration": False
         })
 
     #Inserting plugin configs if it does not exist (incase of re-inviting)

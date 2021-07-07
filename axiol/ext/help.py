@@ -81,7 +81,7 @@ def automodhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="🛡️ Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"filters", value="Shows all available Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
-    ).add_field(name=getprefix(ctx)+"automodwhitelist", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
+    ).add_field(name=getprefix(ctx)+"automodwhitelist `<#channel>`", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
     ).add_field(name=getprefix(ctx)+"addmodrole", value="Adds a mod role, members with this role are immune to all Auto-Moderation actions", inline=False
     ).add_field(name=getprefix(ctx)+"removemodrole", value="Removes any existing mod role which would make the role affected by Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"allmodroles", value="Shows all mod roles which are immune to Auto-Moderation", inline=False

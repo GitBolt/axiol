@@ -222,9 +222,11 @@ class AutoMod(commands.Cog):
             for i in GuildDoc["Settings"]["modroles"]:
                 role = ctx.guild.get_role(i)
                 value += f'{role.mention} '
-
-            embed.add_field(name="Immune roles", value=value)
-            await ctx.send(embed=embed)
+            if value != "":
+                embed.add_field(name="Immune roles", value=value)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("There are no mod roles yet")
         else:
             await ctx.send("Auto moderation is not setted up yet")
 
@@ -279,6 +281,23 @@ class AutoMod(commands.Cog):
             ).add_field(name="Format", value=f"```{getprefix(ctx)}automodblacklist <#channel>```")
             )
 
+    @commands.command()
+    async def allautomodwhitelists(self, ctx):
+        GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+        if GuildDoc is not None:
+            embed = discord.Embed(title="All Auto-Moderation whitelists", description="Messages in these channel are immune from automod", color=var.C_MAIN)
+            desc = ""
+            for i in GuildDoc["Settings"]["blacklists"]:
+                desc += f"{i.mention} "
+
+            if desc != "":
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("There are no blacklisted channels right now")
+        else:
+            await ctx.send("This server does not have automod setted up right now")
+
+            
     @commands.command()
     @has_command_permission()
     async def ignorebots(self, ctx):
@@ -407,11 +426,14 @@ class AutoMod(commands.Cog):
             allbannedwords = ""
             for i in GuildDoc["BadWords"]["words"]:
                 allbannedwords += f"`{i}` "
-
-            embed.add_field(name="All bad words", value=allbannedwords)
-            await ctx.send(embed=embed)
+            
+            if allbannedwords == "":
+                await ctx.send("This server does not have any bad word right now.")
+            else:
+                embed.add_field(name="All bad words", value=allbannedwords)
+                await ctx.send(embed=embed)
         else:
-            await ctx.send("This server does not have any bad word right now.")
+            await ctx.send("This server does not have automod setted up")
 
 
     @commands.Cog.listener()

@@ -158,6 +158,71 @@ class AutoMod(commands.Cog):
 
 
     @commands.command()
+    async def addmodrole(self, ctx, role:discord.Role=None):
+        if role is not None:
+            GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+            currentlist = GuildDoc["Settings"]["modroles"]
+            newlist = currentlist.copy()
+            if role.id not in currentlist:
+                newlist.append(role.id)
+                db.AUTOMOD.update_one(GuildDoc, {"$set":{"Settings.modroles": newlist}})
+                await ctx.send(embed=discord.Embed(
+                    title="Successfully added mod role",
+                    description=f"{role.mention} is immune from auto moderation now!",
+                    color=var.C_GREEN
+                ))
+            else:
+                await ctx.send("This role is already a mod role")
+        else:
+            await ctx.send(embed=discord.Embed(
+                title="Not enough arguments",
+                description="You need to define the role too!",
+                color=var.C_RED
+            ).add_field(name="Format", value=f"```{getprefix(ctx)}addmodrole <role>```")
+            )
+
+    @commands.command()
+    async def removemodrole(self, ctx, role:discord.Role=None):
+        if role is not None:
+            GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+            currentlist = GuildDoc["Settings"]["modroles"]
+            newlist = currentlist.copy()
+            if role.id in currentlist:
+                newlist.remove(role.id)
+                db.AUTOMOD.update_one(GuildDoc, {"$set":{"Settings.modroles": newlist}})
+                await ctx.send(embed=discord.Embed(
+                    title="Successfully removed mod role",
+                    description=f"{role.mention} is not immune from auto moderation now!",
+                    color=var.C_GREEN
+                ))
+            else:
+                await ctx.send("This role is not a mod role")
+        else:
+            await ctx.send(embed=discord.Embed(
+                title="Not enough arguments",
+                description="You need to define the role too!",
+                color=var.C_RED
+            ).add_field(name="Format", value=f"```{getprefix(ctx)}addmodrole <role>```")
+            )
+
+
+    @commands.command()
+    async def allmodroles(self, ctx):
+        GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+        if GuildDoc is not None:
+            embed = discord.Embed(title="Moderator roles", description="These roles are immune to auto-moderation by me!", color=var.C_MAIN)
+            value = ""
+            for i in GuildDoc["Settings"]["modroles"]:
+                role = ctx.guild.get_role(i)
+                value += f'{role.mention} '
+
+            embed.add_field(name="Immune roles", value=value)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send("Auto moderation is not setted up yet")
+
+
+    @commands.command()
     async def automodblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
@@ -327,7 +392,8 @@ class AutoMod(commands.Cog):
             embed = discord.Embed(title="Bad Words", description="All other forms of each bad words are also deleted", color=var.C_TEAL)
             allbannedwords = ""
             for i in GuildDoc["BadWords"]["words"]:
-                allbannedwords += f"{i}, "
+                allbannedwords += f"`{i}` "
+
             embed.add_field(name="All bad words", value=allbannedwords)
             await ctx.send(embed=embed)
         else:
@@ -338,7 +404,9 @@ class AutoMod(commands.Cog):
     async def on_message(self, message):
         GuildDoc = db.AUTOMOD.find_one({'_id': message.guild.id})
 
-        if GuildDoc is not None and message.author != self.bot.user and message.channel.id not in GuildDoc["Settings"]["blacklists"]:
+        if (GuildDoc is not None and message.author != self.bot.user 
+        and message.channel.id not in GuildDoc["Settings"]["blacklists"]
+        and not any(item in GuildDoc["Settings"]["modroles"] for item in [i.id for i in message.author.roles])):
             if not message.author.bot or message.author.bot and GuildDoc["Settings"]["ignorebots"]:
 
                 if GuildDoc["Links"]["status"]:

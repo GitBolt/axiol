@@ -152,7 +152,6 @@ class Settings(commands.Cog):
                             "Settings": {
                                 "ignorebots": False,
                                 "blacklists": [],
-                                "whitelists": []
                             }
                         })         
             except asyncio.TimeoutError:

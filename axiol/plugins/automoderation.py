@@ -1,6 +1,7 @@
 import re
 import discord
 from discord.ext import commands
+from discord.guild import Guild
 import database as db
 import variables as var
 from functions import getprefix
@@ -159,7 +160,43 @@ class AutoMod(commands.Cog):
     @commands.command()
     async def automodblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            pass
+            GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+            if GuildDoc is not None and channel.id not in GuildDoc["Settings"]["blacklists"]:
+                currentlist = GuildDoc["Settings"]["blacklists"]
+                newlist = currentlist.copy()
+                newlist.append(channel.id)
+                db.AUTOMOD.update_one(GuildDoc, {"$set":{"Settings.blacklists": newlist}})
+                await ctx.send(embed=discord.Embed(
+                    title="Successfully blacklisted",
+                    description=f"{channel.mention} is immune from auto moderation now!",
+                    color=var.C_GREEN
+                ))
+            else:
+                await ctx.send("This channel is already blacklisted")
+        else:
+            await ctx.send(embed=discord.Embed(
+                title="Not enough arguments",
+                description="You need to define the channel too!",
+                color=var.C_RED
+            ).add_field(name="Format", value=f"```{getprefix(ctx)}automodblacklist <#channel>```")
+            )
+
+    @commands.command()
+    async def automodwhitelist(self, ctx, channel:discord.TextChannel=None):
+        if channel is not None:
+            GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
+            if GuildDoc is not None and channel.id in GuildDoc["Settings"]["blacklists"]:
+                currentlist = GuildDoc["Settings"]["blacklists"]
+                newlist = currentlist.copy()
+                newlist.remove(channel.id)
+                db.AUTOMOD.update_one(GuildDoc, {"$set":{"Settings.blacklists": newlist}})
+                await ctx.send(embed=discord.Embed(
+                    title="Successfully whitelisted",
+                    description=f"{channel.mention} is whitelisted hence affected with auto moderation now!",
+                    color=var.C_GREEN
+                ))
+            else:
+                await ctx.send("This channel is not blacklisted hence can't whitelist either")
         else:
             await ctx.send(embed=discord.Embed(
                 title="Not enough arguments",
@@ -303,7 +340,7 @@ class AutoMod(commands.Cog):
 
         if GuildDoc is not None and message.author != self.bot.user and message.channel.id not in GuildDoc["Settings"]["blacklists"]:
             if not message.author.bot or message.author.bot and GuildDoc["Settings"]["ignorebots"]:
-                
+
                 if GuildDoc["Links"]["status"]:
                     regex = re.compile(
                             r'^(?:http|ftp)s?://' # http:// or https://

@@ -79,10 +79,10 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
 
 def automodhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"{var.E_AUTOMOD} Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
-    ).add_field(name=getprefix(ctx)+"filters", value="Shows all avaiable Auto-Moderation", inline=False
+    ).add_field(name=getprefix(ctx)+"filters", value="Shows all available Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
     ).add_field(name=getprefix(ctx)+"automodwhitelist", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
-    ).add_field(name=getprefix(ctx)+"ignorebot", value="Toggles between whether bots should be affect or not", inline=False
+    ).add_field(name=getprefix(ctx)+"ignorebots", value="Toggles between whether bots should be affect or not", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
@@ -155,7 +155,7 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            "AutoModeration": automodhelp
+            "AutoMod": automodhelp
             
         }
 
@@ -264,9 +264,9 @@ class Help(commands.Cog):
             ))
 
     @help.command()
-    async def automoderation(self, ctx):
+    async def automod(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("AutoModeration") == True:
+        if GuildDoc.get("AutoMod") == True:
             await ctx.send(embed=automodhelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(

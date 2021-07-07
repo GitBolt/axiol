@@ -134,20 +134,20 @@ class Settings(commands.Cog):
                             "_id": ctx.guild.id,
                             "BadWords":{
                                 "status": True,
-                                "words": [],
-                                "response": "You aren't allowed to say that"
+                                "words": ["fuck", "bitch", "porn", "slut", "asshole"],
+                                "response": "You aren't allowed to say that!"
                             },
                             "Invites": {
                                 "status": True,
-                                "response": "You can't send invites here"
+                                "response": "You can't send invites here!"
                             },
                             "Links": {
                                 "status": True,
-                                "response": "You can't send invites here"
+                                "response": "You can't send send here!"
                             },
                             "Mentions": {
                                 "status": False,
-                                "response": "You can't mention so many people"
+                                "response": "You can't mention so many people!"
                             },
                             "Settings": {
                                 "ignorebots": False,

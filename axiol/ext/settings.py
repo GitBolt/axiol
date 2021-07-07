@@ -129,7 +129,7 @@ class Settings(commands.Cog):
                             "rewards": {}
                             })   
 
-                    if str(reaction.emoji) == var.E_AUTOMOD and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
+                    if str(reaction.emoji) =="🛡️" and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
                         db.AUTOMOD.insert_one({
                             "_id": ctx.guild.id,
                             "BadWords":{

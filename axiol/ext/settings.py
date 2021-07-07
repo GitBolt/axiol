@@ -129,8 +129,8 @@ class Settings(commands.Cog):
                             "rewards": {}
                             })   
 
-                    if str(reaction.emoji) == var.E_AUTOMOD and db.AUTOMODERATION.find_one({"_id":ctx.guild.id}) is None:
-                        db.AUTOMODERATION.insert_one({
+                    if str(reaction.emoji) == var.E_AUTOMOD and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
+                        db.AUTOMOD.insert_one({
                             "_id": ctx.guild.id,
                             "BadWords":{
                                 "status": True,
@@ -149,7 +149,11 @@ class Settings(commands.Cog):
                                 "status": False,
                                 "response": "You can't mention so many people"
                             },
-                            "IgnoreBots": False
+                            "Settings": {
+                                "ignorebots": False,
+                                "blacklists": [],
+                                "modroles": []
+                            }
                         })         
             except asyncio.TimeoutError:
                 try:

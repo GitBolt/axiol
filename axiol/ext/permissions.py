@@ -41,7 +41,7 @@ class Permissions(commands.Cog):
     @commands.command(aliases=["setpermission", "allowpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
-        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands']
+        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands', 'AutoMod']
 
         if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
             embed = discord.Embed(
@@ -51,6 +51,8 @@ class Permissions(commands.Cog):
 
             if plugin.lower() == "reactionroles":
                 plugin_name = "ReactionRoles"
+            if plugin.lower() == "automod":
+                plugin_name = "AutoMod"
             else:
                 plugin_name = plugin.capitalize()
 

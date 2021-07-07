@@ -6,6 +6,7 @@ import database as db
 from functions import getprefix, leaderboardpagination, getxprange
 from ext.permissions import has_command_permission
 
+
 class Leveling(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -20,7 +21,6 @@ class Leveling(commands.Cog):
                 description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
-
 
 
     @commands.command()
@@ -209,7 +209,7 @@ class Leveling(commands.Cog):
             if str(reaction.emoji) == var.E_CONTINUE:
                 return user == ctx.author and reaction.message == botmsg
 
-        reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+        await self.bot.wait_for("reaction_add", check=reactioncheck)
         try:
             await botmsg.clear_reactions()
         except:
@@ -256,7 +256,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the member and the amount to give them xp",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}givexp <user> <amount>`"
+            ).add_field(name="Format", value=f"```{getprefix(ctx)}givexp <user> <amount>```"
             ).set_footer(text="For user either user mention or user ID can be used")
             )
 

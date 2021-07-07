@@ -1,11 +1,10 @@
 import re
 import discord
 from discord.ext import commands
-from discord.guild import Guild
 import database as db
 import variables as var
 from functions import getprefix
-
+from ext.permissions import has_command_permission
 
 
 async def manage_filter(self, filtername, embed, GuildDoc, ctx): 
@@ -113,6 +112,7 @@ class AutoMod(commands.Cog):
 
 
     @commands.group(pass_context=True, invoke_without_command=True, aliases=["filter"])
+    @has_command_permission()
     async def filters(self ,ctx):
         embed = discord.Embed(title="All Auto-Moderation filters", description="Use the subcommand to configure each filter seperately!", color=var.C_MAIN)
         embed.set_footer(text="The emoji before filter name is their status whether they are enabled or disabled")
@@ -125,6 +125,7 @@ class AutoMod(commands.Cog):
 
             
     @filters.command()
+    @has_command_permission()
     async def invites(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id}, {"_id":0})
         embed = discord.Embed(
@@ -133,6 +134,7 @@ class AutoMod(commands.Cog):
         await manage_filter(self, "Invites", embed, GuildDoc, ctx)
 
     @filters.command()
+    @has_command_permission()
     async def links(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id}, {"_id":0})
         embed = discord.Embed(
@@ -141,6 +143,7 @@ class AutoMod(commands.Cog):
         await manage_filter(self, "Links", embed, GuildDoc, ctx)
 
     @filters.command()
+    @has_command_permission()
     async def badwords(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id}, {"_id":0})
         embed = discord.Embed(
@@ -149,6 +152,7 @@ class AutoMod(commands.Cog):
         await manage_filter(self, "BadWords", embed, GuildDoc, ctx)
 
     @filters.command()
+    @has_command_permission()
     async def mentions(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id}, {"_id":0})
         embed = discord.Embed(
@@ -158,6 +162,7 @@ class AutoMod(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def addmodrole(self, ctx, role:discord.Role=None):
         if role is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
@@ -182,6 +187,7 @@ class AutoMod(commands.Cog):
             )
 
     @commands.command()
+    @has_command_permission()
     async def removemodrole(self, ctx, role:discord.Role=None):
         if role is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
@@ -207,6 +213,7 @@ class AutoMod(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def allmodroles(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
         if GuildDoc is not None:
@@ -223,6 +230,7 @@ class AutoMod(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def automodblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
@@ -247,6 +255,7 @@ class AutoMod(commands.Cog):
             )
 
     @commands.command()
+    @has_command_permission()
     async def automodwhitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
@@ -271,6 +280,7 @@ class AutoMod(commands.Cog):
             )
 
     @commands.command()
+    @has_command_permission()
     async def ignorebots(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
         ignored = GuildDoc["Settings"]["ignorebots"]
@@ -316,6 +326,7 @@ class AutoMod(commands.Cog):
                 pass
 
     @commands.command()
+    @has_command_permission()
     async def mentionamount(self, ctx, amount:int=None):
         if amount is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id})
@@ -333,6 +344,7 @@ class AutoMod(commands.Cog):
             )
 
     @commands.command()
+    @has_command_permission()
     async def addbadword(self, ctx, word:str=None):
         if word is not None:
 
@@ -360,6 +372,7 @@ class AutoMod(commands.Cog):
             )
     
     @commands.command()
+    @has_command_permission()
     async def removebadword(self, ctx, word:str=None):
         if word is not None:
             GuildDoc = db.AUTOMOD.find_one({"_id":ctx.guild.id})
@@ -386,6 +399,7 @@ class AutoMod(commands.Cog):
             )
 
     @commands.command()
+    @has_command_permission()
     async def allbadwords(self, ctx):
         GuildDoc = db.AUTOMOD.find_one({"_id": ctx.guild.id})
         if GuildDoc is not None:

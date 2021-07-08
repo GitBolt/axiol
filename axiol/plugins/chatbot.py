@@ -128,7 +128,7 @@ class Chatbot(commands.Cog):
             or message.channel.id in channels() and message.author.bot == False):
                 ctx = await self.bot.get_context(message)
 
-                res = requests.post(f"http://localhost:8000/ai/chatbot?content={message.content}").json()
+                res = requests.post(f"https://axiol.up.railway.app/ai/chatbot?content={message.content}").json()
                 print(res)
                 if res["response"] == "help":
                     await ctx.invoke(self.bot.get_command('help'))

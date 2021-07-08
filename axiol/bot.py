@@ -17,6 +17,9 @@ bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=int
 
 @bot.event
 async def on_ready():
+    for i in bot.guilds:
+        if i.id == 807140294276415510:
+            print(i)
     await bot.change_presence(activity=discord.Activity(
                             type=discord.ActivityType.streaming,
                             name=f"Get started with {var.DEFAULT_PREFIX}help"

@@ -1,22 +1,10 @@
-import json
-import torch
-import random
 import discord
+import requests
 from discord.ext import commands
 import database as db
 import variables as var
 from functions import getprefix
-from chatbot.model import NeuralNet
-from chatbot.utils import bag_of_words, tokenize
 from ext.permissions import has_command_permission
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-def sendresponse(ctx, tag, responselist):
-    choice = random.choice(responselist)
-    if tag == "prefix":
-        choice = choice.replace("~", getprefix(ctx))
-    return choice
 
 
 class Chatbot(commands.Cog):
@@ -138,65 +126,18 @@ class Chatbot(commands.Cog):
 
             if (self.bot.user in message.mentions and message.author.bot == False
             or message.channel.id in channels() and message.author.bot == False):
+                ctx = await self.bot.get_context(message)
 
-                with open('chatbot/intents.json', 'r') as json_data:
-                    intents = json.load(json_data)
+                res = requests.post(f"http://localhost:8000/ai/chatbot?content={message.content}").json()
+                print(res)
+                if res["response"] == "help":
+                    await ctx.invoke(self.bot.get_command('help'))
 
-                FILE = "chatbot/data.pth"
-                data = torch.load(FILE, map_location='cpu')
-
-                input_size = data["input_size"]
-                hidden_size = data["hidden_size"]
-                output_size = data["output_size"]
-                all_words = data['all_words']
-                tags = data['tags']
-                model_state = data["model_state"]
-
-                model = NeuralNet(input_size, hidden_size, output_size).to(device)
-                model.load_state_dict(model_state)
-                model.eval()
-
-                sentence = message.content.strip(f"<@!{843484459113775114}>") #Removing the bot ping
-                sentence = tokenize(sentence)
-                X = bag_of_words(sentence, all_words)
-                X = X.reshape(1, X.shape[0])
-                X = torch.from_numpy(X).to(device)
-
-                output = model(X)
-                _, predicted = torch.max(output, dim=1)
-
-                tag = tags[predicted.item()]
-                probs = torch.softmax(output, dim=1)
-                prob = probs[0][predicted.item()]
-                if prob.item() > 0.85:
-                    for intent in intents['intents']:
-                        if tag == intent["tag"]:
-                            response = sendresponse(message, tag, intent["responses"])
-
-                            if response == "help":
-                                ctx = await self.bot.get_context(message)
-                                await ctx.invoke(self.bot.get_command('help'))
-                            else:
-                                await message.channel.send(response)
+                elif res["tag"] == "prefix":
+                    await message.channel.send(res["response"].replace("~", getprefix(ctx)))
 
                 else:
-                    #Logging this to improve
-                    ch = self.bot.get_channel(843516136540864512)
-                    msg = await ch.send(embed=discord.Embed(description={message.content},color=var.C_MAIN))
-                    await msg.pin()
-
-                    await message.channel.send(random.choice([
-                        "What?",
-                        "Sorry what?",
-                        "?",
-                        "Didn't understand",
-                        "Huh",
-                        ":face_with_raised_eyebrow:",
-                        "what",
-                        "Can you say that differently?",
-                        "Hmm?"
-                    ]))
-
+                    await message.channel.send(res["response"])
 
 
 

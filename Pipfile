@@ -7,10 +7,8 @@ name = "pypi"
 "discord.py" = "*"
 pymongo = "*"
 dnspython = "*"
-youtube-dl = "*"
-pynacl = "*"
-nltk = "*"
-torch = "*"
+youtube_dl = "*"
+PyNaCl = "*"
 requests = "*"
 
 [dev-packages]

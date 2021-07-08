@@ -8,8 +8,8 @@ class BarGraph(commands.Cog):
     def __init__(self, bot):
         self.bot=bot
 
-    @commands.command(aliases=["rankchart", "levelgraph", "levelchart"])
-    async def rankgraph(self, ctx, limit:int=10):
+    @commands.command(aliases=["barchart", "rankbarchart", "rankbargraph"])
+    async def bargraph(self, ctx, limit:int=10):
         if limit > 30:
             await ctx.send(embed=discord.Embed(
                         description="🚫 You cannot view more than 30 users in a bar graph, that's way to much haha",

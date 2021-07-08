@@ -10,7 +10,8 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"{var.E_LEVELING}  Leveling", description="Ah yes leveling, MEE6 who?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user! User field is optional for checking rank of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows the server leaderboard", inline=False
-    ).add_field(name=getprefix(ctx)+"rankgraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default and max amount is 30", inline=False
+    ).add_field(name=getprefix(ctx)+"bargraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default and max amount is 30", inline=False
+    ).add_field(name=getprefix(ctx)+"piechart", value="Shows a Pie chart of top 10 users!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP", inline=False
     ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings", inline=False

@@ -1,3 +1,4 @@
+import json
 import discord
 import requests
 from discord.ext import commands
@@ -129,7 +130,7 @@ class Chatbot(commands.Cog):
                 ctx = await self.bot.get_context(message)
                 
                 content = message.content.replace("<@!843484459113775114>", "")
-                res = requests.post(f"https://axiol.up.railway.app/ai/chatbot?content={content}").json()
+                res = requests.post(f"http://localhost:8000/ai/chatbot", json={"content": content}).json()
                 if res["response"] == "help":
                     await ctx.invoke(self.bot.get_command('help'))
 

@@ -71,9 +71,10 @@ class Commands(commands.Cog):
         color=var.C_MAIN
         ).add_field(name="Server Count", value=guildcount, inline=False
         ).add_field(name="Members", value=membercount, inline=False
-        ).add_field(name="Ping", value=ping, inline=False
         ).add_field(name="Made by", value="Bolt#8905", inline=False
-        ).set_footer(text="I was born on 16 May, 2021"
+        ).add_field(name="Creation date", value="16 May, 2021", inline=False
+        ).set_footer(text=f"Ping: {ping}"
+
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
         )
         await ctx.send(embed=embed)

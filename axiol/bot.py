@@ -71,6 +71,7 @@ async def on_guild_join(guild):
             "Verification": {},
             "Chatbot": {},
             "Commands": {},
+            "AutoMod": {}
         })
 
     #Support server Log

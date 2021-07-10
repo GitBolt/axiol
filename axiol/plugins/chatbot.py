@@ -131,6 +131,7 @@ class Chatbot(commands.Cog):
                 
                 content = message.content.replace("<@!843484459113775114>", "")
                 res = requests.post(f"http://axiol.up.railway.app/ai/chatbot", json={"content": content}).json()
+                
                 if res["response"] == "help":
                     await ctx.invoke(self.bot.get_command('help'))
 

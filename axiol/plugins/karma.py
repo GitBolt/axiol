@@ -78,8 +78,9 @@ class Karma(commands.Cog):
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                 
-            }).sort("xp", -1))
+            }).sort("karma", -1))
 
+        print(karmas)
         if len(karmas) < 10:
             exactpages = 1
         else:
@@ -132,7 +133,7 @@ class Karma(commands.Cog):
 
                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                     
-                }).sort("xp", -1))
+                }).sort("karma", -1))
 
             rankcount = (current_page)*10
             user_amount = current_page*10

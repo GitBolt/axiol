@@ -45,11 +45,11 @@ class Karma(commands.Cog):
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                 
             }).sort("karma", -1))
-        position = karmas.index(userdata) + 1 #Index starts with one
 
         if userdata is None:
                 await ctx.send("This user does not have any karma yet...")
         else:
+            position = karmas.index(userdata) + 1 #Index starts with one
             embed = discord.Embed(
             title=f"Karma for {user.name}",
             color=var.C_MAIN
@@ -57,6 +57,16 @@ class Karma(commands.Cog):
             ).add_field(name="Position", value=f"{position}/{len(karmas)}", inline=False
             ).set_thumbnail(url=user.avatar_url
             )
+            totalkarma = 0
+            for i in karmas:
+                totalkarma += i["karma"]
+            average = totalkarma/len(karmas)
+            if userdata["karma"] > average:
+                embed.description=f"Your karma is better than the average {user.name}! :)"
+            if userdata["karma"] < average:
+                embed.description = f"Your karma is lower than the average {user.name}, is it because you don't talk much or you are not nice enough? :eyes:"
+            if position == 1:
+                embed.description = f"Woohoo {user.name}, you are the nicest person in the server!"
             await ctx.channel.send(embed=embed)
 
 
@@ -79,9 +89,14 @@ class Karma(commands.Cog):
         else:
             all_pages = exactpages
 
+        totalkarma = 0
+        for i in karmas:
+            totalkarma += i["karma"]
+        average = totalkarma/len(karmas)
+
         embed = discord.Embed(
-        title=f"Karma Leaderboard", 
-        description="◀️ First page\n⬅️ Previous page\n➡️ Next page\n▶️ Last page\n",
+        title=f"Karma Board", 
+        description=f"The average karma in this server is **{average}**",
         color=var.C_BLUE
         ).set_thumbnail(url=ctx.guild.icon_url
         )

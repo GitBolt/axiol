@@ -63,8 +63,6 @@ class Leveling(commands.Cog):
             ).add_field(name="Progress", value=boxes * "<:current:850041599139905586>" +(20-boxes) * "<:left:850041599127584776>", inline=False
             ).set_thumbnail(url=user.avatar_url
             )
-            if db.LEVELDATABASE[str(ctx.guild.id)].find_one({"_id":0}).get("status") == False:
-                embed.set_footer(text="Leveling for this server is disabled this means the xp is still there but members won't gain any new xp")
             await ctx.channel.send(embed=embed)
 
 
@@ -489,7 +487,7 @@ class Leveling(commands.Cog):
         
         GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
-        if GuildPluginLevelingDoc.get("Leveling") == True and message.author.bot == False:
+        if GuildPluginLevelingDoc.get("Leveling") and message.author.bot == False:
             if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
 
                 GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]

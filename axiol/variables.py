@@ -43,5 +43,6 @@ DICT_PLUGINEMOJIS = {
     "Welcome": "👋",
     "Verification": "✅",
     "Chatbot": "🤖",
-    "AutoMod": "🛡️"
+    "AutoMod": "🛡️",
+    "Karma": "🎭"
 }

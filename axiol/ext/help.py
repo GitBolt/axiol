@@ -90,6 +90,15 @@ def automodhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
+def karmahelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title="🎭 Karma", description="Let's see who is the nicest member!" ,color=var.C_MAIN,
+    ).add_field(name=getprefix(ctx)+"karma `<user>`", value="Shows server karma of the user! User field is optional for checking karma of yourself", inline=False
+    ).add_field(name=getprefix(ctx)+"karmaboard", value="Shows the karma leaderboard of server members", inline=False
+    ).add_field(name=getprefix(ctx)+"kblacklist", value="Blacklists a channel from karma system hence members won't gain any karma there", inline=False
+    ).add_field(name=getprefix(ctx)+"kwhitelist", value="Whitelists a channel therefore letting users gain karma again in that channel", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
 def settingshelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"plugins",value="Manage your plugins", inline=False
@@ -159,7 +168,8 @@ class Help(commands.Cog):
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
-            "AutoMod": automodhelp
+            "AutoMod": automodhelp,
+            "Karma": karmahelp
             
         }
 
@@ -275,6 +285,17 @@ class Help(commands.Cog):
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Auto-Moderation plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def karma(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Karma") == True:
+            await ctx.send(embed=karmahelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Karma plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
 

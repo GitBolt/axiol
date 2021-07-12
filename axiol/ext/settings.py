@@ -117,6 +117,13 @@ class Settings(commands.Cog):
                     if str(reaction.emoji) =="✅" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
                         await ctx.invoke(self.bot.get_command('verifysetup'))
 
+                    if str(reaction.emoji) == "🎭"and str(ctx.guild.id) not in db.KARMADATBASE.list_collection_names():
+                        GuildDoc = db.KARMADATBASE.create_collection(str(ctx.guild.id))
+                        GuildDoc.insert_one({
+                            "_id": 0,
+                            "blacklists": [],
+                            })   
+
                     if str(reaction.emoji) == var.E_LEVELING and str(ctx.guild.id) not in db.LEVELDATABASE.list_collection_names():
                         GuildDoc = db.LEVELDATABASE.create_collection(str(ctx.guild.id))
                         GuildDoc.insert_one({
@@ -127,7 +134,7 @@ class Settings(commands.Cog):
                             "blacklistedchannels": [],
                             "alerts": True,
                             "rewards": {}
-                            })   
+                            })  
 
                     if str(reaction.emoji) =="🛡️" and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
                         db.AUTOMOD.insert_one({

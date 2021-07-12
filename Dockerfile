@@ -4,6 +4,6 @@ COPY /axiol /main
 
 WORKDIR /main
 
-RUN pip install discord.py pymongo dnspython requests
+RUN pip install discord.py pymongo dnspython requests nltk
 
 CMD ["python3", "bot.py"]

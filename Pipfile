@@ -10,6 +10,7 @@ dnspython = "*"
 youtube_dl = "*"
 PyNaCl = "*"
 requests = "*"
+nltk = "*"
 
 [dev-packages]
 

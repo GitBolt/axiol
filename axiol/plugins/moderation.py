@@ -461,6 +461,47 @@ class Moderation(commands.Cog):
                 ).add_field(name="Format", value=f"```{getprefix(ctx)}warn <member> <reason>```"
                 ))
 
+
+    @commands.command(aliases=["remove-warn", "unwarn"])
+    @has_command_permission()
+    async def removewarn(self, ctx, member:discord.Member=None, position=None):
+        if member and position is not None:
+            try:
+                position = int(position)
+            except ValueError:
+                await ctx.send(embed=discord.Embed(description=f"The position should be a number!", color=var.C_RED))
+                return
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userdoc = GuildCol.find_one({"_id": member.id})
+            if userdoc is None:
+                await ctx.send(embed=discord.Embed(description=f"{member.mention} does not have any warns", color=var.C_RED
+                ).set_footer(text="Note that this warn's position has been taken by the warn below it, therefore moving all warns below this one position above")
+                )
+            else:
+                warns = userdoc["warns"]
+                if len(warns)-1 >= position-1:
+                    reason = warns[position-1]
+                    newwarns = warns.copy()
+                    newwarns.pop(position-1)
+                    newdata = {"$set":{
+                        "warns": newwarns
+                    }}
+                    GuildCol.update_one(userdoc, newdata)
+                    await ctx.send(embed=discord.Embed(description=f"{var.E_ACCEPT} Removed {position} warn with the reason **{reason}**  from {member.mention}", color=var.C_GREEN
+                    ).set_footer(text="Note that if there are any warns below this one then they are moved one position up to take the removed warn's place")
+                    )
+                else:
+                    await ctx.send(embed=discord.Embed(description=f"{member.mention} does not have {position} warn(s)", color=var.C_RED))
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both the member and the warn position to remove the warn",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}removewarn <member> <position>```"
+                ).set_footer(text="Note that position here is just a number")
+                )
+
+
     @commands.command()
     @has_command_permission()
     async def warns(self, ctx, member:discord.Member=None):

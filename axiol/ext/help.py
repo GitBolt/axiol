@@ -20,12 +20,15 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     return embed
 
 def modhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="🔨 Moderation", description="Reasons in every command are optional :)", color=var.C_MAIN
+    embed = discord.Embed(title="🔨 Moderation", description="Reasons in every command except warn is optional :)", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
     ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans any already banned user", inline=False
     ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server", inline=False
     ).add_field(name=getprefix(ctx)+"mute `<member>`", value="Disables the ability for users to send text messages in all channels", inline=False
     ).add_field(name=getprefix(ctx)+"unmute `<member>`", value="Removes the 'Muted' role therefore lets the user send messages", inline=False
+    ).add_field(name=getprefix(ctx)+"warn `<member>` `<reason>`", value="Warns a member, reason is mandatory", inline=False
+    ).add_field(name=getprefix(ctx)+"removewarn `<member>` `<warn_position>`", value="Removes the warn from the position defined from the member", inline=False
+    ).add_field(name=getprefix(ctx)+"warns `<member>`", value="Shows all warns of the member", inline=False
     ).add_field(name=getprefix(ctx)+"purge `<amount>`", value="Deletes the number of messages defined in the command from the channel", inline=False
     ).add_field(name=getprefix(ctx)+"nick `<member>`", value="Changes nickname of a member", inline=False
     ).add_field(name=getprefix(ctx)+"addrole `<member>` `<role>`", value="Gives the member the role defined", inline=False

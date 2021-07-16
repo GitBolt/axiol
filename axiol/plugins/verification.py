@@ -308,7 +308,7 @@ class Verification(commands.Cog):
     @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):
         if ctx.channel.id in db.VERIFY.distinct("channel"): #Verify channel IDs
-            assignrole = db.VERIFY.find_one({"_id": ctx.guild.id}).get("assignrole")
+            assignrole = db.VERIFY.find_one({"_id": ctx.guild.id})["assignrole"]
 
             await ctx.message.delete()
             if db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
@@ -341,24 +341,26 @@ class Verification(commands.Cog):
                 def codecheck(message):
                     return message.author == ctx.author and message.channel.id == ctx.channel.id
                 
-                usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
+                try:
+                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
 
-                #ayo bots aren't this smart
-                code = embed.image.url[77:-4]
-                if usermsg.content == code:
-                    roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
-                    role = ctx.guild.get_role(roleid)
-                    await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
-                    await ctx.author.remove_roles(role)
-                    if assignrole is not None:
-                        await ctx.author.add_roles(ctx.guild.get_role(assignrole))
-                    await botmsg.delete()
-                    await usermsg.delete()
-                else:
-                    await ctx.send("Wrong, try again", delete_after=1)
-                    await botmsg.delete()
-                    await usermsg.delete()
-
+                    #ayo bots aren't this smart
+                    code = embed.image.url[77:-4]
+                    if usermsg.content == code:
+                        roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
+                        role = ctx.guild.get_role(roleid)
+                        await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
+                        await ctx.author.remove_roles(role)
+                        if assignrole is not None:
+                            await ctx.author.add_roles(ctx.guild.get_role(assignrole))
+                        await botmsg.delete()
+                        await usermsg.delete()
+                    else:
+                        await ctx.send("Wrong, try again", delete_after=1)
+                        await botmsg.delete()
+                        await usermsg.delete()
+                except asyncio.TimeOutError:
+                    pass
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -366,7 +368,6 @@ class Verification(commands.Cog):
         GuildVerifyDoc = db.VERIFY.find_one({"_id": message.guild.id})
         if GuildVerifyDoc is not None:
             if (message.channel.id == GuildVerifyDoc.get("channel") and 
-                message.content != f"{getprefix(message)}verify" and 
                 message.author != self.bot.user):
                 
                 await message.delete()

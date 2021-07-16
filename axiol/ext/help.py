@@ -106,7 +106,9 @@ def settingshelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"plugins",value="Manage your plugins", inline=False
     ).add_field(name=getprefix(ctx)+"prefix", value="View or change my prefix", inline=False
-    ).add_field(name=getprefix(ctx)+"permissions",value="Change the permissions for commands", inline=False)
+    ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Adds a command role permission, users with the role defined will be able to use the command from the plugin", inline=False
+    ).add_field(name=getprefix(ctx)+"removeperm `<command_name>` `<role>`",value="Removes command role permission, users with that role defined would no longer be able to use the command", inline=False
+    ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False)
     return embed
 
 

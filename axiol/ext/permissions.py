@@ -30,15 +30,24 @@ class Permissions(commands.Cog):
 
 
     @commands.command()
-    async def permissions(self, ctx):
+    async def allperms(self, ctx):
         embed = discord.Embed(title=f"Command role permissions", color=var.C_MAIN)
         GuildDoc = db.PERMISSIONS.find_one({"_id":ctx.guild.id}, {"_id":0})
         for i in GuildDoc:
-            embed.add_field(name=i, value=GuildDoc[i], inline=False)
+            perms = GuildDoc[i]
+            cmds = [x for x in perms]
+            roles = [x for x in perms.values()]
+            d = {}
+            for r in roles:
+                fetched = [ctx.guild.get_role(x).mention for x in r]
+                cmd = cmds[roles.index(r )]
+                d.update({cmd: fetched})
+            value = d
+            embed.add_field(name=i, value=value, inline=False)
         await ctx.send(embed=embed)
 
 
-    @commands.command(aliases=["setpermission", "allowpermission"])
+    @commands.command(aliases=["setpermission", "addperm", "addpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
         cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands', 'AutoMod', "Karma"]
@@ -93,10 +102,11 @@ class Permissions(commands.Cog):
                             description=f"There is no role with the ID `{data[1]}`. Try again with correct role mention or ID",
                             color=var.C_ORANGE
                         ))
+                    elif int(data[1].strip("<>@&")) in db.PERMISSIONS.find_one({"_id": ctx.guild.id})[plugin_name][data[0]]:
+                        await ctx.send(embed=discord.Embed(description=f"{ctx.guild.get_role(int(data[1].strip('<>@&'))).mention} role already has permissions for **{data[0]}**", color=var.C_RED))
                     else:
                         GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
                         role = ctx.guild.get_role(int(data[1].strip("<>@&")))
-
                         plugin_dict = GuildDoc[plugin_name]
                         newdict = plugin_dict.copy()
                         try:
@@ -115,7 +125,7 @@ class Permissions(commands.Cog):
                                     title="Successfully updated permissions",
                                     description=f"{var.E_ACCEPT} Users with {role.mention} can now use the command {data[0]}",
                                     color=var.C_GREEN
-                        ).add_field(name="To view all permissions", value=f"```{getprefix(ctx)}allpermissions```")
+                        ).add_field(name="To view all permissions", value=f"```{getprefix(ctx)}allperms```")
                         )
                         break
         else:

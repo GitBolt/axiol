@@ -360,7 +360,7 @@ class Verification(commands.Cog):
                         await ctx.send("Wrong, try again", delete_after=1)
                         await botmsg.delete()
                         await usermsg.delete()
-                except asyncio.TimeOutError:
+                except asyncio.TimeoutError:
                     pass
 
     @commands.Cog.listener()

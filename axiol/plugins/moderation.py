@@ -273,6 +273,7 @@ class Moderation(commands.Cog):
 
 
     @commands.command(aliases=["giverole"])
+    @has_command_permission()
     async def addrole(self, ctx, member:discord.Member=None, role:discord.Role=None):
         if member and role is not None:
             try:
@@ -299,6 +300,7 @@ class Moderation(commands.Cog):
                 ))
 
     @commands.command()
+    @has_command_permission()
     async def removerole(self, ctx, member:discord.Member=None, role:discord.Role=None):
         if member and role is not None:
             try:
@@ -325,6 +327,7 @@ class Moderation(commands.Cog):
                 ))
 
     @commands.command()
+    @has_command_permission()
     async def massrole(self, ctx, role:discord.Role=None, role2:discord.Role=None):
         if role and role2 is not None:
             botmsg = await ctx.send(embed=discord.Embed(
@@ -375,6 +378,7 @@ class Moderation(commands.Cog):
 
 
     @commands.command()
+    @has_command_permission()
     async def massroleremove(self, ctx, role:discord.Role=None, role2:discord.Role=None):
         if role and role2 is not None:
             botmsg = await ctx.send(embed=discord.Embed(
@@ -422,6 +426,64 @@ class Moderation(commands.Cog):
                 color=var.C_RED        
                 ).add_field(name="Format", value=f"```{getprefix(ctx)}massroleremove <role1> <role2>```"
                 ).set_footer(text="For role, either ping or ID can be used"))
+
+
+    @commands.command()
+    @has_command_permission()
+    async def warn(self, ctx, member:discord.Member=None, reason=None):
+        if member and reason is not None:
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userwarns = GuildCol.find_one({"_id": member.id})
+            if userwarns is None:
+                GuildCol.insert_one({"_id": member.id, "warns":[reason]})
+            else:
+                currentwarns = userwarns["warns"]
+                newwarns = currentwarns.copy()
+                newwarns.append(reason)
+                newdata = {"$set":{
+                    "warns": newwarns
+
+                    }}
+                GuildCol.update_one(userwarns, newdata)
+                
+            await ctx.send(content=f"{member.mention} has been warned!", embed=discord.Embed(
+            description=f"Reason: **{reason}**\nTotal warns: **{len(newwarns)}**",
+            color=var.C_BLUE
+            ).set_footer(text=f"Moderator: {ctx.author}")
+            )
+        elif member is not None and reason is None:
+            await ctx.send("Reason is required too!")
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define both the member and reason to warn them!",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}warn <member> <reason>```"
+                ))
+
+    @commands.command()
+    @has_command_permission()
+    async def warns(self, ctx, member:discord.Member=None):
+        if member is not None:
+
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userdata = GuildCol.find_one({"_id": member.id})
+            if userdata is None:
+                await ctx.send(f"{member} does not have any warnings")
+            else:
+                warns = userdata["warns"]
+                embed = discord.Embed(title=f"{member} warns", color=var.C_MAIN)
+                for i in warns:
+                    embed.add_field(name=f"Warn {warns.index(i)+1}", value=i, inline=False)
+                await ctx.send(embed=embed)
+        else:
+            await ctx.send(embed=discord.Embed(
+                title=f"🚫 Missing arguments",
+                description="You need to define the member to view their warns",
+                color=var.C_RED        
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}warns <member>```"
+                    ))
+       
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

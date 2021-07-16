@@ -196,29 +196,30 @@ class Leveling(commands.Cog):
         ).add_field(name="Highest XP Member", value=maxrank_user, inline=False
         ).add_field(name="Leveling XP Range", value=xprange, inline=False
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False
-        ).add_field(name="Alert Status", value=status
+        ).add_field(name="Alert Status", value=status, inline=False
         ).add_field(name="Alert channel", value=getalertchannel(), inline=False
-        ).add_field(name="Level Rewards", value=f"React to {var.E_CONTINUE}")
-
+        ).add_field(name="Level rewards", value=f"React to {var.E_CONTINUE}" if GuildDoc["rewards"] else "There are no level rewards right now", inline=False
+        )
         botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction(var.E_CONTINUE)
+        if GuildDoc["rewards"]: 
+            await botmsg.add_reaction(var.E_CONTINUE)
 
-        def reactioncheck(reaction, user):
-            if str(reaction.emoji) == var.E_CONTINUE:
-                return user == ctx.author and reaction.message == botmsg
+            def reactioncheck(reaction, user):
+                if str(reaction.emoji) == var.E_CONTINUE:
+                    return user == ctx.author and reaction.message == botmsg
 
-        await self.bot.wait_for("reaction_add", check=reactioncheck)
-        try:
-            await botmsg.clear_reactions()
-        except:
-            pass
-        rewards = GuildDoc.get("rewards")
-        embed.title = "Level rewards"
-        embed.clear_fields()
-        for i in rewards:
-            role = ctx.guild.get_role(rewards.get(i))
-            embed.add_field(name=f"Level {i}", value=role.mention, inline=False)
-        await botmsg.edit(embed=embed)
+            await self.bot.wait_for("reaction_add", check=reactioncheck)
+            try:
+                await botmsg.clear_reactions()
+            except:
+                pass
+            rewards = GuildDoc.get("rewards")
+            embed.title = "Level rewards"
+            embed.clear_fields()
+            for i in rewards:
+                role = ctx.guild.get_role(rewards.get(i))
+                embed.add_field(name=f"Level {i}", value=role.mention, inline=False)
+            await botmsg.edit(embed=embed)
 
 
     @commands.command()
@@ -456,21 +457,22 @@ class Leveling(commands.Cog):
             settings = GuildCol.find_one({"_id": 0})
 
             existingdata = settings.get("rewards")
+            if not level in existingdata.keys():
+                await ctx.send("This role does not have any rewards setted up")
+            else:
+                newdict = existingdata.copy()
+                role = ctx.guild.get_role(newdict.get(level))
+                newdict.pop(level)
+                
+                newdata = {"$set":{
+                    "rewards":newdict
+                }}
 
-            newdict = existingdata.copy()
-
-            role = ctx.guild.get_role(newdict.get(level))
-            newdict.pop(level)
-            
-            newdata = {"$set":{
-                "rewards":newdict
-            }}
-
-            GuildCol.update_one(settings, newdata)
-            await ctx.send(embed=discord.Embed(
-                        description=f"Successfully removed {role.mention} as the reward from Level {level}!",
-                        color=var.C_GREEN)
-                        )
+                GuildCol.update_one(settings, newdata)
+                await ctx.send(embed=discord.Embed(
+                            description=f"Successfully removed {role.mention} as the reward from Level {level}!",
+                            color=var.C_GREEN)
+                            )
 
         else:
             await ctx.send(embed=discord.Embed(

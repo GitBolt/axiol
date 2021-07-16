@@ -5,6 +5,7 @@ import database as db
 from functions import getprefix
 import random
 from ext.permissions import has_command_permission
+import asyncio
 
 class Verification(commands.Cog):
     def __init__(self, bot):

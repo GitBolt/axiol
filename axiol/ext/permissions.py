@@ -1,4 +1,3 @@
-from re import L
 import discord
 from discord.ext import commands
 import database as db
@@ -37,12 +36,14 @@ class Permissions(commands.Cog):
             perms = GuildDoc[i]
             cmds = [x for x in perms]
             roles = [x for x in perms.values()]
-            d = {}
-            for r in roles:
-                fetched = [ctx.guild.get_role(x).mention for x in r]
-                cmd = cmds[roles.index(r )]
-                d.update({cmd: fetched})
-            value = d
+            value = ""
+            for c in cmds:
+                roleids = roles[cmds.index(c)]
+                mentioned = [f"<@&{x}>" for x in roleids]
+                stringed = ", ".join(mentioned)
+                value += f"{c}: {stringed}\n"
+            if GuildDoc[i] == {}:
+                value = None
             embed.add_field(name=i, value=value, inline=False)
         await ctx.send(embed=embed)
 
@@ -80,6 +81,7 @@ class Permissions(commands.Cog):
                     await ctx.send(f"Cancelled permissions change for {plugin} plugin")
                     break
                 else:
+                    GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
                     data = usermsg.content.split(" ")
                     if len(data) != 2:
                         await ctx.send(embed=discord.Embed(
@@ -95,14 +97,13 @@ class Permissions(commands.Cog):
                             description=f"There is no command named `{data[0]}`` in **{plugin_name}**. Try again with correct command in {plugin_name} plugin",
                             color=var.C_ORANGE
                         ))
-                        
                     elif data[1].strip("<>@&").isnumeric() == False or ctx.guild.get_role(int(data[1].strip("<>@&"))) == None:
                         await ctx.send(embed=discord.Embed(
                             title="Role not found",
                             description=f"There is no role with the ID `{data[1]}`. Try again with correct role mention or ID",
                             color=var.C_ORANGE
                         ))
-                    elif int(data[1].strip("<>@&")) in db.PERMISSIONS.find_one({"_id": ctx.guild.id})[plugin_name][data[0]]:
+                    elif data[0] in GuildDoc[plugin_name].keys() and int(data[1].strip("<>@&")) in GuildDoc[plugin_name][data[0]]:
                         await ctx.send(embed=discord.Embed(description=f"{ctx.guild.get_role(int(data[1].strip('<>@&'))).mention} role already has permissions for **{data[0]}**", color=var.C_RED))
                     else:
                         GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
@@ -172,7 +173,6 @@ class Permissions(commands.Cog):
                         color=var.C_GREEN
                     ).add_field(name="To add new command permission", value=f"```{getprefix(ctx)}addperm <plugin>```")
                     )
-                    
                 except ValueError:
                     await ctx.send(embed=discord.Embed(
                         title="Invalid combination",

@@ -27,5 +27,6 @@ Make sure to check out [these functions](axiol/functions.py) to get it working l
 [Invite the bot from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)
 
 ### BotLists
-[Top.gg](https://top.gg/bot/843484459113775114/vote)
+[Top.gg](https://top.gg/bot/843484459113775114/vote) </br>
+
 [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)

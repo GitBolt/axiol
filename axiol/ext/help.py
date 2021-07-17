@@ -216,7 +216,7 @@ class Help(commands.Cog):
 
 
            
-    @help.command()
+    @help.command(aliases=["levels"])
     async def leveling(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
@@ -227,7 +227,7 @@ class Help(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @help.command()
+    @help.command(aliases=["mod", "moderator"])
     async def moderation(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Moderation") == True:
@@ -238,7 +238,7 @@ class Help(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @help.command()
+    @help.command(aliases=["reaction_roles", "rr", "reaction-roles"])
     async def reactionroles(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Reaction Roles") == True:
@@ -260,7 +260,7 @@ class Help(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @help.command()
+    @help.command(aliases=["verify"])
     async def verification(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Verification") == True:
@@ -282,7 +282,7 @@ class Help(commands.Cog):
                 color=var.C_ORANGE
             ))
 
-    @help.command()
+    @help.command(aliases=["automoderation", "automoderator"])
     async def automod(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("AutoMod") == True:
@@ -316,7 +316,6 @@ class Help(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def levelconfig(self, ctx):
-        
         embed = discord.Embed(title="Configure leveling for this server",
         color=var.C_TEAL
         ).add_field(name=getprefix(ctx)+"xprange `<leastamount>` `<highestamount>`",value="Set the range between which users will be awarded with random xp", inline=False

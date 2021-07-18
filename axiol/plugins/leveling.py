@@ -534,8 +534,9 @@ class Leveling(commands.Cog):
                     if str(levelnow) in rewards.keys():
                         roleid = rewards.get(str(levelnow))
                         role = message.guild.get_role(roleid)
-                        if role not in message.author.roles:
+                        if role is not None and role not in message.author.roles:
                             await message.author.add_roles(role)
-
+                        else:
+                            print(f"ERROR! {role} - {roleid} in server {message.guild.id} with name {message.guild.name}")
 def setup(bot):
     bot.add_cog(Leveling(bot))

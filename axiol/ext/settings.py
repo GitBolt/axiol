@@ -154,7 +154,8 @@ class Settings(commands.Cog):
                             },
                             "Mentions": {
                                 "status": False,
-                                "response": "You can't mention so many people!"
+                                "response": "You can't mention so many people!",
+                                "amount": 5
                             },
                             "Settings": {
                                 "ignorebots": False,

@@ -16,7 +16,9 @@ def has_command_permission():
             if permitted_roles == []:
                 return True
             else:
-                return any(item in permitted_roles for item in author_roles)
+                permission = any(item in permitted_roles for item in author_roles)
+                if permission:
+                    return True
         except KeyError:
             return True
 
@@ -94,7 +96,7 @@ class Permissions(commands.Cog):
                     elif data[0].lower() not in [str(i).lower() for i in self.bot.cogs[plugin_name].walk_commands()]:
                         await ctx.send(embed=discord.Embed(
                             title="Command not found",
-                            description=f"There is no command named `{data[0]}`` in **{plugin_name}**. Try again with correct command in {plugin_name} plugin",
+                            description=f"There is no command named `{data[0].lower()}`` in **{plugin_name}**. Try again with correct command in {plugin_name} plugin",
                             color=var.C_ORANGE
                         ))
                     elif data[1].strip("<>@&").isnumeric() == False or ctx.guild.get_role(int(data[1].strip("<>@&"))) == None:
@@ -103,20 +105,20 @@ class Permissions(commands.Cog):
                             description=f"There is no role with the ID `{data[1]}`. Try again with correct role mention or ID",
                             color=var.C_ORANGE
                         ))
-                    elif data[0] in GuildDoc[plugin_name].keys() and int(data[1].strip("<>@&")) in GuildDoc[plugin_name][data[0]]:
-                        await ctx.send(embed=discord.Embed(description=f"{ctx.guild.get_role(int(data[1].strip('<>@&'))).mention} role already has permissions for **{data[0]}**", color=var.C_RED))
+                    elif data[0].lower() in GuildDoc[plugin_name].keys() and int(data[1].strip("<>@&")) in GuildDoc[plugin_name][data[0].lower()]:
+                        await ctx.send(embed=discord.Embed(description=f"{ctx.guild.get_role(int(data[1].strip('<>@&'))).mention} role already has permissions for **{data[0].lower()}**", color=var.C_RED))
                     else:
                         GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
                         role = ctx.guild.get_role(int(data[1].strip("<>@&")))
                         plugin_dict = GuildDoc[plugin_name]
                         newdict = plugin_dict.copy()
                         try:
-                            currentlist = plugin_dict[data[0]]
+                            currentlist = plugin_dict[data[0].lower()]
                         except KeyError:
                             currentlist = []
                         newlist = currentlist.copy()
                         newlist.append(role.id)
-                        newdict.update({data[0]: newlist})
+                        newdict.update({data[0].lower(): newlist})
 
                         newdata = {"$set":{
                             plugin_name: newdict
@@ -124,7 +126,7 @@ class Permissions(commands.Cog):
                         db.PERMISSIONS.update_one(GuildDoc, newdata)
                         await ctx.send(embed=discord.Embed(
                                     title="Successfully updated permissions",
-                                    description=f"{var.E_ACCEPT} Users with {role.mention} can now use the command {data[0]}",
+                                    description=f"{var.E_ACCEPT} Users with {role.mention} can now use the command {data[0].lower()}",
                                     color=var.C_GREEN
                         ).add_field(name="To view all permissions", value=f"```{getprefix(ctx)}allperms```")
                         )

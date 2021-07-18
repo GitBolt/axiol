@@ -264,6 +264,8 @@ class Commands(commands.Cog):
                         usermsg = await self.bot.wait_for('message', check=msgcheck)   
                         try:
                             if usermsg.content in ["skip", "`skip`", "```skip```"]:
+                                await ctx.send("Skipped image, react to 🇮 again to set it.")
+                                await edit.remove_reaction("🇮", ctx.author)
                                 break   
                             elif usermsg.attachments:
                                 embed.set_image(url=usermsg.attachments[0].url)

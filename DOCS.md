@@ -4,6 +4,7 @@ Oh hey, look who is here! Welcome to Axiol bot documentation (well kinda) <br>
 ## Getting started
 The first recommended command after you have invited the bot to your server is **```.plugins```**. Go ahead I'm waiting.......done? Great! </br>
 Now you will see all the plugins which Axiol provides, here you can manage plugins by reacting to their respective emojis in the embed! </br> </br>
+
 To change the prefix use the command **``.prefix``**. In case you forgot what you changed your prefix to; then just ping Axiol and ask him the prefix just you like you would to anyone else! For example:
 > Oh hey @Axiol, what's your prefix?</br>
 > @Axiol prefix?</br>
@@ -49,14 +50,16 @@ By default the plugin is disabled.
   To configure each filter, use the command ```.filter <filter_name>```. There are four filters: ```badwords```, ```links```, ```invites```, ```mentions``` </br></br>
   To change the response of each filter react to the [gear emoji](https://cdn.discordapp.com/emojis/860554043284914218.png?v=10?size=10). To toggle between enable/disable, react to the other emoji which would be either the [disable](https://cdn.discordapp.com/emojis/847850081700020254.png?v=1) emoji if currently that filter is enabled and would be [enable](https://cdn.discordapp.com/emojis/847850083819323442.png?v=1) emoji if currently that filter is disabled. </br>
   All filter configuration commands are only visible in that filter's embed only if the filter is enabled. </br> </br>
-  BadWords and Mentions filters have some extra configurations available, let's have a look into that! </br>
+  BadWords and Mentions filters have some extra configurations available, let's have a look into that:
+  ```
   * BadWords: 
-  ```.addbadword <your_word>``` To add any badword in the list which bot would delete</br>
-  ```.removebadword <you_word>``` To remove any badword, make sure that the word is already in the bad word list or else it won't work, but wait how would you make sure...? Let's move on to the next command for it! </br>
-  ```.allbadwords``` To view all bad words, this will show all words which the bot does not like therefore deletes them!</br>
-  * Mentions
-  ```.mentionamount``` To add a custom amount of mentions which the bot would delete for mass mentions, remember that only unique mentions are deleted!
+  .addbadword <your_word> - To add any badword in the list which bot would delete
+  .removebadword <you_word> - To remove any badword, make sure that the word is already in the bad word list or else it won't work
+  .allbadwords - To view all bad words, this will show all words
   
+  * Mentions
+  .mentionamount - To add a custom amount of mentions which the bot would delete for mass mentions, remember that only unique mentions are deleted!
+  ```
 #### .automodblacklist <channel>
   This command blacklists a channel from auto moderation, users are immune to all filters in that channel.
       
@@ -173,4 +176,4 @@ Help command: ```.help moderation```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865997578503192611/unknown.png" width=280> </br>
 By default the plugin is enabled.
                 
->
+###

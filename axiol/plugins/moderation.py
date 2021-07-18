@@ -435,7 +435,8 @@ class Moderation(commands.Cog):
             GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
             userwarns = GuildCol.find_one({"_id": member.id})
             if userwarns is None:
-                GuildCol.insert_one({"_id": member.id, "warns":[reason]})
+                newwarns = [reason]
+                GuildCol.insert_one({"_id": member.id, "warns":newwarns})
             else:
                 currentwarns = userwarns["warns"]
                 newwarns = currentwarns.copy()

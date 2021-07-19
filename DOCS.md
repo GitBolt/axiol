@@ -1,6 +1,8 @@
 # Axiol tutorial
 Oh hey, look who is here! Welcome to Axiol bot documentation.<br>
 
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png" width=100>
+
 ## Getting started
 The first recommended command after you have invited the bot to your guilds is **```.plugins```**. Go ahead I'm waiting.......done? Great! </br>
 Now you will see all the plugins which Axiol provides, here you can manage them by reacting to their respective emojis in the embed. </br></br>
@@ -39,6 +41,17 @@ Looks great so far? Let's move on! Here are some quick links to the plugins
 - [👋 Welcome](#Welcome) 
 - [➡️ Extras](#Extras) *This is not a plugin*
 
+##### But first let's understand command permissions before moving on to plugins
+
+## Command permissions
+Command permissions fall under the settings category therefore can be accessed using the command **```.help settings```**. </br>
+Using command permissions you can set a role to have the permission to use any command which Axiol provides, for example setting the role "X" for the command "Y" will only let members having the "X" role use command "Y". Here are the commands for this:</br> </br>
+
+- `setperm <plugin_name>`: Using this command will send an embed will all commands from the plugin defined, the next message which you will send will be used to set command permission, the format is `command_name role`; here the command name is used without the prefix otherwise it will trigger the actual command then seperated by a space you need to enter your role whether it be the mention or ID, doing so will a command permission where users having that role can only use that command, to cancel this proccess simply type `cancel`, sending the message in wrong format will result in bot sending a warning message, this won't cancel the entire proccess so you can always try again without having to start over, this only stops if you enter `cancel`. </br>
+- `removeperm <command> <role>`: This simply removes a command permission of the role from a command. </br>
+- `allperms`: This shows all plugin names inside which the command names which have command permission setted up followed by the roles which an use that command. 
+
+##### Understood? Hope so you did, let's go to the plugins part now!
 
 ## AutoMod
 Help command: ```.help automod```</br>
@@ -61,16 +74,16 @@ By default the plugin is disabled.
   * Mentions
   .mentionamount - To add a custom amount of mentions which the bot would delete for mass mentions, remember that only unique mentions are deleted!
   ```
-#### .automodblacklist <channel>
+#### .automodblacklist \<channel>
   This command blacklists a channel from auto moderation, members are immune to all filters in that channel.
       
-#### .automodwhitelist <channel>
+#### .automodwhitelist \<channel>
   By default, all channels are whitelisted hence protected with auto moderation but if any channel has been blacklisted using the previous command then they can be whitelisted again using this command.
   
-#### .addmodrole <role>
+#### .addmodrole \<role>
   This commands adds a role in the *moderator role list* therefore members having any of the roles which are in the list are immune to all auto moderation actions by the bot.
 
-#### .removemodrole <role>
+#### .removemodrole \<role>
   Any role which has been added as a moderator role earlier can be removed from the list using this command, members having this role would no longer be immune to auto moderation.
   
 #### .allmodroles
@@ -85,16 +98,16 @@ Help command: ```.help chatbot```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865985154689400872/unknown.png" width=280> </br>
 By default this plugin is enabled, therefore Axiol will reply to all pings and disabling this plugin would make Axiol not reply to any messages or pings.
   
-#### .setchatbot <channel>
+#### .setchatbot \<channel>
   This commands sets a channel to a chatbot channel therefore all messages in that channel will be replied by Axiol and members would not need require to ping!
 
-#### .removechatbot <channel>
+#### .removechatbot \<channel>
   This commands removes a channel from chatbot channel list if it is there, therefore Axiol would no longer reply to all messages there.
 
 #### .chatbotchannels
   This commands shows all channels which are chatbot channels, the channels shown in the embed are where the bot replies to all messages by everyone.
  
-#### .chatbotreport <description>
+#### .chatbotreport \<description>
   If the chatbot does anything wrong, behaves weirdly or does not work then a quick report to the [support server](https://discord.gg/hxc73psNsB) can be sent with just this command without needing to join the server and reporting manually, the description has no limit so it can be as long as you want.
   
   
@@ -103,7 +116,7 @@ Help command: ```.help karma```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865987550325506108/unknown.png" width=280> </br>
 By default this plugin is disabled, very similar to leveling the only difference being members earn points for being nice!
   
-#### .karma <user>
+#### .karma \<user>
   Shows the karma of the user! If the user is not defined then the karma of the person who used the command is shown, depending on the user's karma average, a small description about the performence is also there!
   
 #### .karmaboard
@@ -115,10 +128,10 @@ By default this plugin is disabled, very similar to leveling the only difference
   * ▶️ for last page
 ```
 
-#### .kblacklist <channel>
+#### .kblacklist \<channel>
   This blacklists a channel with karma therefore any member messaging anything in that channel won't gain any karma, by default no channels are blacklisted.
 
-#### .kwhitelist <channel>
+#### .kwhitelist \<channel>
   By default all channels are blacklisted therefore giving members karma based on their messages, if any channel has been blacklisted using the previous command then they can be whitelisted again using this command.
 
   
@@ -127,7 +140,7 @@ Help command: ```.help leveling```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865989871486631966/unknown.png" width=280> </br>
 By default the plugin is disabled.
 
-#### .rank <user>
+#### .rank \<user>
   Shows server rank of a user by returning an embed with all information and box emojis for progress bar x) Use the command without user field to check your own rank, note that this is user therefore xp of members who have left the server is also available.
 
 #### .leaderboard
@@ -141,16 +154,16 @@ By default the plugin is disabled.
 ```
   The bargraph emoji is a bit different than shown here, it was not possible to show custom discord emoji here.
   
-#### .bargraph <amount>
+#### .bargraph \<amount>
   Sends a bargraph image of top users in the leaderboard, the amount field left blank returns top 10 users however the amount can be defined upto 30, more than that was slow and harder to fit in >.<
 
-#### .piechart <amount>
+#### .piechart \<amount>
   Same as bargraph just shows piechart instead
   
-#### .givexp <user> <amount>
+#### .givexp \<user> \<amount>
   Adds more XP to a user, the maximum amount which can be given to someone is **10000000**, giving someone XP using this command does not send the levelup alert message.
   
-#### .removexp <user> <amount>
+#### .removexp \<user> \<amount>
   Removes xp from a user, the maximum amount is same as `.givexp` command therefore **10000000**, removing more XP than what user current has puts them in debt therefore negative XP.
   
 #### .levelinfo
@@ -178,46 +191,46 @@ Help command: ```.help moderation```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865997578503192611/unknown.png" width=280> </br>
 By default the plugin is enabled, reasons in ban, kick are optional and required in warn.
                 
-#### .ban <user> <reason>
+#### .ban \<user> \<reason>
   Permanantly bans a user from guild, user ID can be used too therefore users which are not in the server can also be banned, bans using this command are permanant and can only be reversed manually or by using the next command.
 
-#### .unban <user>
+#### .unban \<user>
   Unbans a previously banned user from the guild.
 
-#### .kick <member> <reason>
+#### .kick \<member> \<reason>
   Kicks a member out of the server, which means they can join again.
 
-#### .mute <member>
+#### .mute \<member>
   This creates a 'Muted' role on first time usage and 'send messages' permission is disabled from all channels then the member is assigned the role therefore disabling their ability to send messages hence 'Muting', if there is a 'Muted' role already then it is used without creating any new one.
 
-#### .unmute <member>
+#### .unmute \<member>
   Removes the 'Muted' role from member therefore lets them send messages again.
 
-#### .warn <member> <reason>
+#### .warn \<member> \<reason>
   Warns a member, the reason is required. Right now warnings does not have any special punishments
 
-#### .removewarn <member> <position>
+#### .removewarn \<member> \<position>
   Removes a warning from a member, the position is the number in which the warn is placed in the list, after removing a warn the warns below it are moved one position upwards to take the place of the warn removed.
 
-#### .warns <member>
+#### .warns \<member>
   Shows all warns of the member with their reasons and position.
 
-#### .purge <amount>
+#### .purge \<amount>
   Deletes the number of messages defined in the amount field from the channel where the command is used, amount can only be a number.
 
-#### .nick <member> <newnick>
+#### .nick \<member> \<newnick>
   Changes nickname of the member to the new nick defined in the command.
 
-#### .addrole <member> <role>
+#### .addrole \<member> \<role>
   Adds a role to the member.
 
-#### .removerole <member> <role>
+#### .removerole \<member> \<role>
   Removes a role from the member.
 
-#### .massrole <role1> <role2>
+#### .massrole \<role1> \<role2>
   This gets confusing a bit but hey I got you covered! The **role1** is the role *of which* the members are given **role2**, this means every member in the server who has role1 gets role2, this may take some time depending on the number of members, after entering the command a confirmation embed is sent, reacting to the [tick](https://cdn.discordapp.com/emojis/847850079968559175.png?v=1) emoji will update everyone silently, and reacting to the [enable](https://cdn.discordapp.com/emojis/847850083819323442.png?v=1) emoji will update members with live stats which will send a message after the member gets updated with the role and [cross](https://cdn.discordapp.com/emojis/847850006995402822.png?v=1) emoji will cancel it.
 
-#### .massroleremove <role1> <role2>
+#### .massroleremove \<role1> \<role2>
   This works exactly same as the previous command (.massrole) the only difference being **role2** is removed from people with **role1**.
 
 
@@ -227,19 +240,19 @@ Help command: ```.help reactionroles```</br>
 By default the plugin is enabled.
 
 
-#### .rr <channel> <messageid> <role> <emoji>
+#### .rr \<channel> \<messageid> \<role> \<emoji>
   This creates a reaction role, which means after using the command, the message having the id in the channel defined in the command gets a react which is the emoji defined in the command and whenever someone reacts to the emoji they are given the role defined
 
-#### .removerr <messageid> <emoji>
+#### .removerr \<messageid> \<emoji>
   This removes a reaction role, since a message can only have one unique emoji simply using the messageid and emoji removes the reaction role
 
 #### .allrr 
   Shows all reaction roles setted up in the server with pagination similar to leaderboard
 
-#### .uniquerr <messageid>
+#### .uniquerr \<messageid>
   This marks a message with unique reaction role therefore a member can only react once and take on emoji from all reaction role defined in a single message.
 
-#### .removeunique <messageid>
+#### .removeunique \<messageid>
   This unmarks a message with unique reaction role hence letting users reaction resulting in letting them choose as many self roles as they want.
 
 
@@ -254,7 +267,7 @@ By default this plugin is disabled. There are two types of verification named 'C
 #### .verifyswitch
   Since there are only two types of verification avaiable, using this command will switch the verification type quickly without any confirmation.
 
-#### .verifyrole <role>
+#### .verifyrole \<role>
   This adds a role which will be given to the members after they verify successfully, this is not required for members to be able to get verfied and view all channels again. At one time only one verified role can be added which means using this command again after setting up a verifyrole will replace the previous role with the new one.
 
 #### .verifyroleremove
@@ -268,7 +281,7 @@ By default this plugin is disabled. On first time enabling it, Axiol will ask fo
 #### .welcomecard
   Shows the current guild welcome card, it's not an embed since there is also a message outside the embed so together they form the embed 'card'.
 
-#### .welcomechannel <channel>
+#### .welcomechannel \<channel>
   Changes the welcome channel where members will be greeted.
 
 #### .welcomemessage
@@ -280,7 +293,7 @@ By default this plugin is disabled. On first time enabling it, Axiol will ask fo
 #### .welcomeimage
   After using the command the next file or link which you will send will become the embed image, gifs won't work!
 
-#### .welcomerole <role>
+#### .welcomerole \<role>
   This will create a autorole which will be given to the members when they join, only works with welcome!
 
 #### .welcomereset
@@ -306,7 +319,7 @@ Help commands: ```.help extras``` </br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/866561999680438332/unknown.png" width=280> </br>
 This is not a plugin but some extra commands which are also useful. </br>
 
-#### .embed <channel>
+#### .embed \<channel>
   Use this command to create an embed! These embeds are not useful right now which means you would need to create new embed everytime, if you wish to not set anything which Axiol asks then just type `skip`. As you keep going on, the original embed becomes the preview therefore edits itself to the embed you are creating after each step. This will be the proccess:
   - You would need to set the colour, either you can react to one of the colour circle emojis or react to the paint brush emoji to set a custom hex, when you are done press the continue emoji at the last (not compulsary, can be skipped with the default color)
   - Axiol will ask for title (compulsary, title is required)
@@ -314,7 +327,7 @@ This is not a plugin but some extra commands which are also useful. </br>
   - Axiol will ask for thumbnail, a file or link can be used; only static images (pngs, jpgs etc) supported (not compulsary, can be skipped)
   - The embed is ready to be sent! However you are free to add fields, footer, image and author by reacting to the respective emojis in the new embed sent, at this point you will see a [tick](https://cdn.discordapp.com/emojis/847850079968559175.png?v=1) emoji in your original embed (which became the preview) just click on the tick emoji to send it to the channel which you defined at the beginning when using the command!
 
-#### .avatar <user>
+#### .avatar \<user>
   Shows the avatar or profile picture as many say of the user! Notice that it's user not member which means avatar of anyone from discord whether they are in server or not can be viewed.
 
 #### .stats
@@ -324,7 +337,7 @@ This is not a plugin but some extra commands which are also useful. </br>
 #### .about
   Shows bot information including number of server it's in, total number of members, creater, creation date and ping.
 
-#### .suggest <idea>
+#### .suggest \<idea>
   Using this command a direct suggestion to the [Support Server](https://discord.gg/3QfRNFXMzQ) suggestion channel will be sent, there is no limit for the size of the idea.
 
 #### .invite

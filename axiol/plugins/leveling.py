@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, leaderboardpagination, getxprange
+from functions import getprefix, getxprange
 from ext.permissions import has_command_permission
 
 
@@ -165,7 +165,7 @@ class Leveling(commands.Cog):
                     await botmsg.clear_reactions()
                 except discord.Forbidden:
                     pass
-                await ctx.invoke(self.bot.get_command('levelchart'))
+                await ctx.invoke(self.bot.get_command('barchart'))
 
             if str(reaction.emoji) == "⬅️":
                 try:

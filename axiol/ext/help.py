@@ -11,7 +11,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user! User field is optional for checking rank of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows the server leaderboard", inline=False
     ).add_field(name=getprefix(ctx)+"bargraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default and max amount is 30", inline=False
-    ).add_field(name=getprefix(ctx)+"piechart", value="Shows a Pie chart of top 10 users!", inline=False
+    ).add_field(name=getprefix(ctx)+"piechart `<amount>`", value="Shows a Pie chart of top 10 users!", inline=False
     ).add_field(name=getprefix(ctx)+"givexp `<user>` `<amount>`", value="Gives user more XP", inline=False
     ).add_field(name=getprefix(ctx)+"removexp `<user>` `<amount>`", value="Removes user more XP", inline=False
     ).add_field(name=getprefix(ctx)+"levelinfo", value="Shows the server's leveling settings", inline=False
@@ -23,14 +23,14 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="🔨 Moderation", description="Reasons in every command except warn is optional :)", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
     ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans any already banned user", inline=False
-    ).add_field(name=getprefix(ctx)+"kick `<reason>`", value="Kicks the user out of the server", inline=False
+    ).add_field(name=getprefix(ctx)+"kick `<member>` `<reason>`", value="Kicks the user out of the server", inline=False
     ).add_field(name=getprefix(ctx)+"mute `<member>`", value="Disables the ability for users to send text messages in all channels", inline=False
     ).add_field(name=getprefix(ctx)+"unmute `<member>`", value="Removes the 'Muted' role therefore lets the user send messages", inline=False
     ).add_field(name=getprefix(ctx)+"warn `<member>` `<reason>`", value="Warns a member, reason is mandatory", inline=False
     ).add_field(name=getprefix(ctx)+"removewarn `<member>` `<warn_position>`", value="Removes the warn from the position defined from the member", inline=False
     ).add_field(name=getprefix(ctx)+"warns `<member>`", value="Shows all warns of the member", inline=False
     ).add_field(name=getprefix(ctx)+"purge `<amount>`", value="Deletes the number of messages defined in the command from the channel", inline=False
-    ).add_field(name=getprefix(ctx)+"nick `<member>`", value="Changes nickname of a member", inline=False
+    ).add_field(name=getprefix(ctx)+"nick `<member>` `<member>`", value="Changes nickname of a member", inline=False
     ).add_field(name=getprefix(ctx)+"addrole `<member>` `<role>`", value="Gives the member the role defined", inline=False
     ).add_field(name=getprefix(ctx)+"removerole `<member>` `<role>`", value="Removes the role defined from the member", inline=False
     ).add_field(name=getprefix(ctx)+"massrole `<role1>` `<role2>`", value="Members having role1 will be given role2", inline=False

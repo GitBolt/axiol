@@ -31,7 +31,7 @@ class Karma(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def karma(self, ctx, karmauser:discord.Member=None):
+    async def karma(self, ctx, karmauser:discord.User=None):
         if karmauser is None:
             user = ctx.author
         else:
@@ -106,7 +106,7 @@ class Karma(commands.Cog):
         for i in karmas:
             count += 1
             try:
-                user = ctx.guild.get_member(i.get("_id"))
+                user = self.bot.get_user(i.get("_id"))
                 karma = i.get("karma")
                 embed.add_field(name=f"{count}: {user}", value=f"Total Karma: {karma}", inline=False)
             except:
@@ -139,12 +139,8 @@ class Karma(commands.Cog):
             user_amount = current_page*10
             for i in karmas[user_amount:]:
                 rankcount += 1
-                getuser = ctx.guild.get_member(i.get("_id"))
+                user = self.bot.get_user(i.get("_id"))
                 karma = i.get("karma")
-                if getuser == None:
-                    user = "🚫 This user has left the server"
-                else:
-                    user = getuser
                 embed.add_field(name=f"{rankcount}: {user}", value=f"Total Karma: {karma}", inline=False)
                 if rankcount == (current_page)*10 + 10:
                     break

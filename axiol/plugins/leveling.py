@@ -25,7 +25,7 @@ class Leveling(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def rank(self, ctx, rankuser:discord.Member=None):
+    async def rank(self, ctx, rankuser:discord.User=None):
         if rankuser is None:
             user = ctx.author
         else:
@@ -113,6 +113,27 @@ class Leveling(commands.Cog):
         await botmsg.add_reaction("➡️")
         await botmsg.add_reaction("▶️")
 
+        async def leaderboardpagination(current_page, embed, all_pages):
+            pagern = current_page + 1
+            embed.set_footer(text=f"Page {pagern}/{all_pages}")
+            embed.clear_fields()
+
+            rankings = GuildCol.find({
+
+                    "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+                    
+                }).sort("xp", -1)
+
+            rankcount = (current_page)*10
+            user_amount = current_page*10
+            for i in rankings[user_amount:]:
+                rankcount += 1
+                user = self.bot.get_user(i.get("_id"))
+                xp = i.get("xp")
+                embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
+                if rankcount == (current_page)*10 + 10:
+                    break
+
         def reactioncheck(reaction, user):
             return user == ctx.author and reaction.message == botmsg
         
@@ -125,7 +146,7 @@ class Leveling(commands.Cog):
                 except discord.Forbidden:
                     pass
                 current_page = 0
-                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(current_page, embed, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "➡️":
@@ -136,7 +157,7 @@ class Leveling(commands.Cog):
                 current_page += 1
                 if current_page > all_pages:
                     current_page -= 1
-                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(current_page, embed, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "<:RankChart:854068306285428767>":
@@ -154,7 +175,7 @@ class Leveling(commands.Cog):
                 current_page -= 1
                 if current_page < 0:
                     current_page += 1
-                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(current_page, embed, all_pages)
                 await botmsg.edit(embed=embed)
 
             if str(reaction.emoji) == "▶️":
@@ -163,7 +184,7 @@ class Leveling(commands.Cog):
                 except discord.Forbidden:
                     pass
                 current_page = all_pages-1
-                await leaderboardpagination(ctx, current_page, embed, GuildCol, all_pages)
+                await leaderboardpagination(current_page, embed, all_pages)
                 await botmsg.edit(embed=embed)
 
 

@@ -1,3 +1,4 @@
+import random
 from variables import DEFAULT_PREFIX
 from database import PREFIXES, LEVELDATABASE, PLUGINS, PERMISSIONS
 
@@ -15,7 +16,28 @@ def getxprange(message):
     return xprange
 
 
-#Some functions to counter errors and warning while working locally :p
+def random_text(typing_time):
+    f = open("resources/all_text.txt").read()
+    words = f.split(" ")
+    text = " ".join([random.choice(words) for i in range(typing_time+15*2)])
+    return text
+
+
+"""
+Some functions to counter errors and warnings while working locally :p
+
+To get everything work properly database needs to be updates even if it's working locally
+on a single guild, this is because lots of places have major database dependencies.
+
+First function simply updates all plugin documents with a new plugin, only used when some new plugin is added,
+not required to use this function to fix any errors or warnings.
+
+Second function does the main job, it checks for all plugin, permission, leveling (if enabled) and prefix documents,
+then updates/adds them if they aren't there.
+
+I would have loved to say that I did this intentionally to avoid people from stealing code but it was just me writing bad code
+which ended up benefiting ¯\_(ツ)_/¯
+"""
 
 #Adding new plugin
 def updateplugins(plugin):
@@ -26,8 +48,7 @@ def updateplugins(plugin):
             }
     )
 
-
-#updating leveling, plugin and permission data
+#updating leveling, plugin, prefix and permission data
 def updatedb(serverid):
 
     if not PLUGINS.count_documents({"_id": serverid}, limit=1):
@@ -58,7 +79,7 @@ def updatedb(serverid):
         print(f"✅{serverid} - Permissions 🔨")
 
 
-    if PLUGINS.find_one({"_id": serverid}).get("Leveling"):
+    if PLUGINS.find_one({"_id": serverid})["Leveling"]:
         try:
             GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
             GuildLevelDB.insert_one({
@@ -71,7 +92,7 @@ def updatedb(serverid):
                 }) 
             print(f"✅{serverid} - Leveling 📊")
         except:
-            print(f"❌{serverid} - Leveling 📊")
+            pass
     
     try:
         PREFIXES.insert_one({
@@ -87,4 +108,5 @@ def updatedb(serverid):
 serveridlist = []
 #for i in serveridlist:
    #updatedb(i)
+
 #updateplugins("Karma")

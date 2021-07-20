@@ -15,26 +15,6 @@ def getxprange(message):
     return xprange
 
 
-async def reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc):
-    pagern = current_page + 1
-    embed.set_footer(text=f"Page {pagern}/{all_pages}")
-    embed.clear_fields()
-
-    rrcount = (current_page)*10
-    rr_amount = current_page*10
-
-    for i in GuildDoc["reaction_roles"][rr_amount:]:
-        rrcount += 1
-        messageid = i.get("messageid")
-        role = Guild.get_role(i.get("roleid"))
-        emoji = i.get("emoji")
-        embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\nMessageID: `{messageid}`", inline=False)
-
-        if rrcount == (current_page)*10 + 10:
-            break
-
-
-
 #Some functions to counter errors and warning while working locally :p
 
 #Adding new plugin

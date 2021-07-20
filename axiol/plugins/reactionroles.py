@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, reactionrolespagination
+from functions import getprefix
 from ext.permissions import has_command_permission
 
 
@@ -171,14 +171,33 @@ class ReactionRoles(commands.Cog):
                 embed.add_field(name="** **", value=f"{emoji} for {role.mention} in message ID `{messageid}`", inline=False)
                 if rrcount == 10:
                     break
-
             embed.set_footer(text=f"Page 1/{all_pages}")
+
             botmsg = await ctx.send(embed=embed)
             await botmsg.add_reaction("◀️")
             await botmsg.add_reaction("⬅️")
             await botmsg.add_reaction("➡️")
             await botmsg.add_reaction("▶️")
 
+
+            async def reactionrolespagination(current_page, embed, Guild):
+                pagern = current_page + 1
+                embed.set_footer(text=f"Page {pagern}/{all_pages}")
+                embed.clear_fields()
+
+                rrcount = (current_page)*10
+                rr_amount = current_page*10
+
+                for i in GuildDoc["reaction_roles"][rr_amount:]:
+                    rrcount += 1
+                    messageid = i.get("messageid")
+                    role = Guild.get_role(i.get("roleid"))
+                    emoji = i.get("emoji")
+                    embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\nMessageID: `{messageid}`", inline=False)
+
+                    if rrcount == (current_page)*10 + 10:
+                        break
+            
             def reactioncheck(reaction, user):
                 if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
                     return user == ctx.author and reaction.message == botmsg

@@ -110,8 +110,8 @@ class Fun(commands.Cog):
                 timer = typing_time
 
                 while not waiter.done():
-                    await asyncio.sleep(5)
-                    timer -= 5
+                    await asyncio.sleep(1)
+                    timer -= 1
                     if typing_time == 60 and timer == 30:
                         await ctx.send("Half of the time is gone! 30 seconds left")
                     if typing_time == 30 and timer == 15:
@@ -123,20 +123,20 @@ class Fun(commands.Cog):
                 else:
                     content = waiter.result().content
 
-                    mistakes = []
-                    correct = []
+                    wrong_chars = []
+                    correct_chars = []
                     for i in content:
                         if i == text[content.index(i)]:
-                            correct.append(i)
+                            correct_chars.append(i)
                         else:
-                            mistakes.append(i)
+                            wrong_chars.append(i)
 
                     time_taken =  round(time.time() - initial_time, 2)
-                    total_chars = len(correct) + len(mistakes)
+                    total_chars_len = len(correct_chars) + len(wrong_chars)
                     raw_wpm = round((len(content)/5/time_taken)*60, 2)
-                    accuracy = round((len(correct) / total_chars) * 100, 2) if len(correct) != 0 else 0
-                    mistakes = str(len(mistakes)) + "/" + str(total_chars)
-                    error_rate = round((len(mistakes) / time_taken)*60, 2)
+                    accuracy = round((len(correct_chars) / total_chars_len) * 100, 2) if len(correct_chars) != 0 else 0
+                    mistakes = str(len(wrong_chars)) + "/" + str(total_chars_len)
+                    error_rate = round((len(wrong_chars) / time_taken), 2)
                     wpm = round(raw_wpm - error_rate, 2)
                     wpm = wpm if wpm >= 0 else 0
                     description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"

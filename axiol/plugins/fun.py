@@ -62,16 +62,21 @@ class Fun(commands.Cog):
 
             if  str(reaction.emoji) == TYPE_15:
                 typing_time = 15
-                text_size = 70
-                text_width = 40
+                text_size = 72
+                text_width = 35
+                text_height = 120
+
             elif str(reaction.emoji) == TYPE_30:
                 typing_time = 30
-                text_size = 50
-                text_width = 50
+                text_size = 60
+                text_width = 45
+                text_height = 95
+
             elif str(reaction.emoji) == TYPE_60:
                 typing_time = 60
-                text_size = 45
+                text_size = 52
                 text_width = 55
+                text_height = 82
 
             botmsg = await ctx.send(embed=discord.Embed(
                 description=f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!", 
@@ -81,7 +86,9 @@ class Fun(commands.Cog):
             await botmsg.add_reaction(var.E_ACCEPT)
             await self.bot.wait_for("reaction_add", check=confirmcheck)
 
-            text = random_text(typing_time)
+            get_text = random_text(typing_time)
+            text = get_text if get_text.endswith(".") else get_text+"."
+
             image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
             draw = ImageDraw.Draw(image)
             font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
@@ -90,7 +97,7 @@ class Fun(commands.Cog):
             offset = 300
             for line in textwrap.wrap(text, width=text_width):
                 draw.text((72, offset), line ,(169,240,255),font=font2)
-                offset += 80
+                offset += text_height
 
             with BytesIO() as image_binary:
                 image.save(image_binary, 'PNG')
@@ -99,45 +106,58 @@ class Fun(commands.Cog):
 
             try:
                 initial_time = time.time()
-                usermsg = await self.bot.wait_for("message", check=messagecheck, timeout=typing_time)
-                content = usermsg.content
+                waiter = self.bot.loop.create_task(self.bot.wait_for("message", check=messagecheck, timeout=typing_time))
+                timer = typing_time
 
-                mistakes = []
-                correct = []
-                for i in content:
-                    if i == text[content.index(i)]:
-                        correct.append(i)
-                    else:
-                        mistakes.append(i)
+                while not waiter.done():
+                    await asyncio.sleep(5)
+                    timer -= 5
+                    if typing_time == 60 and timer == 30:
+                        await ctx.send("Half of the time is gone! 30 seconds left")
+                    if typing_time == 30 and timer == 15:
+                        await ctx.send("Half of the time is gone! Only 15 seconds left")
+                    if timer == 10:
+                        await ctx.send("Only 10 secs left!")
+                    if timer == 5:
+                        await ctx.send(f"Only 5 seconds left {ctx.author.mention}!")
+                else:
+                    content = waiter.result().content
 
-                time_taken =  round(time.time() - initial_time, 2)
-                total_chars = len(correct) + len(mistakes)
-                raw_wpm = round((len(usermsg.content)/5/time_taken)*60, 2)
-                accuracy = round((len(correct) / total_chars) * 100, 2) if len(correct) != 0 else 0
-                mistakes = str(len(mistakes)) + "/" + str(total_chars)
-                error_rate = round((len(mistakes) / time_taken)*60, 2)
-                print(error_rate)
-                wpm = round(raw_wpm - error_rate, 2)
-                description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"
+                    mistakes = []
+                    correct = []
+                    for i in content:
+                        if i == text[content.index(i)]:
+                            correct.append(i)
+                        else:
+                            mistakes.append(i)
 
-                embed = discord.Embed(
-                    title=f"{wpm} words per minute",
-                    description=f"{description} {ctx.author.mention}"
-                )
-                embed.add_field(name="Raw WPM", value=f"{raw_wpm}", inline=False)
-                embed.add_field(name="Time taken", value=f"{time_taken} Seconds", inline=False)
-                embed.add_field(name="Accuracy", value=f"{accuracy}%", inline=False)
-                embed.add_field(name="Mistakes", value=mistakes, inline=False)
-                embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
+                    time_taken =  round(time.time() - initial_time, 2)
+                    total_chars = len(correct) + len(mistakes)
+                    raw_wpm = round((len(content)/5/time_taken)*60, 2)
+                    accuracy = round((len(correct) / total_chars) * 100, 2) if len(correct) != 0 else 0
+                    mistakes = str(len(mistakes)) + "/" + str(total_chars)
+                    error_rate = round((len(mistakes) / time_taken)*60, 2)
+                    wpm = round(raw_wpm - error_rate, 2)
+                    wpm = wpm if wpm >= 0 else 0
+                    description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"
 
-                embed.color = var.C_GREEN
-                embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-                embed.set_footer(text="Final typing speed is adjusted depending on the accuracy.")
-                await ctx.send(embed=embed)
+                    embed = discord.Embed(
+                        title=f"{wpm} words per minute",
+                        description=f"{description} {ctx.author.mention}"
+                    )
+                    embed.add_field(name="Raw WPM", value=f"{raw_wpm}", inline=False)
+                    embed.add_field(name="Time taken", value=f"{time_taken} Seconds", inline=False)
+                    embed.add_field(name="Accuracy", value=f"{accuracy}%", inline=False)
+                    embed.add_field(name="Mistakes", value=mistakes, inline=False)
+                    embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
+
+                    embed.color = var.C_GREEN
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                    embed.set_footer(text="Final typing speed is adjusted depending on the accuracy.")
+                    await ctx.send(embed=embed)
 
             except asyncio.TimeoutError:
-                await ctx.send(f"Time is up! You failed to complete the test in time {ctx.author.mention}")
-
+                await ctx.send(embed=discord.Embed(description=f"Time is up! You failed to complete the test in time {ctx.author.mention}", color=var.C_RED))
 
     @commands.command()
     @has_command_permission()

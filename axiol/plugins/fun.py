@@ -62,10 +62,16 @@ class Fun(commands.Cog):
 
             if  str(reaction.emoji) == TYPE_15:
                 typing_time = 15
+                text_size = 70
+                text_width = 40
             elif str(reaction.emoji) == TYPE_30:
                 typing_time = 30
+                text_size = 50
+                text_width = 50
             elif str(reaction.emoji) == TYPE_60:
                 typing_time = 60
+                text_size = 45
+                text_width = 55
 
             botmsg = await ctx.send(embed=discord.Embed(
                 description=f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!", 
@@ -79,10 +85,10 @@ class Fun(commands.Cog):
             image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
             draw = ImageDraw.Draw(image)
             font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
-            font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), 48)
+            font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), text_size)
             draw.text((810, 55),str(typing_time) ,(184,184,184),font=font)
             offset = 300
-            for line in textwrap.wrap(text, width=58):
+            for line in textwrap.wrap(text, width=text_width):
                 draw.text((72, offset), line ,(169,240,255),font=font2)
                 offset += 80
 
@@ -121,8 +127,8 @@ class Fun(commands.Cog):
                 embed.add_field(name="Raw WPM", value=f"{raw_wpm}", inline=False)
                 embed.add_field(name="Time taken", value=f"{time_taken} Seconds", inline=False)
                 embed.add_field(name="Accuracy", value=f"{accuracy}%", inline=False)
-                embed.add_field(name="Mistakes", value=mistakes)
-                embed.add_field(name="Error rate", value=error_rate)
+                embed.add_field(name="Mistakes", value=mistakes, inline=False)
+                embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
 
                 embed.color = var.C_GREEN
                 embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)

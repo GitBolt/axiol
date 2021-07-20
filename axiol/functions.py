@@ -61,19 +61,24 @@ def updatedb(serverid):
     if not PLUGINS.count_documents({"_id": serverid}, limit=1):
         PLUGINS.insert_one({
 
-                    "_id":serverid,
-                    "Leveling":False,
-                    "Moderation": False,
-                    "Reaction Roles": False,
-                    "Welcome": False,
-                    "Verification": False,
-                    "Chatbot": False,
-                })
+            "_id": serverid,
+            "Leveling": False,
+            "Moderation": True,
+            "Reaction Roles": True,
+            "Welcome": False,
+            "Verification": False,
+            "Chatbot": True,
+            "AutoMod": False,
+            "Karma": False,
+            "Fun": True,
+        })
+
         print(f"✅{serverid} - Plugins 🔧")
 
     
     if not PERMISSIONS.count_documents({"_id": serverid}, limit=1):
         PERMISSIONS.insert_one({
+
             "_id": serverid,
             "Leveling": {},
             "Moderation": {},
@@ -82,6 +87,9 @@ def updatedb(serverid):
             "Verification": {},
             "Chatbot": {},
             "Commands": {},
+            "AutoMod": {},
+            "Karma": {},
+            "Fun": {},
         })
         print(f"✅{serverid} - Permissions 🔨")
 
@@ -116,4 +124,4 @@ serveridlist = []
 #for i in serveridlist:
    #updatedb(i)
 
-#updateplugins("Fun")
+#updateplugins("Karma")

@@ -57,7 +57,8 @@ async def on_guild_join(guild):
             "Verification": False,
             "Chatbot": True,
             "AutoMod": False,
-            "Karma": False
+            "Karma": False,
+            "Fun": True,
         })
 
     #Inserting plugin configs if it does not exist (incase of re-inviting)
@@ -73,7 +74,8 @@ async def on_guild_join(guild):
             "Chatbot": {},
             "Commands": {},
             "AutoMod": {},
-            "Karma": {}
+            "Karma": {},
+            "Fun": {},
         })
 
     #Support server Log

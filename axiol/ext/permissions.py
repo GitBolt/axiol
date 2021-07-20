@@ -53,7 +53,7 @@ class Permissions(commands.Cog):
     @commands.command(aliases=["setpermission", "addperm", "addpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
-        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands', 'AutoMod', "Karma"]
+        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands', 'AutoMod', "Karma", "Fun"]
 
         if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
             embed = discord.Embed(
@@ -154,7 +154,6 @@ class Permissions(commands.Cog):
                 ))
             else:
                 plugin_name = [x for x in GuildDoc if cmd in GuildDoc[x].keys()][0]
-                print(plugin_name)
                 plugin_dict = GuildDoc[plugin_name]
                 newdict = plugin_dict.copy()
                 rolelist = plugin_dict[cmd]

@@ -11,6 +11,7 @@ youtube_dl = "*"
 PyNaCl = "*"
 requests = "*"
 nltk = "*"
+pillow = "*"
 
 [dev-packages]
 

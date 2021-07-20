@@ -19,7 +19,13 @@ def getxprange(message):
 def random_text(typing_time):
     f = open("resources/all_text.txt").read()
     words = f.split(" ")
-    text = " ".join([random.choice(words) for i in range(typing_time*2)])
+
+    if typing_time > 30:
+        r = range(typing_time+30)
+    else:
+        r = range(typing_time*2)
+
+    text = " ".join([random.choice(words) for i in r])
     return text
 
 

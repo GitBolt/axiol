@@ -111,15 +111,20 @@ def settingshelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False)
     return embed
 
+def funhelp(ctx: commands.Context) -> discord.Embed:
+    embed = discord.Embed(title=f"🎯 Fun", description="Let's have some fun!", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"typingtest",value="Starts a typing test, let's see how fast you type!", inline=False
+    ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
+    ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
+    )
+    return embed
 
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="▶️ Extras", 
-    description="[Vote](https://top.gg/bot/843484459113775114) "+
-    "[Invite](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot) "+
-    "[Support Server](https://discord.gg/hxc73psNsB) \n"+
+    description="[Vote](https://top.gg/bot/843484459113775114)  "+
+    "[Invite](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)  "+
+    "[SupportServer](https://discord.gg/hxc73psNsB) \n"+
     "Commands that are useful but don't belong to other categories!", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
-    ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Shows information about me!", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Sends an idea directly to the support server!", inline=False
@@ -174,7 +179,8 @@ class Help(commands.Cog):
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
             "AutoMod": automodhelp,
-            "Karma": karmahelp
+            "Karma": karmahelp,
+            "Fun": funhelp
             
         }
 
@@ -301,6 +307,17 @@ class Help(commands.Cog):
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Karma plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def fun(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Fun") == True:
+            await ctx.send(embed=funhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",
                 color=var.C_ORANGE
             ))
 

@@ -19,7 +19,7 @@ def getxprange(message):
 def random_text(typing_time):
     f = open("resources/all_text.txt").read()
     words = f.split(" ")
-    text = " ".join([random.choice(words) for i in range(typing_time+15*2)])
+    text = " ".join([random.choice(words) for i in range(typing_time*2)])
     return text
 
 
@@ -29,7 +29,7 @@ Some functions to counter errors and warnings while working locally :p
 To get everything work properly database needs to be updates even if it's working locally
 on a single guild, this is because lots of places have major database dependencies.
 
-First function simply updates all plugin documents with a new plugin, only used when some new plugin is added,
+First function simply updates all plugin and permissions documents with a new plugin, only used when some new plugin is added,
 not required to use this function to fix any errors or warnings.
 
 Second function does the main job, it checks for all plugin, permission, leveling (if enabled) and prefix documents,
@@ -39,7 +39,7 @@ I would have loved to say that I did this intentionally to avoid people from ste
 which ended up benefiting ¯\_(ツ)_/¯
 """
 
-#Adding new plugin
+#Adding new plugin and permissions
 def updateplugins(plugin):
     PLUGINS.update_many(
         { plugin: { "$exists": False } },
@@ -47,6 +47,13 @@ def updateplugins(plugin):
                 "$set": { plugin : False }
             }
     )
+    PERMISSIONS.update_many(
+        { plugin: {"$exists": False} },
+        {
+            "$set": { plugin: {}}
+        }
+        
+        )
 
 #updating leveling, plugin, prefix and permission data
 def updatedb(serverid):
@@ -109,4 +116,4 @@ serveridlist = []
 #for i in serveridlist:
    #updatedb(i)
 
-#updateplugins("Karma")
+#updateplugins("Fun")

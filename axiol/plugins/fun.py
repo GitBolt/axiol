@@ -76,10 +76,10 @@ class Fun(commands.Cog):
             await self.bot.wait_for("reaction_add", check=confirmcheck)
 
             text = random_text(typing_time)
-            image = Image.open(os.path.dirname(os.getcwd()) + "/axiol/resources/backgrounds/typing_board.png")
+            image = Image.open(os.path.dirname(os.getcwd()) + "/resources/backgrounds/typing_board.png")
             draw = ImageDraw.Draw(image)
-            font = ImageFont.truetype(os.path.dirname(os.getcwd()) + "/axiol/resources/fonts/Poppins-Medium.ttf", 80)
-            font2 = ImageFont.truetype(os.path.dirname(os.getcwd()) + "/axiol/resources/fonts/Poppins-Light.ttf", 48)
+            font = ImageFont.truetype(os.path.dirname(os.getcwd()) + "/resources/fonts/Poppins-Medium.ttf", 80)
+            font2 = ImageFont.truetype(os.path.dirname(os.getcwd()) + "/resources/fonts/Poppins-Light.ttf", 48)
             draw.text((810, 55),str(typing_time) ,(184,184,184),font=font)
             offset = 300
             for line in textwrap.wrap(text, width=58):

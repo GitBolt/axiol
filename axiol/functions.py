@@ -23,7 +23,7 @@ def random_text(typing_time):
     if typing_time > 30:
         r = range(typing_time+30)
     else:
-        r = range(typing_time)
+        r = range(typing_time*2)
 
     text = " ".join([random.choice(words) for i in r])
     return text

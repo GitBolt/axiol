@@ -208,7 +208,7 @@ By default the plugin is disabled.
   
 ## Moderation
 Help command: ```.help moderation```</br>
-<img src="https://cdn.discordapp.com/attachments/843519647055609856/865997578503192611/unknown.png" width=280> </br>
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/867323748708909056/unknown.png" width=280> </br>
 By default the plugin is enabled, reasons in ban, kick are optional and required in warn.
                 
 #### .ban \<user> \<reason>
@@ -336,7 +336,7 @@ Roses are red, violets are blue, {member} hopped into the server, are they a kan
 
 ## Extras
 Help commands: ```.help extras``` </br>
-<img src="https://cdn.discordapp.com/attachments/843519647055609856/866561999680438332/unknown.png" width=280> </br>
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/867322118785204244/unknown.png" width=280> </br>
 This is not a plugin but some extra commands which are also useful. </br>
 
 #### .stats

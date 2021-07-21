@@ -33,6 +33,7 @@ Also note that `User` and `Member` are different, whenever there is `Member` in 
 Looks great so far? Let's move on! Here are some quick links to the plugins
 - [🛡️ AutoMod](#AutoMod)
 - [🤖 ChatBot](#ChatBot)
+- [🎯 Fun](#Fun)
 - [🎭 Karma](#Karma)
 - [📊 Leveling](#Leveling)
 - [🔨 Moderation](#Moderation)
@@ -47,7 +48,7 @@ Looks great so far? Let's move on! Here are some quick links to the plugins
 Command permissions fall under the settings category therefore can be accessed using the command **```.help settings```**. </br>
 Using command permissions you can set a role to have the permission to use any command which Axiol provides, for example setting the role "X" for the command "Y" will only let members having the "X" role use command "Y". Here are the commands for this:</br> </br>
 
-- `setperm <plugin_name>`: Using this command will send an embed will all commands from the plugin defined, the next message which you will send will be used to set command permission, the format is `command_name role`; here the command name is used without the prefix otherwise it will trigger the actual command then seperated by a space you need to enter your role whether it be the mention or ID, doing so will a command permission where users having that role can only use that command, to cancel this proccess simply type `cancel`, sending the message in wrong format will result in bot sending a warning message, this won't cancel the entire proccess so you can always try again without having to start over, this only stops if you enter `cancel`. </br>
+- `setperm <plugin_name>`: Using this command will send an embed with all commands from the plugin defined, the next message which you will send will be used to set command permission, the format is `command_name role`; here the command name is used without the prefix otherwise it will trigger the actual command, then seperated by a space you need to enter your role; whether it be the mention or ID, doing so will a command permission where users having that role can only use that command, to cancel this proccess simply type `cancel`, sending the message in wrong format will result in bot sending a warning message, this won't cancel the entire proccess so you can always try again without having to start over, this only stops if you enter `cancel`. </br>
 - `removeperm <command> <role>`: This simply removes a command permission of the role from a command. </br>
 - `allperms`: This shows all plugin names inside which the command names which have command permission setted up followed by the roles which an use that command. 
 
@@ -110,7 +111,26 @@ By default this plugin is enabled, therefore Axiol will reply to all pings and d
 #### .chatbotreport \<description>
   If the chatbot does anything wrong, behaves weirdly or does not work then a quick report to the [support server](https://discord.gg/hxc73psNsB) can be sent with just this command without needing to join the server and reporting manually, the description has no limit so it can be as long as you want.
   
-  
+## Fun
+Help command: ```.help fun```</br>
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/867320597595160606/unknown.png", width=280> </br>
+By default this plugin is enabled.
+
+#### .typingtest
+  Test your typing speed! After you enter the command the bot will ask for the test length, just click on the respective emojis to proceed. Now the bot send another confirmation embed and as soon as you press on the tick emoji an image will be sent with the text (used image so users can't copypaste), here many people get it wrong; the task is to type *as much as you can* from the given text under the time you specified, not complete the entire text. Axiol will send alert messages when about time in between, in the last 5 seconds it will also ping you because sending your message after time is over would be useless.
+
+#### .embed \<channel>
+  Use this command to create an embed! These embeds are not useful right now which means you would need to create new embed everytime, if you wish to not set anything which Axiol asks then just type `skip`. As you keep going on, the original embed becomes the preview therefore edits itself to the embed you are creating after each step. This will be the proccess:
+  - You would need to set the colour, either you can react to one of the colour circle emojis or react to the paint brush emoji to set a custom hex, when you are done press the continue emoji at the last (not compulsary, can be skipped with the default color)
+  - Axiol will ask for title (compulsary, title is required)
+  - Axiol will ask for descrption (not compulsary, can be skipped by typing 'skip')
+  - Axiol will ask for thumbnail, a file or link can be used; only static images (pngs, jpgs etc) supported (not compulsary, can be skipped)
+  - The embed is ready to be sent! However you are free to add fields, footer, image and author by reacting to the respective emojis in the new embed sent, at this point you will see a [tick](https://cdn.discordapp.com/emojis/847850079968559175.png?v=1) emoji in your original embed (which became the preview) just click on the tick emoji to send it to the channel which you defined at the beginning when using the command!
+
+#### .avatar \<user>
+  Shows the avatar or profile picture as many say of the user! Notice that it's user not member which means avatar of anyone from discord whether they are in server or not can be viewed.
+
+
 ## Karma
 Help command: ```.help karma```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/865987550325506108/unknown.png" width=280> </br>
@@ -318,17 +338,6 @@ Roses are red, violets are blue, {member} hopped into the server, are they a kan
 Help commands: ```.help extras``` </br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/866561999680438332/unknown.png" width=280> </br>
 This is not a plugin but some extra commands which are also useful. </br>
-
-#### .embed \<channel>
-  Use this command to create an embed! These embeds are not useful right now which means you would need to create new embed everytime, if you wish to not set anything which Axiol asks then just type `skip`. As you keep going on, the original embed becomes the preview therefore edits itself to the embed you are creating after each step. This will be the proccess:
-  - You would need to set the colour, either you can react to one of the colour circle emojis or react to the paint brush emoji to set a custom hex, when you are done press the continue emoji at the last (not compulsary, can be skipped with the default color)
-  - Axiol will ask for title (compulsary, title is required)
-  - Axiol will ask for descrption (not compulsary, can be skipped by typing 'skip')
-  - Axiol will ask for thumbnail, a file or link can be used; only static images (pngs, jpgs etc) supported (not compulsary, can be skipped)
-  - The embed is ready to be sent! However you are free to add fields, footer, image and author by reacting to the respective emojis in the new embed sent, at this point you will see a [tick](https://cdn.discordapp.com/emojis/847850079968559175.png?v=1) emoji in your original embed (which became the preview) just click on the tick emoji to send it to the channel which you defined at the beginning when using the command!
-
-#### .avatar \<user>
-  Shows the avatar or profile picture as many say of the user! Notice that it's user not member which means avatar of anyone from discord whether they are in server or not can be viewed.
 
 #### .stats
   Shows the server stats! If the [Verification](#Verification) is enabled then number of members which are not verified is also shown.

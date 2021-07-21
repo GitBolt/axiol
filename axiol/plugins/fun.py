@@ -78,10 +78,9 @@ class Fun(commands.Cog):
                 text_width = 55
                 text_height = 82
 
-            botmsg = await ctx.send(embed=discord.Embed(
-                description=f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!", 
-                color=var.C_MAIN
-                )
+            botmsg = await ctx.send(
+                f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!\n" +
+                f"Remember, the task is not to complete all the text given, instead type as much as you can in the time specified and send it under the last 5 seconds. Axiol will keep you updated with the time passed!"
                 )
             await botmsg.add_reaction(var.E_ACCEPT)
             await self.bot.wait_for("reaction_add", check=confirmcheck)
@@ -136,7 +135,7 @@ class Fun(commands.Cog):
                     raw_wpm = round((len(content)/5/time_taken)*60, 2)
                     accuracy = round((len(correct_chars) / total_chars_len) * 100, 2) if len(correct_chars) != 0 else 0
                     mistakes = str(len(wrong_chars)) + "/" + str(total_chars_len)
-                    error_rate = round((len(wrong_chars) / time_taken), 2)
+                    error_rate = round(len(wrong_chars) / time_taken, 2)
                     wpm = round(raw_wpm - error_rate, 2)
                     wpm = wpm if wpm >= 0 else 0
                     description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"
@@ -153,7 +152,7 @@ class Fun(commands.Cog):
 
                     embed.color = var.C_GREEN
                     embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
-                    embed.set_footer(text="Final typing speed is adjusted depending on the accuracy.")
+                    embed.set_footer(text="Final typing speed is adjusted depending on the accuracy")
                     await ctx.send(embed=embed)
 
             except asyncio.TimeoutError:

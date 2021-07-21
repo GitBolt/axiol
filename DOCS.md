@@ -113,7 +113,7 @@ By default this plugin is enabled, therefore Axiol will reply to all pings and d
   
 ## Fun
 Help command: ```.help fun```</br>
-<img src="https://cdn.discordapp.com/attachments/843519647055609856/867320597595160606/unknown.png", width=280> </br>
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/867320597595160606/unknown.png" width=280> </br>
 By default this plugin is enabled.
 
 #### .typingtest

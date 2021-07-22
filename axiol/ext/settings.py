@@ -150,7 +150,7 @@ class Settings(commands.Cog):
                             },
                             "Links": {
                                 "status": True,
-                                "response": "You can't send send here!"
+                                "response": "You can't send links here!"
                             },
                             "Mentions": {
                                 "status": False,

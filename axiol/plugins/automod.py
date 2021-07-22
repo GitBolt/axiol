@@ -439,12 +439,13 @@ class AutoMod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        GuildDoc = db.AUTOMOD.find_one({'_id': message.guild.id})
-        try:
+        if db.PLUGINS.find_one({"_id": message.guild.id})["AutoMod"]:
+            GuildDoc = db.AUTOMOD.find_one({'_id': message.guild.id})
             if (GuildDoc is not None and message.author != self.bot.user 
             and message.channel.id not in GuildDoc["Settings"]["blacklists"]
             and not any(item in GuildDoc["Settings"]["modroles"] for item in [i.id for i in message.author.roles])):
                 if not message.author.bot or message.author.bot and GuildDoc["Settings"]["ignorebots"]:
+                    
                     if GuildDoc["Links"]["status"]:
                         regex = re.compile(
                             r"(?:http|ftp)s?://" # http:// or https://
@@ -490,9 +491,6 @@ class AutoMod(commands.Cog):
                             await message.delete()
                             res = GuildDoc["BadWords"]["response"]
                             await message.channel.send(f"{message.author.mention} {res}", delete_after=2)            
-        except AttributeError:
-            print(f"ERROR! {message.author} - {message.author.id} in guild {message.guild.name} - {message.guild.id}")
-
 
 def setup(bot):
     bot.add_cog(AutoMod(bot))

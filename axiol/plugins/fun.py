@@ -38,7 +38,7 @@ class Fun(commands.Cog):
             title="Typing Test",
             description=f"Let's see how fast you can type! React to the respective emoji below to start.\n\n{TYPE_15} 15 Seconds Test\n{TYPE_30} 30 Seconds Test\n{TYPE_60} 60 Seconds Test\n{var.E_DECLINE} Cancel Test",
             color=var.C_BLUE
-            )
+            ).add_field(name="Note", value="The task is to type as much as you can in the time specified, not to complete all the text given. I will inform you when less time is left!")
             )
         await botmsg.add_reaction(TYPE_15)
         await botmsg.add_reaction(TYPE_30)
@@ -79,9 +79,7 @@ class Fun(commands.Cog):
                 text_height = 82
 
             botmsg = await ctx.send(
-                f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!\n" +
-                f"Remember, the task is not to complete all the text given, instead type as much as you can in the time specified and send it under the last 5 seconds. Axiol will keep you updated with the time passed!"
-                )
+                f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!")
             await botmsg.add_reaction(var.E_ACCEPT)
             await self.bot.wait_for("reaction_add", check=confirmcheck)
 
@@ -124,11 +122,11 @@ class Fun(commands.Cog):
 
                     wrong_chars = []
                     correct_chars = []
-                    for i in content:
-                        if i == text[content.index(i)]:
-                            correct_chars.append(i)
+                    for x, y in zip(text, content):
+                        if x == y:
+                            correct_chars.append(y)
                         else:
-                            wrong_chars.append(i)
+                            wrong_chars.append(y)
 
                     time_taken =  round(time.time() - initial_time, 2)
                     total_chars_len = len(correct_chars) + len(wrong_chars)

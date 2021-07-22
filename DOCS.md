@@ -116,8 +116,12 @@ Help command: ```.help fun```</br>
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/867320597595160606/unknown.png" width=280> </br>
 By default this plugin is enabled.
 
-#### .typingtest
-  Test your typing speed! After you enter the command the bot will ask for the test length, just click on the respective emojis to proceed. Now the bot send another confirmation embed and as soon as you press on the tick emoji an image will be sent with the text (used image so users can't copypaste), here many people get it wrong; the task is to type *as much as you can* from the given text under the time you specified, not complete the entire text. Axiol will send alert messages when about time in between, in the last 5 seconds it will also ping you because sending your message after time is over would be useless.
+#### .typingtest \<type>
+  Test your typing speed! There are two types of test right now: `time` and `word` </br>
+  - **Time** based typing test is where you need to type as much as you can under the time you specify, note that your goal is not to complete the entire text given!
+  - **Word** based typing test is the opposite of time based one, here you need to complete the entire text under 60 seconds, this test is quicker and starts right after you enter the command and has much smaller text.
+
+  2 seconds are subtracted from total time taken to cover up time taken for image to load and user to start typing.
 
 #### .embed \<channel>
   Use this command to create an embed! These embeds are not useful right now which means you would need to create new embed everytime, if you wish to not set anything which Axiol asks then just type `skip`. As you keep going on, the original embed becomes the preview therefore edits itself to the embed you are creating after each step. This will be the proccess:

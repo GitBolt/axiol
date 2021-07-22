@@ -1,14 +1,15 @@
 import re
 import os
 import time
+import typing
 import discord
 import asyncio
 import textwrap
 from io import BytesIO
-from discord.ext import commands
+from discord.ext import commands, tasks
 from PIL import Image, ImageDraw, ImageFont
 import variables as var
-from functions import random_text, getprefix
+from functions import random_text, getprefix, random_name
 from ext.permissions import has_command_permission
 import database as db
 
@@ -20,11 +21,38 @@ CONFIG_15 = {"time":15, "size": 75, "width": 35, "height": 120}
 CONFIG_30 = {"time":30, "size": 60, "width": 45, "height": 95}
 CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
 
+
+class TypeRacer:
+    def __init__(self, bot, players, name=random_name()):
+        self.bot = bot
+        self.players = []
+        self.players.append(players)
+        self.name = name
+
+        self.gameover:bool = False
+
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def remove_player(self, player):
+        self.players.remove(player)
+
+    def player_count(self):
+        return len(self.players)
+
+    async def start(self):
+        for player in self.players:
+            await player.send("You are playing type racer with 5 other people, Let's go!")
+        
+            
+
+
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-
+        self.games: typing.List[TypeRacer] = []
+        self.player_check.start()
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
@@ -36,6 +64,51 @@ class Fun(commands.Cog):
                 color=var.C_ORANGE
             ))
     
+    def check_playing(self, player:discord.Member):
+        return any(player in game.players for game in self.games)
+    
+    def get_game(self, player:discord.Member):
+        for match in self.games:
+            if player in match.players:
+                return match
+
+    
+    @commands.group(pass_context=True, invoke_without_command=True)
+    @has_command_permission()
+    async def typeracer(self, ctx):
+
+        if self.check_playing(ctx.author):
+            return await ctx.send(f"{ctx.author.mention} You are already in a type race queue with the name **{self.get_game(ctx.author).name}**!")
+
+        if not self.games:
+            match = TypeRacer(self.bot, ctx.author)
+            self.games.append(match)
+            await ctx.send(embed=discord.Embed(
+                title="You have started a new match!",
+                description=f"The name of this match is __{match.name}__\nWaiting for players to join",
+                color=var.C_GREEN
+            ))
+        else:
+            highest_players = max([x.players for x in self.games])
+            match = [match for match in self.games if match.players == highest_players][0]
+            match.add_player(ctx.author)
+            await ctx.send(embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=f"The name of the match is __{match.name}__ which currently has **{match.player_count()}** players.",
+                color=var.C_BLUE
+            ))
+
+
+    @typeracer.command(aliases=["quit"])
+    @has_command_permission()
+    async def exit(self, ctx):
+        match = self.get_game(ctx.author)
+        if match:
+            match.remove_player(ctx.author)
+            await ctx.send(f"You removed yourself from the queue of the match __{match.name}__")
+        else:
+            await ctx.send("You are not in any match queue right now.")
+
     @commands.command()
     @has_command_permission()
     async def typingtest(self, ctx, type=None):
@@ -150,7 +223,7 @@ class Fun(commands.Cog):
                     wpm = round(raw_wpm - error_rate, 2)
                     wpm = wpm if wpm >= 0 else 0
                     description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"
-
+        
                     embed = discord.Embed(
                         title=f"{wpm} words per minute",
                         description=f"{description} {ctx.author.mention}"
@@ -165,10 +238,10 @@ class Fun(commands.Cog):
                     embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
                     embed.set_footer(text="Final typing speed is adjusted depending on the accuracy")
                     await ctx.send(embed=embed)
-
+        
             except asyncio.TimeoutError:
                 await ctx.send(embed=discord.Embed(description=f"Time is up! You failed to complete the test in time {ctx.author.mention}", color=var.C_RED))
-
+ 
     @commands.command()
     @has_command_permission()
     async def avatar(self, ctx, user:discord.User=None):
@@ -390,6 +463,14 @@ class Fun(commands.Cog):
 
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
+
+    @tasks.loop(seconds=2)
+    async def player_check(self):
+        for match in self.games:
+            if match.player_count() >= 2:
+                await match.start()
+                self.games.remove(match)
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

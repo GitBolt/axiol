@@ -28,6 +28,9 @@ def random_text(typing_time):
     text = " ".join([random.choice(words) for i in r])
     return text
 
+def random_name():
+    file = open("resources/words.txt").read()
+    return random.choice(file.split(" ")) + " " + random.choice(file.split(" "))
 
 """
 Some functions to counter errors and warnings while working locally :p

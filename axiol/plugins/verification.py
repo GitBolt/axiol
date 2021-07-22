@@ -311,7 +311,6 @@ class Verification(commands.Cog):
         if ctx.channel.id in db.VERIFY.distinct("channel"): #Verify channel IDs
             assignrole = db.VERIFY.find_one({"_id": ctx.guild.id})["assignrole"]
 
-            await ctx.message.delete()
             if db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
                 roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                 role = ctx.guild.get_role(roleid)
@@ -355,11 +354,9 @@ class Verification(commands.Cog):
                         if assignrole is not None:
                             await ctx.author.add_roles(ctx.guild.get_role(assignrole))
                         await botmsg.delete()
-                        await usermsg.delete()
                     else:
                         await ctx.send("Wrong, try again", delete_after=1)
                         await botmsg.delete()
-                        await usermsg.delete()
                 except asyncio.TimeoutError:
                     pass
 

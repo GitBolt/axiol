@@ -445,22 +445,34 @@ class AutoMod(commands.Cog):
             and message.channel.id not in GuildDoc["Settings"]["blacklists"]
             and not any(item in GuildDoc["Settings"]["modroles"] for item in [i.id for i in message.author.roles])):
                 if not message.author.bot or message.author.bot and GuildDoc["Settings"]["ignorebots"]:
-
                     if GuildDoc["Links"]["status"]:
                         regex = re.compile(
-                                r'^(?:http|ftp)s?://' # http:// or https://
-                                r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-                                r'localhost|' #localhost...
-                                r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-                                r'(?::\d+)?' # optional port
-                                r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-                        if re.match(regex, message.content) is not None:
+                            r"(?:http|ftp)s?://" # http:// or https://
+                            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|" #domain...
+                            r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" # ...or ip
+                            r"(?::\d+)?", # optional port
+                            #r"([a-zA-Z0-9\-]+)", 
+                            flags=re.IGNORECASE)
+
+                        if regex.findall(message.content):
                             await message.delete()
                             res = GuildDoc["Links"]["response"]
                             await message.channel.send(f"{message.author.mention} {res}", delete_after=2)
 
                     if GuildDoc["Invites"]["status"]:
-                        if "discord.gg/" in message.content:
+                        regex = re.compile(
+                            r"(?:discord(?:[\.,]|dot)gg|" # Could be discord.gg/
+                            r"discord(?:[\.,]|dot)com(?:\/|slash)invite|"# or discord.com/invite/
+                            r"discordapp(?:[\.,]|dot)com(?:\/|slash)invite|"# or discordapp.com/invite/
+                            r"discord(?:[\.,]|dot)me|" # or discord.me
+                            r"discord(?:[\.,]|dot)li|" # or discord.li
+                            r"discord(?:[\.,]|dot)io" # or discord.io.
+                            r")(?:[\/]|slash)" # / or 'slash'
+                            r"([a-zA-Z0-9\-]+)", # the invite code itself
+                            flags=re.IGNORECASE
+                        )
+
+                        if regex.findall(message.content):
                             await message.delete()
                             res = GuildDoc["Invites"]["response"]
                             await message.channel.send(f"{message.author.mention} {res}", delete_after=2)

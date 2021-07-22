@@ -141,7 +141,7 @@ class Fun(commands.Cog):
                         else:
                             wrong_chars.append(y)
 
-                    time_taken =  round(time.time() - initial_time, 2)
+                    time_taken =  round((time.time() - initial_time)-2, 2)
                     total_chars_len = len(correct_chars) + len(wrong_chars)
                     raw_wpm = round((len(content)/5/time_taken)*60, 2)
                     accuracy = round((len(correct_chars) / total_chars_len) * 100, 2) if len(correct_chars) != 0 else 0

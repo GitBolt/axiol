@@ -113,7 +113,7 @@ def settingshelp(ctx: commands.Context) -> discord.Embed:
 
 def funhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"🎯 Fun", description="Let's have some fun!", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"typingtest",value="Starts a typing test, let's see how fast you type!", inline=False
+    ).add_field(name=getprefix(ctx)+"typingtest `<type>`",value="Starts a typing test! There are two types: `time` and `word`", inline=False
     ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
     )

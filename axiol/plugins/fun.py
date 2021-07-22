@@ -11,9 +11,14 @@ import variables as var
 from functions import random_text, getprefix
 from ext.permissions import has_command_permission
 import database as db
+
 TYPE_15 = "<:15:866917795513892883>" 
 TYPE_30 = "<:30:866917795261579304>"
 TYPE_60 = "<:60:866917796507418634>"
+
+CONFIG_15 = {"time":15, "size": 75, "width": 35, "height": 120}
+CONFIG_30 = {"time":30, "size": 60, "width": 45, "height": 95}
+CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -33,85 +38,93 @@ class Fun(commands.Cog):
     
     @commands.command()
     @has_command_permission()
-    async def typingtest(self, ctx):
-        botmsg = await ctx.send(embed=discord.Embed(
-            title="Typing Test",
-            description=f"Let's see how fast you can type! React to the respective emoji below to start.\n\n{TYPE_15} 15 Seconds Test\n{TYPE_30} 30 Seconds Test\n{TYPE_60} 60 Seconds Test\n{var.E_DECLINE} Cancel Test",
-            color=var.C_BLUE
-            ).add_field(name="Note", value="The task is to type as much as you can in the time specified, not to complete all the text given. I will inform you when less time is left!")
+    async def typingtest(self, ctx, type=None):
+        if type is None:
+            return await ctx.send(embed=discord.Embed(
+            title="🚫 Missing arguments",
+            description="You need to define the typing test type too!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}typingtest <type>`\nThere are two types available: `time` and `word`"
+            ))
+
+        elif type not in ["time", "word"]:
+            return await ctx.send(embed=discord.Embed(
+                title="🚫 Invalid type",
+                description="The type can be either `time` or `word`",
+                color=var.C_RED
+            ).add_field(name="time", value="Time based typing test, here you have to type as much as you can from the text given under the time you choose."
+            ).add_field(name="word", value="Word base typing test, here you need to complete the entire text given and the max time is 60 seconds.")
             )
-        await botmsg.add_reaction(TYPE_15)
-        await botmsg.add_reaction(TYPE_30)
-        await botmsg.add_reaction(TYPE_60)
-        await botmsg.add_reaction(var.E_DECLINE)
 
-        def reactioncheck(reaction, user):
-            return user == ctx.author and reaction.message == botmsg
+        if type == "time":
+            botmsg = await ctx.send(embed=discord.Embed(
+                title=f"{type.capitalize()} based typing test",
+                description=f"Let's see how fast you can type! React to the respective emoji below to start.\n\n{TYPE_15} 15 Seconds Test\n{TYPE_30} 30 Seconds Test\n{TYPE_60} 60 Seconds Test\n{var.E_DECLINE} Cancel Test",
+                color=var.C_BLUE
+                ).add_field(name="Note", value="The task is to type as much as you can in the time specified, not to complete all the text given. I will inform you when less time is left!")
+                )
+            await botmsg.add_reaction(TYPE_15)
+            await botmsg.add_reaction(TYPE_30)
+            await botmsg.add_reaction(TYPE_60)
+            await botmsg.add_reaction(var.E_DECLINE)
 
-        def confirmcheck(reaction, user):
-            if str(reaction.emoji) == var.E_ACCEPT:
+            def reactioncheck(reaction, user):
                 return user == ctx.author and reaction.message == botmsg
 
-        def messagecheck(message):
-            return message.author == ctx.author and message.channel.id == ctx.channel.id
+            def confirmcheck(reaction, user):
+                if str(reaction.emoji) == var.E_ACCEPT:
+                    return user == ctx.author and reaction.message == botmsg
 
-        reaction, user = await  self.bot.wait_for("reaction_add", check=reactioncheck)
-        if str(reaction.emoji) == var.E_DECLINE:
-            await ctx.send(f" {var.E_ACCEPT} Cancelled typing test.")
-        else:
+            reaction, user = await  self.bot.wait_for("reaction_add", check=reactioncheck)
+            if str(reaction.emoji) == var.E_DECLINE:
+                await ctx.send(f" {var.E_ACCEPT} Cancelled typing test.")
+            else:
+                if str(reaction.emoji) == TYPE_15:
+                    config = CONFIG_15
 
-            if  str(reaction.emoji) == TYPE_15:
-                typing_time = 15
-                text_size = 72
-                text_width = 35
-                text_height = 120
+                elif str(reaction.emoji) == TYPE_30:
+                    config = CONFIG_30
+                elif str(reaction.emoji) == TYPE_60:
+                    config = CONFIG_60
 
-            elif str(reaction.emoji) == TYPE_30:
-                typing_time = 30
-                text_size = 60
-                text_width = 45
-                text_height = 95
-
-            elif str(reaction.emoji) == TYPE_60:
-                typing_time = 60
-                text_size = 52
-                text_width = 55
-                text_height = 82
-
-            botmsg = await ctx.send(
-                f"You have selected **{typing_time}** seconds for typing test, react to {var.E_ACCEPT} to start!")
+            botmsg = await ctx.send(f"You have selected **{config['time']}** seconds for typing test, react to {var.E_ACCEPT} to start!")
             await botmsg.add_reaction(var.E_ACCEPT)
             await self.bot.wait_for("reaction_add", check=confirmcheck)
+        else:
+            config = CONFIG_15
+            config["time"] = 60
 
-            get_text = random_text(typing_time)
-            text = get_text if get_text.endswith(".") else get_text+"."
+        get_text = random_text(config["time"] if type == "time" else 10)
+        text = get_text if get_text.endswith(".") else get_text+"."
 
-            image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
-            draw = ImageDraw.Draw(image)
-            font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
-            font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), text_size)
-            draw.text((810, 55),str(typing_time) ,(184,184,184),font=font)
-            offset = 300
-            for line in textwrap.wrap(text, width=text_width):
-                draw.text((72, offset), line ,(169,240,255),font=font2)
-                offset += text_height
+        image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
+        font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), config["size"])
+        draw.text((810, 55), str(config["time"]) ,(184,184,184),font=font)
+        offset = 300
+        for line in textwrap.wrap(text, width=config["width"]):
+            draw.text((72, offset), line ,(169,240,255),font=font2)
+            offset += config["height"]
 
-            with BytesIO() as image_binary:
-                image.save(image_binary, 'PNG')
-                image_binary.seek(0)
-                await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
+        with BytesIO() as image_binary:
+            image.save(image_binary, 'PNG')
+            image_binary.seek(0)
+            await ctx.send(file=discord.File(fp=image_binary, filename='image.png'))
 
             try:
                 initial_time = time.time()
-                waiter = self.bot.loop.create_task(self.bot.wait_for("message", check=messagecheck, timeout=typing_time))
-                timer = typing_time
+                def messagecheck(message):
+                    return message.author == ctx.author and message.channel.id == ctx.channel.id
+                waiter = self.bot.loop.create_task(self.bot.wait_for("message", check=messagecheck, timeout=config["time"]))
+                timer = config["time"]
 
                 while not waiter.done():
                     await asyncio.sleep(1)
                     timer -= 1
-                    if typing_time == 60 and timer == 30:
+                    if config["time"] == 60 and timer == 30:
                         await ctx.send("Half of the time is gone! 30 seconds left")
-                    if typing_time == 30 and timer == 15:
+                    if config["time"] == 30 and timer == 15:
                         await ctx.send("Half of the time is gone! Only 15 seconds left")
                     if timer == 10:
                         await ctx.send("Only 10 secs left!")

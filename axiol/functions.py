@@ -32,6 +32,10 @@ def random_name():
     file = open("resources/words.txt").read()
     return random.choice(file.split(" ")) + " " + random.choice(file.split(" "))
 
+def code_generator():
+    return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                             "1234567890", k = 5))
+
 """
 Some functions to counter errors and warnings while working locally :p
 

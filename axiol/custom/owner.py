@@ -87,6 +87,11 @@ class Owner(commands.Cog):
         
         await ctx.send(f"**{doc_name.upper()}** Document for **{guildobj.name}**\n```json\n{doc}```")
 
+    @commands.command()
+    async def update_db(self, ctx):
+        for guild in self.bot.guilds:
+            updatedb(guild.id)
+        
 
 def setup(bot):
     bot.add_cog(Owner(bot))

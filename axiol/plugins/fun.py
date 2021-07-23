@@ -10,7 +10,7 @@ from datetime import datetime
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import variables as var
-from functions import random_text, getprefix, random_name
+from functions import random_text, getprefix, random_name, code_generator
 from ext.permissions import has_command_permission
 import database as db
 
@@ -33,6 +33,7 @@ class TypeRacer:
 
         self.gameover:bool = False
         self.created_at = datetime.now()
+        self.code = code_generator()
 
     def add_player(self, player):
         self.players.append(player)
@@ -67,19 +68,38 @@ class TypeRacer:
             await player.send(f"__New player has joined!__\n{user} just joined the queue, {len(self.players)} players now.")
 
     async def start(self):
-        
+        count = 5
+        embed = discord.Embed(
+        title="All players joined!", 
+        description=f"Match starting in {count}...", 
+        color=var.C_MAIN, 
+        ).add_field(name="Started", value=f"{self.time_elapsed()} ago", inline=False
+        ).add_field(name="Players", value="\n".join([str(player) for player in self.players]), inline=False
+        )
+        def check(message):
+            return message.guild == None and message.author == player
+        msgs = {}
         for player in self.players:
-            await player.send(embed=discord.Embed(
-                title="All players joined!",
-                description="Match started",
-                color=var.C_GREEN
-            ))
-            with BytesIO() as image_binary:
-                image = self.create_board()
-                image.save(image_binary, 'PNG')
-                image_binary.seek(0)
-                await player.send(file=discord.File(fp=image_binary, filename='image.png'))
-            #self.bot.loop.create_task(self.bot.wait_for("message", check=check, timeout=60))
+            msg = await player.send(embed=embed)
+            msgs.update({player:msg})
+
+        for _ in range(4):
+            count -= 1
+            await asyncio.sleep(1)
+            for msg in msgs.values():
+                embed.description = f"Match starting in {count}..."
+                await msg.edit(embed=embed)
+
+        with BytesIO() as image_binary:
+            image = self.create_board()
+            image.save(image_binary, 'PNG')
+            for player in self.players:
+                    image_binary.seek(0)
+                    embed.description = f"Match starting now!"
+                    await msgs[player].edit(embed=embed)
+                    await player.send(file=discord.File(fp=image_binary, filename='image.png'))
+                    await msgs[player].delete()
+            tsk = self.bot.loop.create_task(self.bot.wait_for("message", check=check, timeout=60))
 
             
 
@@ -120,18 +140,20 @@ class Fun(commands.Cog):
                 description=f"The match currently has `{len(match.players)}` players in the queue",
                 color=var.C_ORANGE
             ).add_field(name="Match name", value=match.name, inline=False
+            ).add_field(name="Code", value=match.code)
             ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
             ).add_field(name="Required player amount", value=match.required_amount)
-            )
 
         if not self.matches:
             match = TypeRacer(self.bot, ctx.author, 2)
             self.matches.append(match)
             await ctx.send(embed=discord.Embed(
                 title="You have started a new match!",
-                description=f"The name of this match is __{match.name}__\nWaiting for players to join...",
+                description=f"The name of this match is __{match.name}__",
                 color=var.C_GREEN
-            ))
+            ).add_field(name="Code", value=match.code
+            ).set_footer(text="Waiting for players to join...")
+            )
         else:
             highest_players = max([x.players for x in self.matches])
             match = [match for match in self.matches if match.players == highest_players][0]
@@ -140,7 +162,8 @@ class Fun(commands.Cog):
                 title="You have been added to the queue!",
                 description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
-            ))
+            ).add_field(name="Code", value=match.code)
+            )
             await match.join_alert(ctx.author)
             if  len(match.players) >= match.required_amount:
                 await match.start()
@@ -156,6 +179,33 @@ class Fun(commands.Cog):
             await ctx.send(f"You removed yourself from the queue of the match __{match.name}__")
         else:
             await ctx.send("You are not in any match queue right now.")
+
+
+    @typeracer.command()
+    @has_command_permission()
+    async def join(self, ctx, code=None):
+        if code is None:
+            return await ctx.send(embed=discord.Embed(
+                title="🚫 Missing argument",
+                description="You need to enter the code too!",
+                color=var.C_RED
+            ).add_field(name="format", value=f"{getprefix(ctx)}typeracer join <code>"
+            ))
+        if code in [x.code for x in self.matches]:
+            match = [match for match in self.matches if match.code == code][0]
+            match.add_player(ctx.author)
+            await ctx.send(embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
+                color=var.C_BLUE
+            ).add_field(name="Code", value=match.code)
+            )
+            await match.join_alert(ctx.author)
+            if  len(match.players) >= match.required_amount:
+                await match.start()
+                self.matches.remove(match)
+        else:
+            await ctx.send("Invalid code.")
 
     @commands.command()
     @has_command_permission()

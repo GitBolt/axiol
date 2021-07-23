@@ -6,7 +6,8 @@ import discord
 import asyncio
 import textwrap
 from io import BytesIO
-from discord.ext import commands, tasks
+from datetime import datetime
+from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import variables as var
 from functions import random_text, getprefix, random_name
@@ -23,14 +24,15 @@ CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
 
 
 class TypeRacer:
-    def __init__(self, bot, players, name=random_name()):
+    def __init__(self, bot, players, required_amount, name=random_name()):
         self.bot = bot
         self.players = []
         self.players.append(players)
         self.name = name
+        self.required_amount = required_amount
 
         self.gameover:bool = False
-
+        self.created_at = datetime.now()
 
     def add_player(self, player):
         self.players.append(player)
@@ -38,21 +40,54 @@ class TypeRacer:
     def remove_player(self, player):
         self.players.remove(player)
 
-    def player_count(self):
-        return len(self.players)
+    def time_elapsed(self):
+        time =  datetime.now() - self.created_at
+        if time.total_seconds() < 60:
+            return f"{round(time.total_seconds(), 1)} seconds"
+        else:
+            return f"{round(time.total_seconds()/60, 1)} minutes"
+
+    @staticmethod
+    def create_board():
+        get_text = random_text(10)
+        text = get_text if get_text.endswith(".") else get_text+"."
+        image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
+        font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), CONFIG_15["size"])
+        draw.text((810, 55), str(CONFIG_15["time"]) ,(184,184,184),font=font)
+        offset = 300
+        for line in textwrap.wrap(text, width=CONFIG_15["width"]):
+            draw.text((72, offset), line ,(169,240,255),font=font2)
+            offset += CONFIG_15["height"]
+        return image
+
+    async def join_alert(self, user):
+        for player in self.players:
+            await player.send(f"__New player has joined!__\n{user} just joined the queue, {len(self.players)} players now.")
 
     async def start(self):
-        for player in self.players:
-            await player.send("You are playing type racer with 5 other people, Let's go!")
         
-            
+        for player in self.players:
+            await player.send(embed=discord.Embed(
+                title="All players joined!",
+                description="Match started",
+                color=var.C_GREEN
+            ))
+            with BytesIO() as image_binary:
+                image = self.create_board()
+                image.save(image_binary, 'PNG')
+                image_binary.seek(0)
+                await player.send(file=discord.File(fp=image_binary, filename='image.png'))
+            #self.bot.loop.create_task(self.bot.wait_for("message", check=check, timeout=60))
 
+            
 
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.games: typing.List[TypeRacer] = []
-        self.player_check.start()
+        self.matches: typing.List[TypeRacer] = []
+
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
@@ -65,10 +100,10 @@ class Fun(commands.Cog):
             ))
     
     def check_playing(self, player:discord.Member):
-        return any(player in game.players for game in self.games)
+        return any(player in match.players for match in self.matches)
     
-    def get_game(self, player:discord.Member):
-        for match in self.games:
+    def get_match(self, player:discord.Member):
+        for match in self.matches:
             if player in match.players:
                 return match
 
@@ -78,31 +113,44 @@ class Fun(commands.Cog):
     async def typeracer(self, ctx):
 
         if self.check_playing(ctx.author):
-            return await ctx.send(f"{ctx.author.mention} You are already in a type race queue with the name **{self.get_game(ctx.author).name}**!")
+            match = self.get_match(ctx.author)
+            return await ctx.send(content=f"You are already in a queue {ctx.author.mention}",
+            embed=discord.Embed(
+                title=f"Queue info",
+                description=f"The match currently has `{len(match.players)}` players in the queue",
+                color=var.C_ORANGE
+            ).add_field(name="Match name", value=match.name, inline=False
+            ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+            ).add_field(name="Required player amount", value=match.required_amount)
+            )
 
-        if not self.games:
-            match = TypeRacer(self.bot, ctx.author)
-            self.games.append(match)
+        if not self.matches:
+            match = TypeRacer(self.bot, ctx.author, 2)
+            self.matches.append(match)
             await ctx.send(embed=discord.Embed(
                 title="You have started a new match!",
-                description=f"The name of this match is __{match.name}__\nWaiting for players to join",
+                description=f"The name of this match is __{match.name}__\nWaiting for players to join...",
                 color=var.C_GREEN
             ))
         else:
-            highest_players = max([x.players for x in self.games])
-            match = [match for match in self.games if match.players == highest_players][0]
+            highest_players = max([x.players for x in self.matches])
+            match = [match for match in self.matches if match.players == highest_players][0]
             match.add_player(ctx.author)
             await ctx.send(embed=discord.Embed(
                 title="You have been added to the queue!",
-                description=f"The name of the match is __{match.name}__ which currently has **{match.player_count()}** players.",
+                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
             ))
+            await match.join_alert(ctx.author)
+            if  len(match.players) >= match.required_amount:
+                await match.start()
+                self.matches.remove(match)
 
 
     @typeracer.command(aliases=["quit"])
     @has_command_permission()
     async def exit(self, ctx):
-        match = self.get_game(ctx.author)
+        match = self.get_match(ctx.author)
         if match:
             match.remove_player(ctx.author)
             await ctx.send(f"You removed yourself from the queue of the match __{match.name}__")
@@ -120,7 +168,7 @@ class Fun(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}typingtest <type>`\nThere are two types available: `time` and `word`"
             ))
 
-        elif type not in ["time", "word"]:
+        if type not in ["time", "word"]:
             return await ctx.send(embed=discord.Embed(
                 title="🚫 Invalid type",
                 description="The type can be either `time` or `word`",
@@ -154,7 +202,6 @@ class Fun(commands.Cog):
             else:
                 if str(reaction.emoji) == TYPE_15:
                     config = CONFIG_15
-
                 elif str(reaction.emoji) == TYPE_30:
                     config = CONFIG_30
                 elif str(reaction.emoji) == TYPE_60:
@@ -165,7 +212,8 @@ class Fun(commands.Cog):
             await self.bot.wait_for("reaction_add", check=confirmcheck)
         else:
             config = CONFIG_15
-            config["time"] = 60
+            if type == "word":
+                config["time"] = 60
 
         get_text = random_text(config["time"] if type == "time" else 10)
         text = get_text if get_text.endswith(".") else get_text+"."
@@ -463,13 +511,6 @@ class Fun(commands.Cog):
 
         else:
             await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
-
-    @tasks.loop(seconds=2)
-    async def player_check(self):
-        for match in self.games:
-            if match.player_count() >= 2:
-                await match.start()
-                self.games.remove(match)
 
 
 def setup(bot):

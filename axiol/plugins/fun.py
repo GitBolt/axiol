@@ -1,17 +1,20 @@
 import re
 import os
 import time
-import discord
+import typing
 import asyncio
+import discord
 import textwrap
 from io import BytesIO
 from datetime import datetime
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-import variables as var
-from functions import random_text, getprefix, random_name, code_generator
-from ext.permissions import has_command_permission
+from discord.ext.commands.core import command
 import database as db
+import variables as var
+from ext.permissions import has_command_permission
+from functions import random_text, getprefix, random_name, code_generator
+
 
 TYPE_15 = "<:15:866917795513892883>" 
 TYPE_30 = "<:30:866917795261579304>"
@@ -71,7 +74,7 @@ class TypeRacer:
             else:
                 wrong_chars.append(y)
 
-        time_taken =  round((time.time() - initial_time)-2, 2)
+        time_taken =  round(time.time() - initial_time, 2)
         raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
         error_rate = round(len(wrong_chars) / time_taken, 2)
         wpm = round(raw_wpm - error_rate, 2)
@@ -138,8 +141,7 @@ class TypeRacer:
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-
+        self.matches: typing.List[TypeRacer] = []
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
@@ -269,12 +271,20 @@ class Fun(commands.Cog):
             )
             )
             await match.join_alert(ctx.author)
-            if  len(match.players) >= match.required_amount:
+            if len(match.players) >= match.required_amount:
                 await match.start()
                 self.matches.remove(match)
         else:
             await ctx.send("Invalid code.")
 
+    @typeracer.command()
+    @commands.is_owner()
+    async def matches(self, ctx):
+        embed = discord.Embed(title="All active matches", description=f"There are currently {len(self.matches)} queues", color=var.C_MAIN)
+        for match in self.matches:
+            embed.add_field(name=match.name + " - " + match.code, value=len(match.players) + "/" + match.required_amount, inline=False)
+
+        await ctx.send(embed=embed)
 
 
     @commands.command()

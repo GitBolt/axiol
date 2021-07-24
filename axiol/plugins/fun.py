@@ -5,10 +5,11 @@ import discord
 import asyncio
 import textwrap
 from io import BytesIO
+from datetime import datetime
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import variables as var
-from functions import random_text, getprefix
+from functions import random_text, getprefix, random_name, code_generator
 from ext.permissions import has_command_permission
 import database as db
 
@@ -19,6 +20,120 @@ TYPE_60 = "<:60:866917796507418634>"
 CONFIG_15 = {"time":15, "size": 75, "width": 35, "height": 120}
 CONFIG_30 = {"time":30, "size": 60, "width": 45, "height": 95}
 CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
+
+
+class TypeRacer:
+    def __init__(self, bot, players, required_amount, name=random_name()):
+        self.bot = bot
+        self.players = []
+        self.players.append(players)
+        self.name = name
+        self.required_amount = required_amount
+
+        self.created_at = datetime.now()
+        self.code = code_generator()
+
+    def add_player(self, player):
+        self.players.append(player)
+
+    def remove_player(self, player):
+        self.players.remove(player)
+
+    def time_elapsed(self):
+        time =  datetime.now() - self.created_at
+        if time.total_seconds() < 60:
+            return f"{round(time.total_seconds(), 1)} seconds"
+        else:
+            return f"{round(time.total_seconds()/60, 1)} minutes"
+
+    @staticmethod
+    def create_board():
+        get_text = random_text(10)
+        text = get_text if get_text.endswith(".") else get_text+"."
+        image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
+        font2 = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Light.ttf")), CONFIG_15["size"])
+        draw.text((810, 55), "60" ,(184,184,184),font=font)
+        offset = 300
+        for line in textwrap.wrap(text, width=CONFIG_15["width"]):
+            draw.text((72, offset), line ,(169,240,255),font=font2)
+            offset += CONFIG_15["height"]
+        return image, text
+
+    @staticmethod
+    def calculate_result(initial_time, user_content, text):
+        wrong_chars = []
+        correct_chars = []
+        for x, y in zip(text, user_content):
+            if x == y:
+                correct_chars.append(y)
+            else:
+                wrong_chars.append(y)
+
+        time_taken =  round((time.time() - initial_time)-2, 2)
+        raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
+        error_rate = round(len(wrong_chars) / time_taken, 2)
+        wpm = round(raw_wpm - error_rate, 2)
+        wpm = wpm if wpm >= 0 else 0
+        return wpm
+
+    async def join_alert(self, user):
+        for player in self.players:
+            await player.send(f"__New player has joined!__\n{user} just joined the queue, {len(self.players)} players now.")
+
+    async def coro(self, player):
+        try:
+            m = await self.bot.wait_for("message", check=lambda m:m.author == player, timeout=60)
+            if m:
+                await player.send(f"You test has been completed! Waiting for other players to complete to send results.")
+                return m.content
+        except asyncio.TimeoutError:
+            await player.send("Time is up! You failed to complete the test in time.")
+
+    async def start(self):
+        count = 3
+        embed = discord.Embed(
+        title="All players joined!", 
+        description=f"Match starting in {count}...", 
+        color=var.C_MAIN, 
+        ).add_field(name="Started", value=f"{self.time_elapsed()} ago", inline=False
+        ).add_field(name="Players", value="\n".join([str(player) for player in self.players]), inline=False
+        )
+        msgs = {}
+        for player in self.players:
+            msg = await player.send(embed=embed)
+            msgs.update({player:msg})
+
+        for _ in range(2):
+            count -= 1
+            await asyncio.sleep(1)
+            for msg in msgs.values():
+                embed.description = f"Match starting in {count}..."
+                await msg.edit(embed=embed)
+
+        with BytesIO() as image_binary:
+            image, text = self.create_board()
+            image.save(image_binary, 'PNG')
+            for player in self.players:
+                image_binary.seek(0)
+                embed.description = f"Match starting now!"
+                await msgs[player].edit(embed=embed)
+                await player.send(file=discord.File(fp=image_binary, filename='easter_egg_found-report_this_to_get_a_special_role_in_the_support_server!.png'))
+                await msgs[player].delete()
+        
+        initial_time = time.time()
+        result_embed = discord.Embed(title="Typing race results", color=var.C_GREEN)
+        results = {}
+        messages = await asyncio.gather(*[self.coro(player)for  player in self.players])
+        for player, message in zip(self.players, messages):
+            results.update({self.calculate_result(initial_time, message, text): player})
+        ordered = sorted(results.items(), reverse=True)
+        for r in ordered:
+            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0]} WPM", inline=False)
+
+        for player in self.players:
+            await player.send(embed=result_embed)
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -36,6 +151,132 @@ class Fun(commands.Cog):
                 color=var.C_ORANGE
             ))
     
+    def check_playing(self, player:discord.Member):
+        return any(player in match.players for match in self.matches)
+    
+    def get_match(self, player:discord.Member):
+        for match in self.matches:
+            if player in match.players:
+                return match
+
+    
+    @commands.group(pass_context=True, invoke_without_command=True)
+    @has_command_permission()
+    async def typeracer(self, ctx):
+
+        if self.check_playing(ctx.author):
+            match = self.get_match(ctx.author)
+            return await ctx.send(content=f"You are already in a queue {ctx.author.mention}", embed=discord.Embed(
+                title=f"Queue info",
+                description=f"The match currently has `{len(match.players)}` players in the queue",
+                color=var.C_ORANGE
+                ).add_field(name="Match name", value=match.name, inline=False
+                ).add_field(name="Code", value=match.code, inline=False
+                ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+                ).add_field(name="Players required", value=match.required_amount, inline=False
+                ))
+
+        if not self.matches:
+            await ctx.send(embed=discord.Embed(
+                title="No matches found",
+                description="There are no on going queues right now, maybe create your own?",
+                color=var.C_ORANGE
+            ).add_field(name="Start a new match", value=f"```{getprefix(ctx)}typeracer new <number_of_players>```")
+            )
+        else:
+            highest_players = max([x.players for x in self.matches])
+            match = [match for match in self.matches if match.players == highest_players][0]
+            match.add_player(ctx.author)
+            await ctx.send(embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
+                color=var.C_BLUE
+            ).add_field(name="Code", value=match.code, inline=False
+            ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+            ).add_field(name="Players required", value=match.required_amount, inline=False
+            )
+            )
+            await match.join_alert(ctx.author)
+            if  len(match.players) >= match.required_amount:
+                await match.start()
+                self.matches.remove(match)
+
+
+    @typeracer.command(aliases=["quit", "leave"])
+    @has_command_permission()
+    async def exit(self, ctx):
+        match = self.get_match(ctx.author)
+        if match:
+            match.remove_player(ctx.author)
+            await ctx.send(f"You removed yourself from the queue of the match __{match.name}__")
+        else:
+            await ctx.send("You are not in any match queue right now.")
+
+
+    @typeracer.command(aliases=["start"])
+    @has_command_permission()
+    async def new(self, ctx, player_amount=None):
+        if player_amount is None:
+            return await ctx.send(embed=discord.Embed(
+                title="🚫 Missing argument",
+                description="You need to enter the player amount too!",
+                color=var.C_RED
+            ).add_field(name="format", value=f"```{getprefix(ctx)}typeracer new <player_amount>```"
+            ))
+        if self.get_match(ctx.author):
+            return await ctx.send("You are already in a match queue!")
+        if not player_amount.isnumeric():
+            return await ctx.send("The argument which you entered is not numeric.")
+
+        player_amount = int(player_amount)
+        match = TypeRacer(self.bot, ctx.author, player_amount)
+        self.matches.append(match)
+        await ctx.send(embed=discord.Embed(
+            title="You have started a new match!",
+            description=f"The name of this match is __{match.name}__",
+            color=var.C_GREEN
+        ).add_field(name="Code", value=match.code, inline=False
+        ).add_field(name="Players required", value=match.required_amount, inline=False
+        ).set_footer(text="Waiting for players to join..."
+        ).set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        )
+        if player_amount == 1:
+            await match.start()
+
+    @typeracer.command()
+    @has_command_permission()
+    async def join(self, ctx, code=None):
+        if code is None:
+            return await ctx.send(embed=discord.Embed(
+                title="🚫 Missing argument",
+                description="You need to enter the code too!",
+                color=var.C_RED
+            ).add_field(name="format", value=f"```{getprefix(ctx)}typeracer join <code>```"
+            ))
+        if self.get_match(ctx.author):
+            return await ctx.send("You are already in a match queue!")
+
+        if code in [x.code for x in self.matches]:
+            match = [match for match in self.matches if match.code == code][0]
+            match.add_player(ctx.author)
+            await ctx.send(embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
+                color=var.C_BLUE
+            ).add_field(name="Code", value=match.code,
+            ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+            ).add_field(name="Players required", value=match.required_amount
+            )
+            )
+            await match.join_alert(ctx.author)
+            if  len(match.players) >= match.required_amount:
+                await match.start()
+                self.matches.remove(match)
+        else:
+            await ctx.send("Invalid code.")
+
+
+
     @commands.command()
     @has_command_permission()
     async def typingtest(self, ctx, type=None):

@@ -7,6 +7,8 @@ import variables as var
 
 #Function to get current server prefix
 def serverprefix(bot, message):
+    if not message.guild:
+        return var.DEFAULT_PREFIX
     if db.PREFIXES.find_one({"_id": message.guild.id}) is None:
         return var.DEFAULT_PREFIX
     return db.PREFIXES.find_one({"_id": message.guild.id}).get("prefix")

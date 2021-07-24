@@ -250,6 +250,8 @@ class Karma(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if not message.guild:
+            return
         if db.PLUGINS.find_one({"_id": message.guild.id})["Karma"] and message.author.bot == False:
             if not message.channel.id in db.KARMADATBASE[str(message.guild.id)].find_one({"_id":0})["blacklists"]:
 

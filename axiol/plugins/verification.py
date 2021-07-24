@@ -362,9 +362,11 @@ class Verification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if db.PLUGINS["Verification"]:
+        if not message.guild:
+            return
+        if db.PLUGINS.find_one({"_id":message.guild.id})["Verification"]:
             GuildVerifyDoc = db.VERIFY.find_one({"_id": message.guild.id})
-            if (message.channel.id == GuildVerifyDoc.get("channel") and 
+            if (message.channel.id == GuildVerifyDoc["channel"] and 
                 message.author != self.bot.user):
                 
                 await message.delete()

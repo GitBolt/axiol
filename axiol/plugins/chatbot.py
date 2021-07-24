@@ -113,6 +113,8 @@ class Chatbot(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if not message.guild:
+            return
         GuildChatbotDoc = db.CHATBOT.find_one({"_id": message.guild.id})
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
         

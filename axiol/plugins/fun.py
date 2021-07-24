@@ -150,18 +150,15 @@ class Fun(commands.Cog):
                 ).add_field(name="Match name", value=match.name, inline=False
                 ).add_field(name="Code", value=match.code,
                 ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
-                ).add_field(name="Required player amount", value=match.required_amount
+                ).add_field(name="Players required", value=match.required_amount
                 ))
 
         if not self.matches:
-            match = TypeRacer(self.bot, ctx.author, 5)
-            self.matches.append(match)
             await ctx.send(embed=discord.Embed(
-                title="You have started a new match!",
-                description=f"The name of this match is __{match.name}__",
-                color=var.C_GREEN
-            ).add_field(name="Code", value=match.code
-            ).set_footer(text="Waiting for players to join...")
+                title="No matches found",
+                description="There are no on going queues right now, maybe create your own?",
+                color=var.C_ORANGE
+            ).add_field(name="Start a new match", value=f"```{getprefix(ctx)}typeracer new <number_of_players>```")
             )
         else:
             highest_players = max([x.players for x in self.matches])
@@ -171,7 +168,10 @@ class Fun(commands.Cog):
                 title="You have been added to the queue!",
                 description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
-            ).add_field(name="Code", value=match.code)
+            ).add_field(name="Code", value=match.code,
+            ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+            ).add_field(name="Players required", value=match.required_amount
+            )
             )
             await match.join_alert(ctx.author)
             if  len(match.players) >= match.required_amount:
@@ -213,6 +213,7 @@ class Fun(commands.Cog):
             description=f"The name of this match is __{match.name}__",
             color=var.C_GREEN
         ).add_field(name="Code", value=match.code
+        ).add_field(name="Players reqired", value=match.required_amount
         ).set_footer(text="Waiting for players to join...")
         )
         if player_amount == 1:
@@ -238,7 +239,10 @@ class Fun(commands.Cog):
                 title="You have been added to the queue!",
                 description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
-            ).add_field(name="Code", value=match.code)
+            ).add_field(name="Code", value=match.code,
+            ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
+            ).add_field(name="Players required", value=match.required_amount
+            )
             )
             await match.join_alert(ctx.author)
             if  len(match.players) >= match.required_amount:

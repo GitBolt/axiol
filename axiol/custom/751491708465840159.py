@@ -51,7 +51,8 @@ class LogicallyAnswered(commands.Cog):
     #Soon gonna add auto reactions too
     @commands.Cog.listener()
     async def on_message(self, message):
-        
+        if not message.guild:
+            return
         def messagecheck(msg):
             allowed = list(string.ascii_lowercase + string.digits)
             return msg <= allowed

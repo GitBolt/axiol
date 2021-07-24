@@ -321,7 +321,8 @@ class ChemistryHelp(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-
+        if not message.guild:
+            return
         if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383] and message.author.bot == False:
 
             GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]

@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands, tasks
 import string
-import requests
+import random
+from functions import random_text
 import variables as var
 
 #Custom cog for Logically Answered discord server | 751491708465840159
@@ -37,14 +38,22 @@ class LogicallyAnswered(commands.Cog):
             await ctx.send("You don't have level 30+ role yet, you can't use the command right now.")
 
         
-    @commands.command()
-    async def storystart(self, ctx):
+    @commands.group(pass_context=True, invoke_without_command=True)
+    async def ows(self, ctx):
+        status = onewordstory.is_running()
+        seconds = onewordstory.seconds
+        minutes = onewordstory.minutes
+        hours = onewordstory.hours
+        await ctx.send(f"```css\n.Running? [{status}]\n.StopWhen? [{hours}h {minutes}h {seconds}s]```")
+
+    @ows.command()
+    async def start(self, ctx):
         onewordstory.start(self, ctx)
         await ctx.send(f"{var.E_ENABLE} Started the background proccess for one word story")
 
-    @commands.command()
-    async def storystop(self, ctx):
-        onewordstory.cancel()
+    @ows.command()
+    async def stop(self, ctx):
+        onewordstory.stop()
         await ctx.send(f"{var.E_DISABLE} Stopped the background proccess for one word story")
 
 
@@ -110,25 +119,22 @@ class LogicallyAnswered(commands.Cog):
 async def onewordstory(self, ctx):
     channel = self.bot.get_channel(803308171577393172)
     botmsg = await channel.history().find(lambda m: m.author == self.bot.user)
-    unfiltered = []
-    for i in botmsg.embeds:
-        unfiltered.append(i.to_dict())
-    firstword = unfiltered[0]["title"]
-    storymessages = await channel.history(after=botmsg).flatten()
-    wholestory = ""
-    for msg in storymessages:
-        wholestory += msg.content + ' '
 
-    word = requests.get("https://random-word-api.herokuapp.com/word?number=1")
+    botembeds = [embed.to_dict() for embed in botmsg.embeds]
+    firstword = botembeds[0]["fields"][0]["value"]
+    messages = await channel.history(after=botmsg).flatten()
+    previous_story = " ".join([msg.content for msg in messages])
 
     embed = discord.Embed(
-            title=f"`{word.json()[0]}`",
+            title=f"Create a new story!",
+            description = f">>> **Previous story**\n{firstword} {previous_story}",
             color=var.C_MAIN
-    ).add_field(name="Previous story", value=f"**{firstword}** {wholestory}"
-    ).set_footer(text='After 12 hours I will combine all the words and form a story and then send a new word to start a new story!'
-    )
+    ).add_field(name="New word", value=random_text(0).strip("."))
 
     await channel.send(embed=embed)
-        
+
+
+
+
 def setup(bot):
     bot.add_cog(LogicallyAnswered(bot))

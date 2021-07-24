@@ -22,6 +22,10 @@ def random_text(typing_time):
 
     if typing_time > 30:
         r = range(typing_time+30)
+
+    elif typing_time == 0:
+        r = range(1)
+        
     else:
         r = range(typing_time*2)
 

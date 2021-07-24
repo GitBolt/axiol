@@ -47,10 +47,6 @@ class TypeRacer:
         else:
             return f"{round(time.total_seconds()/60, 1)} minutes"
 
-    async def join_alert(self, user):
-        for player in self.players:
-            await player.send(f"__New player has joined!__\n{user} just joined the queue, {len(self.players)} players now.")
-
     @staticmethod
     def create_board():
         get_text = random_text(10)
@@ -66,12 +62,36 @@ class TypeRacer:
             offset += CONFIG_15["height"]
         return image, text
 
-    async def coro(self, uid):
-        m = await self.bot.wait_for("message", check=lambda m:m.author.id ==uid, timeout=60)
-        if m:
-            await self.bot.get_user(uid).send("Yuim")
-            return m.content
-            
+    @staticmethod
+    def calculate_result(initial_time, user_content, text):
+        wrong_chars = []
+        correct_chars = []
+        for x, y in zip(text, user_content):
+            if x == y:
+                correct_chars.append(y)
+            else:
+                wrong_chars.append(y)
+
+        time_taken =  round((time.time() - initial_time)-2, 2)
+        raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
+        error_rate = round(len(wrong_chars) / time_taken, 2)
+        wpm = round(raw_wpm - error_rate, 2)
+        wpm = wpm if wpm >= 0 else 0
+        return wpm
+
+    async def join_alert(self, user):
+        for player in self.players:
+            await player.send(f"__New player has joined!__\n{user} just joined the queue, {len(self.players)} players now.")
+
+    async def coro(self, player):
+        try:
+            m = await self.bot.wait_for("message", check=lambda m:m.author == player, timeout=60)
+            if m:
+                await player.send(f"You test has been completed! Waiting for other players to complete to send results.")
+                return m.content
+        except asyncio.TimeoutError:
+            await player.send("Time is up! You failed to complete the test in time.")
+
     async def start(self):
         count = 3
         embed = discord.Embed(
@@ -100,17 +120,21 @@ class TypeRacer:
                 image_binary.seek(0)
                 embed.description = f"Match starting now!"
                 await msgs[player].edit(embed=embed)
-                await player.send(file=discord.File(fp=image_binary, filename='image.png'))
+                await player.send(file=discord.File(fp=image_binary, filename='easter_egg_found-report_this_to_get_a_special_role_in_the_support_server!.png'))
                 await msgs[player].delete()
-                m = await self.bot.wait_for("message", check=lambda m:m.author.id == player.id, timeout=10)
-            
-        uids = [x.id for x in self.players]
-        while True:
-            await asyncio.sleep(2)
-            texts = await asyncio.gather(*[self.coro(uid)for  uid in uids])
-            for uid, text in zip(uids, texts):
-                print("\n\n",uid, text,"\n\n")
+        
+        initial_time = time.time()
+        result_embed = discord.Embed(title="Typing race results", color=var.C_GREEN)
+        results = {}
+        messages = await asyncio.gather(*[self.coro(player)for  player in self.players])
+        for player, message in zip(self.players, messages):
+            results.update({self.calculate_result(initial_time, message, text): player})
+        ordered = sorted(results.items(), reverse=True)
+        for r in ordered:
+            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0]} WPM", inline=False)
 
+        for player in self.players:
+            await player.send(embed=result_embed)
 
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -148,9 +172,9 @@ class Fun(commands.Cog):
                 description=f"The match currently has `{len(match.players)}` players in the queue",
                 color=var.C_ORANGE
                 ).add_field(name="Match name", value=match.name, inline=False
-                ).add_field(name="Code", value=match.code,
+                ).add_field(name="Code", value=match.code, inline=False
                 ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
-                ).add_field(name="Players required", value=match.required_amount
+                ).add_field(name="Players required", value=match.required_amount, inline=False
                 ))
 
         if not self.matches:
@@ -168,9 +192,9 @@ class Fun(commands.Cog):
                 title="You have been added to the queue!",
                 description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
-            ).add_field(name="Code", value=match.code,
+            ).add_field(name="Code", value=match.code, inline=False
             ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
-            ).add_field(name="Players required", value=match.required_amount
+            ).add_field(name="Players required", value=match.required_amount, inline=False
             )
             )
             await match.join_alert(ctx.author)
@@ -212,9 +236,10 @@ class Fun(commands.Cog):
             title="You have started a new match!",
             description=f"The name of this match is __{match.name}__",
             color=var.C_GREEN
-        ).add_field(name="Code", value=match.code
-        ).add_field(name="Players reqired", value=match.required_amount
-        ).set_footer(text="Waiting for players to join...")
+        ).add_field(name="Code", value=match.code, inline=False
+        ).add_field(name="Players required", value=match.required_amount, inline=False
+        ).set_footer(text="Waiting for players to join..."
+        ).set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         )
         if player_amount == 1:
             await match.start()

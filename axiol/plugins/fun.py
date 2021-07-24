@@ -203,7 +203,7 @@ class Fun(commands.Cog):
                 self.matches.remove(match)
 
 
-    @typeracer.command(aliases=["quit"])
+    @typeracer.command(aliases=["quit", "leave"])
     @has_command_permission()
     async def exit(self, ctx):
         match = self.get_match(ctx.author)

@@ -17,8 +17,8 @@ def getxprange(message):
 
 
 def random_text(typing_time):
-    f = open("resources/all_text.txt").read()
-    words = f.split(" ")
+    f = open("resources/words.txt").read()
+    words = f.split("\n")
 
     if typing_time > 30:
         r = range(typing_time+30)
@@ -26,15 +26,13 @@ def random_text(typing_time):
         r = range(typing_time*2)
 
     text = " ".join([random.choice(words) for i in r])
-    return text
-
-def random_name():
-    file = open("resources/words.txt").read()
-    return random.choice(file.split(" ")) + " " + random.choice(file.split(" "))
+    return text+"."
 
 def code_generator():
     return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                              "1234567890", k = 5))
+
+
 
 """
 Some functions to counter errors and warnings while working locally :p

@@ -9,11 +9,10 @@ from io import BytesIO
 from datetime import datetime
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-from discord.ext.commands.core import command
 import database as db
 import variables as var
 from ext.permissions import has_command_permission
-from functions import random_text, getprefix, random_name, code_generator
+from functions import random_text, getprefix, code_generator
 
 
 TYPE_15 = "<:15:866917795513892883>" 
@@ -26,11 +25,10 @@ CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
 
 
 class TypeRacer:
-    def __init__(self, bot, players, required_amount, name=random_name()):
+    def __init__(self, bot, players, required_amount):
         self.bot = bot
         self.players = []
         self.players.append(players)
-        self.name = name
         self.required_amount = required_amount
 
         self.created_at = datetime.now()
@@ -122,7 +120,7 @@ class TypeRacer:
                 image_binary.seek(0)
                 embed.description = f"Match starting now!"
                 await msgs[player].edit(embed=embed)
-                await player.send(file=discord.File(fp=image_binary, filename='easter_egg_found-report_this_to_get_a_special_role_in_the_support_server!.png'))
+                await player.send(file=discord.File(fp=image_binary, filename='axiol_typeracer.png'))
                 await msgs[player].delete()
         
         initial_time = time.time()
@@ -172,7 +170,6 @@ class Fun(commands.Cog):
                 title=f"Queue info",
                 description=f"The match currently has `{len(match.players)}` players in the queue",
                 color=var.C_ORANGE
-                ).add_field(name="Match name", value=match.name, inline=False
                 ).add_field(name="Code", value=match.code, inline=False
                 ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
                 ).add_field(name="Players required", value=match.required_amount, inline=False
@@ -191,7 +188,7 @@ class Fun(commands.Cog):
             match.add_player(ctx.author)
             await ctx.send(embed=discord.Embed(
                 title="You have been added to the queue!",
-                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
+                description=f"The queue currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
             ).add_field(name="Code", value=match.code, inline=False
             ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
@@ -210,7 +207,7 @@ class Fun(commands.Cog):
         match = self.get_match(ctx.author)
         if match:
             match.remove_player(ctx.author)
-            await ctx.send(f"You removed yourself from the queue of the match __{match.name}__")
+            await ctx.send(f"You removed yourself from the queue of the match with code __{match.code}__")
         else:
             await ctx.send("You are not in any match queue right now.")
 
@@ -235,7 +232,7 @@ class Fun(commands.Cog):
         self.matches.append(match)
         await ctx.send(embed=discord.Embed(
             title="You have started a new match!",
-            description=f"The name of this match is __{match.name}__",
+            description=f"Invite your friends by sharing the code",
             color=var.C_GREEN
         ).add_field(name="Code", value=match.code, inline=False
         ).add_field(name="Players required", value=match.required_amount, inline=False
@@ -263,7 +260,7 @@ class Fun(commands.Cog):
             match.add_player(ctx.author)
             await ctx.send(embed=discord.Embed(
                 title="You have been added to the queue!",
-                description=f"The name of the match is __{match.name}__ which currently has **{len(match.players)}** players.",
+                description=f"The queue currently has **{len(match.players)}** players.",
                 color=var.C_BLUE
             ).add_field(name="Code", value=match.code,
             ).add_field(name="Started", value=match.time_elapsed() + " ago", inline=False
@@ -282,7 +279,7 @@ class Fun(commands.Cog):
     async def matches(self, ctx):
         embed = discord.Embed(title="All active matches", description=f"There are currently {len(self.matches)} queues", color=var.C_MAIN)
         for match in self.matches:
-            embed.add_field(name=match.name + " - " + match.code, value=len(match.players) + "/" + match.required_amount, inline=False)
+            embed.add_field(name=match.code, value=f"{len(match.players)}/{match.required_amount}", inline=False)
 
         await ctx.send(embed=embed)
 
@@ -461,7 +458,7 @@ class Fun(commands.Cog):
                 return message.author == ctx.author and message.channel.id == ctx.channel.id
 
             while True:
-                reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck, timeout=20.0)
+                reaction, user = await self.bot.wait_for('reaction_add', check=previewreactioncheck)
                 if str(reaction.emoji) == "🖌️":
                     await ctx.send("Send a hex colour code to make it the embed colour! You can use either 3 or 6 hex characters")
                     usermsg = await self.bot.wait_for('message', check=msgcheck)

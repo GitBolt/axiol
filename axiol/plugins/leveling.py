@@ -507,7 +507,8 @@ class Leveling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        
+        if not message.guild:
+            return
         GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
         if GuildPluginLevelingDoc.get("Leveling") and message.author.bot == False:

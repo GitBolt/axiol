@@ -113,10 +113,10 @@ def settingshelp(ctx: commands.Context) -> discord.Embed:
 
 def funhelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title=f"🎯 Fun", description="Let's have some fun!", color=var.C_MAIN
-    ).add_field(name=getprefix(ctx)+"typeracer", value="Quickly join a type racing queue with most players! Make sure that I can DM you for this to work"
-    ).add_field(name=getprefix(ctx)+"typeracer new `<player_count>`", value="Create your own type racing match, share the code with your friends for them to join!"
-    ).add_field(name=getprefix(ctx)+"typeracer join `<code>`", value="Join a type racing match. Make sure the code is valid!"
-    ).add_field(name=getprefix(ctx)+"typeracer exit", value="Leave the type racing queue in which you are currently in"
+    ).add_field(name=getprefix(ctx)+"typeracer", value="Quickly join a type racing queue with most players! Make sure that I can DM you for this to work", inline=False
+    ).add_field(name=getprefix(ctx)+"typeracer new `<player_count>`", value="Create your own type racing match, share the code with your friends for them to join!", inline=False
+    ).add_field(name=getprefix(ctx)+"typeracer join `<code>`", value="Join a type racing match. Make sure the code is valid!", inline=False
+    ).add_field(name=getprefix(ctx)+"typeracer exit", value="Leave the type racing queue in which you are currently in", inline=False
     ).add_field(name=getprefix(ctx)+"typingtest `<type>`",value="Starts a solo typing test! There are two types: `time` and `word`", inline=False
     ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False

@@ -113,8 +113,20 @@ By default this plugin is enabled, therefore Axiol will reply to all pings and d
   
 ## Fun
 Help command: ```.help fun```</br>
-<img src="https://cdn.discordapp.com/attachments/843519647055609856/867320597595160606/unknown.png" width=280> </br>
+<img src="https://cdn.discordapp.com/attachments/843519647055609856/868409390359773184/unknown.png" width=280> </br>
 By default this plugin is enabled.
+
+#### .typeracer
+  Makes you join a typing race queue quickly! The queue in which you are joined is the one with highest number of players out of all other queues to start the match quickly, in case there are not active queues then Axiol will inform you with that.
+
+#### .typeracer new \<player_amount>
+  This creates a new type racing match! In case there aren't any publically avaialable queues then you can create your own, the player amount is the total number of players required to start the match; not minimum or maximum.
+
+#### .typeracer join \<code>
+  Using this command you can join any typing race queue, every match (or queue) has a unique code using which anyone can join, the code is case sensitive.
+
+#### .typeracer exit
+  To leave the queue you are currently in, you can use this command. You don't need to define the match using code or name since one user can join only one queue at a time. There is no confirmation for leaving.
 
 #### .typingtest \<type>
   Test your typing speed! There are two types of test right now: `time` and `word` </br>

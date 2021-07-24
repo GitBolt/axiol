@@ -23,7 +23,7 @@ class Errors(commands.Cog):
             )
 
         #Missing Permissions
-        if isinstance(error, commands.MissingPermissions):
+        elif isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(
                         title="Missing Permissions",
                         description=f"🚫 You don't have permissions to do that {ctx.author.name} ",
@@ -31,7 +31,7 @@ class Errors(commands.Cog):
             ))
 
         #Member not found (left)
-        if isinstance(error, commands.MemberNotFound):
+        elif isinstance(error, commands.MemberNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Member not found",
                 description=f"🚫 You sure the mention/ID is correct? Or maybe they left? Maybe they don't even exist? [SpongoBob?](https://youtu.be/wjXBqelv4GM)",
@@ -39,7 +39,7 @@ class Errors(commands.Cog):
             ))
 
         #User not found (account deleted)
-        if isinstance(error, commands.UserNotFound):
+        elif isinstance(error, commands.UserNotFound):
             await ctx.send(embed=discord.Embed(
                 title="User not found",
                 description="🚫 Make sure the User ID is correct, if you are sure it's correct then perhaps the User deleted their account?",
@@ -47,14 +47,14 @@ class Errors(commands.Cog):
             ))
 
         #Message not found
-        if isinstance(error, commands.MessageNotFound):
+        elif isinstance(error, commands.MessageNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Message not found",
                 description="🚫 Are you sure that the message ID belongs to this server and is valid?",
                 color=C_RED
             ))
 
-        if isinstance(error, commands.RoleNotFound):
+        elif isinstance(error, commands.RoleNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Role not found",
                 description="🚫 Make sure that the ID or mention is correct. Maybe you pinged any member instead of the role? Maybe you copied the wrong ID?",
@@ -62,7 +62,7 @@ class Errors(commands.Cog):
             ))
 
         #Cog check failure
-        if isinstance(error, commands.CheckFailure):
+        elif isinstance(error, commands.CheckFailure):
             pass
 
 

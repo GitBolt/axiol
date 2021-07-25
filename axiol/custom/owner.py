@@ -3,7 +3,9 @@ from discord.ext import commands
 from functions import updatedb
 from discord.ext.commands import GuildConverter
 import database as db
+import difflib
 
+Differentiator = difflib.Differ()
 # A private cog which only works for me
 class Owner(commands.Cog):
     def __init__(self, bot):
@@ -17,18 +19,18 @@ class Owner(commands.Cog):
     async def accuracy(self, ctx, *, txt=None):
         if txt is None:
             return await ctx.send("You need to define both main text and user inputted content sepeated by `|`")
-        text = txt.split("|")[0].lstrip(' ').rstrip(' ').lower()
-        content = txt.split("|")[1].lstrip(' ').rstrip(' ').lower()
-        wrong_chars = []
-        correct_chars = []
-        for x, y in zip(text, content):
-            if x == y:
-                correct_chars.append(y)
-            else:
-                wrong_chars.append(y)
-        accuracy = round((len(correct_chars) / (len(wrong_chars)+len(correct_chars))) * 100, 2) if len(correct_chars) != 0 else 0
+        raw_text = txt.split("|")[0].lstrip(' ').rstrip(' ').lower()
+        user_content = txt.split("|")[1].lstrip(' ').rstrip(' ').lower()
 
-        await ctx.send(f"Main text: {text}\nUser input: {content}\n\nMain text characters: __{len(text)}__\nInput text characters: __{len(content)}__\n```Mistakes: __{len(wrong_chars)}__\nAccuracy: {accuracy}%```")
+        text = " ".join(raw_text.split(" ")[:len(user_content.split(" "))])
+
+        comparision = Differentiator.compare(text, user_content)
+        mistakes = [x for x in comparision if "-" in x or "+" in x]
+        comparision = Differentiator.compare(text, user_content)
+        
+        accuracy = difflib.SequenceMatcher(None, text, user_content).ratio()
+
+        await ctx.send(f"Main text characters: __{len(text)}__\nInput text characters: __{len(user_content)}__\n```Mistakes: __{len(mistakes)}__\nAccuracy: {accuracy}%```")
 
 
     @commands.command()

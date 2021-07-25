@@ -2,6 +2,7 @@ import re
 import os
 import time
 import typing
+import difflib
 import asyncio
 import discord
 import textwrap
@@ -23,6 +24,7 @@ CONFIG_15 = {"time":15, "size": 75, "width": 35, "height": 120}
 CONFIG_30 = {"time":30, "size": 60, "width": 45, "height": 95}
 CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
 
+Differentiator = difflib.Differ()
 
 class TypeRacer:
     def __init__(self, bot, players, required_amount):
@@ -63,18 +65,14 @@ class TypeRacer:
         return image, text
 
     @staticmethod
-    def calculate_result(initial_time, user_content, text):
-        wrong_chars = []
-        correct_chars = []
-        for x, y in zip(text, user_content):
-            if x == y:
-                correct_chars.append(y)
-            else:
-                wrong_chars.append(y)
-
-        time_taken =  round(time.time() - initial_time, 2)
+    def calculate_result(initial_time, raw_text, user_content):
+        text = " ".join(raw_text.split(" ")[:len(user_content.split(" "))])
+        comparision = Differentiator.compare(text, user_content)
+        mistakes = [x for x in comparision if "-" in x or "+" in x]
+        accuracy = round(difflib.SequenceMatcher(None, text, user_content).ratio(), 2)*100
+        time_taken =  round((time.time() - initial_time)-1, 2)
         raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
-        error_rate = round(len(wrong_chars) / time_taken, 2)
+        error_rate = round(len(mistakes) / time_taken, 2)
         wpm = round(raw_wpm - error_rate, 2)
         wpm = wpm if wpm >= 0 else 0
         return wpm
@@ -379,25 +377,22 @@ class Fun(commands.Cog):
                     if timer == 5:
                         await ctx.send(f"Only 5 seconds left {ctx.author.mention}!")
                 else:
-                    content = waiter.result().content
+                    user_content = waiter.result().content
 
-                    wrong_chars = []
-                    correct_chars = []
-                    for x, y in zip(text, content):
-                        if x == y:
-                            correct_chars.append(y)
-                        else:
-                            wrong_chars.append(y)
+                    text = " ".join(text.split(" ")[:len(user_content.split(" "))])
+                    comparision = Differentiator.compare(text, user_content)
+                    mistakes = [x for x in comparision if "-" in x or "+" in x]
+                    comparision = Differentiator.compare(text, user_content)
 
-                    time_taken =  round((time.time() - initial_time)-2, 2)
-                    total_chars_len = len(correct_chars) + len(wrong_chars)
-                    raw_wpm = round((len(content)/5/time_taken)*60, 2)
-                    accuracy = round((len(correct_chars) / total_chars_len) * 100, 2) if len(correct_chars) != 0 else 0
-                    mistakes = str(len(wrong_chars)) + "/" + str(total_chars_len)
-                    error_rate = round(len(wrong_chars) / time_taken, 2)
+                    time_taken =  round((time.time() - initial_time)-1, 2)
+                    raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
+                    mistake_ratio = f"{len(mistakes)}/{len(user_content)}"
+                    accuracy = round(difflib.SequenceMatcher(None, text, user_content).ratio(), 2)*100
+                    error_rate = round(len(mistakes) / time_taken, 2)
                     wpm = round(raw_wpm - error_rate, 2)
                     wpm = wpm if wpm >= 0 else 0
-                    description = "Your typing speed is above average :ok_hand:" if wpm >= 60 else "Your typing speed is below average"
+                    
+                    description = "Your typing speed is above average 📈" if wpm >= 60 else "Your typing speed is below average 📉"
 
                     embed = discord.Embed(
                         title=f"{wpm} words per minute",
@@ -406,7 +401,7 @@ class Fun(commands.Cog):
                     embed.add_field(name="Raw WPM", value=f"{raw_wpm}", inline=False)
                     embed.add_field(name="Time taken", value=f"{time_taken} Seconds", inline=False)
                     embed.add_field(name="Accuracy", value=f"{accuracy}%", inline=False)
-                    embed.add_field(name="Mistakes", value=mistakes, inline=False)
+                    embed.add_field(name="Mistakes", value=mistake_ratio, inline=False)
                     embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
 
                     embed.color = var.C_GREEN

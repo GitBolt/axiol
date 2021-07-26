@@ -20,14 +20,20 @@ def random_text(typing_time):
     f = open("resources/words.txt").read()
     words = f.split("\n")
 
-    if typing_time > 30:
-        r = range(typing_time+30)
+    if typing_time == 60:
+        r = range(60)
 
-    elif typing_time == 0:
-        r = range(1)
-        
+    elif typing_time == 30:
+        r = range(40)
+
+    elif typing_time == 15:
+        r = range(25)
+
+    elif typing_time == 10:
+        r = range(15)
+    
     else:
-        r = range(typing_time*2)
+        r = range(1)
 
     text = " ".join([random.choice(words) for i in r])
     return text+"."

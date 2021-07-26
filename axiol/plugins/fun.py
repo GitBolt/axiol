@@ -22,7 +22,7 @@ TYPE_60 = "<:60:866917796507418634>"
 
 CONFIG_15 = {"time":15, "size": 75, "width": 35, "height": 120}
 CONFIG_30 = {"time":30, "size": 60, "width": 45, "height": 95}
-CONFIG_60 = {"time":60, "size": 52, "width": 55, "height": 82}
+CONFIG_60 = {"time":60, "size": 54, "width": 52, "height": 82}
 
 Differentiator = difflib.Differ()
 
@@ -338,7 +338,7 @@ class Fun(commands.Cog):
             await self.bot.wait_for("reaction_add", check=confirmcheck)
         else:
             config = CONFIG_15
-            config["time"] = 60
+            if type == "time":config["word"] = 60
 
         get_text = random_text(config["time"] if type == "time" else 10)
         text = get_text if get_text.endswith(".") else get_text+"."

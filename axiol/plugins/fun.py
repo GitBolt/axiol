@@ -338,7 +338,7 @@ class Fun(commands.Cog):
             await self.bot.wait_for("reaction_add", check=confirmcheck)
         else:
             config = CONFIG_15
-            if type == "time":config["word"] = 60
+            if type == "word":config["time"] = 60
 
         get_text = random_text(config["time"] if type == "time" else 10)
         text = get_text if get_text.endswith(".") else get_text+"."

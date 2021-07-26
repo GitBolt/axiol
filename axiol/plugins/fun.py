@@ -330,7 +330,8 @@ class Fun(commands.Cog):
 
                 elif str(reaction.emoji) == TYPE_30:
                     config = CONFIG_30
-                elif str(reaction.emoji) == TYPE_60:
+
+                else:
                     config = CONFIG_60
 
             botmsg = await ctx.send(f"You have selected **{config['time']}** seconds for typing test, react to {var.E_ACCEPT} to start!")
@@ -338,7 +339,7 @@ class Fun(commands.Cog):
             await self.bot.wait_for("reaction_add", check=confirmcheck)
         else:
             config = CONFIG_15
-            if type == "word":config["time"] = 60
+            config["time"] = 60
 
         get_text = random_text(config["time"] if type == "time" else 10)
         text = get_text if get_text.endswith(".") else get_text+"."

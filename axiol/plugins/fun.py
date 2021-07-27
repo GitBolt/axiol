@@ -322,17 +322,18 @@ class Fun(commands.Cog):
                     return user == ctx.author and reaction.message == botmsg
 
             reaction, user = await  self.bot.wait_for("reaction_add", check=reactioncheck)
+            
             if str(reaction.emoji) == var.E_DECLINE:
-                await ctx.send(f" {var.E_ACCEPT} Cancelled typing test.")
-            else:
-                if str(reaction.emoji) == TYPE_15:
-                    config = CONFIG_15
+                return await ctx.send(f" {var.E_ACCEPT} Cancelled typing test.")
+                
+            if str(reaction.emoji) == TYPE_15:
+                config = CONFIG_15
 
-                elif str(reaction.emoji) == TYPE_30:
-                    config = CONFIG_30
+            if str(reaction.emoji) == TYPE_30:
+                config = CONFIG_30
 
-                else:
-                    config = CONFIG_60
+            if str(reaction.emoji) == TYPE_60:
+                config = CONFIG_60
 
             botmsg = await ctx.send(f"You have selected **{config['time']}** seconds for typing test, react to {var.E_ACCEPT} to start!")
             await botmsg.add_reaction(var.E_ACCEPT)
@@ -341,8 +342,7 @@ class Fun(commands.Cog):
             config = CONFIG_15
             config["time"] = 60
 
-        get_text = random_text(config["time"] if type == "time" else 10)
-        text = get_text if get_text.endswith(".") else get_text+"."
+        text = random_text(config["time"] if type == "time" else 10)
 
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)

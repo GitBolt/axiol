@@ -65,17 +65,17 @@ class TypeRacer:
         return image, text
 
     @staticmethod
-    def calculate_result(initial_time, raw_text, user_content):
+    def calculate_result(start_time, end_time, user_content, raw_text):
         text = " ".join(raw_text.split(" ")[:len(user_content.split(" "))])
         comparision = Differentiator.compare(text, user_content)
         mistakes = [x for x in comparision if "-" in x or "+" in x]
         accuracy = round(difflib.SequenceMatcher(None, text, user_content).ratio(), 2)*100
-        time_taken =  round((time.time() - initial_time)-1, 2)
+        time_taken =  round((end_time - start_time)-1, 2)
         raw_wpm = round((len(user_content)/5/time_taken)*60, 2)
         error_rate = round(len(mistakes) / time_taken, 2)
         wpm = round(raw_wpm - error_rate, 2)
         wpm = wpm if wpm >= 0 else 0
-        return wpm
+        return wpm, accuracy
 
     async def join_alert(self, user):
         for player in self.players:
@@ -86,7 +86,7 @@ class TypeRacer:
             m = await self.bot.wait_for("message", check=lambda m:m.author == player, timeout=60)
             if m:
                 await player.send(f"You test has been completed! Waiting for other players to complete to send results.")
-                return m.content
+                return time.time(), m.content
         except asyncio.TimeoutError:
             await player.send("Time is up! You failed to complete the test in time.")
 
@@ -121,12 +121,12 @@ class TypeRacer:
                 await player.send(file=discord.File(fp=image_binary, filename='axiol_typeracer.png'))
                 await msgs[player].delete()
         
-        initial_time = time.time()
+        start_time = time.time()
         result_embed = discord.Embed(title="Typing race results", color=var.C_GREEN)
         results = {}
-        messages = await asyncio.gather(*[self.coro(player)for  player in self.players])
-        for player, message in zip(self.players, messages):
-            results.update({self.calculate_result(initial_time, message, text): player})
+        datas = await asyncio.gather(*[self.coro(player)for  player in self.players])
+        for player, data in zip(self.players, datas):
+            results.update({self.calculate_result(start_time, data[0], data[1], text): player})
         ordered = sorted(results.items(), reverse=True)
         for r in ordered:
             result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0]} WPM", inline=False)

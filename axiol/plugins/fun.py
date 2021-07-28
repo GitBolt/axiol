@@ -284,8 +284,8 @@ class Fun(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def typingtest(self, ctx, type=None):
-        if type is None:
+    async def typingtest(self, ctx, test_type=None):
+        if test_type is None:
             return await ctx.send(embed=discord.Embed(
             title="🚫 Missing arguments",
             description="You need to define the typing test type too!",
@@ -293,7 +293,7 @@ class Fun(commands.Cog):
             ).add_field(name="Format", value=f"`{getprefix(ctx)}typingtest <type>`\nThere are two types available: `time` and `word`"
             ))
 
-        elif type not in ["time", "word"]:
+        elif test_type not in ["time", "word"]:
             return await ctx.send(embed=discord.Embed(
                 title="🚫 Invalid type",
                 description="The type can be either `time` or `word`",
@@ -302,9 +302,9 @@ class Fun(commands.Cog):
             ).add_field(name="word", value="Word base typing test, here you need to complete the entire text given and the max time is 60 seconds.")
             )
 
-        if type == "time":
+        if test_type == "time":
             botmsg = await ctx.send(embed=discord.Embed(
-                title=f"{type.capitalize()} based typing test",
+                title=f"{test_type.capitalize()} based typing test",
                 description=f"Let's see how fast you can type! React to the respective emoji below to start.\n\n{TYPE_15} 15 Seconds Test\n{TYPE_30} 30 Seconds Test\n{TYPE_60} 60 Seconds Test\n{var.E_DECLINE} Cancel Test",
                 color=var.C_BLUE
                 ).add_field(name="Note", value="The task is to type as much as you can in the time specified, not to complete all the text given. I will inform you when less time is left!")
@@ -324,7 +324,7 @@ class Fun(commands.Cog):
             reaction, user = await  self.bot.wait_for("reaction_add", check=reactioncheck)
             
             if str(reaction.emoji) == var.E_DECLINE:
-                return await ctx.send(f" {var.E_ACCEPT} Cancelled typing test.")
+                return await ctx.send(f"Cancelled typing test.")
                 
             if str(reaction.emoji) == TYPE_15:
                 config = CONFIG_15

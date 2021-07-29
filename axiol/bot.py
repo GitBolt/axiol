@@ -6,4 +6,4 @@ headers = {
 }
 
 r  = requests.get("https://discord.com/users/@me", headers=headers)
-print(f"Response: {r.status_code}\nMessage: {}")
+print(f"Response: {r.status_code}\nHeaders: {r.headers}")

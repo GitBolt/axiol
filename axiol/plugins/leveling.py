@@ -509,57 +509,57 @@ class Leveling(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        GuildPluginLevelingDoc = db.PLUGINS.find_one({"_id": message.guild.id})
 
-        if GuildPluginLevelingDoc.get("Leveling") and message.author.bot == False:
-            if not message.channel.id in db.LEVELDATABASE[str(message.guild.id)].find_one({"_id":0}).get("blacklistedchannels"):
+        GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
+        GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
 
-                GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
-                userdata = GuildLevelDoc.find_one({"_id": message.author.id})
+        if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc["blacklistedchannels"] or message.author.bot:
+            return
 
-                if userdata is None:
-                    GuildLevelDoc.insert_one({"_id": message.author.id, "xp": 0})
-                else:
-                    xp = userdata["xp"]
+        userdata = GuildLevelDoc.find_one({"_id": message.author.id})
 
-                    initlvl = 0
-                    while True:
-                        if xp < ((50*(initlvl**2))+(50*initlvl)):
-                            break
-                        initlvl += 1
+        if userdata is None:
+            GuildLevelDoc.insert_one({"_id": message.author.id, "xp": 0})
+        else:
+            xp = userdata["xp"]
 
-                    xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
-                    GuildLevelDoc.update_one(userdata, {"$set": {"xp": xp}})
+            initlvl = 0
+            while True:
+                if xp < ((50*(initlvl**2))+(50*initlvl)):
+                    break
+                initlvl += 1
 
-                    levelnow = 0
-                    while True:
-                        if xp < ((50*(levelnow**2))+(50*levelnow)):
-                            break
-                        levelnow += 1
+            xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
+            GuildLevelDoc.update_one(userdata, {"$set": {"xp": xp}})
 
-                    if levelnow > initlvl and GuildLevelDoc.find_one({"_id":0}).get("alerts") == True:
-                        ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0}).get("alertchannel"))
-                        embed = discord.Embed(
-                        title="You leveled up!",
-                        description=f"{var.E_ACCEPT} You are now level {levelnow}!",
-                        color=var.C_MAIN
-                        )
-                        try:
-                            if ch is not None:
-                                await ch.send(content=message.author.mention, embed=embed)
-                            else:
-                                await message.channel.send(content=message.author.mention, embed=embed)
-                        except discord.Forbidden:
-                            pass
+            levelnow = 0
+            while True:
+                if xp < ((50*(levelnow**2))+(50*levelnow)):
+                    break
+                levelnow += 1
 
-                    rewards = GuildLevelDoc.find_one({"_id":0}).get("rewards")
-                    if str(levelnow) in rewards.keys():
-                        roleid = rewards.get(str(levelnow))
-                        role = message.guild.get_role(roleid)
-                        if role is not None and role not in message.author.roles:
-                            try:
-                                await message.author.add_roles(role)
-                            except:
-                                print(f"ERROR! {role} - {roleid} in server {message.guild.id} with name {message.guild.name}")
+            if levelnow > initlvl and GuildLevelDoc.find_one({"_id": 0})["alerts"]:
+                ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0})["alertchannel"])
+                embed = discord.Embed(
+                title="You leveled up!",
+                description=f"{var.E_ACCEPT} You are now level {levelnow}!",
+                color=var.C_MAIN
+                )
+                try:
+                    if ch is not None:
+                        await ch.send(content=message.author.mention, embed=embed)
+                    else:
+                        await message.channel.send(content=message.author.mention, embed=embed)
+                except discord.Forbidden:
+                    pass
+
+            rewards = GuildLevelDoc.find_one({"_id":0}).get("rewards")
+            if str(levelnow) in rewards.keys():
+                roleid = rewards.get(str(levelnow))
+                role = message.guild.get_role(roleid)
+                if role is not None and role not in message.author.roles:
+                    await message.author.add_roles(role)
+
+
 def setup(bot):
     bot.add_cog(Leveling(bot))

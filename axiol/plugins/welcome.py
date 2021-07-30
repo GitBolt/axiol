@@ -53,7 +53,7 @@ class Welcome(commands.Cog):
             "channelid":chid,
             "message": None,
             "welcomegreeting": "Hope you enjoy your stay here ✨",
-            "image": "https://cdn.discordapp.com/attachments/843519647055609856/864924991597314078/Frame_1.png📷",
+            "image": "https://cdn.discordapp.com/attachments/843519647055609856/864924991597314078/Frame_1.png",
             "assignroles": []
         })
         successembed = discord.Embed(
@@ -293,7 +293,7 @@ class Welcome(commands.Cog):
             channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
 
             def getcontent():
-                if GuildWelcomeDoc.get("message") is None:
+                if GuildWelcomeDoc.get("message") == None:
                     content = greeting(member.mention)
                 else:
                     content = f"{member.mention} {GuildWelcomeDoc.get('message')}"

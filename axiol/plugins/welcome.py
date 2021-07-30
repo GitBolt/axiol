@@ -52,7 +52,7 @@ class Welcome(commands.Cog):
             "_id":ctx.guild.id,
             "channelid":chid,
             "message": None,
-            "welcomegreeting": "Hope you enjoy your stay here ✨",
+            "greeting": "Hope you enjoy your stay here ✨",
             "image": "https://cdn.discordapp.com/attachments/843519647055609856/864924991597314078/Frame_1.png",
             "assignroles": []
         })

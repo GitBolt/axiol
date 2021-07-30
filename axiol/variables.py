@@ -38,7 +38,7 @@ E_RECYCLE = "<:recycle:853300271944695858>"
 DICT_PLUGINEMOJIS = {
     "Leveling": E_LEVELING,
     "Moderation": "🔨",
-    "Reaction Roles": "✨",
+    "ReactionRoles": "✨",
     "Welcome": "👋",
     "Verification": "✅",
     "Chatbot": "🤖",

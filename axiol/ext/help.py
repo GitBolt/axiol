@@ -155,9 +155,9 @@ class Help(commands.Cog):
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
 
         for i in GuildDoc:
-            if GuildDoc.get(i) == True:
+            if GuildDoc.get(i):
                 helpname = i.lower()
-                if i.lower() == "reaction roles": #Reaction roles command doesn't have space in between reaction and roles
+                if i.lower() == "reactionroles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
                 embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{var.DICT_PLUGINEMOJIS.get(i)} {i} Help", inline=False)
 
@@ -178,7 +178,7 @@ class Help(commands.Cog):
         HelpDict = {
             "Leveling": levelhelp,
             "Moderation": modhelp,
-            "Reaction Roles":rrhelp,
+            "ReactionRoles":rrhelp,
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
@@ -251,7 +251,7 @@ class Help(commands.Cog):
     @help.command(aliases=["reaction_roles", "rr", "reaction-roles"])
     async def reactionroles(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Reaction Roles") == True:
+        if GuildDoc.get("ReactionRoles") == True:
             await ctx.send(embed=rrhelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(

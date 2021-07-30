@@ -71,7 +71,7 @@ class Owner(commands.Cog):
 
 
     @commands.command()
-    async def get_doc(self, ctx, doc_name, guild):
+    async def get_doc(self, ctx, doc_name=None, guild=None):
         if doc_name is None or guild is None:
             return await ctx.send("You need to define both document name and guild name/id")
         converter = GuildConverter()
@@ -94,6 +94,51 @@ class Owner(commands.Cog):
         for guild in self.bot.guilds:
             updatedb(guild.id)
         
+    @commands.command()
+    async def clean_db(self, ctx):
+        guildids = []
+        for guild in self.bot.guilds:
+            guildids.append(guild.id)
 
+        for i in db.AUTOMOD.find({}):
+            if i["_id"] not in guildids:
+                db.AUTOMOD.delete_one(i)
+                print("AUTOMOD", i["_id"])
+        print("\n")
+        for i in db.CHATBOT.find({}):
+            if i["_id"] not in guildids:
+                db.CHATBOT.delete_one(i)
+                print("CHATBOT", i["_id"])
+        print("\n")
+        for i in db.PERMISSIONS.find({}):
+            if i["_id"] not in guildids:
+                db.PERMISSIONS.delete_one(i)
+                print("PERMISSIONS", i["_id"])
+        print("\n")
+        for i in db.PLUGINS.find({}):
+            if i["_id"] not in guildids:
+                db.PLUGINS.delete_one(i)
+                print("PLUGINS", i["_id"])
+        print("\n")
+        for i in db.PREFIXES.find({}):
+            if i["_id"] not in guildids:
+                db.PREFIXES.delete_one(i)
+                print("PREFIXES", i["_id"])
+        print("\n")
+        for i in db.REACTIONROLES.find({}):
+            if i["_id"] not in guildids:
+                db.REACTIONROLES.delete_one(i)
+                print("REACTIONROLES", i["_id"])
+        print("\n")
+        for i in db.VERIFY.find({}):
+            if i["_id"] not in guildids:
+                db.VERIFY.delete_one(i)
+                print("VERIFY", i["_id"])
+        print("\n")
+        for i in db.WELCOME.find({}):
+            if i["_id"] not in guildids:
+                db.WELCOME.delete_one(i)
+                print("WELCOME", i["_id"])
+                
 def setup(bot):
     bot.add_cog(Owner(bot))

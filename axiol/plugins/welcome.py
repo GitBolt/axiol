@@ -296,7 +296,7 @@ class Welcome(commands.Cog):
                 if GuildWelcomeDoc.get("message") is None:
                     content = greeting(member.mention)
                 else:
-                    content = f"{member.mention} GuildWelcomeDoc.get("message")"
+                    content = f"{member.mention} {GuildWelcomeDoc.get('message')}"
                 return content
 
             embed = discord.Embed(

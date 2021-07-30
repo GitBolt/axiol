@@ -53,7 +53,7 @@ class Permissions(commands.Cog):
     @commands.command(aliases=["setpermission", "addperm", "addpermission"])
     @commands.has_permissions(administrator=True)
     async def setperm(self, ctx, plugin=None):
-        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome', 'Welcome', 'Verification', 'Chatbot', 'Commands', 'AutoMod', "Karma", "Fun"]
+        cogs = ['Leveling', 'Moderation', 'ReactionRoles', 'Welcome' , 'Verification', 'Chatbot', 'Extras', 'AutoMod', "Karma", "Fun"]
 
         if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
             embed = discord.Embed(
@@ -61,7 +61,7 @@ class Permissions(commands.Cog):
                 color=var.C_GREEN
             ).add_field(name="Note", value="Make sure to not enter the command name with the prefix, that would trigger the command. Just enter the command name followed by a space and then role (ID or Mention can be used)")
 
-            if plugin.lower() == "reactionroles":
+            if plugin.lower() == "reactionroles" or plugin.lower() == "rr":
                 plugin_name = "ReactionRoles"
             if plugin.lower() == "automod":
                 plugin_name = "AutoMod"

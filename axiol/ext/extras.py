@@ -61,7 +61,7 @@ class Extras(commands.Cog):
 
         embed = discord.Embed(
         title="Some information about me :flushed:",
-        description=f"[Donation](https://paypal.me/palbolt) [Vote](https://top.gg/bot/843484459113775114/vote) [Support](https://discord.gg/hxc73psNsB)"
+        description=f"[Donation](https://paypal.me/palbolt) [Vote](https://top.gg/bot/843484459113775114/vote) [Support](https://discord.gg/hxc73psNsB)",
         color=var.C_MAIN
         ).add_field(name="Server Count", value=guildcount, inline=False
         ).add_field(name="Members", value=membercount, inline=False

@@ -513,7 +513,7 @@ class Leveling(commands.Cog):
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
         GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
 
-        if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc["blacklistedchannels"] or message.author.bot:
+        if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc.find_one({"_id":0})["blacklistedchannels"] or message.author.bot:
             return
 
         userdata = GuildLevelDoc.find_one({"_id": message.author.id})

@@ -180,7 +180,7 @@ class ReactionRoles(commands.Cog):
             await botmsg.add_reaction("▶️")
 
 
-            async def reactionrolespagination(current_page, embed, Guild):
+            async def reactionrolespagination(current_page, embed):
                 pagern = current_page + 1
                 embed.set_footer(text=f"Page {pagern}/{all_pages}")
                 embed.clear_fields()
@@ -191,7 +191,7 @@ class ReactionRoles(commands.Cog):
                 for i in GuildDoc["reaction_roles"][rr_amount:]:
                     rrcount += 1
                     messageid = i.get("messageid")
-                    role = Guild.get_role(i.get("roleid"))
+                    role = ctx.guild.get_role(i.get("roleid"))
                     emoji = i.get("emoji")
                     embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\nMessageID: `{messageid}`", inline=False)
 
@@ -211,7 +211,7 @@ class ReactionRoles(commands.Cog):
                     except discord.Forbidden:
                         pass
                     current_page = 0
-                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await reactionrolespagination(current_page, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "➡️":
@@ -220,7 +220,7 @@ class ReactionRoles(commands.Cog):
                     except discord.Forbidden:
                         pass
                     current_page += 1
-                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await reactionrolespagination(current_page, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "⬅️":
@@ -231,7 +231,7 @@ class ReactionRoles(commands.Cog):
                     current_page -= 1
                     if current_page < 0:
                         current_page += 1
-                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await reactionrolespagination(current_page, embed)
                     await botmsg.edit(embed=embed)
 
                 if str(reaction.emoji) == "▶️":
@@ -240,7 +240,7 @@ class ReactionRoles(commands.Cog):
                     except discord.Forbidden:
                         pass
                     current_page = all_pages-1
-                    await reactionrolespagination(current_page, all_pages, embed, Guild, GuildDoc)
+                    await reactionrolespagination(current_page, embed)
                     await botmsg.edit(embed=embed)
 
         else:

@@ -342,7 +342,7 @@ class Fun(commands.Cog):
             config = CONFIG_15
             config["time"] = 60
 
-        text = random_text(config["time"] if type == "time" else 10)
+        text = random_text(config["time"] if test_type == "time" else 10)
 
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)

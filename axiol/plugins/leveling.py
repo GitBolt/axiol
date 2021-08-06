@@ -96,7 +96,7 @@ class Leveling(commands.Cog):
         for i in rankings:
             rankcount += 1
             try:
-                user = ctx.guild.get_member(i.get("_id"))
+                user = self.bot.get_user(i.get("_id"))
                 xp = i.get("xp")
                 embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
             except:

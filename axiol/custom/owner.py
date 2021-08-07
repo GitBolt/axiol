@@ -71,7 +71,7 @@ class Owner(commands.Cog):
 
 
     @commands.command()
-    async def get_doc(self, ctx, doc_name=None, guild=None):
+    async def get_doc(self, ctx, doc_name=None, *,guild=None):
         if doc_name is None or guild is None:
             return await ctx.send("You need to define both document name and guild name/id")
         converter = GuildConverter()

@@ -125,10 +125,7 @@ def funhelp(ctx: commands.Context) -> discord.Embed:
 
 def extrahelp(ctx: commands.Context) -> discord.Embed:
     embed = discord.Embed(title="▶️ Extras", 
-    description="[Vote](https://top.gg/bot/843484459113775114)  "+
-    "[Invite](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)  "+
-    "[SupportServer](https://discord.gg/hxc73psNsB) \n"+
-    "Commands that are useful but don't belong to other categories!", color=var.C_MAIN
+    description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics", inline=False
     ).add_field(name=getprefix(ctx)+"about", value="Shows information about me!", inline=False
     ).add_field(name=getprefix(ctx)+"suggest `<youridea>`",value="Sends an idea directly to the support server!", inline=False
@@ -145,11 +142,11 @@ class Help(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
         embed = discord.Embed(
-        title="Axiol Help",
-        description=f"Help subcommands for all **enabled plugins**\n For all users, members, roles and channels either their ID or mention can be used.",
+        title="Help subcommands for all **enabled plugins**\nEnable/Disable plugins to view more/less help",
+        description="[Donation](https://paypal.me/palbolt) [Vote](https://top.gg/bot/843484459113775114/vote) [Support](https://discord.gg/hxc73psNsB)",
         color=var.C_MAIN
         ).set_footer(text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
@@ -166,7 +163,7 @@ class Help(commands.Cog):
         helpmsg = await ctx.send(embed=embed)
 
         for i in GuildDoc:
-            if GuildDoc.get(i) == True:
+            if GuildDoc.get(i):
                 await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
         await helpmsg.add_reaction("▶️")
         await helpmsg.add_reaction(var.E_SETTINGS)

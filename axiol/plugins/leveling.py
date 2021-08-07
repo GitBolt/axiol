@@ -96,7 +96,7 @@ class Leveling(commands.Cog):
         for i in rankings:
             rankcount += 1
             try:
-                user = ctx.guild.get_member(i.get("_id"))
+                user = self.bot.get_user(i.get("_id"))
                 xp = i.get("xp")
                 embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
             except:
@@ -513,7 +513,7 @@ class Leveling(commands.Cog):
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
         GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
 
-        if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc["blacklistedchannels"] or message.author.bot:
+        if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc.find_one({"_id":0})["blacklistedchannels"] or message.author.bot:
             return
 
         userdata = GuildLevelDoc.find_one({"_id": message.author.id})

@@ -40,7 +40,7 @@ class Welcome(commands.Cog):
         try:
             chid = int(usermsg.content.strip("<>#"))
         except:
-            await ctx.send(embed=discord.Embed(
+             return await ctx.send(embed=discord.Embed(
                         title="Invalid Channel",
                         description="🚫 I was not able to find the channel which you entered",
                         color=var.C_RED

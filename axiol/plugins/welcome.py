@@ -27,26 +27,22 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomesetup(self, ctx):
-        embed = discord.Embed(
-        title="Send the welcome channel where I can greet members!",
-        description="Since this is the first time this plugin is being enabled, I need to know where I am supposed to greet new members :D",
-        color=var.C_BLUE
-        ).set_footer(text="The next message which you will send will become the welcome channel, make sure that the Channel/ChannelID is valid other wise this won't work"
-        )
-        await ctx.send(embed=embed)
+        await ctx.send("Now send the channel where you want me to send welcome message.")
         def messagecheck(message):
             return message.author == ctx.author and message.channel.id == ctx.channel.id
         usermsg = await self.bot.wait_for('message', check=messagecheck)
+
         try:
             chid = int(usermsg.content.strip("<>#"))
         except:
-             return await ctx.send(embed=discord.Embed(
+            db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
+            return await ctx.send(embed=discord.Embed(
                         title="Invalid Channel",
-                        description="🚫 I was not able to find the channel which you entered",
+                        description="🚫 I was not able to find the channel which you entered. The plugin has been disabled, try again",
                         color=var.C_RED
                     ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                     )
-
+            
         db.WELCOME.insert_one({
 
             "_id":ctx.guild.id,

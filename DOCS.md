@@ -48,11 +48,11 @@ Looks great so far? Let's move on! Here are some quick links to the plugins
 Command permissions fall under the settings category therefore can be accessed using the command **```.help settings```**. </br>
 Using command permissions you can set a role to have the permission to use any command which Axiol provides, for example setting the role "X" for the command "Y" will only let members having the "X" role use command "Y". Here are the commands for this:</br> </br>
 
-- `setperm <plugin_name>`: Using this command will send an embed with all commands from the plugin defined, the next message which you will send will be used to set command permission, the format is `command_name role`; here the command name is used without the prefix otherwise it will trigger the actual command, then seperated by a space you need to enter your role; whether it be the mention or ID, doing so will a command permission where users having that role can only use that command, to cancel this proccess simply type `cancel`, sending the message in wrong format will result in bot sending a warning message, this won't cancel the entire proccess so you can always try again without having to start over, this only stops if you enter `cancel`. </br>
+- `setperm <plugin_name>`: Using this command will send an embed with all commands from the plugin defined, the next message which you will send will be used to set command permission, the format is `command_name role`; here the command name is used without the prefix otherwise it will trigger the actual command, then seperated by a space you need to enter your role; whether it be the mention or ID, doing so will create the command permission where users having that role can only use that command, to cancel this proccess simply type `cancel`, sending the message in the wrong format will result in bot sending a warning message, this won't cancel the entire proccess so you can always try again without having to start over, this only stops if you enter `cancel`. </br>
 - `removeperm <command> <role>`: This simply removes a command permission of the role from a command. </br>
 - `allperms`: This shows all plugin names inside which the command names which have command permission setted up followed by the roles which an use that command. 
 
-##### Understood? Hope so you did, let's go to the plugins part now!
+##### Another note that make sure to read the error messagaes, descriptions and help embeds properly, majority of the problems reported are due to users not reading things properly and getting stuck on basic things.</br>Understood? Hope so you did, let's go to the plugins part now!
 
 ## AutoMod
 Help command: ```.help automod```</br>
@@ -308,6 +308,7 @@ By default this plugin is disabled. There are two types of verification named 'C
 
 #### .verifyroleremove
   This removes the verifed role, the role is not needed to define since only one verified role can be setted up.
+  **Note: Verification is prone to most issues due to permissions, usage of this command is heavily recommended if that happens, in case you still face any issues then feel free to join the support server or DM me (Bolt#8905)**
 
 ## Welcome
 Help command: ```.help welcome```</br>

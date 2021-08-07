@@ -230,7 +230,7 @@ class Fun(commands.Cog):
         self.matches.append(match)
         await ctx.send(embed=discord.Embed(
             title="You have started a new match!",
-            description=f"Invite your friends by sharing the code",
+            description=f"Invite your friends by sharing the code\nThe command would be ```{getprefix(ctx)}typeracer join {match.code}```",
             color=var.C_GREEN
         ).add_field(name="Code", value=match.code, inline=False
         ).add_field(name="Players required", value=match.required_amount, inline=False

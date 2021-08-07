@@ -142,7 +142,7 @@ class Help(commands.Cog):
 
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
         embed = discord.Embed(
         title="Help subcommands for all **enabled plugins**\nEnable/Disable plugins to view more/less help",
@@ -163,7 +163,7 @@ class Help(commands.Cog):
         helpmsg = await ctx.send(embed=embed)
 
         for i in GuildDoc:
-            if GuildDoc.get(i) == True:
+            if GuildDoc.get(i):
                 await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
         await helpmsg.add_reaction("▶️")
         await helpmsg.add_reaction(var.E_SETTINGS)

@@ -295,7 +295,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both member and role",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}giverole <member> <role>```"
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}addrole <member> <role>```"
                 ).set_footer(text="For both member and role, either ping or ID can be used"
                 ))
 
@@ -322,7 +322,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both member and role",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}giverole <member> <role>```"
+                ).add_field(name="Format", value=f"```{getprefix(ctx)}removerole <member> <role>```"
                 ).set_footer(text="For both member and role, either ping or ID can be used"
                 ))
 

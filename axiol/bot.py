@@ -21,7 +21,7 @@ bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=int
 async def on_ready():
     await bot.change_presence(activity=discord.Activity(
                             type=discord.ActivityType.streaming,
-                            name=f"Get started with {var.DEFAULT_PREFIX}help"
+                            name=f"Ping for help 👌"
                             ))
     print("I woke up 🌥️")
 

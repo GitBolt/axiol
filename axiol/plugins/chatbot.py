@@ -108,17 +108,19 @@ class Chatbot(commands.Cog):
             description=desc,
             color=var.C_MAIN
         ).add_field(name="By", value=ctx.author
-        ).add_field(name="From Server", value=ctx.guild.name)
+        ).add_field(name="Guild ID", value=ctx.guild.id)
         )
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if not message.guild:
             return
-        GuildChatbotDoc = db.CHATBOT.find_one({"_id": message.guild.id})
+
         GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
-        
-        if GuildPluginDoc.get("Chatbot") == True:
+        ctx = await self.bot.get_context(message)
+
+        if GuildPluginDoc["Chatbot"]:
+            GuildChatbotDoc = db.CHATBOT.find_one({"_id": message.guild.id})
             def channels():
                 if GuildChatbotDoc is not None and GuildChatbotDoc.get("channels") != []:
                     channels = GuildChatbotDoc.get("channels")
@@ -128,7 +130,6 @@ class Chatbot(commands.Cog):
 
             if (self.bot.user in message.mentions and message.author.bot == False
             or message.channel.id in channels() and message.author.bot == False):
-                ctx = await self.bot.get_context(message)
                 
                 content = message.content.replace("<@!843484459113775114>", "")
                 res = requests.post(f"http://axiol.up.railway.app/ai/chatbot", json={"content": content}).json()
@@ -142,6 +143,8 @@ class Chatbot(commands.Cog):
                 else:
                     await message.channel.send(res["response"])
 
+        elif "<@!843484459113775114>" == message.content:
+            await ctx.invoke(self.bot.get_command("help"))
 
 
 def setup(bot):

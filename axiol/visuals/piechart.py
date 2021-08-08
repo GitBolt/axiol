@@ -4,7 +4,7 @@ import requests
 import variables as var
 
 
-class BarGraph(commands.Cog):
+class PieChart(commands.Cog):
     def __init__(self, bot):
         self.bot=bot
 
@@ -17,4 +17,4 @@ class BarGraph(commands.Cog):
             await botmsg.delete()
     
 def setup(bot):
-    bot.add_cog(BarGraph(bot))
+    bot.add_cog(PieChart(bot))

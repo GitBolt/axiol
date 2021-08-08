@@ -3,7 +3,7 @@
     <img
       alt="Axiol"
       src="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
-      width="180"
+      width="140"
     />
   </a>
 </p>
@@ -33,3 +33,5 @@ Any contribution to the documentation even if it's a small typo is open
 [Top.gg](https://top.gg/bot/843484459113775114/vote) </br>
 
 [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)
+
+[Bots.gg](https://discord.bots.gg/bots/843484459113775114)

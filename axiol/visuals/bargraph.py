@@ -1,6 +1,6 @@
 import discord
+from aiohttp import request
 from discord.ext import commands
-import requests
 import variables as var
 
 
@@ -18,9 +18,10 @@ class BarGraph(commands.Cog):
         else:
             botmsg = await ctx.send(f"Fetching data {var.E_LOADING} Just a second!")
             await ctx.trigger_typing()
-            res = requests.get(f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}?limit={limit}")
-            await ctx.send(res.json()["message"])
-            await botmsg.delete()
+            async with request("GET", f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}?limit={limit}") as res:
+                response = await res.json()
+                await ctx.send(response["message"])
+                await botmsg.delete()
     
 def setup(bot):
     bot.add_cog(BarGraph(bot))

@@ -24,7 +24,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji=None):
+    async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji:discord.Emoji=None):
 
         if {channel, msgid, role, emoji} == {None}:
             return await ctx.send(embed=discord.Embed(
@@ -41,7 +41,7 @@ class ReactionRoles(commands.Cog):
             botrole = bot_member.roles[0]
 
         try:
-            msg = await channel.fetch_message(msgid)
+            msg = channel.get_partial_message(msgid)
         except:
             return await ctx.send(embed=discord.Embed(
                         title="Invalid Message ID",
@@ -93,11 +93,10 @@ class ReactionRoles(commands.Cog):
             )
 
 
-
             
     @commands.command()
     @has_command_permission()
-    async def removerr(self, ctx, msgid:int=None, emoji:str=None):
+    async def removerr(self, ctx, msgid:int=None, emoji:discord.Emoji=None):
         
         if {msgid, emoji} == {None}:
             return await ctx.send(embed=discord.Embed(
@@ -338,8 +337,8 @@ class ReactionRoles(commands.Cog):
                         await payload.member.add_roles(assignrole)
 
         if GuildDoc is not None and payload.message_id in GuildDoc["unique_messages"]:
-            channel = await self.bot.get_channel(payload.channel_id)
-            message = await channel.get_message(payload.message_id)
+            channel = self.bot.get_channel(payload.channel_id)
+            message = await channel.fetch_message(payload.message_id)
             for r in message.reactions:
                 if payload.member in await r.users().flatten() and not payload.member.bot and str(r) != str(payload.emoji):
                     await message.remove_reaction(r.emoji, payload.member)

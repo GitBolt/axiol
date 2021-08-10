@@ -60,6 +60,12 @@ class Errors(commands.Cog):
                 description="🚫 Make sure that the ID or mention is correct. Maybe you pinged any member instead of the role? Maybe you copied the wrong ID?",
                 color=C_RED
             ))
+        elif isinstance(error, commands.EmojiNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="Emoji not found",
+                description="🚫 Either the emoji is invalid or I'm not in the server where this emoji is from to be able to use it.",
+                color=C_RED
+            ))
 
         #Cog check failure
         elif isinstance(error, commands.CheckFailure):

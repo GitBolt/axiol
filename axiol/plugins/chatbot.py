@@ -1,5 +1,5 @@
 import discord
-import requests
+from aiohttp import request
 from discord.ext import commands
 import database as db
 import variables as var
@@ -132,8 +132,9 @@ class Chatbot(commands.Cog):
             or message.channel.id in channels() and message.author.bot == False):
                 
                 content = message.content.replace("<@!843484459113775114>", "")
-                res = requests.post(f"http://axiol.up.railway.app/ai/chatbot", json={"content": content}).json()
-                
+                async with request("POST", f"https://http://axiol.up.railway.app/ai/chatbot", json={"content": content}) as response:
+                    res = await response.json()
+                    
                 if res["response"] == "help":
                     await ctx.invoke(self.bot.get_command('help'))
 

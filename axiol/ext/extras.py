@@ -86,7 +86,7 @@ class Extras(commands.Cog):
         embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=False)
         embed.add_field(name="Boost Level", value=ctx.guild.premium_tier, inline=False)
         embed.add_field(name="Created at", value=str(ctx.guild.created_at.strftime("%Y - %m - %d")) , inline=False)
-        embed.set_thumbnail(url = ctx.guild.icon_url)
+        embed.set_thumbnail(url = ctx.guild.icon.url)
 
         GuildVerifyDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
         if GuildVerifyDoc is not None:

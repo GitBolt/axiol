@@ -32,7 +32,7 @@ for filename in os.listdir('./custom'):
         bot.load_extension(f'custom.{filename[:-3]}')
 
 for filename in os.listdir('./ext'):
-    if filename.endswith('.py'):
+    if filename.endswith('.py') and filename != "buttons.py":
         bot.load_extension(f'ext.{filename[:-3]}')
 
 for filename in os.listdir('./plugins'):

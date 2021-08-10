@@ -235,7 +235,7 @@ class Fun(commands.Cog):
         ).add_field(name="Code", value=match.code, inline=False
         ).add_field(name="Players required", value=match.required_amount, inline=False
         ).set_footer(text="Waiting for players to join..."
-        ).set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+        ).set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
         )
         if player_amount == 1:
             await match.start()
@@ -406,7 +406,7 @@ class Fun(commands.Cog):
                     embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
 
                     embed.color = var.C_GREEN
-                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
                     embed.set_footer(text="Final typing speed is adjusted depending on the accuracy")
                     await ctx.send(embed=embed)
 
@@ -417,7 +417,7 @@ class Fun(commands.Cog):
     @has_command_permission()
     async def avatar(self, ctx, user:discord.User=None):
         if user is not None:
-            avatar = user.avatar_url
+            avatar = user.avatar.url
             embed = discord.Embed(
                     title=f"Avatar of **{user}**",
                     color=var.C_TEAL
@@ -619,7 +619,7 @@ class Fun(commands.Cog):
                             userid = usermsg.content.strip("!@<>")
                             try:
                                 authoruser = await self.bot.fetch_user(userid)
-                                embed.set_author(name=authoruser, icon_url=authoruser.avatar_url)
+                                embed.set_author(name=authoruser, icon_url=authoruser.avatar.url)
                                 await authorbotmsg.delete()
                                 try:
                                     await edit.clear_reaction("🇺")

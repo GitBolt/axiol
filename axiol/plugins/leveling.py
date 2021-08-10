@@ -1,8 +1,9 @@
 import random
 import discord
 from discord.ext import commands
-import variables as var
 import database as db
+import variables as var
+from ext.buttons import Paginator
 from functions import getprefix, getxprange
 from ext.permissions import has_command_permission
 
@@ -61,7 +62,7 @@ class Leveling(commands.Cog):
             ).add_field(name="XP", value=f"{xp}/{int(200*((1/2)*lvl))}", inline=True
             ).add_field(name="Level", value=lvl, inline=True
             ).add_field(name="Progress", value=boxes * "<:current:850041599139905586>" +(20-boxes) * "<:left:850041599127584776>", inline=False
-            ).set_thumbnail(url=user.avatar_url
+            ).set_thumbnail(url=user.avatar.url
             )
             await ctx.channel.send(embed=embed)
 
@@ -70,122 +71,29 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def leaderboard(self, ctx):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
-        rankings = GuildCol.find({
+        rankings = list(GuildCol.find({
 
-                "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
+                "_id": { "$ne": 0 }, #Removing ID 0 (It's config doc, unrelated to user xp) 
                 
-            }).sort("xp", -1)
-
-        if rankings.count() < 10:
-            exactpages = 1
-        else:
-            exactpages = rankings.count() / 10
-        if type(exactpages) != int:
-            all_pages = round(exactpages) + 1
-        else:
-            all_pages = exactpages
-
+            }).sort("xp", -1))
+        
+        exact_pages = 1 if len(rankings) <= 10 else len(rankings) / 10
+        all_pages = int(exact_pages) + 1 if type(exact_pages) != int else exact_pages
         embed = discord.Embed(
         title=f"Leaderboard", 
-        description="◀️ First page\n⬅️ Previous page\n<:RankChart:854068306285428767> Bar graph of top 10 users\n➡️ Next page\n▶️ Last page\n",
         color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url
+        ).set_thumbnail(url=ctx.guild.icon.url
         )
-
         rankcount = 0
-        for i in rankings:
+        for i in rankings[:10]:
             rankcount += 1
-            try:
-                user = self.bot.get_user(i.get("_id"))
-                xp = i.get("xp")
-                embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-            except:
-                print(f"Not found {i}")
-
-            if rankcount == 10:
-                break
-            
+            user = self.bot.get_user(i["_id"])
+            xp = i["xp"]
+            embed.add_field(name=f"{rankcount}. {user}", value=f"Total XP: {xp}", inline=False)
         embed.set_footer(text=f"Page 1/{all_pages}")
-        botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction("◀️")
-        await botmsg.add_reaction("⬅️")
-        await botmsg.add_reaction("<:RankChart:854068306285428767>")
-        await botmsg.add_reaction("➡️")
-        await botmsg.add_reaction("▶️")
 
-        async def leaderboardpagination(current_page, embed, all_pages):
-            pagern = current_page + 1
-            embed.set_footer(text=f"Page {pagern}/{all_pages}")
-            embed.clear_fields()
-
-            rankings = GuildCol.find({
-
-                    "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                    
-                }).sort("xp", -1)
-
-            rankcount = (current_page)*10
-            user_amount = current_page*10
-            for i in rankings[user_amount:]:
-                rankcount += 1
-                user = self.bot.get_user(i.get("_id"))
-                xp = i.get("xp")
-                embed.add_field(name=f"{rankcount}: {user}", value=f"Total XP: {xp}", inline=False)
-                if rankcount == (current_page)*10 + 10:
-                    break
-
-        def reactioncheck(reaction, user):
-            return user == ctx.author and reaction.message == botmsg
-        
-        current_page = 0
-        while True:
-            reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
-            if str(reaction.emoji) == "◀️":
-                try:
-                    await botmsg.remove_reaction("◀️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page = 0
-                await leaderboardpagination(current_page, embed, all_pages)
-                await botmsg.edit(embed=embed)
-
-            if str(reaction.emoji) == "➡️":
-                try:
-                    await botmsg.remove_reaction("➡️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page += 1
-                if current_page > all_pages:
-                    current_page -= 1
-                await leaderboardpagination(current_page, embed, all_pages)
-                await botmsg.edit(embed=embed)
-
-            if str(reaction.emoji) == "<:RankChart:854068306285428767>":
-                try:
-                    await botmsg.clear_reactions()
-                except discord.Forbidden:
-                    pass
-                await ctx.invoke(self.bot.get_command('barchart'))
-
-            if str(reaction.emoji) == "⬅️":
-                try:
-                    await botmsg.remove_reaction("⬅️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page -= 1
-                if current_page < 0:
-                    current_page += 1
-                await leaderboardpagination(current_page, embed, all_pages)
-                await botmsg.edit(embed=embed)
-
-            if str(reaction.emoji) == "▶️":
-                try:
-                    await botmsg.remove_reaction("▶️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page = all_pages-1
-                await leaderboardpagination(current_page, embed, all_pages)
-                await botmsg.edit(embed=embed)
+        view = Paginator(self.bot, ctx, "levels", all_pages, embed, rankings)
+        view.message = await ctx.send(embed=embed, view=view)
 
 
     @commands.command()
@@ -213,7 +121,7 @@ class Leveling(commands.Cog):
         embed = discord.Embed(
         title="Server leveling information",
         color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url
+        ).set_thumbnail(url=ctx.guild.icon.url
         ).add_field(name="Highest XP Member", value=maxrank_user, inline=False
         ).add_field(name="Leveling XP Range", value=xprange, inline=False
         ).add_field(name="Blacklisted channels", value=blacklistedchannels, inline=False

@@ -1,13 +1,27 @@
 import discord
 from discord.ext import commands
-import variables as var
 import database as db
+import variables as var
 from functions import getprefix
-import asyncio
 
 
-def levelhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title=f"{var.E_LEVELING}  Leveling", description="Ah yes leveling, MEE6 who?", color=var.C_MAIN
+HELP_OPTIONS = [
+        discord.SelectOption(label="AutoMod", description="Auto moderation help", emoji="🛡️"),
+        discord.SelectOption(label="ChatBot", description="ChatBot help", emoji="🤖"),
+        discord.SelectOption(label="Fun", description="Fun help", emoji="🎯"),
+        discord.SelectOption(label="Karma", description="Karma help", emoji="🎭"),
+        discord.SelectOption(label="Leveling", description="Leveling help", emoji="📊"),
+        discord.SelectOption(label="Moderation", description="Moderation help", emoji="🔨"),
+        discord.SelectOption(label="Reaction Roles", description="Reaction roles help", emoji="✨"),
+        discord.SelectOption(label="Verification", description="Member verification help", emoji="✅"),
+        discord.SelectOption(label="Welcome", description="Welcome greeting help", emoji="👋"),
+        discord.SelectOption(label="Extras", description="Extra commands help (not a plugin)", emoji="▶️"),
+        discord.SelectOption(label="Settings", description="Bot settings help (not a plugin)", emoji="⚙️")
+    ]
+
+
+def levelinghelp(ctx: commands.Context):
+    embed = discord.Embed(title="📊 Leveling", description="Ah yes leveling, MEE6 who?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user! User field is optional for checking rank of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows the server leaderboard", inline=False
     ).add_field(name=getprefix(ctx)+"bargraph `<amount>`", value="Shows a Bar chart of top users! Amount field is optional since 10 users are shown by default and max amount is 30", inline=False
@@ -19,7 +33,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def modhelp(ctx: commands.Context) -> discord.Embed:
+def modhelp(ctx: commands.Context):
     embed = discord.Embed(title="🔨 Moderation", description="Reasons in every command except warn is optional :)", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
     ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans any already banned user", inline=False
@@ -38,7 +52,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def rrhelp(ctx: commands.Context) -> discord.Embed:
+def rrhelp(ctx: commands.Context):
     embed = discord.Embed(title="✨ Reaction Roles", description="Whether it be default, custom, animated or even deleted after setting up - All types of emojis are allowed!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Adds a reaction role", inline=False
     ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Removes the reaction role", inline=False
@@ -48,7 +62,7 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
     return embed
 
-def welcomehelp(ctx: commands.Context) -> discord.Embed:
+def welcomehelp(ctx: commands.Context):
     embed = discord.Embed(title="👋 Welcome", description="Greet new members with a nice welcome :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"welcomecard", value="Shows server welcome card", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel `<#channel>`", value="Changes welcome channel", inline=False
@@ -60,7 +74,7 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def verifyhelp(ctx: commands.Context) -> discord.Embed:
+def verifyhelp(ctx: commands.Context):
     embed = discord.Embed(title="✅ Verification", description="Keep the server safe from raiders and bots!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"verifyinfo", value="Shows information of verification setup", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Changes the verification channel", inline=False
@@ -72,7 +86,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     ).set_footer(text="For verify role, you can only set one at a time, if a verify role is already setted up then setting up another one will replace the existing one")
     return embed
 
-def chatbothelp(ctx: commands.Context) -> discord.Embed:
+def chatbothelp(ctx: commands.Context):
     embed = discord.Embed(title="🤖 Chatbot", description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Makes a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Removes a chatbot channel", inline=False
@@ -81,7 +95,7 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def automodhelp(ctx: commands.Context) -> discord.Embed:
+def automodhelp(ctx: commands.Context):
     embed = discord.Embed(title="🛡️ Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"filters", value="Shows all available Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
@@ -93,7 +107,7 @@ def automodhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def karmahelp(ctx: commands.Context) -> discord.Embed:
+def karmahelp(ctx: commands.Context):
     embed = discord.Embed(title="🎭 Karma", description="Let's see who is the nicest member!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"karma `<user>`", value="Shows server karma of the user! User field is optional for checking karma of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"karmaboard", value="Shows the karma leaderboard of server members", inline=False
@@ -102,8 +116,8 @@ def karmahelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def settingshelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
+def settingshelp(ctx: commands.Context):
+    embed = discord.Embed(title="⚙️ Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"plugins",value="Manage your plugins", inline=False
     ).add_field(name=getprefix(ctx)+"prefix", value="View or change my prefix", inline=False
     ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Adds a command role permission, users with the role defined will be able to use the command from the plugin", inline=False
@@ -111,7 +125,7 @@ def settingshelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False)
     return embed
 
-def funhelp(ctx: commands.Context) -> discord.Embed:
+def funhelp(ctx: commands.Context):
     embed = discord.Embed(title=f"🎯 Fun", description="Let's have some fun!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"typeracer", value="Quickly join a type racing queue with most players! Make sure that I can DM you for this to work", inline=False
     ).add_field(name=getprefix(ctx)+"typeracer new `<player_count>`", value="Create your own type racing match, share the code with your friends for them to join!", inline=False
@@ -123,7 +137,7 @@ def funhelp(ctx: commands.Context) -> discord.Embed:
     )
     return embed
 
-def extrahelp(ctx: commands.Context) -> discord.Embed:
+def extrahelp(ctx: commands.Context):
     embed = discord.Embed(title="▶️ Extras", 
     description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics", inline=False
@@ -134,100 +148,69 @@ def extrahelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
+class View(discord.ui.View):
+    def __init__(self, ctx):
+        self.ctx = ctx
+        super().__init__(timeout=None)
+
+    async def on_timeout(self):
+        print("Timed out")
+        
+    async def interaction_check(self, interaction: discord.Interaction):
+        if not interaction.user == self.ctx.author:
+            await interaction.response.send_message("You can't select items in someone else's command.", ephemeral=True)
+        return interaction.user == self.ctx.author
+    
+    @discord.ui.select(placeholder="Select help", options=HELP_OPTIONS)
+    async def callback(self, select: discord.ui.select, interaction: discord.Interaction):
+        help_type = interaction.data["values"][0]
+
+        if help_type == "AutoMod":
+            await interaction.message.edit(embed=automodhelp(self.ctx))
+        elif help_type == "ChatBot":
+            await interaction.message.edit(embed=chatbothelp(self.ctx))
+        elif help_type == "Fun":
+            await interaction.message.edit(embed=funhelp(self.ctx))
+        elif help_type == "Karma":
+            await interaction.message.edit(embed=karmahelp(self.ctx))
+        elif help_type == "Leveling":
+            await interaction.message.edit(embed=levelinghelp(self.ctx))
+        elif help_type == "Moderation":
+            await interaction.message.edit(embed=modhelp(self.ctx))
+        elif help_type == "Reaction Roles":
+            await interaction.message.edit(embed=rrhelp(self.ctx))
+        elif help_type == "Verification":
+            await interaction.message.edit(embed=verifyhelp(self.ctx))
+        elif help_type == "Welcome":
+            await interaction.message.edit(embed=welcomehelp(self.ctx))
+        elif help_type == "Extras":
+            await interaction.message.edit(embed=extrahelp(self.ctx))
+        else:
+            await interaction.message.edit(embed=settingshelp(self.ctx))
+
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.group(pass_context=True, invoke_without_command=True)
     async def help(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
         embed = discord.Embed(
-        title="Help subcommands for all **enabled plugins**\nEnable/Disable plugins to view more/less help",
-        description="[Donation](https://paypal.me/palbolt) [Vote](https://top.gg/bot/843484459113775114/vote) [Support](https://discord.gg/hxc73psNsB)",
-        color=var.C_MAIN
-        ).set_footer(text="Either use the subcommand or react to the emojis below"
-        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
-
-        for i in GuildDoc:
-            if GuildDoc.get(i):
-                helpname = i.lower()
-                if i.lower() == "reactionroles": #Reaction roles command doesn't have space in between reaction and roles
-                    helpname = i.lower().replace(" ", "")
-                embed.add_field(name=f"{getprefix(ctx)}help {helpname}", value=f"{var.DICT_PLUGINEMOJIS.get(i)} {i} Help", inline=False)
-
-        embed.add_field(name=f"{getprefix(ctx)}help extras", value=f"▶️ Non plugin commands", inline=False)
-        embed.add_field(name=f"{getprefix(ctx)}help settings", value=f"{var.E_SETTINGS} Configure settings", inline=False)
-        helpmsg = await ctx.send(embed=embed)
-
-        for i in GuildDoc:
-            if GuildDoc.get(i):
-                await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
-        await helpmsg.add_reaction("▶️")
-        await helpmsg.add_reaction(var.E_SETTINGS)
-        
-        def check(reaction, user):
-            return user == ctx.author and reaction.message == helpmsg
-
-
-        HelpDict = {
-            "Leveling": levelhelp,
-            "Moderation": modhelp,
-            "ReactionRoles":rrhelp,
-            "Welcome": welcomehelp,
-            "Verification": verifyhelp,
-            "Chatbot": chatbothelp,
-            "AutoMod": automodhelp,
-            "Karma": karmahelp,
-            "Fun": funhelp
-            
-        }
-
-        try:
-            while True:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
-                if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
-
-                    helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
-                    await helpmsg.edit(embed=HelpDict.get(helptype)(ctx))
-                    try:
-                        await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
-                    except discord.Forbidden:
-                        pass
-                
-                #Since extra help and plugin is always there
-                if str(reaction.emoji) == "▶️":
-                    await helpmsg.edit(embed=extrahelp(ctx))
-                    try:
-                        await helpmsg.remove_reaction("▶️", ctx.author)
-                    except discord.Forbidden:
-                        pass
-                if str(reaction.emoji) == var.E_SETTINGS:
-                    await helpmsg.edit(embed=settingshelp(ctx))
-                    try:
-                        await helpmsg.remove_reaction(var.E_SETTINGS, ctx.author)
-                    except discord.Forbidden:
-                        pass
-
-        except asyncio.TimeoutError:
-            try:
-                await helpmsg.clear_reactions()
-            except discord.Forbidden:
-                await helpmsg.remove_reaction(var.E_SETTINGS, self.bot.user)
-                for i in GuildDoc:
-                    if GuildDoc.get(i) == True:
-                        await helpmsg.remove_reaction(var.DICT_PLUGINEMOJIS.get(i), self.bot.user)
-                await helpmsg.remove_reaction("▶️", self.bot.user)
-
+            title="Here to help!",
+            description="Select the respective help option from the menu below.",
+            color=var.C_MAIN
+        ).add_field(name="Note", value="Help embeds for each plugin can also be viewed using sub commands of help which are followed by the plugin name. Like `help automod`"
+        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
+        ).set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
+        await ctx.send(embed=embed, view=View(ctx))
 
            
     @help.command(aliases=["levels"])
     async def leveling(self, ctx):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Leveling") == True:
-            await ctx.send(embed=levelhelp(ctx))
+            await ctx.send(embed=levelinghelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",

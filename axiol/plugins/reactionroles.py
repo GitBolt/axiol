@@ -3,6 +3,7 @@ from discord.ext import commands
 import database as db
 import variables as var
 from functions import getprefix
+from ext.buttons import Paginator
 from ext.permissions import has_command_permission
 
 
@@ -140,105 +141,33 @@ class ReactionRoles(commands.Cog):
     @has_command_permission()
     async def allrr(self, ctx):
 
-        Guild = self.bot.get_guild(ctx.guild.id)
-        GuildDoc = db.REACTIONROLES.find_one({"_id": Guild.id})
-        if GuildDoc is not None:
+        GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
 
-            rramount = len(GuildDoc.get("reaction_roles"))
-            if rramount <= 10:
-                exactpages = 1
-            else:
-                exactpages = rramount / 10
-            all_pages = round(exactpages)
+        if GuildDoc is None:
+            return await ctx.send("This server does not have any active reaction roles right now.")
 
-            embed = discord.Embed(
-            title="All active reaction roles", 
-            color=var.C_MAIN
-            )
-            
-            rrcount = 0
-            for i in GuildDoc["reaction_roles"]:
-                rrcount += 1
-                messageid = i.get("messageid")
-                role = Guild.get_role(i.get("roleid"))
-                emoji = i.get("emoji")
-                embed.add_field(name="** **", value=f"{emoji} for {role.mention} in message ID `{messageid}`", inline=False)
-                if rrcount == 10:
-                    break
-            embed.set_footer(text=f"Page 1/{all_pages}")
+        reaction_roles =  GuildDoc["reaction_roles"]
+        exact_pages = 1 if len(reaction_roles) <= 10 else len(reaction_roles) / 10
+        all_pages = int(exact_pages) + 1 if type(exact_pages) != int else exact_pages
 
-            botmsg = await ctx.send(embed=embed)
-            await botmsg.add_reaction("◀️")
-            await botmsg.add_reaction("⬅️")
-            await botmsg.add_reaction("➡️")
-            await botmsg.add_reaction("▶️")
+        embed = discord.Embed(
+        title="All reaction roles", 
+        color=var.C_MAIN
+        ).set_thumbnail(url=ctx.guild.icon.url
+        )
+        
+        rrcount = 0
+        for i in reaction_roles[:10]:
+            rrcount += 1
+            message_id = i["messageid"]
+            role = ctx.guild.get_role(i["roleid"])
+            emoji = i["emoji"]
+            embed.add_field(name=f"{emoji} in {message_id}", value=f"for {role.mention}", inline=False)
 
+        embed.set_footer(text=f"Page 1/{all_pages}")
 
-            async def reactionrolespagination(current_page, embed):
-                pagern = current_page + 1
-                embed.set_footer(text=f"Page {pagern}/{all_pages}")
-                embed.clear_fields()
-
-                rrcount = (current_page)*10
-                rr_amount = current_page*10
-
-                for i in GuildDoc["reaction_roles"][rr_amount:]:
-                    rrcount += 1
-                    messageid = i.get("messageid")
-                    role = ctx.guild.get_role(i.get("roleid"))
-                    emoji = i.get("emoji")
-                    embed.add_field(name=f"** **", value=f"{emoji} for {role.mention}\nMessageID: `{messageid}`", inline=False)
-
-                    if rrcount == (current_page)*10 + 10:
-                        break
-            
-            def reactioncheck(reaction, user):
-                if str(reaction.emoji) == "◀️" or str(reaction.emoji) == "⬅️" or str(reaction.emoji) == "➡️" or str(reaction.emoji) == "▶️":
-                    return user == ctx.author and reaction.message == botmsg
-            
-            current_page = 0
-            while True:
-                reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
-                if str(reaction.emoji) == "◀️":
-                    try:
-                        await botmsg.remove_reaction("◀️", ctx.author)
-                    except discord.Forbidden:
-                        pass
-                    current_page = 0
-                    await reactionrolespagination(current_page, embed)
-                    await botmsg.edit(embed=embed)
-
-                if str(reaction.emoji) == "➡️":
-                    try:
-                        await botmsg.remove_reaction("➡️", ctx.author)
-                    except discord.Forbidden:
-                        pass
-                    current_page += 1
-                    await reactionrolespagination(current_page, embed)
-                    await botmsg.edit(embed=embed)
-
-                if str(reaction.emoji) == "⬅️":
-                    try:
-                        await botmsg.remove_reaction("⬅️", ctx.author)
-                    except discord.Forbidden:
-                        pass
-                    current_page -= 1
-                    if current_page < 0:
-                        current_page += 1
-                    await reactionrolespagination(current_page, embed)
-                    await botmsg.edit(embed=embed)
-
-                if str(reaction.emoji) == "▶️":
-                    try:
-                        await botmsg.remove_reaction("▶️", ctx.author)
-                    except discord.Forbidden:
-                        pass
-                    current_page = all_pages-1
-                    await reactionrolespagination(current_page, embed)
-                    await botmsg.edit(embed=embed)
-
-        else:
-            await ctx.send("This server does not have any active reaction roles right now")
+        view = Paginator(self.bot, ctx, "rr", all_pages, embed, reaction_roles)
+        view.message = await ctx.send(embed=embed, view=view)
 
     
 

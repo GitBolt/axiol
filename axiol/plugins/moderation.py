@@ -430,7 +430,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def warn(self, ctx, member:discord.Member=None, reason=None):
+    async def warn(self, ctx, member:discord.Member=None, *,reason=None):
         if member and reason is not None:
             GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
             userwarns = GuildCol.find_one({"_id": member.id})

@@ -1,4 +1,5 @@
 import discord
+from typing import Union
 from discord.ext import commands
 import database as db
 import variables as var
@@ -23,11 +24,20 @@ class ReactionRoles(commands.Cog):
                 color=var.C_ORANGE
             ))
 
+
     @commands.command()
     @has_command_permission()
-    async def rr(self, ctx, channel:discord.TextChannel=None, msgid:int=None, role: discord.Role=None, emoji:discord.Emoji=None):
+    async def rr(self, 
+                ctx, 
+                channel:discord.TextChannel=None, 
+                message_id:Union[int, str]=None, 
+                role: discord.Role=None, 
+                emoji:Union[discord.Emoji, str]=None
+                ):
+        if type(emoji) == str and emoji.startswith("<"):raise commands.EmojiNotFound(ctx)
+        if type(message_id) == str: return await ctx.send(embed=discord.Embed(description="Message ID needs to be numerical", color=var.C_ORANGE))
 
-        if {channel, msgid, role, emoji} == {None}:
+        if {channel, message_id, role, emoji} == {None}:
             return await ctx.send(embed=discord.Embed(
                 description="🚫 You need to define the channel, message, role and emoji all three to add a reaction role",
                 color=var.C_RED
@@ -42,13 +52,9 @@ class ReactionRoles(commands.Cog):
             botrole = bot_member.roles[0]
 
         try:
-            msg = channel.get_partial_message(msgid)
+            msg = channel.get_partial_message(message_id)
         except:
-            return await ctx.send(embed=discord.Embed(
-                        title="Invalid Message ID",
-                        description=f"There are no messages with the ID **{msgid}** in {channel.mention}",
-                        color=var.C_RED
-            ))
+            raise commands.MessageNotFound(ctx)
 
         if botrole.position > role.position:
             GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
@@ -97,26 +103,29 @@ class ReactionRoles(commands.Cog):
             
     @commands.command()
     @has_command_permission()
-    async def removerr(self, ctx, msgid:int=None, emoji:discord.Emoji=None):
+    async def removerr(self, ctx, message_id:Union[int, str]=None, emoji:Union[discord.Emoji, str]=None):
         
-        if {msgid, emoji} == {None}:
+        if {message_id, emoji} == {None}:
             return await ctx.send(embed=discord.Embed(
                 description="🚫 You need to define the message and emoji both to remove a reaction role",
                 color=var.C_RED
                 ).add_field(name="Format", value=f"`{getprefix(ctx)}removerr <messageid> <emoji>`"
                 )
                 )
+        if type(emoji) == str and emoji.startswith("<"):raise commands.EmojiNotFound(ctx)
+        if type(message_id) == str: return await ctx.send(embed=discord.Embed(description="Message ID needs to be numerical", color=var.C_ORANGE))
+
         GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
         
         def rr_exists():
             for i in GuildDoc["reaction_roles"]:
-                if i.get("messageid") == msgid and i.get("emoji") == emoji:
+                if i.get("messageid") == message_id and i.get("emoji") == str(emoji):
                     return True
 
         if rr_exists():
             def getpair(lst):
                 for rrpairs in lst:
-                    if  msgid == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
+                    if  message_id == rrpairs.get("messageid") and str(emoji) == rrpairs.get("emoji"):
                         return rrpairs
 
             rrlist = GuildDoc["reaction_roles"]
@@ -130,7 +139,7 @@ class ReactionRoles(commands.Cog):
             db.REACTIONROLES.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                         title="Reaction role removed", 
-                        description=f"Reaction role for {role} using {emoji} on message with ID {msgid} has been removed",
+                        description=f"Reaction role for {role} using {emoji} on message with ID {message_id} has been removed",
                         color=var.C_GREEN)
                         )
         else:
@@ -143,7 +152,7 @@ class ReactionRoles(commands.Cog):
 
         GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
 
-        if GuildDoc is None:
+        if GuildDoc is None or GuildDoc["reaction_roles"] == []:
             return await ctx.send("This server does not have any active reaction roles right now.")
 
         reaction_roles =  GuildDoc["reaction_roles"]

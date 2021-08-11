@@ -4,6 +4,7 @@ from discord.ext import commands
 from discord.ext.commands import check, Context
 import variables as var
 import database as db
+from ext.buttons import Disable, Plugins, Enable
 from functions import getprefix
 
 
@@ -27,147 +28,103 @@ class Settings(commands.Cog):
 
         embed = discord.Embed(
         title="All available plugins",
-        description="React to the respective emojis below to enable/disable them!",
+        description="Click on the respective button to enable/disable the plugin",
         color=var.C_MAIN
         ).set_footer(text=f"{enabled_amount}/{total_amount} plugins are enabled in this server"
         ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
         
         for i in GuildDoc:
-            status = "Enabled" if GuildDoc.get(i) == True else "Disabled"
+            status = "Enabled" if GuildDoc.get(i) else "Disabled"
             embed.add_field(name=i, value=f"{var.DICT_PLUGINEMOJIS.get(i)} {status}", inline=False)
 
-        botmsg = await ctx.send(embed=embed)
-        for i in GuildDoc:
-            await botmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
-        
-        def reactioncheck(reaction, user):
-            if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
-                return user == ctx.author and reaction.message == botmsg
+        view = Plugins(self.bot, ctx, embed)
+        view.message = await ctx.send(embed=embed, view=view)
+        await view.wait()
 
-        def enablecheck(reaction, user):
-            if str(reaction.emoji) == var.E_ENABLE:
-                return user == ctx.author and reaction.message == enabledbotmsg
-
-        def disablecheck(reaction, user):
-            if str(reaction.emoji) == var.E_DISABLE:
-                return user == ctx.author and reaction.message == enabledbotmsg
-
-        while True:
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=reactioncheck, timeout=60.0)
-                GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-                try:
-                    await botmsg.clear_reactions()
-                except discord.Forbidden:
-                    pass
-                plugin_type = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
-
-                embed = discord.Embed(
-                title=f"{plugin_type} Plugin",
+        toggle_view = Disable(ctx) if GuildDoc[view.plugin] else Enable(ctx)
+        do_this = "Enable" if toggle_view.type else "Disable"
+        embed = discord.Embed(title=view.plugin + " plugin", 
+                        description=f"{do_this} the plugin by clicking on the button", 
+                    color=var.C_BLUE
                 )
-                if GuildDoc.get(plugin_type) == True:
-                    embed.description=f"{var.E_ENABLE} {plugin_type} is currently enabled"
-                    embed.color=var.C_GREEN
-                    enabledbotmsg = await ctx.send(embed=embed)
-                    await enabledbotmsg.add_reaction(var.E_DISABLE)
+        toggle_view.message = await ctx.send(embed=embed, view=toggle_view)
+        await toggle_view.wait()
 
-                    await self.bot.wait_for('reaction_add', check=disablecheck)
-                    newdata = {"$set":{
-                        plugin_type: False
-                    }}
-                    db.PLUGINS.update_one(GuildDoc, newdata)
+        if toggle_view.value and toggle_view.type:
+            newdata = {"$set":{
+                view.plugin: True
+            }}
+            db.PLUGINS.update_one(GuildDoc, newdata)
 
-                    embed.title=f"{plugin_type} disabled"
-                    embed.description=f"{var.E_DISABLE} {plugin_type} plugin has been disabled"
-                    embed.color=var.C_RED
-                    await enabledbotmsg.edit(embed=embed)
-                    try:
-                        await enabledbotmsg.clear_reactions()
-                    except discord.Forbidden:
-                        pass
+            embed.description=f"{var.E_ENABLE} {view.plugin} plugin has been enabled"
+            embed.color=var.C_GREEN
+            await toggle_view.message.edit(embed=embed)
+        if toggle_view.value and not toggle_view.type:
+            newdata = {"$set":{
+                view.plugin: False
+            }}
+            db.PLUGINS.update_one(GuildDoc, newdata)
+            
+            embed.description=f"{var.E_DISABLE} {view.plugin} plugin has been disabled"
+            embed.color=var.C_RED
+            await toggle_view.message.edit(embed=embed, view=None)
 
-                else:
-                    embed.description=f"{var.E_DISABLE} {plugin_type} is currently disabled"
-                    embed.color = var.C_RED
-                    enabledbotmsg = await ctx.send(embed=embed)
-                    await enabledbotmsg.add_reaction(var.E_ENABLE)
+            #Since welcome and verification are not enabled by default
+            #The time plugin is enabled, there is no information available in the db
+            #Hence we ask for the channel and insert the data
+            #With autmod and leveling we just insert the default configs
+            if view.plugin == "Welcome" and db.WELCOME.find_one({"_id": ctx.guild.id}) is None:
+                await ctx.invoke(self.bot.get_command('welcomesetup'))
+        
+            if view.plugin == "Verification" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
+                await ctx.invoke(self.bot.get_command('verifysetup'))
 
-                    await self.bot.wait_for('reaction_add', check=enablecheck)
-                    newdata = {"$set":{
-                        plugin_type: True
-                    }}
-                    db.PLUGINS.update_one(GuildDoc, newdata)
+            if view.plugin == "Karma" and str(ctx.guild.id) not in db.KARMADATBASE.list_collection_names():
+                GuildDoc = db.KARMADATBASE.create_collection(str(ctx.guild.id))
+                GuildDoc.insert_one({
+                    "_id": 0,
+                    "blacklists": [],
+                    })   
 
-                    embed.title=f"{plugin_type} enabled"
-                    embed.description=f"{var.E_ENABLE} {plugin_type} extension has been enabled"
-                    embed.color=var.C_GREEN
-                    await enabledbotmsg.edit(embed=embed)
-                    try:
-                        await enabledbotmsg.clear_reactions()
-                    except discord.Forbidden:
-                        pass
+            if view.plugin == "Leveling" and str(ctx.guild.id) not in db.LEVELDATABASE.list_collection_names():
+                GuildDoc = db.LEVELDATABASE.create_collection(str(ctx.guild.id))
+                GuildDoc.insert_one({
 
-                    #Since welcome and verification is not enabled by default ->
-                    #The time plugin is enabled, there is no information available in the db ->
-                    #Hence we ask for the channel and insert the data ->
-                    #With leveling we just insert the default configs
-                    if str(reaction.emoji) == "👋" and db.WELCOME.find_one({"_id": ctx.guild.id}) is None:
-                        await ctx.invoke(self.bot.get_command('welcomesetup'))
-                
-                    if str(reaction.emoji) =="✅" and db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
-                        await ctx.invoke(self.bot.get_command('verifysetup'))
+                    "_id": 0,
+                    "xprange": [15, 25],
+                    "alertchannel": None,
+                    "blacklistedchannels": [],
+                    "alerts": True,
+                    "rewards": {}
+                    })  
 
-                    if str(reaction.emoji) == "🎭"and str(ctx.guild.id) not in db.KARMADATBASE.list_collection_names():
-                        GuildDoc = db.KARMADATBASE.create_collection(str(ctx.guild.id))
-                        GuildDoc.insert_one({
-                            "_id": 0,
-                            "blacklists": [],
-                            })   
-
-                    if str(reaction.emoji) == var.E_LEVELING and str(ctx.guild.id) not in db.LEVELDATABASE.list_collection_names():
-                        GuildDoc = db.LEVELDATABASE.create_collection(str(ctx.guild.id))
-                        GuildDoc.insert_one({
-
-                            "_id": 0,
-                            "xprange": [15, 25],
-                            "alertchannel": None,
-                            "blacklistedchannels": [],
-                            "alerts": True,
-                            "rewards": {}
-                            })  
-
-                    if str(reaction.emoji) =="🛡️" and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
-                        db.AUTOMOD.insert_one({
-                            "_id": ctx.guild.id,
-                            "BadWords":{
-                                "status": True,
-                                "words": ["fuck", "bitch", "porn", "slut", "asshole"],
-                                "response": "You aren't allowed to say that!"
-                            },
-                            "Invites": {
-                                "status": True,
-                                "response": "You can't send invites here!"
-                            },
-                            "Links": {
-                                "status": True,
-                                "response": "You can't send links here!"
-                            },
-                            "Mentions": {
-                                "status": False,
-                                "response": "You can't mention so many people!",
-                                "amount": 5
-                            },
-                            "Settings": {
-                                "ignorebots": False,
-                                "blacklists": [],
-                                "modroles": []
-                            }
-                        })         
-            except asyncio.TimeoutError:
-                try:
-                    await botmsg.clear_reactions()
-                except discord.Forbidden:
-                    pass
+            if view.plugin == "AutoMod" and db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
+                db.AUTOMOD.insert_one({
+                    "_id": ctx.guild.id,
+                    "BadWords":{
+                        "status": True,
+                        "words": ["fuck", "bitch", "porn", "slut", "asshole"],
+                        "response": "You aren't allowed to say that!"
+                    },
+                    "Invites": {
+                        "status": True,
+                        "response": "You can't send invites here!"
+                    },
+                    "Links": {
+                        "status": True,
+                        "response": "You can't send links here!"
+                    },
+                    "Mentions": {
+                        "status": False,
+                        "response": "You can't mention so many people!",
+                        "amount": 5
+                    },
+                    "Settings": {
+                        "ignorebots": False,
+                        "blacklists": [],
+                        "modroles": []
+                    }
+                })         
 
 
     @commands.command()

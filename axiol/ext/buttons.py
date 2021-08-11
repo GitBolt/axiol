@@ -1,5 +1,5 @@
 import discord
-
+import variables as var
 
 class Paginator(discord.ui.View):
     def __init__(
@@ -81,4 +81,142 @@ class Paginator(discord.ui.View):
         self.children[0].disabled, self.children[1].disabled = False, False
         self.children[2].disabled, self.children[3].disabled = True, True
         await interaction.response.edit_message(embed=self.embed, view=self)
+
+
+class Enable(discord.ui.View):
+    def __init__(self, context):
+        self.context = context
+        self.value = None
+        self.type = True
+        super().__init__(timeout=60)
+
+    async def on_timeout(self):
+        self.embed.set_footer(text=f"{self.embed.footer.text}\nButtons have been cleared due 60 seconds of inactivity")
+        await self.message.edit(embed=self.embed, view=None)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if not interaction.user == self.context.author:
+            await interaction.response.send_message("You can't press buttons in someone else's command.", ephemeral=True)
+        return interaction.user == self.context.author  
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
+    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.value = False
+        await self.message.edit(view=None)
+        await interaction.response.send_message("Cancelled plugin switch.")
+        self.stop()
+
+    @discord.ui.button(label="Enable", emoji=var.E_ENABLE, style=discord.ButtonStyle.green)
+    async def enable(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.value = True
+        await self.message.edit(view=None)
+        self.stop()
+
+
+class Disable(discord.ui.View):
+    def __init__(self, context):
+        self.context = context
+        self.value = None
+        self.type = False
+        super().__init__(timeout=60)
+
+    async def on_timeout(self):
+        self.embed.set_footer(text=f"{self.embed.footer.text}\nButtons have been cleared due 60 seconds of inactivity")
+        await self.message.edit(embed=self.embed, view=None)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if not interaction.user == self.context.author:
+            await interaction.response.send_message("You can't press buttons in someone else's command.", ephemeral=True)
+        return interaction.user == self.context.author  
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.grey)
+    async def cancel(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.value = False
+        await self.message.edit(view=None)
+        await interaction.response.send_message("Cancelled plugin switch.")
+        self.stop()
+
+    @discord.ui.button(label="Disable", emoji=var.E_DISABLE, style=discord.ButtonStyle.red)
+    async def disable(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.value = True
+        await self.message.edit(view=None)
+        self.stop()
+
+
+class Plugins(discord.ui.View):
+    def __init__(
+            self, 
+            bot,
+            context,
+            embed, 
+        ):
+        self.bot = bot
+        self.context = context
+        self.embed = embed
+
+        self.plugin = None
+        super().__init__(timeout=60)
+
+    async def on_timeout(self):
+        await self.message.edit(view=None)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if not interaction.user == self.context.author:
+            await interaction.response.send_message("You can't press buttons in someone else's command.", ephemeral=True)
+        return interaction.user == self.context.author  
+
+
+    @discord.ui.button(emoji="🛡️", style=discord.ButtonStyle.grey)
+    async def automod(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "AutoMod"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="🤖", style=discord.ButtonStyle.grey)
+    async def chatbot(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Chatbot"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="🎯", style=discord.ButtonStyle.grey)
+    async def fun(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Fun"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="🎭", style=discord.ButtonStyle.grey)
+    async def karma(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Karma"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji=var.E_LEVELING, style=discord.ButtonStyle.grey)
+    async def leveling(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Leveling"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="🔨", style=discord.ButtonStyle.grey)
+    async def moderation(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Moderation"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="✨", style=discord.ButtonStyle.grey)
+    async def reactionroles(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "ReactionRoles"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="✅", style=discord.ButtonStyle.grey)
+    async def verification(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin ="Verification"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="👋", style=discord.ButtonStyle.grey)
+    async def welcome(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Welcome"
+        await self.message.edit(view=None)
+        self.stop()
 

@@ -41,7 +41,8 @@ class Verification(commands.Cog):
         try:
             ch = self.bot.get_channel(int(usermsg.content.strip("<>#")))
         except:
-            await ctx.send(embed=discord.Embed(
+            db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
+            return await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
                     description="🚫 I was not able to find the channel which you entered",
                     color=var.C_RED

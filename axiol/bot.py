@@ -14,7 +14,7 @@ def serverprefix(bot, message):
     return db.PREFIXES.find_one({"_id": message.guild.id}).get("prefix")
 
 intents = discord.Intents().all()
-bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=intents)
+bot = commands.Bot(command_prefix = ",", help_command=None, intents=intents)
 
 
 @bot.event

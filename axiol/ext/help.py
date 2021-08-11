@@ -10,13 +10,13 @@ HELP_OPTIONS = [
         discord.SelectOption(label="ChatBot", description="ChatBot help", emoji="🤖"),
         discord.SelectOption(label="Fun", description="Fun help", emoji="🎯"),
         discord.SelectOption(label="Karma", description="Karma help", emoji="🎭"),
-        discord.SelectOption(label="Leveling", description="Leveling help", emoji="📊"),
+        discord.SelectOption(label="Leveling", description="Leveling help", emoji=var.E_LEVELING),
         discord.SelectOption(label="Moderation", description="Moderation help", emoji="🔨"),
         discord.SelectOption(label="Reaction Roles", description="Reaction roles help", emoji="✨"),
         discord.SelectOption(label="Verification", description="Member verification help", emoji="✅"),
         discord.SelectOption(label="Welcome", description="Welcome greeting help", emoji="👋"),
         discord.SelectOption(label="Extras", description="Extra commands help (not a plugin)", emoji="▶️"),
-        discord.SelectOption(label="Settings", description="Bot settings help (not a plugin)", emoji="⚙️")
+        discord.SelectOption(label="Settings", description="Bot settings help (not a plugin)", emoji=var.E_SETTINGS)
     ]
 
 

@@ -61,6 +61,7 @@ async def on_guild_join(guild):
             "AutoMod": False,
             "Karma": False,
             "Fun": True,
+            "Giveaway": True
         })
 
     #Inserting plugin configs if it does not exist (incase of re-inviting)
@@ -78,6 +79,7 @@ async def on_guild_join(guild):
             "AutoMod": {},
             "Karma": {},
             "Fun": {},
+            "Giveaway": {}
         })
 
     #Support server Log

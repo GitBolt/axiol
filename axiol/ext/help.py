@@ -9,6 +9,7 @@ HELP_OPTIONS = [
         discord.SelectOption(label="AutoMod", description="Auto moderation help", emoji="🛡️"),
         discord.SelectOption(label="ChatBot", description="ChatBot help", emoji="🤖"),
         discord.SelectOption(label="Fun", description="Fun help", emoji="🎯"),
+        discord.SelectOption(label="Giveaway", description="Giveaway help", emoji="🎉"),
         discord.SelectOption(label="Karma", description="Karma help", emoji="🎭"),
         discord.SelectOption(label="Leveling", description="Leveling help", emoji=var.E_LEVELING),
         discord.SelectOption(label="Moderation", description="Moderation help", emoji="🔨"),
@@ -96,7 +97,7 @@ def chatbothelp(ctx: commands.Context):
     return embed
 
 def automodhelp(ctx: commands.Context):
-    embed = discord.Embed(title="🛡️ Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
+    embed = discord.Embed(title="🛡️ Auto Moderation", description="I will try my best to keep the chats clean!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"filters", value="Shows all available Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
     ).add_field(name=getprefix(ctx)+"automodwhitelist `<#channel>`", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
@@ -122,7 +123,8 @@ def settingshelp(ctx: commands.Context):
     ).add_field(name=getprefix(ctx)+"prefix", value="View or change my prefix", inline=False
     ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Adds a command role permission, users with the role defined will be able to use the command from the plugin", inline=False
     ).add_field(name=getprefix(ctx)+"removeperm `<command_name>` `<role>`",value="Removes command role permission, users with that role defined would no longer be able to use the command", inline=False
-    ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False)
+    ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def funhelp(ctx: commands.Context):
@@ -134,7 +136,14 @@ def funhelp(ctx: commands.Context):
     ).add_field(name=getprefix(ctx)+"typingtest `<type>`",value="Starts a solo typing test! There are two types: `time` and `word`", inline=False
     ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
-    )
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
+def giveawayhelp(ctx: commands.Context):
+    embed = discord.Embed(title=f"🎉 Giveaway", description="", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"gstart", value="Starts a new giveaway!", inline=False
+    ).add_field(name=getprefix(ctx)+"gshow", value="Shows all active giveaways", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
 def extrahelp(ctx: commands.Context):
@@ -171,6 +180,8 @@ class View(discord.ui.View):
             await interaction.message.edit(embed=chatbothelp(self.ctx))
         elif help_type == "Fun":
             await interaction.message.edit(embed=funhelp(self.ctx))
+        elif help_type == "Giveaway":
+            await interaction.message.edit(embed=giveawayhelp(self.ctx))
         elif help_type == "Karma":
             await interaction.message.edit(embed=karmahelp(self.ctx))
         elif help_type == "Leveling":
@@ -299,6 +310,17 @@ class Help(commands.Cog):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Fun") == True:
             await ctx.send(embed=funhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def giveaway(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Giveaway") == True:
+            await ctx.send(embed=giveawayhelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",

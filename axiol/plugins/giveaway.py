@@ -7,6 +7,8 @@ from discord.ext import commands, tasks
 import database as db
 import variables as var
 from functions import getprefix
+from ext.permissions import has_command_permission
+
 
 
 class Giveaway(commands.Cog):
@@ -15,6 +17,7 @@ class Giveaway(commands.Cog):
         self.check_gw.start()
 
     @commands.command()
+    @has_command_permission()
     async def gstart(self, ctx, channel:discord.TextChannel=None):
         if channel is None:
             return await ctx.send(embed=discord.Embed(
@@ -130,7 +133,7 @@ class Giveaway(commands.Cog):
         gwmsg = await channel.send(content="New giveaway woohoo!", embed=embed)
         await gwmsg.add_reaction("🎉")
         
-        db.GIVEAWAY.insert_one({"channel_id":ctx.channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"])})
+        db.GIVEAWAY.insert_one({"channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"])})
 
     @gstart.error
     async def gstart_error(self, ctx, error):
@@ -138,7 +141,12 @@ class Giveaway(commands.Cog):
             await ctx.send(embed=discord.Embed(description="Time is up! you failed to respond under 60 seconds, the giveaway proccess has been stopped."), color=var.C_RED)
 
 
+    @commands.command()
+    @has_command_permission()
+    async def gshow(self, ctx):
+        pass
 
+    
     @tasks.loop(seconds=5)
     async def check_gw(self):
         await self.bot.wait_until_ready()

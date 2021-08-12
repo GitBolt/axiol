@@ -61,11 +61,11 @@ which ended up benefiting ¯\_(ツ)_/¯
 """
 
 #Adding new plugin and permissions
-def updateplugins(plugin):
+def update_plugins_and_permissions(plugin):
     PLUGINS.update_many(
         { plugin: { "$exists": False } },
             {
-                "$set": { plugin : False }
+                "$set": { plugin : True }
             }
     )
     PERMISSIONS.update_many(
@@ -92,6 +92,7 @@ def updatedb(serverid):
             "AutoMod": False,
             "Karma": False,
             "Fun": True,
+            "Giveaway": True
         })
 
         print(f"✅{serverid} - Plugins 🔧")
@@ -111,6 +112,7 @@ def updatedb(serverid):
             "AutoMod": {},
             "Karma": {},
             "Fun": {},
+            "Giveaway": {}
         })
         print(f"✅{serverid} - Permissions 🔨")
 
@@ -130,19 +132,20 @@ def updatedb(serverid):
         except:
             pass
     
-    try:
-        PREFIXES.insert_one({
-            "_id": serverid,
-            "prefix": "ax"
-        })
-        print(f"✅{serverid} - Prefix ⚪")
+    #Only use this when working locally
+    # try:
+    #     PREFIXES.insert_one({
+    #         "_id": serverid,
+    #         "prefix": "ax"
+    #     })
+    #     print(f"✅{serverid} - Prefix ⚪")
 
-    except:
-        print(f"❌{serverid} - Prefix ⚪")
+    # except:
+    #     print(f"❌{serverid} - Prefix ⚪")
 
 
 serveridlist = []
 #for i in serveridlist:
    #updatedb(i)
 
-#updateplugins("Karma")
+#update_plugins_and_permissions("Giveaway")

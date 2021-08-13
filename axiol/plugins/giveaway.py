@@ -16,6 +16,18 @@ class Giveaway(commands.Cog):
         self.bot  = bot
         self.check_gw.start()
     
+   #Simple check to see if this cog (plugin) is enabled
+    async def cog_check(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Giveaway") == True:
+            return ctx.guild.id
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Giveaway plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+
     async def end_gw(self, i):
         channel = self.bot.get_channel(i["channel_id"])
         message = await channel.fetch_message(i["message_id"])

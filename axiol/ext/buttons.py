@@ -114,10 +114,11 @@ class Enable(discord.ui.View):
 
 
 class Disable(discord.ui.View):
-    def __init__(self, context):
+    def __init__(self, context, embed):
         self.context = context
         self.value = None
         self.type = False
+        self.embed = embed
         super().__init__(timeout=60)
 
     async def on_timeout(self):
@@ -181,6 +182,12 @@ class Plugins(discord.ui.View):
     @discord.ui.button(emoji="🎯", style=discord.ButtonStyle.grey)
     async def fun(self, button: discord.ui.Button, interaction: discord.Interaction):
         self.plugin = "Fun"
+        await self.message.edit(view=None)
+        self.stop()
+
+    @discord.ui.button(emoji="🎉", style=discord.ButtonStyle.grey)
+    async def fun(self, button: discord.ui.Button, interaction: discord.Interaction):
+        self.plugin = "Giveaway"
         await self.message.edit(view=None)
         self.stop()
 

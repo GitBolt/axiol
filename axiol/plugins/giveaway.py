@@ -1,8 +1,8 @@
 import time
 import random
-import asyncio
 import discord
 import datetime
+from typing import Union
 from discord.ext import commands, tasks
 import database as db
 import variables as var
@@ -15,6 +15,35 @@ class Giveaway(commands.Cog):
     def __init__(self, bot):
         self.bot  = bot
         self.check_gw.start()
+    
+    async def end_gw(self, i):
+        channel = self.bot.get_channel(i["channel_id"])
+        message = await channel.fetch_message(i["message_id"])
+        winner_amount = i["winner_amount"]
+        embed_data = message.embeds[0].to_dict()
+        hosted_by = embed_data["description"].split("\n")[-1]
+
+        users = await message.reactions[0].users().flatten()
+        users.remove(self.bot.user)
+        if len(users) < winner_amount:
+            winners = random.sample(users, len(users))
+        else:
+            winners = random.sample(users, winner_amount)
+
+        db.GIVEAWAY.delete_one(i)
+        embed = discord.Embed(
+            title="Giveaway over",
+            description= f"🎁 {embed_data['title']}\n{hosted_by}\n📩 **{len(users)}** entries\n📋 **{len(winners)}** winners",
+            timestamp = datetime.datetime.now(),
+            color=var.C_BLUE
+        ).set_footer(text="Ended")
+        await message.edit(embed=embed)
+        if len(users) > 0:
+            annoucement = await channel.send(f"Congratulations, you have won **{embed_data['title']}**!" + ", ".join([w.mention for w in winners]))
+        else:
+            annoucement = await channel.send("Aw man, no one participated :(")
+        return annoucement.id
+
 
     @commands.command()
     @has_command_permission()
@@ -47,11 +76,11 @@ class Giveaway(commands.Cog):
                 formats = ("s", "m", "h", "d")
                 conversions = {"s":1, "m":60, "h":3600, "d":86400}
 
-                if string[-1] in formats and len([l for l in string if not l.isdigit()]) == 1:
+                if string[-1] in formats and len([l for l in string if l.isdigit()]) != 0:
                     return True, int(string[:-1]) * conversions[string[-1]]
                 else:
                     return False, None
-            #No other checks needed so just return True
+
             elif type_ == "Winners":
                 return string.isdigit(), None
             else:
@@ -112,7 +141,7 @@ class Giveaway(commands.Cog):
         ).add_field(name="Channel", value=data["Channel"], inline=False
         ).add_field(name="Prize", value=data["Prize"], inline=False
         ).add_field(name="Duration", value=data["Duration"][0], inline=False
-        ).add_field(name="Winner amount", value=data["Winners"], inline=False
+        ).add_field(name="Winner amount", value=data["Winners"][0], inline=False
         ).add_field(name="Hosted by", value=data["Host"], inline=False)
 
         botmsg = await ctx.send(embed=embed)
@@ -120,33 +149,62 @@ class Giveaway(commands.Cog):
         await self.bot.wait_for("reaction_add", check=reactioncheck, timeout=60)
 
         end_time = round(time.time() + int(data["Duration"][1]))
-        
-        days, hours, minutes = round((end_time - time.time())/86400), round((end_time - time.time())/3600), round((end_time - time.time())/60)
+        readable = str(datetime.datetime.fromtimestamp(end_time) - datetime.datetime.fromtimestamp(time.time()))
+        main_time = readable.split(":")[0] + " Hours" 
+        secondary_time = readable.split(":")[1] + " Minutes"
         embed = discord.Embed(
             title=data["Prize"],
             description=f"React to the 🎉 emoji to participate!\n\n📝 Winner amount: **{data['Winners']}**\n🔍 Hosted by: **{data['Host']}**",
             color=var.C_MAIN,
             timestamp= datetime.datetime.now()
-        ).add_field(name="⏳ Ending time", value=f"{days} days, {hours} hours, {minutes} minutes"
+        ).add_field(name="⏳ Ending time", value=main_time + " " + secondary_time
         ).set_thumbnail(url=ctx.guild.icon.url
         )
         gwmsg = await channel.send(content="New giveaway woohoo!", embed=embed)
         await gwmsg.add_reaction("🎉")
         
-        db.GIVEAWAY.insert_one({"channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"])})
-
-    @gstart.error
-    async def gstart_error(self, ctx, error):
-        if isinstance(error, asyncio.TimeoutError):
-            await ctx.send(embed=discord.Embed(description="Time is up! you failed to respond under 60 seconds, the giveaway proccess has been stopped."), color=var.C_RED)
+        guild_gw_cols  = [x for x in db.GIVEAWAY.find({"_id": {"$regex": "^"+str(ctx.guild.id)}})]
+        db.GIVEAWAY.insert_one({"_id": str(ctx.guild.id + len(guild_gw_cols)), "channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"][0])})
 
 
     @commands.command()
     @has_command_permission()
     async def gshow(self, ctx):
-        pass
-
+        embed = discord.Embed(title="All active giveaways", color=var.C_MAIN)
+        for i in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
+            
+            readable = str(datetime.datetime.fromtimestamp(i["end_time"]) - datetime.datetime.fromtimestamp(time.time()))
+            main_time = readable.split(":")[0] + " Hours" 
+            secondary_time = readable.split(":")[1] + " Minutes"
+            embed.add_field(name=f"Ends in {main_time} {secondary_time}", value=f"Winners: {i['winner_amount']} [Jump to the message!](https://discord.com/channels/{ctx.guild.id}/{i['channel_id']}/{i['message_id']})", inline=False)
+        
+        embed.description = f"There are **{len(embed.fields)}** active giveaways right now"
+        await ctx.send(embed=embed)
     
+
+    @commands.command()
+    @has_command_permission()
+    async def gend(self, ctx, msgid:Union[int, None]):
+        if msgid is None:
+            return await ctx.send(embed=discord.Embed(
+            description="🚫 You need to define the message ID in order to end a giveaway!",
+            color=var.C_RED
+            ).add_field(name="Format", value=f"`{getprefix(ctx)}gend <message_id>`"
+            )
+            )
+    
+        all_msg_ids = [x["message_id"] for x in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}})]
+        if not msgid in all_msg_ids:
+            return await ctx.send(embed=discord.Embed(
+                description = f"🚫 There are no active giveaways in this server with the message ID **{msgid}**",
+                color=var.C_RED
+                ))
+        else:
+            i = db.GIVEAWAY.find_one({"message_id": msgid})
+            annoucement_id = await self.end_gw(i)
+            await ctx.send(f"The giveaway has been ended https://discord.com/channels/{ctx.guild.id}/{i['channel_id']}/{annoucement_id}")
+
+
     @tasks.loop(seconds=5)
     async def check_gw(self):
         await self.bot.wait_until_ready()
@@ -154,39 +212,20 @@ class Giveaway(commands.Cog):
             channel = self.bot.get_channel(i["channel_id"])
             message = await channel.fetch_message(i["message_id"])
             end_time = i["end_time"]
-            winner_amount = i["winner_amount"]
             embed_data = message.embeds[0].to_dict()
-            hosted_by = embed_data["description"].split("\n")[-1]
-            days, hours, minutes = round((end_time - time.time())/86400), round((end_time - time.time())/3600), round((end_time - time.time())/60)
+            readable = str(datetime.datetime.fromtimestamp(end_time) - datetime.datetime.fromtimestamp(time.time()))
+            main_time = readable.split(":")[0] + " Hours" 
+            secondary_time = readable.split(":")[1] + " Minutes"
 
-            if time.time() > i["end_time"]:
-
-                users = await message.reactions[0].users().flatten()
-                users.remove(self.bot.user)
-                if len(users) < winner_amount:
-                    winners = random.sample(users, len(users))
-                else:
-                    winners = random.sample(users, winner_amount)
-                db.GIVEAWAY.delete_one(i)
-
-                embed = discord.Embed(
-                    title="Giveaway over",
-                    description= f"🎁 {embed_data['title']}\n{hosted_by}\n📩 **{len(users)}** entries\n📋 **{len(winners)}** winners",
-                    timestamp = datetime.datetime.now(),
-                    color=var.C_BLUE
-                ).set_footer(text="Ended")
-                await message.edit(embed=embed)
-                if len(users) > 0:
-                    await channel.send(f"Congratulations, you have won **{embed_data['title']}**!" + ", ".join([w.mention for w in winners]))
-                else:
-                    await channel.send("Aw man, no one participated :(")
+            if time.time() > end_time:
+                await self.end_gw(i)
             else:
                 embed = discord.Embed(
                     title=embed_data["title"],
                     description=embed_data["description"],
                     color=var.C_MAIN,
                     timestamp = datetime.datetime.now()
-                    ).add_field(name=embed_data["fields"][0]["name"], value=f"{days} days, {hours} hours, {minutes} minutes"
+                    ).add_field(name=embed_data["fields"][0]["name"], value=main_time + " " + secondary_time
                     ).set_thumbnail(url=embed_data["thumbnail"]["url"]
                     )
                 await message.edit(embed=embed)

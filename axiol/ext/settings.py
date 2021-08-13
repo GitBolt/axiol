@@ -41,12 +41,14 @@ class Settings(commands.Cog):
         view.message = await ctx.send(embed=embed, view=view)
         await view.wait()
 
-        toggle_view = Disable(ctx) if GuildDoc[view.plugin] else Enable(ctx)
-        do_this = "Enable" if toggle_view.type else "Disable"
-        embed = discord.Embed(title=view.plugin + " plugin", 
-                        description=f"{do_this} the plugin by clicking on the button", 
+        embed = discord.Embed(
+                    title=view.plugin + " plugin", 
                     color=var.C_BLUE
                 )
+
+        toggle_view = Disable(ctx, embed) if GuildDoc[view.plugin] else Enable(ctx)
+        embed.description=f"{'Enable' if toggle_view.type else 'Disable'} the plugin by clicking on the button", 
+        
         toggle_view.message = await ctx.send(embed=embed, view=toggle_view)
         await toggle_view.wait()
 

@@ -142,6 +142,7 @@ def funhelp(ctx: commands.Context):
 def giveawayhelp(ctx: commands.Context):
     embed = discord.Embed(title=f"🎉 Giveaway", description="", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"gstart", value="Starts a new giveaway!", inline=False
+    ).add_field(name=getprefix(ctx)+"gend `<message_id>`", value="Ends a giveaway, this does not cancel it instead ends the giveaway regardless of time left", inline=False
     ).add_field(name=getprefix(ctx)+"gshow", value="Shows all active giveaways", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed

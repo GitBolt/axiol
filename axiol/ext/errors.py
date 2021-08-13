@@ -1,6 +1,7 @@
 import sys
 import traceback
 import discord
+import asyncio
 from discord.ext import commands
 from variables import C_RED
 
@@ -66,6 +67,10 @@ class Errors(commands.Cog):
                 description="🚫 Either the emoji is invalid or I'm not in the server where this emoji is from to be able to use it.",
                 color=C_RED
             ))
+
+        elif isinstance(error, commands.CommandInvokeError):
+            if isinstance(error.original, asyncio.TimeoutError):
+                await ctx.send("Time is up! You failed to respond under time therefore the proccess has been cancelled.")
 
         #Cog check failure
         elif isinstance(error, commands.CheckFailure):

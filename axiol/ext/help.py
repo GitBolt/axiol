@@ -6,7 +6,7 @@ from functions import getprefix
 import asyncio
 
 
-def levelhelp(ctx: commands.Context) -> discord.Embed:
+def levelhelp(ctx: commands.Context):
     embed = discord.Embed(title=f"{var.E_LEVELING}  Leveling", description="Ah yes leveling, MEE6 who?", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rank `<user>`", value="Shows server rank of the user! User field is optional for checking rank of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"leaderboard", value="Shows the server leaderboard", inline=False
@@ -19,7 +19,7 @@ def levelhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def modhelp(ctx: commands.Context) -> discord.Embed:
+def modhelp(ctx: commands.Context):
     embed = discord.Embed(title="🔨 Moderation", description="Reasons in every command except warn is optional :)", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"ban `<user>` `<reason>`", value="Bans a user from the server", inline=False
     ).add_field(name=getprefix(ctx)+"unban `<user>`", value="Unbans any already banned user", inline=False
@@ -38,7 +38,7 @@ def modhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def rrhelp(ctx: commands.Context) -> discord.Embed:
+def rrhelp(ctx: commands.Context):
     embed = discord.Embed(title="✨ Reaction Roles", description="Whether it be default, custom, animated or even deleted after setting up - All types of emojis are allowed!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"rr `<#channel>` `<messageid>` `<role>` `<emoji>`", value="Adds a reaction role", inline=False
     ).add_field(name=getprefix(ctx)+"removerr `<messageid>` `<emoji>`", value="Removes the reaction role", inline=False
@@ -48,7 +48,7 @@ def rrhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/843530558126817280/Logo.png")
     return embed
 
-def welcomehelp(ctx: commands.Context) -> discord.Embed:
+def welcomehelp(ctx: commands.Context):
     embed = discord.Embed(title="👋 Welcome", description="Greet new members with a nice welcome :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"welcomecard", value="Shows server welcome card", inline=False
     ).add_field(name=getprefix(ctx)+"welcomechannel `<#channel>`", value="Changes welcome channel", inline=False
@@ -60,7 +60,7 @@ def welcomehelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def verifyhelp(ctx: commands.Context) -> discord.Embed:
+def verifyhelp(ctx: commands.Context):
     embed = discord.Embed(title="✅ Verification", description="Keep the server safe from raiders and bots!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"verifyinfo", value="Shows information of verification setup", inline=False
     ).add_field(name=getprefix(ctx)+"verifychannel `<#channel>`", value="Changes the verification channel", inline=False
@@ -72,7 +72,7 @@ def verifyhelp(ctx: commands.Context) -> discord.Embed:
     ).set_footer(text="For verify role, you can only set one at a time, if a verify role is already setted up then setting up another one will replace the existing one")
     return embed
 
-def chatbothelp(ctx: commands.Context) -> discord.Embed:
+def chatbothelp(ctx: commands.Context):
     embed = discord.Embed(title="🤖 Chatbot", description="I will reply to pings in every channel however setting up a bot chat channel won't require you ping me!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"setchatbot `<#channel>`", value="Makes a channel for chatting with me! All messages sent there will be replied by me :D", inline=False
     ).add_field(name=getprefix(ctx)+"removechatbot `<#channel>`", value="Removes a chatbot channel", inline=False
@@ -81,8 +81,8 @@ def chatbothelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def automodhelp(ctx: commands.Context) -> discord.Embed:
-    embed = discord.Embed(title="🛡️ Auto Moderation", description="Basically I'll delete all bad stuff :)" ,color=var.C_MAIN,
+def automodhelp(ctx: commands.Context):
+    embed = discord.Embed(title="🛡️ Auto Moderation", description="I will try my best to keep the chats clean!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"filters", value="Shows all available Auto-Moderation", inline=False
     ).add_field(name=getprefix(ctx)+"automodblacklist `<#channel>`", value="Blacklists a channel from Auto-Moderation, hence automod won't work there", inline=False
     ).add_field(name=getprefix(ctx)+"automodwhitelist `<#channel>`", value="Whitelists a channel from Auto-Moderation, hence automod would work there", inline=False
@@ -93,7 +93,7 @@ def automodhelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def karmahelp(ctx: commands.Context) -> discord.Embed:
+def karmahelp(ctx: commands.Context):
     embed = discord.Embed(title="🎭 Karma", description="Let's see who is the nicest member!" ,color=var.C_MAIN,
     ).add_field(name=getprefix(ctx)+"karma `<user>`", value="Shows server karma of the user! User field is optional for checking karma of yourself", inline=False
     ).add_field(name=getprefix(ctx)+"karmaboard", value="Shows the karma leaderboard of server members", inline=False
@@ -102,16 +102,17 @@ def karmahelp(ctx: commands.Context) -> discord.Embed:
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def settingshelp(ctx: commands.Context) -> discord.Embed:
+def settingshelp(ctx: commands.Context):
     embed = discord.Embed(title=f"{var.E_SETTINGS} Settings", description="Configure my settings and plugins for this server :D", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"plugins",value="Manage your plugins", inline=False
     ).add_field(name=getprefix(ctx)+"prefix", value="View or change my prefix", inline=False
     ).add_field(name=getprefix(ctx)+"setperm `<plugin>`",value="Adds a command role permission, users with the role defined will be able to use the command from the plugin", inline=False
     ).add_field(name=getprefix(ctx)+"removeperm `<command_name>` `<role>`",value="Removes command role permission, users with that role defined would no longer be able to use the command", inline=False
-    ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False)
+    ).add_field(name=getprefix(ctx)+"allperms",value="Shows all commands with the roles that have permission to use it", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def funhelp(ctx: commands.Context) -> discord.Embed:
+def funhelp(ctx: commands.Context):
     embed = discord.Embed(title=f"🎯 Fun", description="Let's have some fun!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"typeracer", value="Quickly join a type racing queue with most players! Make sure that I can DM you for this to work", inline=False
     ).add_field(name=getprefix(ctx)+"typeracer new `<player_count>`", value="Create your own type racing match, share the code with your friends for them to join!", inline=False
@@ -120,10 +121,18 @@ def funhelp(ctx: commands.Context) -> discord.Embed:
     ).add_field(name=getprefix(ctx)+"typingtest `<type>`",value="Starts a solo typing test! There are two types: `time` and `word`", inline=False
     ).add_field(name=getprefix(ctx)+"avatar `<user>`", value="Shows avatar of any user! Works with users outside the server if User ID is correct", inline=False
     ).add_field(name=getprefix(ctx)+"embed `<#channel>`",value="Generate an embed!", inline=False
-    )
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 
-def extrahelp(ctx: commands.Context) -> discord.Embed:
+def giveawayhelp(ctx: commands.Context):
+    embed = discord.Embed(title=f"🎉 Giveaway", description="", color=var.C_MAIN
+    ).add_field(name=getprefix(ctx)+"gstart", value="Starts a new giveaway!", inline=False
+    ).add_field(name=getprefix(ctx)+"gend `<message_id>`", value="Ends a giveaway, this does not cancel it instead ends the giveaway regardless of time left", inline=False
+    ).add_field(name=getprefix(ctx)+"gshow", value="Shows all active giveaways", inline=False
+    ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
+    return embed
+
+def extrahelp(ctx: commands.Context):
     embed = discord.Embed(title="▶️ Extras", 
     description="Commands that are useful but don't belong to other categories!", color=var.C_MAIN
     ).add_field(name=getprefix(ctx)+"stats", value="Shows server statistics", inline=False
@@ -181,7 +190,8 @@ class Help(commands.Cog):
             "Chatbot": chatbothelp,
             "AutoMod": automodhelp,
             "Karma": karmahelp,
-            "Fun": funhelp
+            "Fun": funhelp,
+            "Giveaway": giveawayhelp
             
         }
 
@@ -316,6 +326,17 @@ class Help(commands.Cog):
         GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("Fun") == True:
             await ctx.send(embed=funhelp(ctx))
+        else:
+            await ctx.send(embed=discord.Embed(
+                description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",
+                color=var.C_ORANGE
+            ))
+
+    @help.command()
+    async def giveaway(self, ctx):
+        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Giveaway") == True:
+            await ctx.send(embed=giveawayhelp(ctx))
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",

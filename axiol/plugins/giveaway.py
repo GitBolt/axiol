@@ -166,11 +166,11 @@ class Giveaway(commands.Cog):
         secondary_time = readable.split(":")[1] + " Minutes"
         embed = discord.Embed(
             title=data["Prize"],
-            description=f"React to the 🎉 emoji to participate!\n\n📝 Winner amount: **{data['Winners']}**\n🔍 Hosted by: **{data['Host']}**",
+            description=f"React to the 🎉 emoji to participate!\n\n📝 Winner amount: **{data['Winners'][0]}**\n🔍 Hosted by: **{data['Host']}**",
             color=var.C_MAIN,
             timestamp= datetime.datetime.now()
         ).add_field(name="⏳ Ending time", value=main_time + " " + secondary_time
-        ).set_thumbnail(url=ctx.guild.icon.url
+        ).set_thumbnail(url=ctx.guild.icon_url
         )
         gwmsg = await channel.send(content="New giveaway woohoo!", embed=embed)
         await gwmsg.add_reaction("🎉")

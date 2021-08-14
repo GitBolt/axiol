@@ -91,7 +91,7 @@ class TypeRacer:
             await player.send("Time is up! You failed to complete the test in time.")
 
     async def start(self):
-        count = 3
+        count = 5
         embed = discord.Embed(
         title="All players joined!", 
         description=f"Match starting in {count}...", 
@@ -104,7 +104,7 @@ class TypeRacer:
             msg = await player.send(embed=embed)
             msgs.update({player:msg})
 
-        for _ in range(2):
+        for _ in range(4):
             count -= 1
             await asyncio.sleep(1)
             for msg in msgs.values():
@@ -129,7 +129,7 @@ class TypeRacer:
             results.update({self.calculate_result(start_time, data[0], data[1], text): player})
         ordered = sorted(results.items(), reverse=True)
         for r in ordered:
-            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0]} WPM", inline=False)
+            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0][0]} WPM, {r[0][1]}% Accuracy", inline=False)
 
         for player in self.players:
             await player.send(embed=result_embed)

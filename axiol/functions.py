@@ -36,7 +36,7 @@ def random_text(typing_time):
         r = range(1)
 
     text = " ".join([random.choice(words) for i in r])
-    return text+"."
+    return text
 
 def code_generator():
     return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +

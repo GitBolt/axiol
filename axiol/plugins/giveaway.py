@@ -220,28 +220,30 @@ class Giveaway(commands.Cog):
     @tasks.loop(seconds=5)
     async def check_gw(self):
         await self.bot.wait_until_ready()
-        for i in db.GIVEAWAY.find({}):
-            channel = self.bot.get_channel(i["channel_id"])
-            message = await channel.fetch_message(i["message_id"])
-            end_time = i["end_time"]
-            embed_data = message.embeds[0].to_dict()
-            readable = str(datetime.datetime.fromtimestamp(end_time) - datetime.datetime.fromtimestamp(time.time()))
-            main_time = readable.split(":")[0] + " Hours" 
-            secondary_time = readable.split(":")[1] + " Minutes"
+        try:
+            for i in db.GIVEAWAY.find({}):
+                channel = self.bot.get_channel(i["channel_id"])
+                message = await channel.fetch_message(i["message_id"])
+                end_time = i["end_time"]
+                embed_data = message.embeds[0].to_dict()
+                readable = str(datetime.datetime.fromtimestamp(end_time) - datetime.datetime.fromtimestamp(time.time()))
+                main_time = readable.split(":")[0] + " Hours" 
+                secondary_time = readable.split(":")[1] + " Minutes"
 
-            if time.time() > end_time:
-                await self.end_gw(i)
-            else:
-                embed = discord.Embed(
-                    title=embed_data["title"],
-                    description=embed_data["description"],
-                    color=var.C_MAIN,
-                    timestamp = datetime.datetime.now()
-                    ).add_field(name=embed_data["fields"][0]["name"], value=main_time + " " + secondary_time
-                    ).set_thumbnail(url=embed_data["thumbnail"]["url"]
-                    )
-                await message.edit(embed=embed)
-                
+                if time.time() > end_time:
+                    await self.end_gw(i)
+                else:
+                    embed = discord.Embed(
+                        title=embed_data["title"],
+                        description=embed_data["description"],
+                        color=var.C_MAIN,
+                        timestamp = datetime.datetime.now()
+                        ).add_field(name=embed_data["fields"][0]["name"], value=main_time + " " + secondary_time
+                        ).set_thumbnail(url=embed_data["thumbnail"]["url"]
+                        )
+                    await message.edit(embed=embed)
+        except Exception as e:
+            print("Something went wrong", e)
 
 def setup(bot):
     bot.add_cog(Giveaway(bot))

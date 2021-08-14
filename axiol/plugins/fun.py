@@ -91,7 +91,7 @@ class TypeRacer:
             await player.send("Time is up! You failed to complete the test in time.")
 
     async def start(self):
-        count = 3
+        count = 5
         embed = discord.Embed(
         title="All players joined!", 
         description=f"Match starting in {count}...", 
@@ -104,7 +104,7 @@ class TypeRacer:
             msg = await player.send(embed=embed)
             msgs.update({player:msg})
 
-        for _ in range(2):
+        for _ in range(4):
             count -= 1
             await asyncio.sleep(1)
             for msg in msgs.values():
@@ -129,7 +129,7 @@ class TypeRacer:
             results.update({self.calculate_result(start_time, data[0], data[1], text): player})
         ordered = sorted(results.items(), reverse=True)
         for r in ordered:
-            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0]} WPM", inline=False)
+            result_embed.add_field(name=f"{ordered.index(r)+1} {r[1]}", value=f"{r[0][0]} WPM, {r[0][1]}% Accuracy", inline=False)
 
         for player in self.players:
             await player.send(embed=result_embed)
@@ -235,7 +235,7 @@ class Fun(commands.Cog):
         ).add_field(name="Code", value=match.code, inline=False
         ).add_field(name="Players required", value=match.required_amount, inline=False
         ).set_footer(text="Waiting for players to join..."
-        ).set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
+        ).set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
         )
         if player_amount == 1:
             await match.start()
@@ -406,7 +406,7 @@ class Fun(commands.Cog):
                     embed.add_field(name="Error rate", value=f"{error_rate}%", inline=False)
 
                     embed.color = var.C_GREEN
-                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar_url)
                     embed.set_footer(text="Final typing speed is adjusted depending on the accuracy")
                     await ctx.send(embed=embed)
 
@@ -417,7 +417,7 @@ class Fun(commands.Cog):
     @has_command_permission()
     async def avatar(self, ctx, user:discord.User=None):
         if user is not None:
-            avatar = user.avatar.url
+            avatar = user.avatar_url
             embed = discord.Embed(
                     title=f"Avatar of **{user}**",
                     color=var.C_TEAL
@@ -619,7 +619,7 @@ class Fun(commands.Cog):
                             userid = usermsg.content.strip("!@<>")
                             try:
                                 authoruser = await self.bot.fetch_user(userid)
-                                embed.set_author(name=authoruser, icon_url=authoruser.avatar.url)
+                                embed.set_author(name=authoruser, icon_url=authoruser.avatar_url)
                                 await authorbotmsg.delete()
                                 try:
                                     await edit.clear_reaction("🇺")

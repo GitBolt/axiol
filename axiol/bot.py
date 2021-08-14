@@ -5,24 +5,29 @@ import database as db
 import variables as var
 
 
-#Function to get current server prefix
-def serverprefix(bot, message):
+#Function to get current guild prefix
+async def guild_prefix(bot, message):
     if not message.guild:
         return var.DEFAULT_PREFIX
-    if db.PREFIXES.find_one({"_id": message.guild.id}) is None:
+
+    if await db.PREFIXES.find_one({"_id": message.guild.id}) is None:
         return var.DEFAULT_PREFIX
-    return db.PREFIXES.find_one({"_id": message.guild.id}).get("prefix")
+
+    prefix = await db.PREFIXES.find_one({"_id": message.guild.id})
+    return prefix["prefix"]
+
 
 intents = discord.Intents().all()
-bot = commands.Bot(command_prefix = serverprefix, help_command=None, intents=intents)
+bot = commands.Bot(command_prefix = guild_prefix, help_command=None, intents=intents)
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Activity(
-                            type=discord.ActivityType.streaming,
-                            name=f"Ping for help 👌"
-                            ))
+    await bot.change_presence(
+            activity=discord.Activity(
+            type=discord.ActivityType.streaming,
+            name=f"Ping and ask for help 👀"
+            ))
     print("I woke up 🌥️")
 
 
@@ -44,12 +49,11 @@ for filename in os.listdir('./visuals'):
         bot.load_extension(f'visuals.{filename[:-3]}')
 
 
-
 @bot.event
 async def on_guild_join(guild):
     #Inserting plugin configs if it does not exist (incase of re-inviting)
-    if not db.PLUGINS.count_documents({"_id": guild.id}, limit=1):
-        db.PLUGINS.insert_one({
+    if not await db.PLUGINS.count_documents({"_id": guild.id}, limit=1):
+        await db.PLUGINS.insert_one({
 
             "_id": guild.id,
             "Leveling": False,
@@ -64,9 +68,8 @@ async def on_guild_join(guild):
             "Giveaway": True
         })
 
-    #Inserting plugin configs if it does not exist (incase of re-inviting)
-    if not db.PERMISSIONS.count_documents({"_id": guild.id}, limit=1):
-        db.PERMISSIONS.insert_one({
+    if not await db.PERMISSIONS.count_documents({"_id": guild.id}, limit=1):
+        await db.PERMISSIONS.insert_one({
 
             "_id": guild.id,
             "Leveling": {},

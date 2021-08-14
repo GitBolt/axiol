@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix
+from functions import get_prefix
 import random
 from ext.permissions import has_command_permission
 import asyncio
@@ -14,9 +14,9 @@ class Verification(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Verification") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Verification"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Verification plugin is disabled in this server",
@@ -41,7 +41,7 @@ class Verification(commands.Cog):
         try:
             ch = self.bot.get_channel(int(usermsg.content.strip("<>#")))
         except:
-            db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
+            await db.PLUGINS.update_one(await db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
             return await ctx.send(embed=discord.Embed(
                     title="Invalid Channel",
                     description="🚫 I was not able to find the channel which you entered",
@@ -83,13 +83,13 @@ class Verification(commands.Cog):
                     title="Verification successfully setted up",
                     description=f"{var.E_ACCEPT} New members would need to verify in {ch.mention} to access other channels!",
                     color=var.C_GREEN
-                    ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                    ).add_field(name="To configure further", value=f"`{await get_prefix(ctx)}help verification`"
                     ).set_footer(text="Default verification type is command")
                     
                     await ctx.send(embed=successembed)
 
                 except discord.Forbidden:
-                    db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                    await db.PLUGINS.update_one(await db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                     await ctx.send(embed=discord.Embed(
                                 title="Missing access",
                                 description=f"I don't have access or change role permissions in {ch.mention} to make it a verification channel",
@@ -97,7 +97,7 @@ class Verification(commands.Cog):
                     ))
 
             except:
-                db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                await db.PLUGINS.update_one(await db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                 await ctx.send(embed=discord.Embed(
                             title="Missing Permissions",
                             description="🚫 I don't have permissions to create and set permissions for roles",
@@ -128,7 +128,7 @@ class Verification(commands.Cog):
             ExistingNVerified = discord.utils.get(ctx.guild.roles, name="Not Verified")
 
             if str(reaction.emoji) == var.E_RECYCLE:
-                db.VERIFY.insert_one({
+                await db.VERIFY.insert_one({
                     
                     "_id":ctx.guild.id,
                     "type": "command",
@@ -140,7 +140,7 @@ class Verification(commands.Cog):
                 title="Verification successfully setted up",
                 description=f"{var.E_ACCEPT} New members would need to verify in {ch.mention} to access other channels!",
                 color=var.C_GREEN
-                ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help verification`"
+                ).add_field(name="To configure further", value=f"`{await get_prefix(ctx)}help verification`"
                 ).set_footer(text="Default verification type is command")
                 
                 await ctx.send(embed=successembed)
@@ -149,7 +149,7 @@ class Verification(commands.Cog):
                 try:
                     await ExistingNVerified.delete()
                 except discord.Forbidden:
-                    db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
+                    await db.PLUGINS.update_one(await db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Verification":False}})
                     await ctx.send(embed=discord.Embed(
                                 title="Missing Permissions",
                                 description="🚫 I don't have permissions to delete the existing role, due to this error verification plugin has been disabled again",
@@ -167,7 +167,7 @@ class Verification(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def verifyinfo(self, ctx):
-        GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
+        GuildDoc = await db.VERIFY.find_one({"_id":ctx.guild.id})
         verifytype = GuildDoc.get("type")
         if verifytype == "command":
 
@@ -199,14 +199,14 @@ class Verification(commands.Cog):
     @has_command_permission()
     async def verifychannel(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})  
+            GuildDoc = await db.VERIFY.find_one({"_id": ctx.guild.id})  
             NVerified = ctx.guild.get_role(GuildDoc.get("roleid"))
             await self.bot.get_channel(GuildDoc.get("channel")).set_permissions(ctx.guild.default_role, view_channel=True) 
             await self.bot.get_channel(GuildDoc.get("channel")).set_permissions(NVerified, view_channel=False)
             newdata = {"$set":{
                 "channel": channel.id
             }}
-            db.VERIFY.update_one(GuildDoc, newdata)
+            await db.VERIFY.update_one(GuildDoc, newdata)
             await self.bot.get_channel(channel.id).set_permissions(NVerified, view_channel=True)
             
             embed = discord.Embed(
@@ -220,14 +220,14 @@ class Verification(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the verification channel to change it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}verifychannel <#channel>`"))
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}verifychannel <#channel>`"))
 
 
 
     @commands.command()
     @has_command_permission()
     async def verifyswitch(self, ctx):
-        GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
+        GuildDoc = await db.VERIFY.find_one({"_id":ctx.guild.id})
         if GuildDoc.get("type") == "command":
             newdata = {"$set":{
                 "type": "bot"
@@ -236,7 +236,7 @@ class Verification(commands.Cog):
             newdata = {"$set":{
                 "type": "command"
             }}
-        db.VERIFY.update_one(GuildDoc, newdata)
+        await db.VERIFY.update_one(GuildDoc, newdata)
         await ctx.send(embed=discord.Embed(
                     title="Switched to " + newdata.get("$set").get("type") + " verification",
                     description="Use the command again to switch to the other method",
@@ -248,11 +248,11 @@ class Verification(commands.Cog):
     @has_command_permission()
     async def verifyrole(self, ctx, role:discord.Role=None):
         if role is not None:
-            GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+            GuildDoc = await db.VERIFY.find_one({"_id": ctx.guild.id})
             newdata = {'$set':{
                 "assignrole": role.id
             }}
-            db.VERIFY.update_one(GuildDoc, newdata)
+            await db.VERIFY.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                     description=f"{var.E_ACCEPT} Successfully added {role.mention}",
                     color=var.C_GREEN
@@ -262,7 +262,7 @@ class Verification(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the role too!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyrole <role>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}verifyrole <role>`"
             ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
             )
 
@@ -270,14 +270,14 @@ class Verification(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def verifyroleremove(self, ctx):
-        GuildDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.VERIFY.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("assignrole") is not None:
             role = ctx.guild.get_role(GuildDoc.get("assignrole"))
 
             newdata = {"$set":{
                 "assignrole": None
             }}
-            db.VERIFY.update_one(GuildDoc, newdata)
+            await db.VERIFY.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                     description=f"{var.E_ACCEPT} Removed {role.mention} from verified role",
                     color=var.C_GREEN
@@ -287,7 +287,7 @@ class Verification(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the role too!",
             color=var.C_RED
-             ).add_field(name="Format", value=f"`{getprefix(ctx)}verifyroleremove <role>`"
+             ).add_field(name="Format", value=f"`{await get_prefix(ctx)}verifyroleremove <role>`"
             ).set_footer(text="For role either role mention or ID can be used (to not disturb anyone having the role)")
             )
 
@@ -295,25 +295,25 @@ class Verification(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def verifyremove(self, ctx):
-        GuildDoc = db.VERIFY.find_one({"_id":ctx.guild.id})
-        db.VERIFY.delete_one(GuildDoc)
+        GuildDoc = await db.VERIFY.find_one({"_id":ctx.guild.id})
+        await db.VERIFY.delete_one(GuildDoc)
         await discord.utils.get(ctx.guild.roles, name="Not Verified").delete()
-        GuildPluginDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildPluginDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
         newdata = {"$set":{
             "Verification": False
         }}
-        db.PLUGINS.update_one(GuildPluginDoc, newdata)
+        await db.PLUGINS.update_one(GuildPluginDoc, newdata)
         await ctx.send("Successfully removed verification from this server!")
 
 
 
     @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):
-        if ctx.channel.id in db.VERIFY.distinct("channel"): #Verify channel IDs
-            assignrole = db.VERIFY.find_one({"_id": ctx.guild.id})["assignrole"]
+        if ctx.channel.id in await db.VERIFY.distinct("channel"): #Verify channel IDs
+            assignrole = await db.VERIFY.find_one({"_id": ctx.guild.id})["assignrole"]
 
-            if db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
-                roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
+            if await db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
+                roleid = await db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                 role = ctx.guild.get_role(roleid)
 
                 await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
@@ -348,7 +348,7 @@ class Verification(commands.Cog):
                     #ayo bots aren't this smart
                     code = embed.image.url[77:-4]
                     if usermsg.content == code:
-                        roleid = db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
+                        roleid = await db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
                         role = ctx.guild.get_role(roleid)
                         await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
                         await ctx.author.remove_roles(role)
@@ -365,8 +365,9 @@ class Verification(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        if db.PLUGINS.find_one({"_id":message.guild.id})["Verification"]:
-            GuildVerifyDoc = db.VERIFY.find_one({"_id": message.guild.id})
+        PluginDoc = await db.PLUGINS.find_one({"_id":message.guild.id})
+        if PluginDoc["Verification"]:
+            GuildVerifyDoc = await db.VERIFY.find_one({"_id": message.guild.id})
             if (message.channel.id == GuildVerifyDoc["channel"] and 
                 message.author != self.bot.user):
                 

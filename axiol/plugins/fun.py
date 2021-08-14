@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 import database as db
 import variables as var
 from ext.permissions import has_command_permission
-from functions import random_text, getprefix, code_generator
+from functions import get_randomtext, get_prefix, get_code
 
 
 TYPE_15 = "<:15:866917795513892883>" 
@@ -34,7 +34,7 @@ class TypeRacer:
         self.required_amount = required_amount
 
         self.created_at = datetime.now()
-        self.code = code_generator()
+        self.code = get_code()
 
     def add_player(self, player):
         self.players.append(player)
@@ -51,7 +51,7 @@ class TypeRacer:
 
     @staticmethod
     def create_board():
-        get_text = random_text(10)
+        get_text = get_randomtext(10)
         text = get_text if get_text.endswith(".") else get_text+"."
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)
@@ -138,11 +138,12 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.matches: typing.List[TypeRacer] = []
+
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Fun") == True:
-            return ctx.guild.id
+        GuildDoc = await  db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Fun"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Fun plugin is disabled in this server",
@@ -178,7 +179,7 @@ class Fun(commands.Cog):
                 title="No matches found",
                 description="There are no on going queues right now, maybe create your own?",
                 color=var.C_ORANGE
-            ).add_field(name="Start a new match", value=f"```{getprefix(ctx)}typeracer new <number_of_players>```")
+            ).add_field(name="Start a new match", value=f"```{await get_prefix(ctx)}typeracer new <number_of_players>```")
             )
         else:
             highest_players = max([x.players for x in self.matches])
@@ -218,7 +219,7 @@ class Fun(commands.Cog):
                 title="🚫 Missing argument",
                 description="You need to enter the player amount too!",
                 color=var.C_RED
-            ).add_field(name="format", value=f"```{getprefix(ctx)}typeracer new <player_amount>```"
+            ).add_field(name="format", value=f"```{await get_prefix(ctx)}typeracer new <player_amount>```"
             ))
         if self.get_match(ctx.author):
             return await ctx.send("You are already in a match queue!")
@@ -230,7 +231,7 @@ class Fun(commands.Cog):
         self.matches.append(match)
         await ctx.send(embed=discord.Embed(
             title="You have started a new match!",
-            description=f"Invite your friends by sharing the code\nThe command would be ```{getprefix(ctx)}typeracer join {match.code}```",
+            description=f"Invite your friends by sharing the code\nThe command would be ```{await get_prefix(ctx)}typeracer join {match.code}```",
             color=var.C_GREEN
         ).add_field(name="Code", value=match.code, inline=False
         ).add_field(name="Players required", value=match.required_amount, inline=False
@@ -248,7 +249,7 @@ class Fun(commands.Cog):
                 title="🚫 Missing argument",
                 description="You need to enter the code too!",
                 color=var.C_RED
-            ).add_field(name="format", value=f"```{getprefix(ctx)}typeracer join <code>```"
+            ).add_field(name="format", value=f"```{await get_prefix(ctx)}typeracer join <code>```"
             ))
         if self.get_match(ctx.author):
             return await ctx.send("You are already in a match queue!")
@@ -290,7 +291,7 @@ class Fun(commands.Cog):
             title="🚫 Missing arguments",
             description="You need to define the typing test type too!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}typingtest <type>`\nThere are two types available: `time` and `word`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}typingtest <type>`\nThere are two types available: `time` and `word`"
             ))
 
         elif test_type not in ["time", "word"]:
@@ -342,7 +343,7 @@ class Fun(commands.Cog):
             config = CONFIG_15
             config["time"] = 60
 
-        text = random_text(config["time"] if test_type == "time" else 10)
+        text = get_randomtext(config["time"] if test_type == "time" else 10)
 
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)
@@ -424,7 +425,7 @@ class Fun(commands.Cog):
                     ).set_image(url=avatar)
             await ctx.send(embed=embed)
         else:
-            await ctx.send(f"You need to define the user too! Follow this format:\n```{getprefix(ctx)}avatar <user>```\nFor user either user ID or mention can be used`")
+            await ctx.send(f"You need to define the user too! Follow this format:\n```{await get_prefix(ctx)}avatar <user>```\nFor user either user ID or mention can be used`")
 
 
     @commands.command()
@@ -633,7 +634,7 @@ class Fun(commands.Cog):
                                 )
 
         else:
-            await ctx.send(f"You also need to define the channel too! Format:\n```{getprefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
+            await ctx.send(f"You also need to define the channel too! Format:\n```{await get_prefix(ctx)}embed <#channel>```\nDon't worry, the embed won't be sent right away to the channel :D")
 
 def setup(bot):
     bot.add_cog(Fun(bot))

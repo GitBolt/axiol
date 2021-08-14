@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix, getxprange
+from functions import get_prefix, get_xprange
 from ext.permissions import has_command_permission
 
 
@@ -13,9 +13,9 @@ class Leveling(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Leveling") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Leveling"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Leveling plugin is disabled in this server",
@@ -31,7 +31,7 @@ class Leveling(commands.Cog):
         else:
             user = rankuser
 
-        GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+        GuildCol = await db.LEVELDATABASE[str(ctx.guild.id)]
         userdata = GuildCol.find_one({"_id": user.id})
         if userdata is None:
                 await ctx.send("This user does not have any rank yet...")
@@ -69,7 +69,7 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def leaderboard(self, ctx):
-        GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+        GuildCol = await db.LEVELDATABASE[str(ctx.guild.id)]
         rankings = GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
@@ -191,7 +191,7 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def levelinfo(self, ctx):
-        GuildDoc = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find_one({"_id": 0})
+        GuildDoc = await db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find_one({"_id": 0})
         xprange = GuildDoc.get("xprange")
         bl = []
 
@@ -199,7 +199,7 @@ class Leveling(commands.Cog):
             bl.append(self.bot.get_channel(i).mention)
 
         blacklistedchannels = ', '.join(bl) if not bl == [] else None
-        maxrank = db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find().sort("xp", -1).limit(1)
+        maxrank = await db.LEVELDATABASE.get_collection(str(ctx.guild.id)).find().sort("xp", -1).limit(1)
         maxrank_user = self.bot.get_user(list(maxrank)[0].get("_id"))
         def getalertchannel():
             if GuildDoc.get("alertchannel") is not None:
@@ -255,7 +255,7 @@ class Leveling(commands.Cog):
                     color=var.C_RED
                 ))
             else:
-                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                GuildCol = await db.LEVELDATABASE[str(ctx.guild.id)]
                 data = GuildCol.find_one({"_id": user.id})
                 if data is None:
                     GuildCol.insert_one({"_id": user.id, "xp": amount})
@@ -276,7 +276,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the member and the amount to give them xp",
             color=var.C_RED
-            ).add_field(name="Format", value=f"```{getprefix(ctx)}givexp <user> <amount>```"
+            ).add_field(name="Format", value=f"```{await get_prefix(ctx)}givexp <user> <amount>```"
             ).set_footer(text="For user either user mention or user ID can be used")
             )
 
@@ -291,7 +291,7 @@ class Leveling(commands.Cog):
                     color=var.C_RED
                 ))
             else:
-                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                GuildCol = await db.LEVELDATABASE[str(ctx.guild.id)]
                 data = GuildCol.find_one({"_id": user.id})
 
                 newdata = {"$set":{
@@ -303,7 +303,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the member and the amount to remove their xp",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}removexp <user> <amount>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}removexp <user> <amount>`"
             ).set_footer(text="For user either user mention or user ID can be used")
             )
 
@@ -312,7 +312,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def xprange(self, ctx, minval:int=None, maxval:int=None):
         if minval and maxval is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newdata = {"$set":{
@@ -327,7 +327,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the xp range",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}xprange <min_xp> <max_xp>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}xprange <min_xp> <max_xp>`"
             )
             )
 
@@ -336,7 +336,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def blacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklistedchannels").copy()
@@ -354,7 +354,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the channel to blacklist it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}blacklist <#channel>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}blacklist <#channel>`"
             )
             )
 
@@ -363,7 +363,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def whitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklistedchannels").copy()
@@ -385,7 +385,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the channel to whitelist it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}whitelist <#channel>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}whitelist <#channel>`"
             )
             )
 
@@ -393,7 +393,7 @@ class Leveling(commands.Cog):
     @commands.command(aliases=["removealerts"])
     @has_command_permission()
     async def togglealerts(self, ctx):
-        GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+        GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
         GuildConfig = GuildCol.find_one({"_id": 0})
         if GuildConfig.get("alerts") == True:
             newdata = {"$set":{
@@ -418,7 +418,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def alertchannel(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newdata = {"$set":{
@@ -433,7 +433,7 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the channel to make it the alert channel",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}alertchannel <#channel>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}alertchannel <#channel>`"
             )
             )
 
@@ -443,7 +443,7 @@ class Leveling(commands.Cog):
     async def reward(self, ctx, level:str=None, role:discord.Role=None):
         if level and role is not None and level.isnumeric():
 
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             existingdata = settings.get("rewards")
@@ -465,8 +465,8 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the level and role both to add a reward!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}reward <level> <role>`"
-            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}reward 2 @somerole\nNot {getprefix(ctx)}reward level2 @somerole")
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}reward <level> <role>`"
+            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {await get_prefix(ctx)}reward 2 @somerole\nNot {await get_prefix(ctx)}reward level2 @somerole")
             )
 
     @commands.command()
@@ -474,7 +474,7 @@ class Leveling(commands.Cog):
     async def removereward(self, ctx, level:str=None):
         if level is not None:
 
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.LEVELDATABASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             existingdata = settings.get("rewards")
@@ -499,8 +499,8 @@ class Leveling(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the level to remove it's reward!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}removereward <level>`"
-            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {getprefix(ctx)}removereward 2 \nNot {getprefix(ctx)}removereward level2 ")
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}removereward <level>`"
+            ).set_footer(text=f"Make sure that for level you only the enter level number, example: {await get_prefix(ctx)}removereward 2 \nNot {await get_prefix(ctx)}removereward level2 ")
             )
 
 
@@ -510,16 +510,16 @@ class Leveling(commands.Cog):
         if not message.guild:
             return
 
-        GuildPluginDoc = db.PLUGINS.find_one({"_id": message.guild.id})
+        GuildPluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
         GuildLevelDoc = db.LEVELDATABASE[str(message.guild.id)]
 
         if not GuildPluginDoc["Leveling"] or message.channel.id in GuildLevelDoc.find_one({"_id":0})["blacklistedchannels"] or message.author.bot:
             return
 
-        userdata = GuildLevelDoc.find_one({"_id": message.author.id})
+        userdata = await GuildLevelDoc.find_one({"_id": message.author.id})
 
         if userdata is None:
-            GuildLevelDoc.insert_one({"_id": message.author.id, "xp": 0})
+            await GuildLevelDoc.insert_one({"_id": message.author.id, "xp": 0})
         else:
             xp = userdata["xp"]
 
@@ -529,8 +529,8 @@ class Leveling(commands.Cog):
                     break
                 initlvl += 1
 
-            xp = userdata["xp"] + random.randint(getxprange(message)[0], getxprange(message)[1])
-            GuildLevelDoc.update_one(userdata, {"$set": {"xp": xp}})
+            xp = userdata["xp"] + random.randint(get_xprange(message)[0], get_xprange(message)[1])
+            await GuildLevelDoc.update_one(userdata, {"$set": {"xp": xp}})
 
             levelnow = 0
             while True:
@@ -538,8 +538,8 @@ class Leveling(commands.Cog):
                     break
                 levelnow += 1
 
-            if levelnow > initlvl and GuildLevelDoc.find_one({"_id": 0})["alerts"]:
-                ch = self.bot.get_channel(GuildLevelDoc.find_one({"_id":0})["alertchannel"])
+            if levelnow > initlvl and await GuildLevelDoc.find_one({"_id": 0})["alerts"]:
+                ch = self.bot.get_channel(await GuildLevelDoc.find_one({"_id":0})["alertchannel"])
                 embed = discord.Embed(
                 title="You leveled up!",
                 description=f"{var.E_ACCEPT} You are now level {levelnow}!",
@@ -553,7 +553,7 @@ class Leveling(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-            rewards = GuildLevelDoc.find_one({"_id":0}).get("rewards")
+            rewards = await GuildLevelDoc.find_one({"_id":0}).get("rewards")
             if str(levelnow) in rewards.keys():
                 roleid = rewards.get(str(levelnow))
                 role = message.guild.get_role(roleid)

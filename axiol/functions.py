@@ -1,22 +1,24 @@
+import asyncio
 import random
 from variables import DEFAULT_PREFIX
 from database import PREFIXES, LEVELDATABASE, PLUGINS, PERMISSIONS
 
-def getprefix(ctx):
-    try:
-        return PREFIXES.find_one({"_id": ctx.guild.id}).get("prefix")
-    except AttributeError:
+
+async def get_prefix(ctx):
+    prefix = await PREFIXES.find_one({"_id": ctx.guild.id})
+
+    if prefix is not None:
+        return prefix["prefix"]
+    else:
         return DEFAULT_PREFIX
-    
 
-def getxprange(message):
-    col = LEVELDATABASE.get_collection(str(message.guild.id))
-    settings = col.find_one({"_id": 0})
-    xprange =settings.get("xprange")
-    return xprange
+async def get_xprange(guild_id):
+    collection = await LEVELDATABASE.get_collection(str(guild_id))
+    settings = collection.find_one({"_id": 0})
+    return settings["xprange"]
 
 
-def random_text(typing_time):
+async def get_randomtext(typing_time):
     f = open("resources/words.txt").read()
     words = f.split("\n")
 
@@ -34,11 +36,11 @@ def random_text(typing_time):
     
     else:
         r = range(1)
+        
+    return " ".join([random.choice(words) for i in r])
 
-    text = " ".join([random.choice(words) for i in r])
-    return text
 
-def code_generator():
+async def get_code():
     return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                              "1234567890", k = 5))
 
@@ -61,14 +63,14 @@ which ended up benefiting ¯\_(ツ)_/¯
 """
 
 #Adding new plugin and permissions
-def update_plugins_and_permissions(plugin):
-    PLUGINS.update_many(
+async def update_plugins_and_permissions(plugin):
+    await PLUGINS.update_many(
         { plugin: { "$exists": False } },
             {
                 "$set": { plugin : True }
             }
     )
-    PERMISSIONS.update_many(
+    await PERMISSIONS.update_many(
         { plugin: {"$exists": False} },
         {
             "$set": { plugin: {}}
@@ -77,75 +79,85 @@ def update_plugins_and_permissions(plugin):
         )
 
 #updating leveling, plugin, prefix and permission data
-def updatedb(serverid):
+async def update_db(guild_ids):
 
-    if not PLUGINS.count_documents({"_id": serverid}, limit=1):
-        PLUGINS.insert_one({
-
-            "_id": serverid,
-            "Leveling": False,
-            "Moderation": True,
-            "ReactionRoles": True,
-            "Welcome": False,
-            "Verification": False,
-            "Chatbot": True,
-            "AutoMod": False,
-            "Karma": False,
-            "Fun": True,
-            "Giveaway": True
-        })
-
-        print(f"✅{serverid} - Plugins 🔧")
-
+    plugins_update = []
+    permissions_update = []
+    leveling_update = []
     
-    if not PERMISSIONS.count_documents({"_id": serverid}, limit=1):
-        PERMISSIONS.insert_one({
+    for guild_id in guild_ids:
+        Guild_Plugins = await PLUGINS.find_one({"_id": guild_id})
 
-            "_id": serverid,
-            "Leveling": {},
-            "Moderation": {},
-            "ReactionRoles": {},
-            "Welcome": {},
-            "Verification": {},
-            "Chatbot": {},
-            "Commands": {},
-            "AutoMod": {},
-            "Karma": {},
-            "Fun": {},
-            "Giveaway": {}
-        })
-        print(f"✅{serverid} - Permissions 🔨")
+        if not await PLUGINS.count_documents({"_id": guild_id}, limit=1):
+            PLUGINS.insert_one({
 
+                "_id": guild_id,
+                "Leveling": False,
+                "Moderation": True,
+                "ReactionRoles": True,
+                "Welcome": False,
+                "Verification": False,
+                "Chatbot": True,
+                "AutoMod": False,
+                "Karma": False,
+                "Fun": True,
+                "Giveaway": True
+            })
+            plugins_update.append(guild_id)
+            print(f"✅{guild_id} - Plugins 🔧")
+            
+        if not await PERMISSIONS.count_documents({"_id": guild_id}, limit=1):
+            PERMISSIONS.insert_one({
 
-    if PLUGINS.find_one({"_id": serverid})["Leveling"]:
+                "_id": guild_id,
+                "Leveling": {},
+                "Moderation": {},
+                "ReactionRoles": {},
+                "Welcome": {},
+                "Verification": {},
+                "Chatbot": {},
+                "Commands": {},
+                "AutoMod": {},
+                "Karma": {},
+                "Fun": {},
+                "Giveaway": {}
+            })
+            permissions_update.append(guild_id)
+            print(f"✅{guild_id} - Permissions 🔨")
+
+        
+        if Guild_Plugins["Leveling"]:
+            if str(guild_id) not in await LEVELDATABASE.list_collection_names():
+                GuildLevelDB = await LEVELDATABASE.create_collection(str(guild_id))
+                await GuildLevelDB.insert_one({
+
+                    "_id": 0,
+                    "xprange": [15, 25],
+                    "alertchannel": None,
+                    "blacklistedchannels": [],
+                    "alerts": True
+                    }) 
+                leveling_update.append(guild_id)
+                print(f"✅{guild_id} - Leveling 📊")
+        
+        #Only use this when working locally
         try:
-            GuildLevelDB = LEVELDATABASE.create_collection(str(serverid))
-            GuildLevelDB.insert_one({
+            await PREFIXES.insert_one({
+                "_id": guild_id,
+                "prefix": "ax"
+            })
+            print(f"✅{guild_id} - Prefix ⚪")
 
-                "_id": 0,
-                "xprange": [15, 25],
-                "alertchannel": None,
-                "blacklistedchannels": [],
-                "alerts": True
-                }) 
-            print(f"✅{serverid} - Leveling 📊")
         except:
-            pass
-    
-    #Only use this when working locally
-    # try:
-    #     PREFIXES.insert_one({
-    #         "_id": serverid,
-    #         "prefix": "ax"
-    #     })
-    #     print(f"✅{serverid} - Prefix ⚪")
+            print(f"❌{guild_id} - Prefix ⚪")
 
-    # except:
-    #     print(f"❌{serverid} - Prefix ⚪")
+    print(f"Update results\n{len(plugins_update)} plugins\n{len(permissions_update)} permissions\n{len(leveling_update)} leveling")
 
 
-serveridlist = []
-#for i in serveridlist:
-   #updatedb(i)
+# serveridlist = [843516084266729512, 751491708465840159]
+# loop = asyncio.get_event_loop()
+# loop.run_until_complete(updatedb(serveridlist))
 
 #update_plugins_and_permissions("Giveaway")
+
+

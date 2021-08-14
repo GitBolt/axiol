@@ -1,11 +1,9 @@
 import discord
 from discord.ext import commands
-from functions import updatedb
-from discord.ext.commands import GuildConverter
 import database as db
-import difflib
+from functions import update_db
 
-Differentiator = difflib.Differ()
+
 # A private cog which only works for me
 class Owner(commands.Cog):
     def __init__(self, bot):
@@ -16,25 +14,7 @@ class Owner(commands.Cog):
         
 
     @commands.command()
-    async def accuracy(self, ctx, *, txt=None):
-        if txt is None:
-            return await ctx.send("You need to define both main text and user inputted content sepeated by `|`")
-        raw_text = txt.split("|")[0].lstrip(' ').rstrip(' ').lower()
-        user_content = txt.split("|")[1].lstrip(' ').rstrip(' ').lower()
-
-        text = " ".join(raw_text.split(" ")[:len(user_content.split(" "))])
-
-        comparision = Differentiator.compare(text, user_content)
-        mistakes = [x for x in comparision if "-" in x or "+" in x]
-        comparision = Differentiator.compare(text, user_content)
-        
-        accuracy = difflib.SequenceMatcher(None, text, user_content).ratio()
-
-        await ctx.send(f"Main text characters: __{len(text)}__\nInput text characters: __{len(user_content)}__\n```Mistakes: __{len(mistakes)}__\nAccuracy: {accuracy}%```")
-
-
-    @commands.command()
-    async def get_guilds(self, ctx, user:discord.User=None):
+    async def get_guilds(self, ctx, *,user:discord.User=None):
         if user is None:
             return await ctx.send("You need to define the user to find in which guilds they are!")
         data = {}
@@ -42,27 +22,17 @@ class Owner(commands.Cog):
             for member in guild.members:
                 if member == user:
                     data.update({guild.name: guild.id})
-        if data:
-            await ctx.send(f"**{user}** found in __{len(data)}__ guilds\n```json\n{data}```")
-        else:
-            await ctx.send(f"**{user}** found in __0__ guilds")
-
+        await ctx.send(f"**{user}** found in __{len(data)}__ guilds\n```json\n{data}```")
 
 
     @commands.command()
-    async def get_members(self, ctx, *, guild=None):
+    async def get_members(self, ctx, *, guild:discord.Guild=None):
         if guild is None:
             return await ctx.send("You need to define the guild too")
-        
-        converter = GuildConverter()
-        try:
-            guildobj = await converter.convert(ctx, guild)
-        except commands.errors.GuildNotFound:
-            return await ctx.send(f"**{guild}** Guild not found")
 
         members = ""
-        for i in guildobj.members:
-            members += f"`{i}` - "
+        for member in guild.members:
+            members += f"`{member}` - "
             if len(members) > 1500:
                 members += "**\nMessage was too long so this is not complete**"
                 break
@@ -71,73 +41,67 @@ class Owner(commands.Cog):
 
 
     @commands.command()
-    async def get_doc(self, ctx, doc_name=None, *,guild=None):
+    async def get_doc(self, ctx, doc_name=None, *,guild:discord.Guild=None):
         if doc_name is None or guild is None:
             return await ctx.send("You need to define both document name and guild name/id")
-        converter = GuildConverter()
-        try:
-            guildobj = await converter.convert(ctx, guild)
-        except commands.errors.GuildNotFound:
-            return await ctx.send(f"**{guild}** Guild not found")
 
         try:
             plugindb = getattr(db, doc_name.upper())
         except:
             return await ctx.send(f"No document with name **{doc_name.upper()}**")
 
-        doc = plugindb.find_one({"_id":guildobj.id})
+        doc = plugindb.find_one({"_id":guild.id})
         
-        await ctx.send(f"**{doc_name.upper()}** Document for **{guildobj.name}**\n```json\n{doc}```")
+        await ctx.send(f"**{doc_name.upper()}** Document for **{guild.name}**\n```json\n{doc}```")
+
 
     @commands.command()
     async def update_db(self, ctx):
-        for guild in self.bot.guilds:
-            updatedb(guild.id)
+        await update_db([guild.id for guild in self.bot.guilds])
         
+
     @commands.command()
     async def clean_db(self, ctx):
-        guildids = []
-        for guild in self.bot.guilds:
-            guildids.append(guild.id)
+        guildids = [guild.id for guild in self.bot.guilds]
 
-        for i in db.AUTOMOD.find({}):
+        async for i in db.AUTOMOD.find({}):
             if i["_id"] not in guildids:
-                db.AUTOMOD.delete_one(i)
+                await db.AUTOMOD.delete_one(i)
                 print("AUTOMOD", i["_id"])
         print("\n")
-        for i in db.CHATBOT.find({}):
+        async for i in db.CHATBOT.find({}):
             if i["_id"] not in guildids:
-                db.CHATBOT.delete_one(i)
+                await db.CHATBOT.delete_one(i)
                 print("CHATBOT", i["_id"])
         print("\n")
-        for i in db.PERMISSIONS.find({}):
+        async for i in db.PERMISSIONS.find({}):
             if i["_id"] not in guildids:
-                db.PERMISSIONS.delete_one(i)
+                await db.PERMISSIONS.delete_one(i)
                 print("PERMISSIONS", i["_id"])
         print("\n")
-        for i in db.PLUGINS.find({}):
+        async for i in db.PLUGINS.find({}):
             if i["_id"] not in guildids:
-                db.PLUGINS.delete_one(i)
+                await db.PLUGINS.delete_one(i)
                 print("PLUGINS", i["_id"])
         print("\n")
-        for i in db.PREFIXES.find({}):
+        async for i in db.PREFIXES.find({}):
             if i["_id"] not in guildids:
-                db.PREFIXES.delete_one(i)
+                await db.PREFIXES.delete_one(i)
                 print("PREFIXES", i["_id"])
         print("\n")
-        for i in db.REACTIONROLES.find({}):
+        async for i in db.REACTIONROLES.find({}):
             if i["_id"] not in guildids:
-                db.REACTIONROLES.delete_one(i)
+                await db.REACTIONROLES.delete_one(i)
                 print("REACTIONROLES", i["_id"])
         print("\n")
-        for i in db.VERIFY.find({}):
+        async for i in db.VERIFY.find({}):
             if i["_id"] not in guildids:
-                db.VERIFY.delete_one(i)
+                await db.VERIFY.delete_one(i)
                 print("VERIFY", i["_id"])
         print("\n")
-        for i in db.WELCOME.find({}):
+        async for i in db.WELCOME.find({}):
             if i["_id"] not in guildids:
-                db.WELCOME.delete_one(i)
+                await db.WELCOME.delete_one(i)
                 print("WELCOME", i["_id"])
                 
 def setup(bot):

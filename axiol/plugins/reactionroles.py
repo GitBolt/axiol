@@ -3,7 +3,7 @@ from typing import Union
 from discord.ext import commands
 import database as db
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 from ext.permissions import has_command_permission
 
 
@@ -14,9 +14,9 @@ class ReactionRoles(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("ReactionRoles") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("ReactionRoles"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Reaction Roles plugin is disabled in this server",
@@ -40,7 +40,7 @@ class ReactionRoles(commands.Cog):
             return await ctx.send(embed=discord.Embed(
                 description="🚫 You need to define the channel, message, role and emoji all three to add a reaction role",
                 color=var.C_RED
-                ).add_field(name="Format", value=f"`{getprefix(ctx)}rr <#channel> <messageid> <role> <emoji>`"
+                ).add_field(name="Format", value=f"`{await get_prefix(ctx)}rr <#channel> <messageid> <role> <emoji>`"
                 ).set_footer(text="You can use either role ID or mention it (use ID if you don't want to disturb everyone having the role)")
                 )
 
@@ -56,9 +56,9 @@ class ReactionRoles(commands.Cog):
             raise commands.MessageNotFound(ctx)
 
         if botrole.position > role.position:
-            GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+            GuildDoc = await db.REACTIONROLES.find_one({"_id": ctx.guild.id})
             if GuildDoc == None:
-                db.REACTIONROLES.insert_one({
+                await db.REACTIONROLES.insert_one({
 
                     "_id": ctx.guild.id,
                     "reaction_roles": [{
@@ -87,7 +87,7 @@ class ReactionRoles(commands.Cog):
                     newdata = {"$set":{
                         "reaction_roles": newlist
                     }}
-                    db.REACTIONROLES.update_one(GuildDoc, newdata)
+                    await db.REACTIONROLES.update_one(GuildDoc, newdata)
                     await msg.add_reaction(emoji)
                     await ctx.send(f"Reaction role for {role} using {emoji} setted up! https://discord.com/channels/{ctx.message.guild.id}/{msg.channel.id}/{msg.id}")
         else:
@@ -108,13 +108,13 @@ class ReactionRoles(commands.Cog):
             return await ctx.send(embed=discord.Embed(
                 description="🚫 You need to define the message and emoji both to remove a reaction role",
                 color=var.C_RED
-                ).add_field(name="Format", value=f"`{getprefix(ctx)}removerr <messageid> <emoji>`"
+                ).add_field(name="Format", value=f"`{await get_prefix(ctx)}removerr <messageid> <emoji>`"
                 )
                 )
         if type(emoji) == str and emoji.startswith("<"):raise commands.EmojiNotFound(ctx)
         if type(message_id) == str: return await ctx.send(embed=discord.Embed(description="Message ID needs to be numerical", color=var.C_ORANGE))
 
-        GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.REACTIONROLES.find_one({"_id": ctx.guild.id})
         
         def rr_exists():
             for i in GuildDoc["reaction_roles"]:
@@ -135,7 +135,7 @@ class ReactionRoles(commands.Cog):
                 "reaction_roles": newlist
             }}
             role = ctx.guild.get_role(pair["roleid"])
-            db.REACTIONROLES.update_one(GuildDoc, newdata)
+            await db.REACTIONROLES.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                         title="Reaction role removed", 
                         description=f"Reaction role for {role} using {emoji} on message with ID {message_id} has been removed",
@@ -150,7 +150,7 @@ class ReactionRoles(commands.Cog):
     async def allrr(self, ctx):
 
         Guild = self.bot.get_guild(ctx.guild.id)
-        GuildDoc = db.REACTIONROLES.find_one({"_id": Guild.id})
+        GuildDoc = await db.REACTIONROLES.find_one({"_id": Guild.id})
         if GuildDoc is not None and GuildDoc["reaction_roles"] != []:
 
             rramount = len(GuildDoc.get("reaction_roles"))
@@ -256,7 +256,7 @@ class ReactionRoles(commands.Cog):
     async def uniquerr(self, ctx, msg:discord.Message=None):
         
         if msg is not None:
-            GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+            GuildDoc = await db.REACTIONROLES.find_one({"_id": ctx.guild.id})
             if GuildDoc is not None:
                 allmsgids = []
                 uniquelist = GuildDoc["unique_messages"]
@@ -270,7 +270,7 @@ class ReactionRoles(commands.Cog):
                     newdata = {"$set":{
                         "unique_messages": newlist
                     }}
-                    db.REACTIONROLES.update_one(GuildDoc, newdata)
+                    await db.REACTIONROLES.update_one(GuildDoc, newdata)
                     await ctx.send(embed=discord.Embed(
                                 title="Successfully marked the message with unique reactions", 
                                 description=f"Now users can only react to one emoji and take one role in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
@@ -285,7 +285,7 @@ class ReactionRoles(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the message in order to mark it with unique reactions",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}uniquerr <messageid>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
             )
             )
 
@@ -296,7 +296,7 @@ class ReactionRoles(commands.Cog):
     async def removeunique(self, ctx, msg:discord.Message=None):
         
         if msg is not None:
-            GuildDoc = db.REACTIONROLES.find_one({"_id": ctx.guild.id})
+            GuildDoc = await db.REACTIONROLES.find_one({"_id": ctx.guild.id})
             if GuildDoc is not None:
                 allmsgids = []
                 uniquelist = GuildDoc["unique_messages"]
@@ -310,7 +310,7 @@ class ReactionRoles(commands.Cog):
                     newdata = {"$set":{
                         "unique_messages": newlist
                     }}
-                    db.REACTIONROLES.update_one(GuildDoc, newdata)
+                    await db.REACTIONROLES.update_one(GuildDoc, newdata)
                     await ctx.send(embed=discord.Embed(
                                 title="Successfully unmarked the message with unique reactions", 
                                 description=f"Now users can react and take multiple roles in [this message](https://discord.com/channels/{ctx.guild.id}/{msg.channel.id}/{msg.id})",
@@ -324,7 +324,7 @@ class ReactionRoles(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the message in order to unmark it with unique reactions",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}uniquerr <messageid>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
             )
             )
 
@@ -333,7 +333,7 @@ class ReactionRoles(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         #Listeners don't care about cog checks so need to add a check manually
-        GuildDoc = db.REACTIONROLES.find_one({"_id": payload.guild_id})
+        GuildDoc = await db.REACTIONROLES.find_one({"_id": payload.guild_id})
         
         if GuildDoc is not None and GuildDoc["reaction_roles"] is not None:           
             for i in GuildDoc["reaction_roles"]:
@@ -358,7 +358,7 @@ class ReactionRoles(commands.Cog):
     #Listeners don't care about cog checks so need to add a check manually
     async def on_raw_reaction_remove(self, payload):
 
-        GuildDoc = db.REACTIONROLES.find_one({"_id": payload.guild_id})
+        GuildDoc = await db.REACTIONROLES.find_one({"_id": payload.guild_id})
         if GuildDoc is not None and GuildDoc["reaction_roles"] is not None:
             for i in GuildDoc["reaction_roles"]:
                 if payload.message_id == i.get("messageid") and str(payload.emoji) == i.get("emoji"):

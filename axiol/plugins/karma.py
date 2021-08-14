@@ -4,7 +4,7 @@ from discord.ext import commands
 from nltk.sentiment import SentimentIntensityAnalyzer
 import database as db
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 from ext.permissions import has_command_permission
 
 
@@ -18,9 +18,9 @@ class Karma(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Karma") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Karma"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Karma plugin is disabled in this server",
@@ -37,7 +37,7 @@ class Karma(commands.Cog):
         else:
             user = karmauser
 
-        GuildCol = db.KARMADATBASE[str(ctx.guild.id)]
+        GuildCol = await db.KARMADATBASE[str(ctx.guild.id)]
         userdata = GuildCol.find_one({"_id": user.id})
 
         karmas = list(GuildCol.find({
@@ -73,7 +73,7 @@ class Karma(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def karmaboard(self, ctx):
-        GuildCol = db.KARMADATBASE[str(ctx.guild.id)]
+        GuildCol = await db.KARMADATBASE[str(ctx.guild.id)]
         karmas = list(GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
@@ -193,7 +193,7 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.KARMADATBASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.KARMADATBASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
@@ -214,7 +214,7 @@ class Karma(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the channel to blacklist it!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"```{getprefix(ctx)}kblacklist <#channel>```"
+            ).add_field(name="Format", value=f"```{await get_prefix(ctx)}kblacklist <#channel>```"
             )
             )
 
@@ -222,7 +222,7 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kwhitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.KARMADATBASE.get_collection(str(ctx.guild.id))
+            GuildCol = await db.KARMADATBASE.get_collection(str(ctx.guild.id))
             settings = GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
@@ -243,7 +243,7 @@ class Karma(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the channel to whitelist it!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"```{getprefix(ctx)}kwhitelist <#channel>```"
+            ).add_field(name="Format", value=f"```{await get_prefix(ctx)}kwhitelist <#channel>```"
             )
             )
 
@@ -252,10 +252,11 @@ class Karma(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        if db.PLUGINS.find_one({"_id": message.guild.id})["Karma"] and message.author.bot == False:
-            if not message.channel.id in db.KARMADATBASE[str(message.guild.id)].find_one({"_id":0})["blacklists"]:
+        PluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
+        if PluginDoc["Karma"] and not message.author.bot:
+            if not message.channel.id in await db.KARMADATBASE[str(message.guild.id)].find_one({"_id":0})["blacklists"]:
 
-                GuildKarmaDoc = db.KARMADATBASE[str(message.guild.id)]
+                GuildKarmaDoc = await db.KARMADATBASE[str(message.guild.id)]
                 userdata = GuildKarmaDoc.find_one({"_id": message.author.id})
                 polarity = sia.polarity_scores(message.content)
                 result = max(polarity, key=polarity.get)

@@ -55,6 +55,14 @@ class Errors(commands.Cog):
                 color=C_RED
             ))
 
+        #Message not found
+        elif isinstance(error, commands.GuildNotFound):
+            await ctx.send(embed=discord.Embed(
+                title="Guild not found",
+                description="🚫 Looks like I'm not in the guild or the ID is incorrect, maybe invite me there :eyes:",
+                color=C_RED
+            ))
+
         elif isinstance(error, commands.RoleNotFound):
             await ctx.send(embed=discord.Embed(
                 title="Role not found",

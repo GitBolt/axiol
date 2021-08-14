@@ -2,14 +2,14 @@ import discord
 from discord.ext import commands
 import database as db
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 
 
 def has_command_permission():
     async def predicate(ctx: commands.Context):
         plugin_name = ctx.cog.__cog_name__
         cmd_name = ctx.command.name
-        GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id})
         try:
             permitted_roles = [i for i in GuildDoc[plugin_name][cmd_name]]
             author_roles = [i.id for i in ctx.author.roles]
@@ -33,7 +33,7 @@ class Permissions(commands.Cog):
     @commands.command()
     async def allperms(self, ctx):
         embed = discord.Embed(title=f"Command role permissions", color=var.C_MAIN)
-        GuildDoc = db.PERMISSIONS.find_one({"_id":ctx.guild.id}, {"_id":0})
+        GuildDoc = await db.PERMISSIONS.find_one({"_id":ctx.guild.id}, {"_id":0})
         for i in GuildDoc:
             perms = GuildDoc[i]
             cmds = [x for x in perms]
@@ -85,7 +85,7 @@ class Permissions(commands.Cog):
                     await ctx.send(f"Cancelled permissions change for {plugin} plugin")
                     break
                 else:
-                    GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
+                    GuildDoc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id})
                     data = usermsg.content.split(" ")
                     if len(data) != 2:
                         await ctx.send(embed=discord.Embed(
@@ -110,7 +110,7 @@ class Permissions(commands.Cog):
                     elif data[0].lower() in GuildDoc[plugin_name].keys() and int(data[1].strip("<>@&")) in GuildDoc[plugin_name][data[0].lower()]:
                         await ctx.send(embed=discord.Embed(description=f"{ctx.guild.get_role(int(data[1].strip('<>@&'))).mention} role already has permissions for **{data[0].lower()}**", color=var.C_RED))
                     else:
-                        GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id})
+                        GuildDoc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id})
                         role = ctx.guild.get_role(int(data[1].strip("<>@&")))
                         plugin_dict = GuildDoc[plugin_name]
                         newdict = plugin_dict.copy()
@@ -125,27 +125,27 @@ class Permissions(commands.Cog):
                         newdata = {"$set":{
                             plugin_name: newdict
                         }}
-                        db.PERMISSIONS.update_one(GuildDoc, newdata)
+                        await db.PERMISSIONS.update_one(GuildDoc, newdata)
                         await ctx.send(embed=discord.Embed(
                                     title="Successfully updated permissions",
                                     description=f"{var.E_ACCEPT} Users with {role.mention} can now use the command {data[0].lower()}",
                                     color=var.C_GREEN
-                        ).add_field(name="To view all permissions", value=f"```{getprefix(ctx)}allperms```")
+                        ).add_field(name="To view all permissions", value=f"```{await get_prefix(ctx)}allperms```")
                         )
                         break
         else:
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define a valid plugin!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}setperm <plugin>`"
-            ).set_footer(text=f"You can view all plugins by using the command {getprefix(ctx)}plugins")
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}setperm <plugin>`"
+            ).set_footer(text=f"You can view all plugins by using the command {await get_prefix(ctx)}plugins")
             )
 
     @commands.command(aliases=["removepermission", "disablepermission"])
     @commands.has_permissions(administrator=True)
     async def removeperm(self, ctx, cmd=None, role:discord.Role=None):
         if cmd and role is not None:
-            GuildDoc = db.PERMISSIONS.find_one({"_id": ctx.guild.id}, {"_id":0})
+            GuildDoc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id}, {"_id":0})
             all_perm_commmands = [x for i in GuildDoc.values() for x in i]
 
             if cmd not in all_perm_commmands:
@@ -168,13 +168,13 @@ class Permissions(commands.Cog):
                     newdata = {"$set":{
                         plugin_name: newdict
                     }}
-                    db.PERMISSIONS.update_one(GuildDoc, newdata)
+                    await db.PERMISSIONS.update_one(GuildDoc, newdata)
 
                     await ctx.send(embed=discord.Embed(
                         title="Successfully removed permission",
                         description=f"{var.E_ACCEPT} Members with {role.mention} role can't use **{cmd}** command anymore",
                         color=var.C_GREEN
-                    ).add_field(name="To add new command permission", value=f"```{getprefix(ctx)}addperm <plugin>```")
+                    ).add_field(name="To add new command permission", value=f"```{await get_prefix(ctx)}addperm <plugin>```")
                     )
                 except ValueError:
                     await ctx.send(embed=discord.Embed(
@@ -187,8 +187,8 @@ class Permissions(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the command name and the role",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}removeperm <command> <role>`"
-            ).set_footer(text=f"You can view all plugins by using the permissions setted up using {getprefix(ctx)}allperms")
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}removeperm <command> <role>`"
+            ).set_footer(text=f"You can view all plugins by using the permissions setted up using {await get_prefix(ctx)}allperms")
             )
 
 

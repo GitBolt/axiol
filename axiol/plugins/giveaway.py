@@ -6,7 +6,7 @@ from typing import Union
 from discord.ext import commands, tasks
 import database as db
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 from ext.permissions import has_command_permission
 
 
@@ -18,9 +18,9 @@ class Giveaway(commands.Cog):
     
    #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Giveaway") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Giveaway"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Giveaway plugin is disabled in this server",
@@ -42,7 +42,7 @@ class Giveaway(commands.Cog):
         else:
             winners = random.sample(users, winner_amount)
 
-        db.GIVEAWAY.delete_one(i)
+        await db.GIVEAWAY.delete_one(i)
         embed = discord.Embed(
             title="Giveaway over",
             description= f"🎁 {embed_data['title']}\n{hosted_by}\n📩 **{len(users)}** entries\n📋 **{len(winners)}** winners",
@@ -64,7 +64,7 @@ class Giveaway(commands.Cog):
             return await ctx.send(embed=discord.Embed(
                 description="🚫 You need to define the channel too!",
                 color=var.C_ORANGE
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}gstart <#channel>```", inline=False
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}gstart <#channel>```", inline=False
                 ).add_field(name="Don't worry, this won't send the giveaway right away!", value="** **")
                 )
 
@@ -175,15 +175,15 @@ class Giveaway(commands.Cog):
         gwmsg = await channel.send(content="New giveaway woohoo!", embed=embed)
         await gwmsg.add_reaction("🎉")
         
-        guild_gw_cols  = [x for x in db.GIVEAWAY.find({"_id": {"$regex": "^"+str(ctx.guild.id)}})]
-        db.GIVEAWAY.insert_one({"_id": str(ctx.guild.id + len(guild_gw_cols)), "channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"][0])})
+        guild_gw_cols  = [x for x in await db.GIVEAWAY.find({"_id": {"$regex": "^"+str(ctx.guild.id)}})]
+        await db.GIVEAWAY.insert_one({"_id": str(ctx.guild.id + len(guild_gw_cols)), "channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"][0])})
 
 
     @commands.command()
     @has_command_permission()
     async def gshow(self, ctx):
         embed = discord.Embed(title="All active giveaways", color=var.C_MAIN)
-        for i in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
+        for i in await db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
             
             readable = str(datetime.datetime.fromtimestamp(i["end_time"]) - datetime.datetime.fromtimestamp(time.time()))
             main_time = readable.split(":")[0] + " Hours" 
@@ -201,18 +201,18 @@ class Giveaway(commands.Cog):
             return await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the message ID in order to end a giveaway!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}gend <message_id>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}gend <message_id>`"
             )
             )
     
-        all_msg_ids = [x["message_id"] for x in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}})]
+        all_msg_ids = [x["message_id"] for x in await db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}})]
         if not msgid in all_msg_ids:
             return await ctx.send(embed=discord.Embed(
                 description = f"🚫 There are no active giveaways in this server with the message ID **{msgid}**",
                 color=var.C_RED
                 ))
         else:
-            i = db.GIVEAWAY.find_one({"message_id": msgid})
+            i = await db.GIVEAWAY.find_one({"message_id": msgid})
             annoucement_id = await self.end_gw(i)
             await ctx.send(f"The giveaway has been ended https://discord.com/channels/{ctx.guild.id}/{i['channel_id']}/{annoucement_id}")
 
@@ -221,7 +221,7 @@ class Giveaway(commands.Cog):
     async def check_gw(self):
         await self.bot.wait_until_ready()
         try:
-            for i in db.GIVEAWAY.find({}):
+            async for i in db.GIVEAWAY.find({}):
                 channel = self.bot.get_channel(i["channel_id"])
                 message = await channel.fetch_message(i["message_id"])
                 end_time = i["end_time"]
@@ -243,7 +243,7 @@ class Giveaway(commands.Cog):
                         )
                     await message.edit(embed=embed)
         except Exception as e:
-            print("Something went wrong", e)
+            print("Exception in giveaway task:", e)
 
 def setup(bot):
     bot.add_cog(Giveaway(bot))

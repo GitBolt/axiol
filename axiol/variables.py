@@ -1,7 +1,7 @@
 import os
 
 #Config
-TOKEN = os.environ.get("TOKEN")
+TOKEN = os.environ["TOKEN"]
 DEFAULT_PREFIX = "."
 
 #Colours

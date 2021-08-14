@@ -3,7 +3,7 @@ import asyncio
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix
+from functions import get_prefix
 from ext.permissions import has_command_permission
 
 
@@ -13,9 +13,9 @@ class Moderation(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Moderation") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Moderation"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Moderation plugin is disabled in this server",
@@ -50,7 +50,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the user to ban them, reason is optional",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}ban <user> <reason>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}ban <user> <reason>`"
             ).set_footer(text="For user either User mention or User ID can be used")
             )
     @ban.error
@@ -91,7 +91,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the user to unban them",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}unban <user>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}unban <user>`"
             ).set_footer(text="For user either User mention or User ID can be used")
             )         
     async def unban_error(self, ctx, error):
@@ -124,7 +124,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define member in order to mute them",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}mute <member>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}mute <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
             )
     @mute.error
@@ -156,7 +156,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the member to unmute them",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}unmute <member>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}unmute <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
             )
     @unmute.error
@@ -196,7 +196,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the member to kick them",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}kick <member>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}kick <member>`"
             ).set_footer(text="For user either Member mention or Member ID can be used")
             )
     @kick.error
@@ -225,7 +225,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define both the member and their new nick",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}nick <member> <new nick>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}nick <member> <new nick>`"
             ).set_footer(text="For Member either mention or Member ID can be used")
             )
     @nick.error
@@ -258,7 +258,7 @@ class Moderation(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the amount to delete messages too!",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}purge <amount>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}purge <amount>`"
             )
             )
     @purge.error
@@ -295,7 +295,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both member and role",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}addrole <member> <role>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}addrole <member> <role>```"
                 ).set_footer(text="For both member and role, either ping or ID can be used"
                 ))
 
@@ -322,7 +322,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both member and role",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}removerole <member> <role>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}removerole <member> <role>```"
                 ).set_footer(text="For both member and role, either ping or ID can be used"
                 ))
 
@@ -373,7 +373,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both Role 1 and Role 2\n`role1` are the members having that role and `role2` is the one to be given to them",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}massrole <role1> <role2>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}massrole <role1> <role2>```"
                 ).set_footer(text="For role, either ping or ID can be used"))
 
 
@@ -424,7 +424,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both Role 1 and Role 2\n`role1` are the members having that role and `role2` is the one to be removed from them",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}massroleremove <role1> <role2>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}massroleremove <role1> <role2>```"
                 ).set_footer(text="For role, either ping or ID can be used"))
 
 
@@ -432,7 +432,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def warn(self, ctx, member:discord.Member=None, *,reason=None):
         if member and reason is not None:
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
             userwarns = GuildCol.find_one({"_id": member.id})
             if userwarns is None:
                 newwarns = [reason]
@@ -459,7 +459,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both the member and reason to warn them!",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}warn <member> <reason>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}warn <member> <reason>```"
                 ))
 
 
@@ -472,7 +472,7 @@ class Moderation(commands.Cog):
             except ValueError:
                 await ctx.send(embed=discord.Embed(description=f"The position should be a number!", color=var.C_RED))
                 return
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
             userdoc = GuildCol.find_one({"_id": member.id})
             if userdoc is None:
                 await ctx.send(embed=discord.Embed(description=f"{member.mention} does not have any warns", color=var.C_RED
@@ -498,7 +498,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define both the member and the warn position to remove the warn",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}removewarn <member> <position>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}removewarn <member> <position>```"
                 ).set_footer(text="Note that position here is just a number")
                 )
 
@@ -508,7 +508,7 @@ class Moderation(commands.Cog):
     async def warns(self, ctx, member:discord.Member=None):
         if member is not None:
 
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
             userdata = GuildCol.find_one({"_id": member.id})
             if userdata is None:
                 await ctx.send(f"{member} does not have any warnings")
@@ -523,7 +523,7 @@ class Moderation(commands.Cog):
                 title=f"🚫 Missing arguments",
                 description="You need to define the member to view their warns",
                 color=var.C_RED        
-                ).add_field(name="Format", value=f"```{getprefix(ctx)}warns <member>```"
+                ).add_field(name="Format", value=f"```{await get_prefix(ctx)}warns <member>```"
                     ))
        
 

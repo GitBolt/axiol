@@ -174,8 +174,8 @@ class Giveaway(commands.Cog):
         )
         gwmsg = await channel.send(content="New giveaway woohoo!", embed=embed)
         await gwmsg.add_reaction("🎉")
-        
-        guild_gw_cols  = [x for x in await db.GIVEAWAY.find({"_id": {"$regex": "^"+str(ctx.guild.id)}})]
+
+        guild_gw_cols  = [x async for x in db.GIVEAWAY.find({"_id": {"$regex": "^"+str(ctx.guild.id)}})]
         await db.GIVEAWAY.insert_one({"_id": str(ctx.guild.id + len(guild_gw_cols)), "channel_id":channel.id, "message_id": gwmsg.id, "end_time": end_time, "winner_amount": int(data["Winners"][0])})
 
 
@@ -183,7 +183,7 @@ class Giveaway(commands.Cog):
     @has_command_permission()
     async def gshow(self, ctx):
         embed = discord.Embed(title="All active giveaways", color=var.C_MAIN)
-        for i in await db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
+        async for i in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
             
             readable = str(datetime.datetime.fromtimestamp(i["end_time"]) - datetime.datetime.fromtimestamp(time.time()))
             main_time = readable.split(":")[0] + " Hours" 
@@ -205,7 +205,7 @@ class Giveaway(commands.Cog):
             )
             )
     
-        all_msg_ids = [x["message_id"] for x in await db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}})]
+        all_msg_ids = [x["message_id"] async for x in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}})]
         if not msgid in all_msg_ids:
             return await ctx.send(embed=discord.Embed(
                 description = f"🚫 There are no active giveaways in this server with the message ID **{msgid}**",

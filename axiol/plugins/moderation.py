@@ -368,6 +368,7 @@ class Moderation(commands.Cog):
                                 description=f"Error giving role to {member.mention}",
                                 color=var.C_ORANGE
                             ))
+                        await asyncio.sleep(1)
         else:
             await ctx.send(embed=discord.Embed(
                 title=f"🚫 Missing arguments",
@@ -419,6 +420,7 @@ class Moderation(commands.Cog):
                                 description=f"Error removing role from {member.mention}",
                                 color=var.C_ORANGE
                             ))
+                        await asyncio.sleep(1)
         else:
             await ctx.send(embed=discord.Embed(
                 title=f"🚫 Missing arguments",
@@ -432,11 +434,11 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def warn(self, ctx, member:discord.Member=None, *,reason=None):
         if member and reason is not None:
-            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
-            userwarns = GuildCol.find_one({"_id": member.id})
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userwarns = await GuildCol.find_one({"_id": member.id})
             if userwarns is None:
                 newwarns = [reason]
-                GuildCol.insert_one({"_id": member.id, "warns":newwarns})
+                await GuildCol.insert_one({"_id": member.id, "warns":newwarns})
             else:
                 currentwarns = userwarns["warns"]
                 newwarns = currentwarns.copy()
@@ -445,7 +447,7 @@ class Moderation(commands.Cog):
                     "warns": newwarns
 
                     }}
-                GuildCol.update_one(userwarns, newdata)
+                await GuildCol.update_one(userwarns, newdata)
                 
             await ctx.send(content=f"{member.mention} has been warned!", embed=discord.Embed(
             description=f"Reason: **{reason}**\nTotal warns: **{len(newwarns)}**",
@@ -472,8 +474,8 @@ class Moderation(commands.Cog):
             except ValueError:
                 await ctx.send(embed=discord.Embed(description=f"The position should be a number!", color=var.C_RED))
                 return
-            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
-            userdoc = GuildCol.find_one({"_id": member.id})
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userdoc = await GuildCol.find_one({"_id": member.id})
             if userdoc is None:
                 await ctx.send(embed=discord.Embed(description=f"{member.mention} does not have any warns", color=var.C_RED
                 ).set_footer(text="Note that this warn's position has been taken by the warn below it, therefore moving all warns below this one position above")
@@ -487,7 +489,7 @@ class Moderation(commands.Cog):
                     newdata = {"$set":{
                         "warns": newwarns
                     }}
-                    GuildCol.update_one(userdoc, newdata)
+                    await GuildCol.update_one(userdoc, newdata)
                     await ctx.send(embed=discord.Embed(description=f"{var.E_ACCEPT} Removed {position} warn with the reason **{reason}**  from {member.mention}", color=var.C_GREEN
                     ).set_footer(text="Note that if there are any warns below this one then they are moved one position up to take the removed warn's place")
                     )
@@ -508,8 +510,8 @@ class Moderation(commands.Cog):
     async def warns(self, ctx, member:discord.Member=None):
         if member is not None:
 
-            GuildCol = await db.WARNINGSDATABASE[str(ctx.guild.id)]
-            userdata = GuildCol.find_one({"_id": member.id})
+            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            userdata = await GuildCol.find_one({"_id": member.id})
             if userdata is None:
                 await ctx.send(f"{member} does not have any warnings")
             else:

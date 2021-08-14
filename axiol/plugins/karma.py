@@ -37,19 +37,19 @@ class Karma(commands.Cog):
         else:
             user = karmauser
 
-        GuildCol = await db.KARMADATBASE[str(ctx.guild.id)]
-        userdata = GuildCol.find_one({"_id": user.id})
+        GuildCol = db.KARMADATABASE[str(ctx.guild.id)]
+        userdata = await GuildCol.find_one({"_id": user.id})
 
-        karmas = list(GuildCol.find({
+        karmas = [x async for x in GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                 
-            }).sort("karma", -1))
+            }).sort("karma", -1)]
 
         if userdata is None:
                 await ctx.send("This user does not have any karma yet...")
         else:
-            position = karmas.index(userdata) + 1 #Index starts with one
+            position = karmas.index(userdata) + 1 #Index starts with zero
             embed = discord.Embed(
             title=f"Karma for {user.name}",
             color=var.C_MAIN
@@ -70,17 +70,16 @@ class Karma(commands.Cog):
             await ctx.channel.send(embed=embed)
 
 
-    @commands.command()
+    @commands.command(aliases=["kb"])
     @has_command_permission()
     async def karmaboard(self, ctx):
-        GuildCol = await db.KARMADATBASE[str(ctx.guild.id)]
-        karmas = list(GuildCol.find({
+        GuildCol = db.KARMADATABASE[str(ctx.guild.id)]
+        karmas = [x async for x in GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                 
-            }).sort("karma", -1))
+            }).sort("karma", -1)]
 
-        print(karmas)
         if len(karmas) < 10:
             exactpages = 1
         else:
@@ -129,15 +128,16 @@ class Karma(commands.Cog):
             embed.set_footer(text=f"Page {pagern}/{all_pages}")
             embed.clear_fields()
 
-            karmas = list(GuildCol.find({
+            rankcount = (current_page)*10
+            user_amount = current_page*10
+
+            karmas = [x async for x in GuildCol.find({
 
                     "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
                     
-                }).sort("karma", -1))
+                }).sort("karma", -1).limit(user_amount)]
 
-            rankcount = (current_page)*10
-            user_amount = current_page*10
-            for i in karmas[user_amount:]:
+            for i in karmas:
                 rankcount += 1
                 user = self.bot.get_user(i.get("_id"))
                 karma = i.get("karma")
@@ -193,8 +193,8 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = await db.KARMADATBASE.get_collection(str(ctx.guild.id))
-            settings = GuildCol.find_one({"_id": 0})
+            GuildCol = db.KARMADATABASE[(str(ctx.guild.id))]
+            settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
             if channel.id in newsettings:
@@ -204,7 +204,7 @@ class Karma(commands.Cog):
                 newdata = {"$set":{
                     "blacklists": newsettings
                     }}
-                GuildCol.update_one(settings, newdata)
+                await GuildCol.update_one(settings, newdata)
 
                 await ctx.send(embed=discord.Embed(
                             description=f"{channel.mention} has been blacklisted, hence users won't gain any karma in that channel.",
@@ -222,8 +222,8 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kwhitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = await db.KARMADATBASE.get_collection(str(ctx.guild.id))
-            settings = GuildCol.find_one({"_id": 0})
+            GuildCol = db.KARMADATABASE[(str(ctx.guild.id))]
+            settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
             if not channel.id in newsettings:
@@ -233,7 +233,7 @@ class Karma(commands.Cog):
                 newdata = {"$set":{
                     "blacklists": newsettings
                     }}
-                GuildCol.update_one(settings, newdata)
+                await GuildCol.update_one(settings, newdata)
 
                 await ctx.send(embed=discord.Embed(
                             description=f"{channel.mention} has been whitelisted, hence users would be able to gain karma again in that channel.",
@@ -253,11 +253,12 @@ class Karma(commands.Cog):
         if not message.guild:
             return
         PluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
+        GuildCol = db.KARMADATABASE[str(message.guild.id)]
+        SettingsDoc = await GuildCol.find_one({"_id": 0})
         if PluginDoc["Karma"] and not message.author.bot:
-            if not message.channel.id in await db.KARMADATBASE[str(message.guild.id)].find_one({"_id":0})["blacklists"]:
 
-                GuildKarmaDoc = await db.KARMADATBASE[str(message.guild.id)]
-                userdata = GuildKarmaDoc.find_one({"_id": message.author.id})
+            if not message.channel.id in SettingsDoc["blacklists"]:
+                userdata = await GuildCol.find_one({"_id": message.author.id})
                 polarity = sia.polarity_scores(message.content)
                 result = max(polarity, key=polarity.get)
                 def getkarma():
@@ -269,11 +270,11 @@ class Karma(commands.Cog):
                         return 0
 
                 if userdata is None:
-                    GuildKarmaDoc.insert_one({"_id": message.author.id, "karma": getkarma()})
+                    await GuildCol.insert_one({"_id": message.author.id, "karma": getkarma()})
                 else:
                     newkarma = getkarma()
                     newkarma += userdata["karma"]
-                    GuildKarmaDoc.update_one(userdata, {"$set": {"karma": newkarma}})
+                    await GuildCol.update_one(userdata, {"$set": {"karma": newkarma}})
 
 def setup(bot):
     bot.add_cog(Karma(bot))

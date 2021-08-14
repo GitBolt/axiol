@@ -13,8 +13,8 @@ async def get_prefix(ctx):
         return DEFAULT_PREFIX
 
 async def get_xprange(guild_id):
-    collection = await LEVELDATABASE.get_collection(str(guild_id))
-    settings = collection.find_one({"_id": 0})
+    collection = LEVELDATABASE.get_collection(str(guild_id))
+    settings = await collection.find_one({"_id": 0})
     return settings["xprange"]
 
 

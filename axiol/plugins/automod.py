@@ -14,7 +14,7 @@ class AutoMod(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
         if GuildDoc.get("AutoMod"):
             return True
         else:

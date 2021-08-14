@@ -50,8 +50,8 @@ class TypeRacer:
             return f"{round(time.total_seconds()/60, 1)} minutes"
 
     @staticmethod
-    def create_board():
-        get_text = get_randomtext(10)
+    async def create_board():
+        get_text = await get_randomtext(10)
         text = get_text if get_text.endswith(".") else get_text+"."
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)
@@ -343,7 +343,7 @@ class Fun(commands.Cog):
             config = CONFIG_15
             config["time"] = 60
 
-        text = get_randomtext(config["time"] if test_type == "time" else 10)
+        text = await get_randomtext(config["time"] if test_type == "time" else 10)
 
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)
@@ -417,15 +417,17 @@ class Fun(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def avatar(self, ctx, user:discord.User=None):
-        if user is not None:
-            avatar = user.avatar_url
-            embed = discord.Embed(
-                    title=f"Avatar of **{user}**",
-                    color=var.C_TEAL
-                    ).set_image(url=avatar)
-            await ctx.send(embed=embed)
+        if user is None:
+            avatar_user = ctx.author
         else:
-            await ctx.send(f"You need to define the user too! Follow this format:\n```{await get_prefix(ctx)}avatar <user>```\nFor user either user ID or mention can be used`")
+            avatar_user = user
+
+        avatar = avatar_user.avatar_url
+        embed = discord.Embed(
+                title=f"Avatar of **{avatar_user}**",
+                color=var.C_TEAL
+                ).set_image(url=avatar)
+        await ctx.send(embed=embed)
 
 
     @commands.command()

@@ -351,13 +351,13 @@ class Verification(commands.Cog):
                     ).set_image(url=choice
                     ).set_footer(text='You have 20 seconds to enter the text, if you failed to enter it in time then type the command again.'
                     )
-                botmsg = await ctx.send(embed=embed, delete_after=15.0)
+                botmsg = await ctx.send(embed=embed, delete_after=20.0)
 
                 def codecheck(message):
                     return message.author == ctx.author and message.channel.id == ctx.channel.id
                 
                 try:
-                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
+                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=20.0)
 
                     if usermsg.content == code:
                         role_id = VerifyDoc["roleid"]

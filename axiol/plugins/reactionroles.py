@@ -30,16 +30,15 @@ class ReactionRoles(commands.Cog):
     async def rr(self, 
                 ctx, 
                 channel:discord.TextChannel=None, 
-                message_id:Union[int, str]=None, 
+                message_id:Union[int, None]=None, 
                 role: discord.Role=None, 
                 emoji:Union[discord.Emoji, str]=None
                 ):
         if type(emoji) == str and emoji.startswith("<"):raise commands.EmojiNotFound(ctx)
-        if type(message_id) == str: return await ctx.send(embed=discord.Embed(description="Message ID needs to be numerical", color=var.C_ORANGE))
 
         if {channel, message_id, role, emoji} == {None}:
             return await ctx.send(embed=discord.Embed(
-                description="🚫 You need to define the channel, message, role and emoji all three to add a reaction role",
+                description="🚫 You need to define the channel, message, role and emoji all three to add a reaction role, make sure the IDs are numerical.",
                 color=var.C_RED
                 ).add_field(name="Format", value=f"`{await get_prefix(ctx)}rr <#channel> <messageid> <role> <emoji>`"
                 ).set_footer(text="You can use either role ID or mention it (use ID if you don't want to disturb everyone having the role)")
@@ -56,7 +55,7 @@ class ReactionRoles(commands.Cog):
         except:
             raise commands.MessageNotFound(ctx)
 
-        if botrole.position > role.position:
+        if botrole.position >= role.position:
             GuildDoc = await db.REACTIONROLES.find_one({"_id": ctx.guild.id})
             if GuildDoc == None:
                 await db.REACTIONROLES.insert_one({

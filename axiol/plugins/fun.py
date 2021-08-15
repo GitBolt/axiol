@@ -34,7 +34,7 @@ class TypeRacer:
         self.required_amount = required_amount
 
         self.created_at = datetime.now()
-        self.code = get_code()
+        self.code = get_code(5)
 
     def add_player(self, player):
         self.players.append(player)
@@ -51,8 +51,7 @@ class TypeRacer:
 
     @staticmethod
     async def create_board():
-        get_text = await get_randomtext(10)
-        text = get_text if get_text.endswith(".") else get_text+"."
+        text = await get_randomtext(10)
         image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/typing_board.png")))
         draw = ImageDraw.Draw(image)
         font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)

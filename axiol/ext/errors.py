@@ -81,9 +81,8 @@ class Errors(commands.Cog):
                 print(f"Command: {ctx.message.content} from {ctx.guild.name}")
 
 
-        elif isinstance(error, commands.CommandInvokeError):
-            if isinstance(error.original, asyncio.TimeoutError):
-                await ctx.send("Time is up! You failed to respond under time therefore the proccess has been cancelled.")
+        elif isinstance(error.original, asyncio.TimeoutError):
+            await ctx.send("Time is up! You failed to respond under time therefore the proccess has been cancelled.")
 
 
         #Cog check failure

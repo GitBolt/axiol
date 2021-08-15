@@ -1,11 +1,13 @@
+import os
+import random
+import asyncio
 import discord
 from discord.ext import commands
-import variables as var
+from PIL import Image, ImageDraw, ImageFont
 import database as db
-from functions import get_prefix
-import random
+import variables as var
+from functions import get_prefix, get_code
 from ext.permissions import has_command_permission
-import asyncio
 
 class Verification(commands.Cog):
     def __init__(self, bot):
@@ -57,8 +59,6 @@ class Verification(commands.Cog):
                 embed.set_footer(text="Creating the 'Not Verified' role and setting up proper permissions")
                 await botmsg.edit(embed=embed)
                 try:
-                    await ch.set_permissions(NVerified, view_channel=True, read_message_history=True)
-
                     for i in ctx.guild.text_channels:
                         try:
                             await i.set_permissions(NVerified, view_channel=False)
@@ -67,6 +67,7 @@ class Verification(commands.Cog):
                                         description=f"Skipping {i.mention} since I don't have access to that channel",
                                         color=var.C_ORANGE
                             ))
+                    await ch.set_permissions(NVerified, view_channel=True, read_message_history=True)
                     await ch.set_permissions(self.bot.user, view_channel=True)
                     await ch.set_permissions(ctx.guild.default_role, view_channel=False)
                     
@@ -306,60 +307,72 @@ class Verification(commands.Cog):
         await ctx.send("Successfully removed verification from this server!")
 
 
+    @staticmethod
+    async def create_board():
+        code = await get_code
+        image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/verification_board.png")))
+        draw = ImageDraw.Draw(image)
+        font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
+        draw.text((810, 55), code ,(184,184,184),font=font)
+        return image, code
 
     @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):
         if ctx.channel.id in await db.VERIFY.distinct("channel"): #Verify channel IDs
-            assignrole = await db.VERIFY.find_one({"_id": ctx.guild.id})["assignrole"]
+            VerifyDoc = await db.VERIFY.find_one({"_id":ctx.guild.id})
 
-            if await db.VERIFY.find_one({"_id":ctx.guild.id}).get("type") == "command": #Command verification
-                roleid = await db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
-                role = ctx.guild.get_role(roleid)
+            if VerifyDoc["type"] == "command": #Command based verification
+                role_id = VerifyDoc["roleid"]
+                role = ctx.guild.get_role(role_id)
 
                 await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
                 await ctx.author.remove_roles(role)
-                if assignrole is not None:
-                    await ctx.author.add_roles(ctx.guild.get_role(assignrole))
+                if VerifyDoc["assignrole"] is not None:
+                    await ctx.author.add_roles(ctx.guild.get_role(VerifyDoc["assignrole"]))
 
             else: #Bot verification
-                Image = random.choice([
-                        'https://cdn.discordapp.com/attachments/807140294764003350/808170831586787398/7h3fpaw1.png',
-                        'https://cdn.discordapp.com/attachments/807140294764003350/808170832744415283/bs4hm1gd.png',
-                        'https://cdn.discordapp.com/attachments/807140294764003350/808170834484789309/hdmxe425.png',
-                        'https://cdn.discordapp.com/attachments/807140294764003350/808170834514018304/kp6d1vs9.png',
-                        'https://cdn.discordapp.com/attachments/807140294764003350/808170835957383189/jd3573vq.png',
-                        ])    
+
+                #Lookin epic innit bruv?
+                Images = {
+                        'https://cdn.discordapp.com/attachments/865444983762452520/876497365891178546/axiol_verification.png': "7h3fpaw1",
+                        'https://cdn.discordapp.com/attachments/865444983762452520/876497364779692072/axiol_verification.png.png': "bs4hm1gd",
+                        'https://cdn.discordapp.com/attachments/865444983762452520/876497363387187240/axiol_verification.png.png.png': "kp6d1vs9",
+                        'https://cdn.discordapp.com/attachments/865444983762452520/876497360224669796/axiol_verification.png.png.png.png': "hmxe425",
+                        'https://cdn.discordapp.com/attachments/865444983762452520/876497358681149470/axiol_verification.png.png.png.png.png': "jd3573vq",
+                    }       
+
+                choice = random.choice(list(Images))
+                code = Images[choice]
 
                 embed = discord.Embed(
                     title="Beep Bop,  are you a bot?",
                     description = 'Enter the text given in the image below to verify yourself',
                     colour = var.C_MAIN
-                    ).set_image(url=Image
-                    ).set_footer(text='You have 15 seconds to enter the text, if you failed to enter it in time then type the command again.'
+                    ).set_image(url=choice
+                    ).set_footer(text='You have 20 seconds to enter the text, if you failed to enter it in time then type the command again.'
                     )
-                botmsg = await ctx.send(embed=embed, delete_after=15.0)
+                botmsg = await ctx.send(embed=embed, delete_after=20.0)
 
                 def codecheck(message):
                     return message.author == ctx.author and message.channel.id == ctx.channel.id
                 
                 try:
-                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=15.0)
+                    usermsg = await self.bot.wait_for('message', check=codecheck, timeout=20.0)
 
-                    #ayo bots aren't this smart
-                    code = embed.image.url[77:-4]
                     if usermsg.content == code:
-                        roleid = await db.VERIFY.find_one({"_id": ctx.guild.id}).get("roleid")
-                        role = ctx.guild.get_role(roleid)
+                        role_id = VerifyDoc["roleid"]
+                        role = ctx.guild.get_role(role_id)
                         await ctx.send(f"{var.E_ACCEPT}  Verification successful **```{ctx.author}```**", delete_after=1)
                         await ctx.author.remove_roles(role)
-                        if assignrole is not None:
-                            await ctx.author.add_roles(ctx.guild.get_role(assignrole))
+                        if VerifyDoc["assignrole"] is not None:
+                            await ctx.author.add_roles(ctx.guild.get_role(VerifyDoc["assignrole"]))
                         await botmsg.delete()
                     else:
                         await ctx.send("Wrong, try again", delete_after=1)
                         await botmsg.delete()
                 except asyncio.TimeoutError:
                     pass
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -368,12 +381,24 @@ class Verification(commands.Cog):
         PluginDoc = await db.PLUGINS.find_one({"_id":message.guild.id})
         if PluginDoc["Verification"]:
             GuildVerifyDoc = await db.VERIFY.find_one({"_id": message.guild.id})
-            if (message.channel.id == GuildVerifyDoc["channel"] and 
-                message.author != self.bot.user):
-                
-                await message.delete()
+            if GuildVerifyDoc is None:
+                print(f"First time verification being enabled {message.guild.name}")
+            else:
+                if (message.channel.id == GuildVerifyDoc["channel"] and 
+                    message.author != self.bot.user):
+                    
+                    await message.delete()
 
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        VerifyDoc = await db.VERIFY.find_one({"_id": member.guild.id})
+        PluginDoc = await db.PLUGINS.find_one({"_id": member.guild.id})
 
+        if PluginDoc["Verification"]:
+            roleid = VerifyDoc["roleid"]
+            unverifiedrole = member.guild.get_role(roleid)
 
+            await member.add_roles(unverifiedrole)
+            
 def setup(bot):
     bot.add_cog(Verification(bot))

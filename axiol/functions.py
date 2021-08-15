@@ -40,9 +40,9 @@ async def get_randomtext(typing_time):
     return " ".join([random.choice(words) for i in r])
 
 
-async def get_code():
+async def get_code(amount):
     return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                             "1234567890", k = 5))
+                             "1234567890", k = amount))
 
 
 
@@ -159,5 +159,3 @@ async def update_db(guild_ids):
 # loop.run_until_complete(updatedb(serveridlist))
 
 #update_plugins_and_permissions("Giveaway")
-
-

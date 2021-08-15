@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 import database as db
 from functions import update_db
-
+import io
+import contextlib
+import textwrap
 
 # A private cog which only works for me
 class Owner(commands.Cog):
@@ -13,6 +15,39 @@ class Owner(commands.Cog):
         return ctx.author.id == 791950104680071188
         
 
+    @commands.command(aliases=["eval"])
+    async def e(self, ctx, *, code:str=None):
+
+        if code is None:
+            return await ctx.send(
+                "Define the code too, what is supposed to execute?"
+            )
+        code = code.lstrip("```python").rstrip("\n```").lstrip("\n")
+
+        local_vars = {
+            "discord": discord,
+            "commands": commands,
+            "bot": self.bot,
+            "ctx": ctx,            
+        }
+        stdout = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout):
+                exec(
+
+                    f"async def func():\n{textwrap.indent(code, '    ')}", local_vars
+
+                )
+                obj = await local_vars["func"]()
+                result = f"{stdout.getvalue()}"
+        except Exception as e:
+            result = e
+        if len(result) >= 2000:
+            result = result[:1900]
+            await ctx.send("Result larger than 2000 characters, returned 1900 characters only.")
+
+        await ctx.send(f"```python\n{result}```")
+    
     @commands.command()
     async def get_guilds(self, ctx, *,user:discord.User=None):
         if user is None:

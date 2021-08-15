@@ -1,13 +1,13 @@
 import os
-from pymongo import MongoClient
+from motor.motor_asyncio import AsyncIOMotorClient
 
 
-MONGOCLIENT = MongoClient(os.environ.get("MONGO_URL")) #Client
+MONGOCLIENT = AsyncIOMotorClient(os.environ["MONGO_URL"])
 
 #Databases
 DATABASE = MONGOCLIENT["Axiol"] #Main DB
 LEVELDATABASE = MONGOCLIENT["Leveling"]
-KARMADATBASE = MONGOCLIENT["Karma"]
+KARMADATABASE = MONGOCLIENT["Karma"]
 CUSTOMDATABASE = MONGOCLIENT["Custom"]
 WARNINGSDATABASE = MONGOCLIENT["Warnings"]
 

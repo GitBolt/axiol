@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import string
-import random
-from functions import random_text
+from functions import get_randomtext
 import variables as var
 
 #Custom cog for Logically Answered discord server | 751491708465840159
@@ -129,7 +128,7 @@ async def onewordstory(self, ctx):
             title=f"Create a new story!",
             description = f">>> **Previous story**\n{firstword} {previous_story}",
             color=var.C_MAIN
-    ).add_field(name="New word", value=random_text(0).strip("."))
+    ).add_field(name="New word", value=get_randomtext(0).strip("."))
 
     await channel.send(embed=embed)
 

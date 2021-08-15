@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 import database as db
 
 
@@ -47,7 +47,7 @@ class Extras(commands.Cog):
             await msg.add_reaction(var.E_DECLINE)
             await ctx.send("Suggestion sent to the support server!")
         else:
-            await ctx.send(f"You need to describe your idea too! This is the format\n```{getprefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
+            await ctx.send(f"You need to describe your idea too! This is the format\n```{await get_prefix(ctx)} <description of your idea>```\nDon't forget the space after prefix :D")
 
 
     @commands.command(aliases=["bot", "info"])
@@ -88,7 +88,7 @@ class Extras(commands.Cog):
         embed.add_field(name="Created at", value=str(ctx.guild.created_at.strftime("%Y - %m - %d")) , inline=False)
         embed.set_thumbnail(url = ctx.guild.icon.url)
 
-        GuildVerifyDoc = db.VERIFY.find_one({"_id": ctx.guild.id})
+        GuildVerifyDoc = await db.VERIFY.find_one({"_id": ctx.guild.id})
         if GuildVerifyDoc is not None:
             role = ctx.guild.get_role(GuildVerifyDoc.get("roleid"))
         

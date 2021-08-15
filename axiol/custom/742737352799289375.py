@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord.ext.commands import check, Context
 import database as db
 import variables as var
-from functions import getprefix
+from functions import get_prefix
 
 
 def is_user(*userids):
@@ -27,13 +27,13 @@ class ChemistryHelp(commands.Cog):
     async def chem_addmsg(self, ctx, *, msg:str=None):
         if msg is not None:
 
-            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
 
             data = GuildCol.find_one({"_id": 0})
             if data is None:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
-                GuildCol.insert_one({
+                await GuildCol.insert_one({
                     "_id": 0,
                    trigger: response
                 })
@@ -42,25 +42,25 @@ class ChemistryHelp(commands.Cog):
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 response = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
-                GuildCol.update(data, {"$set": {trigger: response}})
+                await GuildCol.update(data, {"$set": {trigger: response}})
                 await ctx.send(embed=discord.Embed(description=f"Added the message **{trigger}** with response **{response}**", color=var.C_BLUE))
         else:
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define both the message and it's response",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}addmsg <msg> | <response>`"))
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}addmsg <msg> | <response>`"))
 
 
     @commands.command()
     @is_user(565059698399641600, 791950104680071188)
     async def chem_removemsg(self, ctx, *, msg:str=None):
         if msg is not None:
-            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
             data = GuildCol.find_one({"_id":0})
             if data is not None:
                 if msg.lower() in data.keys():
                     res = data.get(msg.lower())
-                    GuildCol.update_one(data, {"$unset": {msg.lower(): ""}})
+                    await GuildCol.update_one(data, {"$unset": {msg.lower(): ""}})
                     await ctx.send(f"Successfully removed the message **msg** which was having the response **{res}**")
                 else:
                     await ctx.send("This message has no responses setted up")
@@ -71,7 +71,7 @@ class ChemistryHelp(commands.Cog):
     @commands.command()
     @is_user(565059698399641600, 791950104680071188)
     async def chem_allmsgs(self, ctx):
-        GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+        GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
         data = GuildCol.find_one({"_id":0})
         if data is not None:
             rramount = len(data)
@@ -167,7 +167,7 @@ class ChemistryHelp(commands.Cog):
     @is_user(565059698399641600, 791950104680071188)
     async def chem_addreact(self, ctx, *, msg:str=None):
         if msg is not None:
-            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
+            GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
 
             data = GuildCol.find_one({"_id": 1})
             if data is None:
@@ -180,7 +180,7 @@ class ChemistryHelp(commands.Cog):
                 except :
                     await ctx.send("Sorry but it seems like either the emoji is invalid or it's a custom emoji from a server where I am not in hence can't use this emoji either :(")
                 
-                GuildCol.insert_one({
+                await GuildCol.insert_one({
                     "_id": 1,
                    trigger: emoji
                 })
@@ -194,13 +194,13 @@ class ChemistryHelp(commands.Cog):
                 except :
                     await ctx.send("Sorry but it seems like either the emoji is invalid or it's a custom emoji from a server where I am not in hence can't use this emoji either :(")
 
-                GuildCol.update(data, {"$set": {trigger: emoji}})
+                await GuildCol.update(data, {"$set": {trigger: emoji}})
                 
         else:
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define both the message and it's reaction",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}addreaction <msg> <emoji>`"))
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}addreaction <msg> <emoji>`"))
 
 
 
@@ -208,13 +208,13 @@ class ChemistryHelp(commands.Cog):
     @is_user(565059698399641600, 791950104680071188)
     async def chem_removereact(self, ctx, *, msg:str=None):
         if msg is not None:
-            GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
-            data = GuildCol.find_one({"_id":1})
+            GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
+            data = await GuildCol.find_one({"_id":1})
             if data is not None:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
                 if trigger in data.keys():
-                    GuildCol.update(data, {"$unset": {trigger.lower(): emoji}})
+                    await GuildCol.update(data, {"$unset": {trigger.lower(): emoji}})
                     await ctx.send(f"Successfully removed {emoji} reaction from **{trigger}** message")
                 else:
                     await ctx.send("This message and emoji combination does not exist")
@@ -226,8 +226,8 @@ class ChemistryHelp(commands.Cog):
     @commands.command()
     @is_user(565059698399641600, 791950104680071188)
     async def chem_allreacts(self, ctx):
-        GuildCol = db.CUSTOMDATABASE[str(ctx.guild.id)]
-        data = GuildCol.find_one({"_id":1})
+        GuildCol = await db.CUSTOMDATABASE[str(ctx.guild.id)]
+        data = await GuildCol.find_one({"_id":1})
         if data is not None:
             rramount = len(data)
             if rramount <= 10:
@@ -276,7 +276,7 @@ class ChemistryHelp(commands.Cog):
             
             current_page = 0
             while True:
-                reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+                reaction, _ = await self.bot.wait_for("reaction_add", check=reactioncheck)
                 if str(reaction.emoji) == "◀️":
                     try:
                         await botmsg.remove_reaction("◀️", ctx.author)
@@ -323,11 +323,11 @@ class ChemistryHelp(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383] and message.author.bot == False:
+        if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383] and not message.author.bot:
 
-            GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
-            msgdata = GuildCol.find_one({"_id": 0})
-            reactiondata = GuildCol.find_one({"_id": 1})
+            GuildCol = await db.CUSTOMDATABASE[str(message.guild.id)]
+            msgdata = await GuildCol.find_one({"_id": 0})
+            reactiondata = await GuildCol.find_one({"_id": 1})
             if msgdata is not None:
                 if message.content.lower() in msgdata.keys():
                     await message.channel.send(msgdata.get(message.content.lower()))

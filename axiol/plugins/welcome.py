@@ -3,9 +3,10 @@ import discord
 from discord.ext import commands
 import variables as var
 import database as db
-from functions import getprefix
+from functions import get_prefix
 from greetings import greeting
 from ext.permissions import has_command_permission
+
 
 class Welcome(commands.Cog):
     def __init__(self, bot):
@@ -14,9 +15,9 @@ class Welcome(commands.Cog):
 
     #Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Welcome") == True:
-            return ctx.guild.id
+        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+        if GuildDoc.get("Welcome"):
+            return True
         else:
             await ctx.send(embed=discord.Embed(
                 description=f"{var.E_DISABLE} The Welcome plugin is disabled in this server",
@@ -28,6 +29,7 @@ class Welcome(commands.Cog):
     @has_command_permission()
     async def welcomesetup(self, ctx):
         await ctx.send("Now send the channel where you want me to send welcome message.")
+
         def messagecheck(message):
             return message.author == ctx.author and message.channel.id == ctx.channel.id
         usermsg = await self.bot.wait_for('message', check=messagecheck)
@@ -35,7 +37,7 @@ class Welcome(commands.Cog):
         try:
             chid = int(usermsg.content.strip("<>#"))
         except:
-            db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
+            await db.PLUGINS.update_one(db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set":{"Welcome":False}})
             return await ctx.send(embed=discord.Embed(
                         title="Invalid Channel",
                         description="🚫 I was not able to find the channel which you entered. The plugin has been disabled, try again",
@@ -43,7 +45,7 @@ class Welcome(commands.Cog):
                     ).set_footer(text="You can either mention the channel (example: #general) or use the channel's id (example: 843516084266729515)")
                     )
             
-        db.WELCOME.insert_one({
+        await db.WELCOME.insert_one({
 
             "_id":ctx.guild.id,
             "channelid":chid,
@@ -56,7 +58,7 @@ class Welcome(commands.Cog):
         title="Welcome greeting successfully setted up",
         description=f"{var.E_ACCEPT} New members will now be greeted in {self.bot.get_channel(chid).mention}!",
         color=var.C_GREEN
-        ).add_field(name="To configure further", value=f"`{getprefix(ctx)}help welcome`")
+        ).add_field(name="To configure further", value=f"`{await get_prefix(ctx)}help welcome`")
         
         await ctx.send(embed=successembed)        
 
@@ -64,7 +66,7 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomecard(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id": ctx.guild.id})
         
         def getcontent():
             if GuildDoc.get("message") is None:
@@ -85,7 +87,7 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomechannel(self, ctx, channel:discord.TextChannel=None):
-        GuildDoc = db.WELCOME.find_one({"_id":ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id":ctx.guild.id})
 
         if channel is not None:
             newdata = {"$set":{
@@ -102,13 +104,13 @@ class Welcome(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the greeting channel to change it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomechannel <#channel>`"))
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}welcomechannel <#channel>`"))
 
 
     @commands.command()
     @has_command_permission()
     async def welcomemessage(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(embed=discord.Embed(
                     tite="Send a message to make it the welcome message",
@@ -130,7 +132,7 @@ class Welcome(commands.Cog):
                 newdata = {"$set":{
                     "message": usermsg.content
                 }}
-                db.WELCOME.update_one(GuildDoc, newdata)
+                await db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
                 title=f"{var.E_ACCEPT} Successfully changed the welcome message!",
@@ -144,7 +146,7 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomegreeting(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(embed=discord.Embed(
                     tite="Send a message to make it the welcome greeting!",
@@ -165,7 +167,7 @@ class Welcome(commands.Cog):
                 newdata = {"$set":{
                     "welcomegreeting": usermsg.content
                 }}
-                db.WELCOME.update_one(GuildDoc, newdata)
+                await db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
                 title=f"{var.E_ACCEPT} Successfully changed the greeting message!",
@@ -179,7 +181,7 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomeimage(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(embed=discord.Embed(
                     tite="Send a message to make it the image",
@@ -198,7 +200,7 @@ class Welcome(commands.Cog):
                 newdata = {"$set":{
                     "image": usermsg.attachments[0].url
                 }}
-                db.WELCOME.update_one(GuildDoc, newdata)
+                await db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
                 title=f"{var.E_ACCEPT} Successfully changed welcome image",
@@ -210,7 +212,7 @@ class Welcome(commands.Cog):
                 newdata = {"$set":{
                     "image": usermsg.content
                 }}
-                db.WELCOME.update_one(GuildDoc, newdata)
+                await db.WELCOME.update_one(GuildDoc, newdata)
 
                 await ctx.send(embed=discord.Embed(
                 title=f"{var.E_ACCEPT} Successfully changed welcome image",
@@ -227,7 +229,7 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomerole(self, ctx, role:discord.Role=None):
-        GuildDoc = db.WELCOME.find_one({"_id":ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id":ctx.guild.id})
         if role is not None:
             rolelist = GuildDoc.get("assignroles")
             updatedlist = rolelist.copy()
@@ -236,7 +238,7 @@ class Welcome(commands.Cog):
             newdata = {"$set":{
                 "assignroles":updatedlist
             }}
-            db.WELCOME.update_one(GuildDoc, newdata)
+            await db.WELCOME.update_one(GuildDoc, newdata)
             await ctx.send(embed=discord.Embed(
                     title="Successfully added auto assign role",
                     description=f"{var.E_ACCEPT} Users will be automatically given {role.mention} when they join",
@@ -246,7 +248,7 @@ class Welcome(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the role",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{getprefix(ctx)}welcomerole <role>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}welcomerole <role>`"
             ).set_footer(text="For role either role ID or role mention can be used")
             )
 
@@ -254,14 +256,14 @@ class Welcome(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def welcomereset(self, ctx):
-        GuildDoc = db.WELCOME.find_one({"_id": ctx.guild.id})
+        GuildDoc = await db.WELCOME.find_one({"_id": ctx.guild.id})
         newdata = {"$set":{
             "message": None,
             "welcomegreeting": "Hope you enjoy your stay here ✨",
             "image": "https://cdn.discordapp.com/attachments/843519647055609856/864924991597314078/Frame_1.png",
             "assignroles": []
         }}
-        db.WELCOME.update_one(GuildDoc, newdata)
+        await db.WELCOME.update_one(GuildDoc, newdata)
         await ctx.send(embed=discord.Embed(
         description=f"{var.E_ACCEPT} Successfully changed the welcome embed back to the default one",
         color=var.C_GREEN)
@@ -270,40 +272,29 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        GuildVerifyDoc = db.VERIFY.find_one({"_id": member.guild.id})
-        GuildWelcomeDoc = db.WELCOME.find_one({"_id": member.guild.id})
 
-        #Verification Stuff
-        if db.PLUGINS.find_one({"_id": member.guild.id}).get("Verification") == True:
-            roleid = GuildVerifyDoc.get("roleid")
-            unverifiedrole = member.guild.get_role(roleid)
+        welcome_guild_ids = [doc["_id"] async for doc in db.PLUGINS.find({"Welcome": True})]
 
-            await member.add_roles(unverifiedrole)
-
-        #Main Welcome stuff
-        servers = []
-        for i in db.PLUGINS.find({"Welcome": True}):
-            servers.append(i.get("_id"))
-
-        if member.guild.id in servers:
-            channel = self.bot.get_channel(GuildWelcomeDoc.get("channelid"))
+        if member.guild.id in welcome_guild_ids:
+            WelcomeDoc = await db.WELCOME.find_one({"_id": member.guild.id})
+            channel = self.bot.get_channel(WelcomeDoc.get("channelid"))
 
             def getcontent():
-                if GuildWelcomeDoc.get("message") == None:
+                if WelcomeDoc.get("message") == None:
                     content = greeting(member.mention)
                 else:
-                    content = f"{member.mention} {GuildWelcomeDoc.get('message')}"
+                    content = f"{member.mention} {WelcomeDoc.get('message')}"
                 return content
 
             embed = discord.Embed(
             title="Welcome to the server!",
-            description=GuildWelcomeDoc.get("greeting"),
+            description=WelcomeDoc.get("greeting"),
             color=discord.Colour.random()
-            ).set_image(url=GuildWelcomeDoc.get("image"))
+            ).set_image(url=WelcomeDoc.get("image"))
 
             await channel.send(content=getcontent(), embed=embed)
 
-            autoroles = GuildWelcomeDoc.get("assignroles")
+            autoroles = WelcomeDoc["assignroles"]
             if autoroles != []:
                 for i in autoroles:
                     autorole = member.guild.get_role(i)

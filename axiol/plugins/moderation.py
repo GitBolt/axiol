@@ -69,23 +69,26 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @has_command_permission()
     async def unban(self, ctx, user:discord.User=None):
-        if user is not None and user != ctx.author:
-
-            await ctx.guild.unban(user)
-            await ctx.send(f'Unbanned `{user}` :ok_hand:')
-
-            try:
-                await user.send(embed=discord.Embed(
-                                title=f"You have been unbanned from {ctx.guild.name}!",
-                                description="Yay I would be happy to see you back!", 
-                                color=var.C_GREEN
-                                ).add_field(name="Unbanned by", value=ctx.author)
-                                )
-            except discord.Forbidden:
-                pass
-
-        elif user == ctx.author:
-            await ctx.send("You are not even banned why you trying to unban yourself :face_with_raised_eyebrow:")
+        if user is not None:
+            bans = await ctx.guild.bans()  
+            banned_users = [ban.user for ban in bans]
+            if user in banned_users:
+                await ctx.guild.unban(user)
+                await ctx.send(f'Successfully unbanned `{user}` :ok_hand:')
+                try:
+                    await user.send(embed=discord.Embed(
+                            title=f"You have been unbanned from {ctx.guild.name}!",
+                            description="Yay I would be happy to see you back!", 
+                            color=var.C_GREEN
+                            ).add_field(name="Unbanned by", value=ctx.author)
+                            )   
+                except discord.Forbidden:
+                    pass
+            else:
+                await ctx.send(embed=discord.Embed(
+                    description=f"The user `{user}` is not banned, therefore cannot unban them.",
+                    color=var.C_ORANGE
+                ))
 
         else:
             await ctx.send(embed=discord.Embed(
@@ -117,8 +120,8 @@ class Moderation(commands.Cog):
                     await i.set_permissions(mutedrole, send_messages=False)
             else:
                 mutedrole = discord.utils.get(ctx.guild.roles, name="Muted")
-                await member.add_roles(mutedrole)
-                await ctx.send(f"Applied chat mute to `{member}` :mute:")
+            await member.add_roles(mutedrole)
+            await ctx.send(f"Applied chat mute to `{member}` :mute:")
 
         else:
             await ctx.send(embed=discord.Embed(
@@ -129,7 +132,7 @@ class Moderation(commands.Cog):
             )
     @mute.error
     async def mute_error(self, ctx, error):
-        if isinstance(error, commands.CommandInvokeError):
+        if isinstance(error, discord.Forbidden):
             await ctx.send(embed=discord.Embed(
                 title="Permission error",
                 description="🚫 I don't have permissions to mute the member, make sure that I have manage roles permission and my role is placed above the highest role which the member has",
@@ -329,12 +332,12 @@ class Moderation(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def massrole(self, ctx, role:discord.Role=None, role2:discord.Role=None):
-        if role and role2 is not None:
+        if role is not None and role2 is not None:
             botmsg = await ctx.send(embed=discord.Embed(
                 title="Confirmation",
                 description=f"Are you sure you want to update all members with the role {role.mention} with {role2.mention}?",
                 color=var.C_BLUE
-            ).add_field(name="React to the respective emoji", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
+            ).add_field(name="Note that this action is irreversable and cannot be stopped once started", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
             )
             )
             await botmsg.add_reaction(var.E_ACCEPT)
@@ -343,32 +346,33 @@ class Moderation(commands.Cog):
             def reactioncheck(reaction, user):
                 return user == ctx.author and reaction.message == botmsg
 
-            reaction, member =await self.bot.wait_for("reaction_add", check=reactioncheck)
+            reaction, _ = await self.bot.wait_for("reaction_add", check=reactioncheck)
+            updates = False
             try:
                 await botmsg.clear_reactions()
             except:
                 pass
             if str(reaction.emoji) == var.E_DECLINE:
-                await ctx.send("Cancelled mass role update")
+                return await ctx.send("Cancelled mass role update")
 
             if str(reaction.emoji) == var.E_ENABLE:
                 updates = True
-            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:             
-                for member in ctx.guild.members:
-                    if role in member.roles:
-                        try:
-                            await member.add_roles(role2)
-                            try:
-                                if updates:
-                                    await ctx.send(f"{member} updated")
-                            except UnboundLocalError: #Fuckoff
-                                pass
-                        except discord.Forbidden:
-                            await ctx.send(embed=discord.Embed(
-                                description=f"Error giving role to {member.mention}",
-                                color=var.C_ORANGE
-                            ))
-                        await asyncio.sleep(1)
+
+            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:     
+                count = 0       
+                for member in [member for member in ctx.guild.members if role in member.roles]:
+                    try:
+                        await member.add_roles(role2)
+                        count += 1
+                        if updates:
+                            await ctx.send(f"{member} updated")
+                    except discord.Forbidden:
+                        await ctx.send(embed=discord.Embed(
+                            description=f"Error giving role to {member.mention}",
+                            color=var.C_ORANGE
+                        ))
+                    await asyncio.sleep(1)
+                await ctx.send(f"Done, updated **{count}** members with the {role2.name} role")
         else:
             await ctx.send(embed=discord.Embed(
                 title=f"🚫 Missing arguments",
@@ -381,12 +385,12 @@ class Moderation(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def massroleremove(self, ctx, role:discord.Role=None, role2:discord.Role=None):
-        if role and role2 is not None:
+        if role is not None and role2 is not None:
             botmsg = await ctx.send(embed=discord.Embed(
                 title="Confirmation",
                 description=f"Are you sure you want to update all members with the role {role.mention} by removing {role2.mention}?",
                 color=var.C_BLUE
-            ).add_field(name="React to the respective emoji", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
+            ).add_field(name="Note that this action is irreversable and cannot be stopped once started", value=f"{var.E_ACCEPT} to accept\n{var.E_ENABLE} to accept with live stats\n{var.E_DECLINE} to decline"
             )
             )
             await botmsg.add_reaction(var.E_ACCEPT)
@@ -395,32 +399,33 @@ class Moderation(commands.Cog):
             def reactioncheck(reaction, user):
                 return user == ctx.author and reaction.message == botmsg
 
-            reaction, member =await self.bot.wait_for("reaction_add", check=reactioncheck)
+            reaction, _ = await self.bot.wait_for("reaction_add", check=reactioncheck)
+            updates = False
             try:
                 await botmsg.clear_reactions()
             except:
                 pass
             if str(reaction.emoji) == var.E_DECLINE:
-                await ctx.send("Cancelled mass role removal")
+                return await ctx.send("Cancelled mass role update")
 
             if str(reaction.emoji) == var.E_ENABLE:
                 updates = True
-            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:             
-                for member in ctx.guild.members:
-                    if role in member.roles:
-                        try:
-                            await member.remove_roles(role2)
-                            try:
-                                if updates:
-                                    await ctx.send(f"{member} updated")
-                            except UnboundLocalError: #Fuckoff
-                                pass
-                        except discord.Forbidden:
-                            await ctx.send(embed=discord.Embed(
-                                description=f"Error removing role from {member.mention}",
-                                color=var.C_ORANGE
-                            ))
-                        await asyncio.sleep(1)
+
+            if str(reaction.emoji) == var.E_ENABLE or str(reaction.emoji) == var.E_ACCEPT:     
+                count = 0       
+                for member in [member for member in ctx.guild.members if role in member.roles]:
+                    try:
+                        await member.remove_roles(role2)
+                        count += 1
+                        if updates:
+                            await ctx.send(f"{member} updated")
+                    except discord.Forbidden:
+                        await ctx.send(embed=discord.Embed(
+                            description=f"Error giving role to {member.mention}",
+                            color=var.C_ORANGE
+                        ))
+                    await asyncio.sleep(1)
+                await ctx.send(f"Done, updated **{count}** members with the {role2.name} role")
         else:
             await ctx.send(embed=discord.Embed(
                 title=f"🚫 Missing arguments",

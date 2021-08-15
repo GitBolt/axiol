@@ -111,7 +111,7 @@ class TypeRacer:
                 await msg.edit(embed=embed)
 
         with BytesIO() as image_binary:
-            image, text = self.create_board()
+            image, text = await self.create_board()
             image.save(image_binary, 'PNG')
             for player in self.players:
                 image_binary.seek(0)

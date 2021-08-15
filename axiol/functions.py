@@ -40,7 +40,7 @@ async def get_randomtext(typing_time):
     return " ".join([random.choice(words) for i in r])
 
 
-async def get_code(amount):
+def get_code(amount):
     return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
                              "1234567890", k = amount))
 

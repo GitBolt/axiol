@@ -271,23 +271,11 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        VerifyDoc = await db.VERIFY.find_one({"_id": member.guild.id})
-        WelcomeDoc = await db.WELCOME.find_one({"_id": member.guild.id})
-        PluginDoc = await db.PLUGINS.find_one({"_id": member.guild.id})
 
-        #Verification Stuff
-        if PluginDoc["Verification"]:
-            roleid = VerifyDoc["roleid"]
-            unverifiedrole = member.guild.get_role(roleid)
+        welcome_guild_ids = [doc["_id"] async for doc in db.PLUGINS.find({"Welcome": True})]
 
-            await member.add_roles(unverifiedrole)
-
-        #Main Welcome stuff
-        servers = []
-        for i in await db.PLUGINS.find({"Welcome": True}):
-            servers.append(i.get("_id"))
-
-        if member.guild.id in servers:
+        if member.guild.id in welcome_guild_ids:
+            WelcomeDoc = await db.WELCOME.find_one({"_id": member.guild.id})
             channel = self.bot.get_channel(WelcomeDoc.get("channelid"))
 
             def getcontent():
@@ -305,7 +293,7 @@ class Welcome(commands.Cog):
 
             await channel.send(content=getcontent(), embed=embed)
 
-            autoroles = WelcomeDoc.get("assignroles")
+            autoroles = WelcomeDoc["assignroles"]
             if autoroles != []:
                 for i in autoroles:
                     autorole = member.guild.get_role(i)

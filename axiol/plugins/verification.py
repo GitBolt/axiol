@@ -1,12 +1,10 @@
-import os
 import random
 import asyncio
 import discord
 from discord.ext import commands
-from PIL import Image, ImageDraw, ImageFont
 import database as db
 import variables as var
-from functions import get_prefix, get_code
+from functions import get_prefix
 from ext.permissions import has_command_permission
 
 class Verification(commands.Cog):
@@ -305,16 +303,6 @@ class Verification(commands.Cog):
         }}
         await db.PLUGINS.update_one(GuildPluginDoc, newdata)
         await ctx.send("Successfully removed verification from this server!")
-
-
-    @staticmethod
-    async def create_board():
-        code = await get_code
-        image = Image.open(os.path.join(os.getcwd(),("resources/backgrounds/verification_board.png")))
-        draw = ImageDraw.Draw(image)
-        font = ImageFont.truetype(os.path.join(os.getcwd(),("resources/fonts/Poppins-Medium.ttf")), 80)
-        draw.text((810, 55), code ,(184,184,184),font=font)
-        return image, code
 
     @commands.command(aliases=["verifyme"])
     async def verify(self, ctx):

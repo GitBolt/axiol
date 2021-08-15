@@ -85,7 +85,7 @@ class Verification(commands.Cog):
                     description=f"{var.E_ACCEPT} New members would need to verify in {ch.mention} to access other channels!",
                     color=var.C_GREEN
                     ).add_field(name="To configure further", value=f"`{await get_prefix(ctx)}help verification`"
-                    ).set_footr(text="Default verification type is command")
+                    ).set_footer(text="Default verification type is command")
                     
                     await ctx.send(embed=successembed)
 

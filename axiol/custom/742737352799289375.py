@@ -325,7 +325,7 @@ class ChemistryHelp(commands.Cog):
             return
         if message.channel.id in [742848285416357970, 742849666256732170, 844657766794788884, 846840113543905383] and not message.author.bot:
 
-            GuildCol = await db.CUSTOMDATABASE[str(message.guild.id)]
+            GuildCol = db.CUSTOMDATABASE[str(message.guild.id)]
             msgdata = await GuildCol.find_one({"_id": 0})
             reactiondata = await GuildCol.find_one({"_id": 1})
             if msgdata is not None:

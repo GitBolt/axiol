@@ -42,7 +42,7 @@ class Owner(commands.Cog):
                 result = f"{stdout.getvalue()}"
         except Exception as e:
             result = e
-        if len(result) >= 2000:
+        if len(str(result)) >= 2000:
             result = result[:1900]
             await ctx.send("Result larger than 2000 characters, returned 1900 characters only.")
 

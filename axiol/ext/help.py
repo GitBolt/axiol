@@ -69,13 +69,14 @@ async def rrhelp(ctx: commands.Context):
 async def welcomehelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
     embed = discord.Embed(title="👋 Welcome", description="Greet new members with a nice welcome :D", color=var.C_MAIN
-    ).add_field(name=prefix+"welcomecard", value="Shows server welcome card", inline=False
-    ).add_field(name=prefix+"welcomechannel `<#channel>`", value="Changes welcome channel", inline=False
-    ).add_field(name=prefix+"welcomemessage", value="Changes welcome message", inline=False
-    ).add_field(name=prefix+"welcomegreeting", value="Changes welcome greeting", inline=False
-    ).add_field(name=prefix+"welcomeimage", value="Changes the welcome image", inline=False
-    ).add_field(name=prefix+"welcomerole `<role>`", value="Assign automatic role to a member when they join", inline=False
-    ).add_field(name=prefix+"welcomereset", value="Resets to the default welcome embed message", inline=False
+    ).add_field(name=prefix+"wcard", value="Shows server welcome card", inline=False
+    ).add_field(name=prefix+"wchannel `<#channel>`", value="Changes welcome channel", inline=False
+    ).add_field(name=prefix+"wmessage", value="Changes welcome message", inline=False
+    ).add_field(name=prefix+"wgreeting", value="Changes welcome greeting", inline=False
+    ).add_field(name=prefix+"wimage", value="Changes the welcome image", inline=False
+    ).add_field(name=prefix+"wrole `<role>`", value="Assign automatic role to a member when they join", inline=False
+    ).add_field(name=prefix+"wbots", value="Changes whether bots should be greeted by me or not", inline=False
+    ).add_field(name=prefix+"wreset", value="Resets to the default welcome embed message", inline=False
     ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
     return embed
 

@@ -128,7 +128,7 @@ async def onewordstory(self, ctx):
             title=f"Create a new story!",
             description = f">>> **Previous story**\n{firstword} {previous_story}",
             color=var.C_MAIN
-    ).add_field(name="New word", value=get_randomtext(0).strip("."))
+    ).add_field(name="New word", value=await get_randomtext(0).strip("."))
 
     await channel.send(embed=embed)
 

@@ -1,5 +1,5 @@
 # Axiol tutorial
-Oh hey, look who is here! Welcome to Axiol bot documentation.<br>
+Oh hey, look who is here! Welcome to the Axiol bot documentation.<br>
 
 <img src="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png" width=100>
 
@@ -14,7 +14,7 @@ To change the prefix use the command **``.prefix``**. In case after changing the
 > I forgot the prefix @Axiol, can you help me?</br>
 
 ## Before continuing
-The prefix used in all examples will be the default one therefore a dot ```.```, use your own prefix for the commands if changed. </br>
+The prefix used in all examples will be the default one therefore a dot ```.```, use your own prefix for the commands if you changed it. </br>
 For every role, user, member and text channel either their mention or ID can be used, for example: </br>
 This...
 > ```.avatar @Bolt#8905```
@@ -370,4 +370,4 @@ This is not a plugin but some extra commands which are also useful. </br>
   Sends the invite link of Axiol.
 
 #### .source
-  Sends the GitHub links of Axiol.
+  Sends the GitHub link of Axiol's source code.

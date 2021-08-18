@@ -8,20 +8,20 @@
   </a>
 </p>
 
-Axiol is an advanced, highly customizable, and interactive Discord Bot coded in pure Python.</br>
+Axiol is an advanced highly customizable interactive Discord Bot coded in pure Python.</br>
 For any suggestions, the command `suggest` (Starting with the server prefix) can be used, and the suggestion will be sent to the
-[Offical Discord Support Server](https://discord.gg/Rzz5WS9jXW).</br>
+[Official Discord Support Server](https://discord.gg/Rzz5WS9jXW).</br>
 
 The default prefix is a dot `.` </br>
 Make sure to read the [Docs](/DOCS.md)
 
 ### Contributing
 ~~Have I mentioned that the database structure is so weird that you can only work locally after fixing tens of errors?~~ Haha gottem code stealers</br>
-Make sure to check out [these functions](axiol/functions.py) to get the bot working locally in case you are interested in contributing to it </br>
+Make sure to check out [these functions](axiol/functions.py) to get it working locally in case you are interested in contributing the bot </br>
 Any contribution to the documentation even if it's a small typo is open
 
-- Fork -> Clone -> Edit -> Commit -> Pull request </br>
-*It is reccomended to make a new branch for your changes*
+- Fork → Clone → Edit → Commit → Pull request </br>
+*Recommended making a new branch for your changes*
 
 ### Support Server
 [Also the bot testing area](https://discord.gg/Rzz5WS9jXW)
@@ -29,7 +29,7 @@ Any contribution to the documentation even if it's a small typo is open
 ### Invite
 [Invite the bot from here](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)
 
-### BotLists
+### Bot lists
 [Top.gg](https://top.gg/bot/843484459113775114/vote) </br>
 
 [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)

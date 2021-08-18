@@ -123,12 +123,13 @@ async def onewordstory(self, ctx):
     firstword = botembeds[0]["fields"][0]["value"]
     messages = await channel.history(after=botmsg).flatten()
     previous_story = " ".join([msg.content for msg in messages])
+    new_word = await get_randomtext(0).strip(".")
 
     embed = discord.Embed(
             title=f"Create a new story!",
             description = f">>> **Previous story**\n{firstword} {previous_story}",
             color=var.C_MAIN
-    ).add_field(name="New word", value=await get_randomtext(0).strip("."))
+    ).add_field(name="New word", value=new_word)
 
     await channel.send(embed=embed)
 

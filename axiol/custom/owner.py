@@ -85,7 +85,7 @@ class Owner(commands.Cog):
         except:
             return await ctx.send(f"No document with name **{doc_name.upper()}**")
 
-        doc = plugindb.find_one({"_id":guild.id})
+        doc = await plugindb.find_one({"_id":guild.id})
         
         await ctx.send(f"**{doc_name.upper()}** Document for **{guild.name}**\n```json\n{doc}```")
 

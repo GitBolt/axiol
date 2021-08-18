@@ -192,7 +192,7 @@ class Leveling(commands.Cog):
     async def levelinfo(self, ctx):
         GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
         SettingsDoc = await GuildCol.find_one({"_id": 0})
-        xprange = SettingsDoc.get("xprange")
+        xprange = " - ".join(str(i) for i in SettingsDoc["xprange"])
 
         bl = [self.bot.get_channel(i) for i in SettingsDoc["blacklistedchannels"] if self.bot.get_channel(i) != None]
 
@@ -204,6 +204,7 @@ class Leveling(commands.Cog):
             }).sort("xp", -1).limit(1)]
 
         maxrank_user = await self.bot.fetch_user(maxrank[0]["_id"])
+
         def getalertchannel():
             if SettingsDoc.get("alertchannel") is not None:
                 alertchannel = self.bot.get_channel(SettingsDoc.get("alertchannel"))
@@ -214,10 +215,8 @@ class Leveling(commands.Cog):
             else:
                 return None
 
-
-
-        status = "Enabled" if SettingsDoc.get("alerts") else "Disabled" 
-        rewards = SettingsDoc.get("rewards")
+        status = "Enabled" if SettingsDoc["alerts"] else "Disabled" 
+        rewards = SettingsDoc["rewards"]
 
         embed = discord.Embed(
         title="Server leveling information",

@@ -103,7 +103,7 @@ class Welcome(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the greeting channel to change it",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}welcomechannel <#channel>`"))
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}wchannel <#channel>`"))
 
 
     @commands.command()
@@ -247,7 +247,7 @@ class Welcome(commands.Cog):
             await ctx.send(embed=discord.Embed(
             description="🚫 You need to define the role",
             color=var.C_RED
-            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}welcomerole <role>`"
+            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}wrole <role>`"
             ).set_footer(text="For role either role ID or role mention can be used")
             )
 

@@ -34,16 +34,16 @@ class Chatbot(commands.Cog):
         if channel is None:
             channel = ctx.channel
             
-         GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-         channelist = GuildDoc.get("channels")
-         newlist = channelist.copy()
-         newlist.append(channel.id)
-         newdata = {"$set":{
+        GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+        channelist = GuildDoc.get("channels")
+        newlist = channelist.copy()
+        newlist.append(channel.id)
+        newdata = {"$set":{
              "channels": newlist
          }}
 
-         await db.CHATBOT.update_one(GuildDoc, newdata)
-         await ctx.send(f"{var.E_ACCEPT} Enabled Chatbot for {channel.mention}")
+        await db.CHATBOT.update_one(GuildDoc, newdata)
+        await ctx.send(f"{var.E_ACCEPT} Enabled Chatbot for {channel.mention}")
     
 
     @commands.command(aliases=["disablechatbot"])

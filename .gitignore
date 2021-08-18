@@ -1,14 +1,13 @@
-# Enviroments
-.env
-env
-ENV
-venv
-VENV
-
-# Everything else
+# Python Enviroments
 __pycache__
+env
+venv
+
+# ide Configurations
 .vscode
+.idea
 
 
-# Private cog
+# Bot configuration and private cog
 axiol/custom/private.py
+.env

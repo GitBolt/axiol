@@ -21,7 +21,7 @@ Make sure to check out [these functions](axiol/functions.py) to get it working l
 Any contribution to the documentation even if it's a small typo is open
 
 - Fork → Clone → Edit → Commit → Pull request </br>
-*Recommended making a new branch for your changes*
+*It is recommended making a new branch for your changes*
 
 ### Support Server
 [Also the bot testing area](https://discord.gg/Rzz5WS9jXW)

@@ -25,34 +25,27 @@ class Chatbot(commands.Cog):
     @commands.command(aliases=["enablechatbot"])
     @has_command_permission()
     async def setchatbot(self, ctx, channel:discord.TextChannel=None):
-
+    
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
             await db.CHATBOT.insert_one({
                 "_id": ctx.guild.id,
-                "channels": []                                    
+                "channels": [ctx.channel.id]                                    
                 })
+        if channel is None:
+            channel = ctx.channel
+            
+         GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+         channelist = GuildDoc.get("channels")
+         newlist = channelist.copy()
+         newlist.append(channel.id)
+         newdata = {"$set":{
+             "channels": newlist
+         }}
 
-        if channel is not None:
-            GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-            channelist = GuildDoc.get("channels")
-            newlist = channelist.copy()
-            newlist.append(channel.id)
-            print(newlist)
-            newdata = {"$set":{
-                "channels": newlist
-            }}
-
-            await db.CHATBOT.update_one(GuildDoc, newdata)
-            await ctx.send(f"Enabled Chatbot for {channel.mention}")
-        else:
-            await ctx.send(embed=discord.Embed(
-            description="🚫 You need to define the channel in order to make it bot chat",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}setchatbot <#channel>`"
-            )
-            )
-
+         await db.CHATBOT.update_one(GuildDoc, newdata)
+         await ctx.send(f"{var.E_ACCEPT} Enabled Chatbot for {channel.mention}")
     
+
     @commands.command(aliases=["disablechatbot"])
     @has_command_permission()
     async def removechatbot(self, ctx, channel:discord.TextChannel=None):
@@ -62,26 +55,21 @@ class Chatbot(commands.Cog):
                 "_id": ctx.guild.id,
                 "channels": []                                    
                 })
-        if channel is not None:
-            GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-            if channel.id in GuildDoc.get("channels"):
-                channelist = GuildDoc.get("channels")
-                newlist = channelist.copy()
-                newlist.remove(channel.id)
-                newdata = {"$set":{
-                    "channels": newlist
-                }}
-                await db.CHATBOT.update_one(GuildDoc, newdata)
-                await ctx.send(f"Disabled Chatbot from {channel.mention}")
-            else:
-                await ctx.send("This channel is not a bot chatting channel")
-        else:   
-            await ctx.send(embed=discord.Embed(
-            description="🚫 You need to define the channel in order to remove bot chat",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"`{await get_prefix(ctx)}removechatbot <#channel>`"
-            )
-            )
+        if channel is None:
+            channel = ctx.channel
+
+        GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+        if channel.id in GuildDoc.get("channels"):
+            channelist = GuildDoc.get("channels")
+            newlist = channelist.copy()
+            newlist.remove(channel.id)
+            newdata = {"$set":{
+                "channels": newlist
+            }}
+            await db.CHATBOT.update_one(GuildDoc, newdata)
+            await ctx.send(f"Disabled Chatbot from {channel.mention}")
+        else:
+            await ctx.send("This channel is not a bot chatting channel")
 
 
     @commands.command()
@@ -98,6 +86,7 @@ class Chatbot(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send("This server does not have any chat bot channel")
+
 
     @commands.command()
     @has_command_permission()

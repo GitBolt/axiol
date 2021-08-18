@@ -439,7 +439,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def warn(self, ctx, member:discord.Member=None, *,reason=None):
         if member and reason is not None:
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = db.WARNINGS_DATABASE[str(ctx.guild.id)]
             userwarns = await GuildCol.find_one({"_id": member.id})
             if userwarns is None:
                 newwarns = [reason]
@@ -479,7 +479,7 @@ class Moderation(commands.Cog):
             except ValueError:
                 await ctx.send(embed=discord.Embed(description=f"The position should be a number!", color=var.C_RED))
                 return
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = db.WARNINGS_DATABASE[str(ctx.guild.id)]
             userdoc = await GuildCol.find_one({"_id": member.id})
             if userdoc is None:
                 await ctx.send(embed=discord.Embed(description=f"{member.mention} does not have any warns", color=var.C_RED
@@ -515,7 +515,7 @@ class Moderation(commands.Cog):
     async def warns(self, ctx, member:discord.Member=None):
         if member is not None:
 
-            GuildCol = db.WARNINGSDATABASE[str(ctx.guild.id)]
+            GuildCol = db.WARNINGS_DATABASE[str(ctx.guild.id)]
             userdata = await GuildCol.find_one({"_id": member.id})
             if userdata is None:
                 await ctx.send(f"{member} does not have any warnings")

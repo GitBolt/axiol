@@ -31,7 +31,7 @@ class Leveling(commands.Cog):
         else:
             user = rankuser
 
-        GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+        GuildCol = db.LEVEL_DATABASE[str(ctx.guild.id)]
         userdata = await GuildCol.find_one({"_id": user.id})
         if userdata is None:
                 await ctx.send("This user does not have any rank yet...")
@@ -69,7 +69,7 @@ class Leveling(commands.Cog):
     @commands.command(aliases=["lb"])
     @has_command_permission()
     async def leaderboard(self, ctx):
-        GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+        GuildCol = db.LEVEL_DATABASE[str(ctx.guild.id)]
         rankings = [x async for x in GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
@@ -190,7 +190,7 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def levelinfo(self, ctx):
-        GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+        GuildCol = db.LEVEL_DATABASE[str(ctx.guild.id)]
         SettingsDoc = await GuildCol.find_one({"_id": 0})
         xprange = " - ".join(str(i) for i in SettingsDoc["xprange"])
 
@@ -263,7 +263,7 @@ class Leveling(commands.Cog):
                     color=var.C_RED
                 ))
             else:
-                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                GuildCol = db.LEVEL_DATABASE[str(ctx.guild.id)]
                 data = await GuildCol.find_one({"_id": user.id})
                 if data is None:
                     await GuildCol.insert_one({"_id": user.id, "xp": amount})
@@ -299,7 +299,7 @@ class Leveling(commands.Cog):
                     color=var.C_RED
                 ))
             else:
-                GuildCol = db.LEVELDATABASE[str(ctx.guild.id)]
+                GuildCol = db.LEVEL_DATABASE[str(ctx.guild.id)]
                 data = await GuildCol.find_one({"_id": user.id})
 
                 newdata = {"$set":{
@@ -320,7 +320,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def xprange(self, ctx, minval:int=None, maxval:int=None):
         if minval and maxval is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             newdata = {"$set":{
@@ -344,7 +344,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def blacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklistedchannels").copy()
@@ -371,7 +371,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def whitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklistedchannels").copy()
@@ -401,7 +401,7 @@ class Leveling(commands.Cog):
     @commands.command(aliases=["removealerts"])
     @has_command_permission()
     async def togglealerts(self, ctx):
-        GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+        GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         GuildConfig = await GuildCol.find_one({"_id": 0})
         if GuildConfig.get("alerts"):
             newdata = {"$set":{
@@ -426,7 +426,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def alertchannel(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             newdata = {"$set":{
@@ -451,7 +451,7 @@ class Leveling(commands.Cog):
     async def reward(self, ctx, level:str=None, role:discord.Role=None):
         if level and role is not None and level.isnumeric():
 
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             existingdata = settings.get("rewards")
@@ -482,7 +482,7 @@ class Leveling(commands.Cog):
     async def removereward(self, ctx, level:str=None):
         if level is not None:
 
-            GuildCol = db.LEVELDATABASE.get_collection(str(ctx.guild.id))
+            GuildCol = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await GuildCol.find_one({"_id": 0})
 
             existingdata = settings.get("rewards")
@@ -516,7 +516,7 @@ class Leveling(commands.Cog):
         if not message.guild:
             return
 
-        GuildLevelCol = db.LEVELDATABASE[str(message.guild.id)]
+        GuildLevelCol = db.LEVEL_DATABASE[str(message.guild.id)]
         GuildPluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
         GuildSettingsDoc = await GuildLevelCol.find_one({"_id": 0})
 

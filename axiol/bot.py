@@ -5,8 +5,8 @@ import database as db
 import variables as var
 
 
-#Function to get current guild prefix
-async def guild_prefix(bot, message):
+async def guild_prefix(_bot, message):
+    """Return current guild prefix"""
     if not message.guild:
         return var.DEFAULT_PREFIX
 
@@ -18,20 +18,21 @@ async def guild_prefix(bot, message):
 
 
 intents = discord.Intents().all()
-bot = commands.Bot(command_prefix = guild_prefix, help_command=None, intents=intents)
+bot = commands.Bot(command_prefix=guild_prefix, help_command=None,
+                   intents=intents)
 
 
 @bot.event
 async def on_ready():
     await bot.change_presence(
-            activity=discord.Activity(
+        activity=discord.Activity(
             type=discord.ActivityType.streaming,
             name=f"Ping and ask for help 👀"
-            ))
+        ))
     print("I woke up 🌥️")
 
 
-#Loading pogs 
+# Loading pogs
 for filename in os.listdir('./custom'):
     if filename.endswith('.py'):
         bot.load_extension(f'custom.{filename[:-3]}')
@@ -51,7 +52,7 @@ for filename in os.listdir('./visuals'):
 
 @bot.event
 async def on_guild_join(guild):
-    #Inserting plugin configs if it does not exist (incase of re-inviting)
+    # Inserting plugin configs if it does not exist (incase of re-inviting)
     if not await db.PLUGINS.count_documents({"_id": guild.id}, limit=1):
         await db.PLUGINS.insert_one({
 
@@ -85,26 +86,26 @@ async def on_guild_join(guild):
             "Giveaway": {}
         })
 
-    #Support server Log
+    # Support server Log
     embed = discord.Embed(
-    title="I just joined a new server!",
-    description=f"Thanks to this kind person for inviting me to `{guild.name}` :D",
-    color=var.C_GREEN
+        title="I just joined a new server!",
+        description=f"Thanks to this kind person for inviting me to `{guild.name}` :D",
+        color=var.C_GREEN
     ).add_field(name="Member count", value=guild.member_count
-    )
-    await bot.get_channel(848207106821980213).send(embed=embed)           
+                )
+    await bot.get_channel(848207106821980213).send(embed=embed)
 
 
-#Support server Log
+# Support server Log
 @bot.event
 async def on_guild_remove(guild):
     embed = discord.Embed(
-    title="I just got removed from a server",
-    description=f"Someone removed me from `{guild.name}` :(",
-    color=var.C_RED
+        title="I just got removed from a server",
+        description=f"Someone removed me from `{guild.name}` :(",
+        color=var.C_RED
     ).add_field(name="Member count", value=guild.member_count
-    )
-    await bot.get_channel(848207106821980213).send(embed=embed)    
+                )
+    await bot.get_channel(848207106821980213).send(embed=embed)
 
 
 bot.run(var.TOKEN)

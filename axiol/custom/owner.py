@@ -99,10 +99,10 @@ class Owner(commands.Cog):
     async def clean_db(self, ctx):
         guildids = [guild.id for guild in self.bot.guilds]
 
-        async for i in db.AUTOMOD.find({}):
+        async for i in db.AUTO_MOD.find({}):
             if i["_id"] not in guildids:
-                await db.AUTOMOD.delete_one(i)
-                print("AUTOMOD", i["_id"])
+                await db.AUTO_MOD.delete_one(i)
+                print("AUTO_MOD", i["_id"])
         print("\n")
         async for i in db.CHATBOT.find({}):
             if i["_id"] not in guildids:
@@ -124,10 +124,10 @@ class Owner(commands.Cog):
                 await db.PREFIXES.delete_one(i)
                 print("PREFIXES", i["_id"])
         print("\n")
-        async for i in db.REACTIONROLES.find({}):
+        async for i in db.REACTION_ROLES.find({}):
             if i["_id"] not in guildids:
-                await db.REACTIONROLES.delete_one(i)
-                print("REACTIONROLES", i["_id"])
+                await db.REACTION_ROLES.delete_one(i)
+                print("REACTION_ROLES", i["_id"])
         print("\n")
         async for i in db.VERIFY.find({}):
             if i["_id"] not in guildids:

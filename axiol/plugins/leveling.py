@@ -18,15 +18,16 @@ class Leveling(commands.Cog):
         if guild_doc.get("Leveling"):
             return True
 
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_DISABLE} The Leveling plugin "
-                    f"is disabled in this server"
-                ),
-                color=var.C_ORANGE
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Leveling plugin "
+                        f"is disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
             )
-        )
 
     @commands.command()
     @has_command_permission()
@@ -37,53 +38,52 @@ class Leveling(commands.Cog):
 
         if userdata is None:
             await ctx.send("This user does not have any rank yet...")
-            return
 
-        xp = userdata["xp"]
-        lvl = 0
-        rank = 0
+        else:
+            xp = userdata["xp"]
+            lvl = 0
+            rank = 0
+            while True:
+                if xp < ((50 * (lvl ** 2)) + (50 * lvl)):
+                    break
+                lvl += 1
+            xp -= ((50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1)))
 
-        while True:
-            if xp < ((50 * (lvl ** 2)) + (50 * lvl)):
-                break
-            lvl += 1
-        xp -= ((50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1)))
+            try:
+                boxes = int((xp / (200 * ((1 / 2) * lvl))) * 20)
 
-        try:
-            boxes = int((xp / (200 * ((1 / 2) * lvl))) * 20)
+            except Exception:
+                boxes = 0
 
-        except Exception:
-            boxes = 0
+            ranking = guild_col.find().sort("xp", -1)
 
-        ranking = guild_col.find().sort("xp", -1)
+            async for x in ranking:
+                rank += 1
+                if userdata["_id"] == x["_id"]:
+                    break
 
-        async for x in ranking:
-            rank += 1
-            if userdata["_id"] == x["_id"]:
-                break
+            embed = discord.Embed(
+                title=f"Level stats for {user.name}",
+                color=var.C_TEAL
+            ).add_field(
+                name="Rank",
+                value=f"{rank}/{await guild_col.estimated_document_count() - 1}"
+            ).add_field(
+                name="XP",
+                value=f"{xp}/{int(200 * ((1 / 2) * lvl))}",
+                inline=True
+            ).add_field(
+                name="Level", value=lvl, inline=True
+            ).add_field(
+                name="Progress",
+                value=(
+                    boxes * "<:current:850041599139905586>"
+                    + (20 - boxes) * "<:left:850041599127584776>"
+                ),
+                inline=False
+            ).set_thumbnail(url=user.avatar_url)
 
-        embed = discord.Embed(
-            title=f"Level stats for {user.name}",
-            color=var.C_TEAL
-        ).add_field(
-            name="Rank",
-            value=f"{rank}/{await guild_col.estimated_document_count() - 1}"
-        ).add_field(
-            name="XP",
-            value=f"{xp}/{int(200 * ((1 / 2) * lvl))}",
-            inline=True
-        ).add_field(
-            name="Level", value=lvl, inline=True
-        ).add_field(
-            name="Progress",
-            value=(
-                boxes * "<:current:850041599139905586>"
-                + (20 - boxes) * "<:left:850041599127584776>"
-            ),
-            inline=False
-        ).set_thumbnail(url=user.avatar_url)
-
-        await ctx.send(embed=embed)
+            await ctx.send(embed=embed)
 
     @commands.command(aliases=["lb"])
     @has_command_permission()
@@ -319,46 +319,86 @@ class Leveling(commands.Cog):
         )
 
         bot_msg = await ctx.send(embed=embed)
-        if not settings_doc["rewards"]:
-            return
+        if settings_doc["rewards"]:
+            await bot_msg.add_reaction(var.E_CONTINUE)
 
-        await bot_msg.add_reaction(var.E_CONTINUE)
+            def reaction_check(reaction, user):
+                if str(reaction.emoji) == var.E_CONTINUE:
+                    return (
+                        user == ctx.author
+                        and reaction.message == bot_msg
+                    )
 
-        def reaction_check(reaction, user):
-            if str(reaction.emoji) == var.E_CONTINUE:
-                return (
-                    user == ctx.author
-                    and reaction.message == bot_msg
+            await self.bot.wait_for("reaction_add", check=reaction_check)
+
+            try:
+                await bot_msg.clear_reactions()
+
+            except Exception:
+                pass
+
+            rewards = settings_doc.get("rewards")
+            embed.title = "Level rewards"
+            embed.clear_fields()
+
+            for i in rewards:
+                role = ctx.guild.get_role(rewards.get(i))
+                embed.add_field(
+                    name=f"Level {i}",
+                    value=role.mention if role is not None else "deleted role",
+                    inline=False
                 )
 
-        await self.bot.wait_for("reaction_add", check=reaction_check)
-
-        try:
-            await bot_msg.clear_reactions()
-
-        except Exception:
-            pass
-
-        rewards = settings_doc.get("rewards")
-        embed.title = "Level rewards"
-        embed.clear_fields()
-
-        for i in rewards:
-            role = ctx.guild.get_role(rewards.get(i))
-            embed.add_field(
-                name=f"Level {i}",
-                value=role.mention if role is not None else "deleted role",
-                inline=False
-            )
-
-        await bot_msg.edit(embed=embed)
+            await bot_msg.edit(embed=embed)
 
     @commands.command(name="givexp")
     @has_command_permission()
     async def give_xp(
         self, ctx, user: discord.Member = None, amount: int = None
     ):
-        if not user or amount is None:
+        if user and amount is not None:
+            if amount > 10000000:
+                await ctx.send(
+                    embed=discord.Embed(
+                        description="🚫 Ayo that's too much",
+                        color=var.C_RED
+                    )
+                )
+
+            else:
+                guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
+                data = await guild_col.find_one({"_id": user.id})
+
+                if data is None:
+                    await guild_col.insert_one({"_id": user.id, "xp": amount})
+                    await ctx.send(
+                        f"Successfully awarded {user} with {amount} xp!"
+                    )
+
+                elif data.get("xp") > 10000000:
+                    await ctx.send(
+                        embed=discord.Embed(
+                            description=(
+                                "🚫 Cannot give more xp to the user,"
+                                " they are too rich already"
+                            ),
+                            color=var.C_RED
+                        )
+                    )
+
+                else:
+                    new_data = {
+                        "$set": {
+                            "xp": data.get("xp") + amount
+                        }
+                    }
+
+                    await guild_col.update_one(data, new_data)
+
+                    await ctx.send(
+                        f"Successfully awarded {user} with {amount} xp!"
+                    )
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -373,56 +413,35 @@ class Leveling(commands.Cog):
                     text="For user either user mention or user ID can be used"
                 )
             )
-            return
-
-        if amount > 10000000:
-            await ctx.send(
-                embed=discord.Embed(
-                    description="🚫 Ayo that's too much",
-                    color=var.C_RED
-                )
-            )
-            return
-
-        guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
-        data = await guild_col.find_one({"_id": user.id})
-
-        if data is None:
-            await guild_col.insert_one({"_id": user.id, "xp": amount})
-            await ctx.send(
-                f"Successfully awarded {user} with {amount} xp!"
-            )
-
-        elif data.get("xp") > 10000000:
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        "🚫 Cannot give more xp to the user,"
-                        " they are too rich already"
-                    ),
-                    color=var.C_RED
-                )
-            )
-
-        else:
-            new_data = {
-                "$set": {
-                    "xp": data.get("xp") + amount
-                }
-            }
-
-            await guild_col.update_one(data, new_data)
-
-            await ctx.send(
-                f"Successfully awarded {user} with {amount} xp!"
-            )
 
     @commands.command(name="removexp")
     @has_command_permission()
     async def remove_xp(
             self, ctx, user: discord.Member = None, amount: int = None
     ):
-        if not user or amount is None:
+        if user and amount is not None:
+            if amount > 10000000:
+                await ctx.send(
+                    embed=discord.Embed(
+                        description="🚫 Ayo that's too much",
+                        color=var.C_RED
+                    )
+                )
+
+            else:
+                guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
+                data = await guild_col.find_one({"_id": user.id})
+
+                new_data = {
+                    "$set": {
+                        "xp": data.get("xp") - amount
+                    }
+                }
+
+                await guild_col.update_one(data, new_data)
+                await ctx.send(f"Successfully removed {amount} xp from {user}!")
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -437,28 +456,6 @@ class Leveling(commands.Cog):
                     text="For user either user mention or user ID can be used"
                 )
             )
-            return
-
-        if amount > 10000000:
-            await ctx.send(
-                embed=discord.Embed(
-                    description="🚫 Ayo that's too much",
-                    color=var.C_RED
-                )
-            )
-
-        else:
-            guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
-            data = await guild_col.find_one({"_id": user.id})
-
-            new_data = {
-                "$set": {
-                    "xp": data.get("xp") - amount
-                }
-            }
-
-            await guild_col.update_one(data, new_data)
-            await ctx.send(f"Successfully removed {amount} xp from {user}!")
 
     @commands.command()
     @has_command_permission()
@@ -496,7 +493,32 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def blacklist(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
+        if channel is not None:
+            guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
+            settings = await guild_col.find_one({"_id": 0})
+
+            new_settings = settings.get("blacklistedchannels").copy()
+            new_settings.append(channel.id)
+
+            new_data = {
+                "$set": {
+                    "blacklistedchannels": new_settings
+                }
+            }
+
+            await guild_col.update_one(settings, new_data)
+
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{channel.mention} has been blacklisted,"
+                        f" hence users won't gain any xp in that channel."
+                    ),
+                    color=var.C_GREEN
+                )
+            )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -508,36 +530,40 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}blacklist <#channel>`"
                 )
             )
-            return
-
-        guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
-        settings = await guild_col.find_one({"_id": 0})
-
-        new_settings = settings.get("blacklistedchannels").copy()
-        new_settings.append(channel.id)
-
-        new_data = {
-            "$set": {
-                "blacklistedchannels": new_settings
-            }
-        }
-
-        await guild_col.update_one(settings, new_data)
-
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{channel.mention} has been blacklisted,"
-                    f" hence users won't gain any xp in that channel."
-                ),
-                color=var.C_GREEN
-            )
-        )
 
     @commands.command()
     @has_command_permission()
     async def whitelist(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
+        if channel is not None:
+            guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
+            settings = await guild_col.find_one({"_id": 0})
+
+            new_settings = settings.get("blacklistedchannels").copy()
+
+            if channel.id in new_settings:
+                new_settings.remove(channel.id)
+
+                new_data = {
+                    "$set": {
+                        "blacklistedchannels": new_settings
+                    }
+                }
+
+                await guild_col.update_one(settings, new_data)
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"{channel.mention} has been removed from blacklist"
+                            f", hence users will be able to gain xp again in"
+                            f" that channel."
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+            else:
+                await ctx.send(f"{channel.mention} was not blacklisted")
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -549,36 +575,6 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}whitelist <#channel>`"
                 )
             )
-            return
-
-        guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
-        settings = await guild_col.find_one({"_id": 0})
-
-        new_settings = settings.get("blacklistedchannels").copy()
-
-        if channel.id not in new_settings:
-            await ctx.send(f"{channel.mention} was not blacklisted")
-            return
-
-        new_settings.remove(channel.id)
-
-        new_data = {
-            "$set": {
-                "blacklistedchannels": new_settings
-            }
-        }
-
-        await guild_col.update_one(settings, new_data)
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{channel.mention} has been removed from blacklist"
-                    f", hence users will be able to gain xp again in"
-                    f" that channel."
-                ),
-                color=var.C_GREEN
-            )
-        )
 
     @commands.command(name="togglealerts", aliases=["removealerts"])
     @has_command_permission()
@@ -619,7 +615,26 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def alert_channel(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
+        if channel is not None:
+            guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
+            settings = await guild_col.find_one({"_id": 0})
+
+            new_data = {
+                "$set": {"alertchannel": channel.id}
+            }
+
+            await guild_col.update_one(settings, new_data)
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{channel.mention} has been marked as the alert "
+                        "channel, hence users who will level up will get "
+                        "mentioned here!"
+                    ),
+                    color=var.C_GREEN
+                )
+            )
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -632,31 +647,34 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}alertchannel <#channel>`"
                 )
             )
-            return
-
-        guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
-        settings = await guild_col.find_one({"_id": 0})
-
-        new_data = {
-            "$set": {"alertchannel": channel.id}
-        }
-
-        await guild_col.update_one(settings, new_data)
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{channel.mention} has been marked as the alert "
-                    "channel, hence users who will level up will get "
-                    "mentioned here!"
-                ),
-                color=var.C_GREEN
-            )
-        )
 
     @commands.command(aliases=["addreward"])
     @has_command_permission()
     async def reward(self, ctx, level: str = None, role: discord.Role = None):
-        if not level or role is None or not level.isnumeric():
+        if level and role is not None and level.isnumeric():
+            guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
+            settings = await guild_col.find_one({"_id": 0})
+
+            existing_data = settings.get("rewards")
+            new_dict = existing_data.copy()
+
+            new_dict.update({level: role.id})
+            new_data = {
+                "$set": {
+                    "rewards": new_dict
+                }
+            }
+
+            await guild_col.update_one(settings, new_data)
+            await ctx.send(embed=discord.Embed(
+                description=(
+                    f"Successfully added {role.mention} "
+                    f"as the reward to Level {level}!"
+                ),
+                color=var.C_GREEN)
+            )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -676,34 +694,45 @@ class Leveling(commands.Cog):
                     )
                 )
             )
-            return
-
-        guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
-        settings = await guild_col.find_one({"_id": 0})
-
-        existing_data = settings.get("rewards")
-        new_dict = existing_data.copy()
-
-        new_dict.update({level: role.id})
-        new_data = {
-            "$set": {
-                "rewards": new_dict
-            }
-        }
-
-        await guild_col.update_one(settings, new_data)
-        await ctx.send(embed=discord.Embed(
-            description=(
-                f"Successfully added {role.mention} "
-                f"as the reward to Level {level}!"
-            ),
-            color=var.C_GREEN)
-        )
 
     @commands.command(name="removereward")
     @has_command_permission()
     async def remove_reward(self, ctx, level: str = None):
-        if level is None:
+        if level is not None:
+
+            guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
+            settings = await guild_col.find_one({"_id": 0})
+
+            existing_data = settings.get("rewards")
+
+            if level not in existing_data.keys():
+                await ctx.send("This level does not have any rewards setted up")
+
+            else:
+                new_dict = existing_data.copy()
+                role = ctx.guild.get_role(new_dict.get(level))
+                new_dict.pop(level)
+
+                new_data = {
+                    "$set": {
+                        "rewards": new_dict
+                    }
+                }
+                await guild_col.update_one(settings, new_data)
+
+                dp_role = role.mention if role is not None else 'deleted role'
+
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"Successfully removed **{dp_role}** "
+                            f"as the reward from Level **{level}**!"
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -719,39 +748,6 @@ class Leveling(commands.Cog):
                         f" number, example: {await get_prefix(ctx)}removereward"
                         f" 2 \nNot {await get_prefix(ctx)}removereward level2 "
                     )
-                )
-            )
-            return
-
-        guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
-        settings = await guild_col.find_one({"_id": 0})
-
-        existing_data = settings.get("rewards")
-
-        if level not in existing_data.keys():
-            await ctx.send("This level does not have any rewards setted up")
-
-        else:
-            new_dict = existing_data.copy()
-            role = ctx.guild.get_role(new_dict.get(level))
-            new_dict.pop(level)
-
-            new_data = {
-                "$set": {
-                    "rewards": new_dict
-                }
-            }
-            await guild_col.update_one(settings, new_data)
-
-            dp_role = role.mention if role is not None else 'deleted role'
-
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"Successfully removed **{dp_role}** "
-                        f"as the reward from Level **{level}**!"
-                    ),
-                    color=var.C_GREEN
                 )
             )
 
@@ -777,60 +773,60 @@ class Leveling(commands.Cog):
             await guild_level_col.insert_one(
                 {"_id": message.author.id, "xp": 0}
             )
-            return
 
-        xp = userdata["xp"]
+        else:
+            xp = userdata["xp"]
 
-        init_lvl = 0
-        while True:
-            if xp < ((50 * (init_lvl ** 2)) + (50 * init_lvl)):
-                break
-            init_lvl += 1
+            init_lvl = 0
+            while True:
+                if xp < ((50 * (init_lvl ** 2)) + (50 * init_lvl)):
+                    break
+                init_lvl += 1
 
-        xp_range = await get_xp_range(message.guild.id)
-        xp = userdata["xp"] + random.randint(xp_range[0], xp_range[1])
-        await guild_level_col.update_one(userdata, {"$set": {"xp": xp}})
+            xp_range = await get_xp_range(message.guild.id)
+            xp = userdata["xp"] + random.randint(xp_range[0], xp_range[1])
+            await guild_level_col.update_one(userdata, {"$set": {"xp": xp}})
 
-        level_now = 0
-        while True:
-            if xp < ((50 * (level_now ** 2)) + (50 * level_now)):
-                break
+            level_now = 0
+            while True:
+                if xp < ((50 * (level_now ** 2)) + (50 * level_now)):
+                    break
 
-            level_now += 1
+                level_now += 1
 
-        if level_now > init_lvl and guild_settings_doc["alerts"]:
-            ch = self.bot.get_channel(guild_settings_doc["alertchannel"])
+            if level_now > init_lvl and guild_settings_doc["alerts"]:
+                ch = self.bot.get_channel(guild_settings_doc["alertchannel"])
 
-            embed = discord.Embed(
-                title="You leveled up!",
-                description=(
-                    f"{var.E_ACCEPT} You are now level {level_now}!"
-                ),
-                color=var.C_MAIN
-            )
+                embed = discord.Embed(
+                    title="You leveled up!",
+                    description=(
+                        f"{var.E_ACCEPT} You are now level {level_now}!"
+                    ),
+                    color=var.C_MAIN
+                )
 
-            try:
-                if ch is not None:
-                    await ch.send(
-                        content=message.author.mention,
-                        embed=embed
-                    )
+                try:
+                    if ch is not None:
+                        await ch.send(
+                            content=message.author.mention,
+                            embed=embed
+                        )
 
-                else:
-                    await message.channel.send(
-                        content=message.author.mention, embed=embed
-                    )
+                    else:
+                        await message.channel.send(
+                            content=message.author.mention, embed=embed
+                        )
 
-            except discord.Forbidden:
-                pass
+                except discord.Forbidden:
+                    pass
 
-        rewards = guild_settings_doc["rewards"]
-        if str(level_now) in rewards.keys():
-            role_id = rewards.get(str(level_now))
-            role = message.guild.get_role(role_id)
+            rewards = guild_settings_doc["rewards"]
+            if str(level_now) in rewards.keys():
+                role_id = rewards.get(str(level_now))
+                role = message.guild.get_role(role_id)
 
-            if role is not None and role not in message.author.roles:
-                await message.author.add_roles(role)
+                if role is not None and role not in message.author.roles:
+                    await message.author.add_roles(role)
 
 
 def setup(bot):

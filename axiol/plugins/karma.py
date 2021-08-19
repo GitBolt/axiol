@@ -22,16 +22,16 @@ class Karma(commands.Cog):
 
         if guild_doc.get("Karma"):
             return True
-
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_DISABLE} The Karma plugin is"
-                    " disabled in this server"
-                ),
-                color=var.C_ORANGE
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Karma plugin is"
+                        " disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
             )
-        )
 
     @commands.command()
     @has_command_permission()
@@ -51,41 +51,40 @@ class Karma(commands.Cog):
 
         if userdata is None:
             await ctx.send("This user does not have any karma yet...")
-            return
+        else:
+            # Index starts with zero
+            position = karmas.index(userdata) + 1
+            embed = discord.Embed(
+                title=f"Karma for {user.name}",
+                color=var.C_MAIN
+            ).add_field(
+                name="Karma", value=userdata["karma"]
+            ).add_field(
+                name="Position", value=f"{position}/{len(karmas)}", inline=False
+            ).set_thumbnail(url=user.avatar_url)
 
-        # Index starts with zero
-        position = karmas.index(userdata) + 1
-        embed = discord.Embed(
-            title=f"Karma for {user.name}",
-            color=var.C_MAIN
-        ).add_field(
-            name="Karma", value=userdata["karma"]
-        ).add_field(
-            name="Position", value=f"{position}/{len(karmas)}", inline=False
-        ).set_thumbnail(url=user.avatar_url)
+            total_karma = sum(i["karma"] for i in karmas)
+            average = total_karma/len(karmas)
 
-        total_karma = sum(i["karma"] for i in karmas)
-        average = total_karma/len(karmas)
+            if userdata["karma"] > average:
+                embed.description = (
+                    f"Your karma is better than the average {user.name}! :)"
+                )
 
-        if userdata["karma"] > average:
-            embed.description = (
-                f"Your karma is better than the average {user.name}! :)"
-            )
+            if userdata["karma"] < average:
+                embed.description = (
+                    f"Your karma is lower than the average {user.name}, "
+                    f"is it because you don't talk much or you are not nice "
+                    f"enough? :eyes:"
+                )
 
-        if userdata["karma"] < average:
-            embed.description = (
-                f"Your karma is lower than the average {user.name}, "
-                f"is it because you don't talk much or you are not nice "
-                f"enough? :eyes:"
-            )
+            if position == 1:
+                embed.description = (
+                    f"Woohoo {user.name}, you are the nicest "
+                    f"person in the server!"
+                )
 
-        if position == 1:
-            embed.description = (
-                f"Woohoo {user.name}, you are the nicest "
-                f"person in the server!"
-            )
-
-        await ctx.channel.send(embed=embed)
+            await ctx.channel.send(embed=embed)
 
     @commands.command(name="karmaboard", aliases=["kb"])
     @has_command_permission()
@@ -138,7 +137,7 @@ class Karma(commands.Cog):
 
             if count == 10:
                 break
-
+            
         embed.set_footer(text=f"Page 1/{all_pages}")
         bot_msg = await ctx.send(embed=embed)
         await bot_msg.add_reaction("◀️")
@@ -237,7 +236,35 @@ class Karma(commands.Cog):
     @commands.command(name="kblacklist")
     @has_command_permission()
     async def k_blacklist(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
+        if channel is not None:
+            guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
+            settings = await guild_col.find_one({"_id": 0})
+
+            new_settings = settings.get("blacklists").copy()
+            if channel.id in new_settings:
+                await ctx.send("This channel is already blacklisted")
+
+            else:
+                new_settings.append(channel.id)
+                new_data = {
+                    "$set": {
+                        "blacklists": new_settings
+                    }
+                }
+
+                await guild_col.update_one(settings, new_data)
+
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"{channel.mention} has been blacklisted, "
+                            f"hence users won't gain any karma in that channel."
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -249,39 +276,41 @@ class Karma(commands.Cog):
                     value=f"```{await get_prefix(ctx)}kblacklist <#channel>```"
                 )
             )
-            return
-
-        guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
-        settings = await guild_col.find_one({"_id": 0})
-
-        new_settings = settings.get("blacklists").copy()
-        if channel.id in new_settings:
-            await ctx.send("This channel is already blacklisted")
-
-        else:
-            new_settings.append(channel.id)
-            new_data = {
-                "$set": {
-                    "blacklists": new_settings
-                }
-            }
-
-            await guild_col.update_one(settings, new_data)
-
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"{channel.mention} has been blacklisted, "
-                        f"hence users won't gain any karma in that channel."
-                    ),
-                    color=var.C_GREEN
-                )
-            )
 
     @commands.command(name="kwhitelist")
     @has_command_permission()
     async def k_whitelist(self, ctx, channel: discord.TextChannel = None):
-        if channel is None:
+        if channel is not None:
+            guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
+            settings = await guild_col.find_one({"_id": 0})
+
+            new_settings = settings.get("blacklists").copy()
+
+            if channel.id not in new_settings:
+                await ctx.send("This channel is not blacklisted")
+
+            else:
+                new_settings.remove(channel.id)
+                new_data = {
+                    "$set": {
+                        "blacklists": new_settings
+                    }
+                }
+
+                await guild_col.update_one(settings, new_data)
+
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"{channel.mention} has been whitelisted, hence "
+                            "users would be able to gain karma again in that "
+                            "channel."
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -293,36 +322,6 @@ class Karma(commands.Cog):
                     value=f"```{await get_prefix(ctx)}kwhitelist <#channel>```"
                 )
             )
-            return
-
-        guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
-        settings = await guild_col.find_one({"_id": 0})
-
-        new_settings = settings.get("blacklists").copy()
-
-        if channel.id not in new_settings:
-            await ctx.send("This channel is not blacklisted")
-            return
-
-        new_settings.remove(channel.id)
-        new_data = {
-            "$set": {
-                "blacklists": new_settings
-            }
-        }
-
-        await guild_col.update_one(settings, new_data)
-
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{channel.mention} has been whitelisted, hence "
-                    "users would be able to gain karma again in that "
-                    "channel."
-                ),
-                color=var.C_GREEN
-            )
-        )
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -333,37 +332,32 @@ class Karma(commands.Cog):
         guild_col = db.KARMA_DATABASE[str(message.guild.id)]
         settings_doc = await guild_col.find_one({"_id": 0})
 
-        if (
-            message.author.bot
-            or not message.channel.id
-            or message.channel.id in settings_doc["blacklists"]
-        ):
-            return
+        if plugin_doc["Karma"] and not message.author.bot:
+            if not message.channel.id in settings_doc["blacklists"]:
+                userdata = await guild_col.find_one({"_id": message.author.id})
+                polarity = sia.polarity_scores(message.content)
+                result = max(polarity, key=polarity.get)
 
-        userdata = await guild_col.find_one({"_id": message.author.id})
-        polarity = sia.polarity_scores(message.content)
-        result = max(polarity, key=polarity.get)
+                def get_karma():
+                    if result == "neg":
+                        return -polarity[result]
 
-        def get_karma():
-            if result == "neg":
-                return -polarity[result]
+                    elif result == "pos":
+                        return polarity[result]
 
-            elif result == "pos":
-                return polarity[result]
+                    return 0
 
-            return 0
+                if userdata is None:
+                    await guild_col.insert_one(
+                        {"_id": message.author.id, "karma": get_karma()}
+                    )
 
-        if userdata is None:
-            await guild_col.insert_one(
-                {"_id": message.author.id, "karma": get_karma()}
-            )
-
-        else:
-            new_karma = get_karma()
-            new_karma += userdata["karma"]
-            await guild_col.update_one(
-                userdata, {"$set": {"karma": new_karma}}
-            )
+                else:
+                    new_karma = get_karma()
+                    new_karma += userdata["karma"]
+                    await guild_col.update_one(
+                        userdata, {"$set": {"karma": new_karma}}
+                    )
 
 
 def setup(bot):

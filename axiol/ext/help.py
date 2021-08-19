@@ -8,7 +8,6 @@ import asyncio
 
 async def levelhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-
     return discord.Embed(
         title=f"{var.E_LEVELING}  Leveling",
         description="Ah yes leveling, MEE6 who?",
@@ -217,8 +216,7 @@ async def welcomehelp(ctx: commands.Context):
 
 async def verifyhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-
-    return discord.Embed(
+    embed = discord.Embed(
         title="✅ Verification",
         description="Keep the server safe from raiders and bots!",
         color=var.C_MAIN
@@ -259,6 +257,8 @@ async def verifyhelp(ctx: commands.Context):
             " existing one"
         )
     )
+
+    return embed
 
 
 async def chatbothelp(ctx: commands.Context):
@@ -493,8 +493,7 @@ async def funhelp(ctx: commands.Context):
         )
         .set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
-                "845662999686414336/Logo1.png"
+                "https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
             )
         )
     )
@@ -730,7 +729,7 @@ class Help(commands.Cog):
     async def moderation(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Moderation"):
+        if guild_doc.get("Moderation") == True:
             await ctx.send(embed=await modhelp(ctx))
 
         else:

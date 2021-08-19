@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-import axiol.database as db
-from axiol.functions import update_db
+import database as db
+from functions import update_db
 import io
 import contextlib
 import textwrap

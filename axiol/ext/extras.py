@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import axiol.variables as var
-from axiol.functions import get_prefix
-import axiol.database as db
+import variables as var
+from functions import get_prefix
+import database as db
 
 
 class Extras(commands.Cog):

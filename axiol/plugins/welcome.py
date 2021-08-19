@@ -1,11 +1,11 @@
 import asyncio
 import discord
 from discord.ext import commands
-import axiol.variables as var
-import axiol.database as db
-from axiol.functions import get_prefix
-from axiol.greetings import greeting
-from axiol.ext.permissions import has_command_permission
+import variables as var
+import database as db
+from functions import get_prefix
+from greetings import greeting
+from ext.permissions import has_command_permission
 
 
 class Welcome(commands.Cog):

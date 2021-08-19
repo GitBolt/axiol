@@ -10,10 +10,10 @@ from io import BytesIO
 from datetime import datetime
 from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
-import axiol.database as db
-import axiol.variables as var
-from axiol.ext.permissions import has_command_permission
-from axiol.functions import get_random_text, get_prefix, get_code
+import database as db
+import variables as var
+from ext.permissions import has_command_permission
+from functions import get_random_text, get_prefix, get_code
 
 TYPE_15 = "<:15:866917795513892883>"
 TYPE_30 = "<:30:866917795261579304>"

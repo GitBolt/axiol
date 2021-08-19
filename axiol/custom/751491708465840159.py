@@ -3,8 +3,8 @@
 import discord
 from discord.ext import commands, tasks
 import string
-from axiol.functions import get_random_text
-import axiol.variables as var
+from functions import get_random_text
+import variables as var
 
 
 class LogicallyAnswered(commands.Cog):

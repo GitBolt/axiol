@@ -1,10 +1,10 @@
 import random
 import discord
 from discord.ext import commands
-import axiol.variables as var
-import axiol.database as db
-from axiol.functions import get_prefix, get_xp_range
-from axiol.ext.permissions import has_command_permission
+import variables as var
+import database as db
+from functions import get_prefix, get_xp_range
+from ext.permissions import has_command_permission
 
 
 class Leveling(commands.Cog):

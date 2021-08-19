@@ -4,10 +4,10 @@ import discord
 import datetime
 from typing import Union
 from discord.ext import commands, tasks
-import axiol.database as db
-import axiol.variables as var
-from axiol.functions import get_prefix
-from axiol.ext.permissions import has_command_permission
+import database as db
+import variables as var
+from functions import get_prefix
+from ext.permissions import has_command_permission
 
 
 class Giveaway(commands.Cog):

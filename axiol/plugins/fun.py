@@ -13,7 +13,7 @@ from PIL import Image, ImageDraw, ImageFont
 import axiol.database as db
 import axiol.variables as var
 from axiol.ext.permissions import has_command_permission
-from axiol.functions import get_randomtext, get_prefix, get_code
+from axiol.functions import get_random_text, get_prefix, get_code
 
 TYPE_15 = "<:15:866917795513892883>"
 TYPE_30 = "<:30:866917795261579304>"
@@ -53,7 +53,7 @@ class TypeRacer:
 
     @staticmethod
     async def create_board():
-        text = await get_randomtext(10)
+        text = await get_random_text(10)
 
         image = Image.open(
             os.path.join(os.getcwd(), "resources/backgrounds/typing_board.png")
@@ -277,7 +277,7 @@ class Fun(commands.Cog):
             )
 
         else:
-            highest_players = max([x.players for x in self.matches])
+            highest_players = max(x.players for x in self.matches)
             match = [
                 match
                 for match in self.matches
@@ -551,7 +551,7 @@ class Fun(commands.Cog):
             config = CONFIG_15
             config["time"] = 60
 
-        text = await get_randomtext(
+        text = await get_random_text(
             config["time"] if test_type == "time" else 10)
 
         image = Image.open(
@@ -710,11 +710,7 @@ class Fun(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def avatar(self, ctx, user: discord.User = None):
-        if user is None:
-            avatar_user = ctx.author
-        else:
-            avatar_user = user
-
+        avatar_user = ctx.author if user is None else user
         avatar = avatar_user.avatar_url
 
         embed = discord.Embed(
@@ -1113,7 +1109,7 @@ class Fun(commands.Cog):
                                 await preview.edit(embed=embed)
                                 break
 
-                            except:
+                            except Exception:
                                 await ctx.send(
                                     embed=discord.Embed(
                                         title="Invalid user",

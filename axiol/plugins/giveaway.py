@@ -64,8 +64,10 @@ class Giveaway(commands.Cog):
 
         if len(users) > 0:
             announcement = await channel.send(
-                f"Congratulations, you have won **{embed_data['title']}**!"
-                + ", ".join([w.mention for w in winners])
+                (
+                    f"Congratulations, you have won **{embed_data['title']}**!"
+                    + ", ".join(w.mention for w in winners)
+                )
             )
 
         else:
@@ -180,7 +182,7 @@ class Giveaway(commands.Cog):
 
             if check:
                 data.update(
-                    {q: user_msg.content}) if value == None else data.update(
+                    {q: user_msg.content}) if value is None else data.update(
                     {q: (user_msg.content, value)})
             else:
                 tries = 3
@@ -274,7 +276,9 @@ class Giveaway(commands.Cog):
 
         bot_msg = await ctx.send(embed=embed)
         await bot_msg.add_reaction(var.E_ACCEPT)
-        await self.bot.wait_for("reaction_add", check=reaction_check, timeout=60)
+        await self.bot.wait_for(
+            "reaction_add", check=reaction_check, timeout=60
+        )
 
         end_time = round(time.time() + int(data["Duration"][1]))
 
@@ -377,7 +381,7 @@ class Giveaway(commands.Cog):
             )
         ]
 
-        if not msg_id in all_msg_ids:
+        if msg_id not in all_msg_ids:
             return await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -388,14 +392,13 @@ class Giveaway(commands.Cog):
                 )
             )
 
-        else:
-            i = await db.GIVEAWAY.find_one({"message_id": msg_id})
-            announcement_id = await self.end_gw(i)
-            await ctx.send(
-                f"The giveaway has been ended"
-                f" https://discord.com/channels/{ctx.guild.id}/"
-                f"{i['channel_id']}/{announcement_id}"
-            )
+        i = await db.GIVEAWAY.find_one({"message_id": msg_id})
+        announcement_id = await self.end_gw(i)
+        await ctx.send(
+            f"The giveaway has been ended"
+            f" https://discord.com/channels/{ctx.guild.id}/"
+            f"{i['channel_id']}/{announcement_id}"
+        )
 
     @tasks.loop(seconds=5)
     async def check_gw(self):
@@ -413,13 +416,13 @@ class Giveaway(commands.Cog):
                     - datetime.datetime.fromtimestamp(time.time())
                 )
 
-                main_time = readable.split(":")[0] + " Hours"
-                secondary_time = readable.split(":")[1] + " Minutes"
-
                 if time.time() > end_time:
                     await self.end_gw(i)
 
                 else:
+                    main_time = readable.split(":")[0] + " Hours"
+                    secondary_time = readable.split(":")[1] + " Minutes"
+
                     embed = discord.Embed(
                         title=embed_data["title"],
                         description=embed_data["description"],

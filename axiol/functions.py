@@ -13,37 +13,40 @@ async def get_prefix(ctx):
         return DEFAULT_PREFIX
 
 
-async def get_xprange(guild_id):
+async def get_xp_range(guild_id):
     collection = LEVEL_DATABASE.get_collection(str(guild_id))
     settings = await collection.find_one({"_id": 0})
     return settings["xprange"]
 
 
-async def get_randomtext(typing_time):
+async def get_random_text(typing_time):
     f = open("resources/words.txt").read()
     words = f.split("\n")
 
-    if typing_time == 60:
-        r = range(60)
-
-    elif typing_time == 30:
-        r = range(40)
+    if typing_time == 10:
+        r = range(15)
 
     elif typing_time == 15:
         r = range(25)
 
-    elif typing_time == 10:
-        r = range(15)
+    elif typing_time == 30:
+        r = range(40)
+
+    elif typing_time == 60:
+        r = range(60)
 
     else:
         r = range(1)
 
-    return " ".join([random.choice(words) for i in r])
+    return " ".join(random.choice(words) for i in r)
 
 
 def get_code(amount):
-    return ''.join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-                                  "1234567890", k=amount))
+    return ''.join(
+        random.choices(
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=amount
+        )
+    )
 
 
 """
@@ -91,7 +94,7 @@ async def update_db(guild_ids):
     leveling_update = []
 
     for guild_id in guild_ids:
-        Guild_Plugins = await PLUGINS.find_one({"_id": guild_id})
+        guild_plugins = await PLUGINS.find_one({"_id": guild_id})
 
         if not await PLUGINS.count_documents({"_id": guild_id}, limit=1):
             PLUGINS.insert_one({
@@ -130,20 +133,23 @@ async def update_db(guild_ids):
             permissions_update.append(guild_id)
             print(f"✅{guild_id} - Permissions 🔨")
 
-        if Guild_Plugins["Leveling"]:
-            if str(guild_id) not in await LEVEL_DATABASE.list_collection_names():
-                GuildLevelDB = await LEVEL_DATABASE.create_collection(
-                    str(guild_id))
-                await GuildLevelDB.insert_one({
+        if (
+            guild_plugins["Leveling"]
+            and str(guild_id)
+            not in await LEVEL_DATABASE.list_collection_names()
+        ):
+            guild_level_db = await LEVEL_DATABASE.create_collection(
+                str(guild_id))
+            await guild_level_db.insert_one({
 
-                    "_id": 0,
-                    "xprange": [15, 25],
-                    "alertchannel": None,
-                    "blacklistedchannels": [],
-                    "alerts": True
-                })
-                leveling_update.append(guild_id)
-                print(f"✅{guild_id} - Leveling 📊")
+                "_id": 0,
+                "xprange": [15, 25],
+                "alertchannel": None,
+                "blacklistedchannels": [],
+                "alerts": True
+            })
+            leveling_update.append(guild_id)
+            print(f"✅{guild_id} - Leveling 📊")
 
         # Only use this when working locally
         try:

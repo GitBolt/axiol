@@ -76,26 +76,28 @@ class ChemistryHelp(commands.Cog):
     @commands.command(name="chem_removemsg")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_remove_msg(self, ctx, *, msg: str = None):
-        if msg is not None:
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-            data = guild_col.find_one({"_id": 0})
-            if data is not None:
-                if msg.lower() in data.keys():
-                    res = data.get(msg.lower())
-                    await guild_col.update_one(
-                        data, {"$unset": {msg.lower(): ""}}
-                    )
+        if msg is None:
+            return
 
-                    await ctx.send(
-                        f"Successfully removed the message **msg**"
-                        f" which was having the response **{res}**"
-                    )
+        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        data = guild_col.find_one({"_id": 0})
 
-                else:
-                    await ctx.send("This message has no responses setted up")
+        if data is None:
+            await ctx.send("You haven't setted up any message yet...")
 
-            else:
-                await ctx.send("You haven't setted up any message yet...")
+        elif msg.lower() in data.keys():
+            res = data.get(msg.lower())
+            await guild_col.update_one(
+                data, {"$unset": {msg.lower(): ""}}
+            )
+
+            await ctx.send(
+                f"Successfully removed the message **msg**"
+                f" which was having the response **{res}**"
+            )
+
+        else:
+            await ctx.send("This message has no responses setted up")
 
     @commands.command(name="chem_allmsgs")
     @is_user(565059698399641600, 791950104680071188)
@@ -447,15 +449,20 @@ class ChemistryHelp(commands.Cog):
             msg_data = await guild_col.find_one({"_id": 0})
             reaction_data = await guild_col.find_one({"_id": 1})
 
-            if msg_data is not None:
-                if message.content.lower() in msg_data.keys():
-                    await message.channel.send(
-                        msg_data.get(message.content.lower()))
+            if (
+                    msg_data is not None
+                    and message.content.lower() in msg_data.keys()
+            ):
+                await message.channel.send(
+                    msg_data.get(message.content.lower())
+                )
 
-            if reaction_data is not None:
-                if message.content.lower() in reaction_data.keys():
-                    await message.add_reaction(
-                        reaction_data.get(message.content.lower()))
+            if (
+                reaction_data is not None
+                and message.content.lower() in reaction_data.keys()
+            ):
+                await message.add_reaction(
+                    reaction_data.get(message.content.lower()))
 
 
 def setup(bot):

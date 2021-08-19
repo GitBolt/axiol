@@ -35,7 +35,9 @@ class AutoMod(commands.Cog):
     async def filters(self, ctx):
         embed = discord.Embed(
             title="All Auto-Moderation filters",
-            description="Use the subcommand to configure each filter seperately!",
+            description=(
+                "Use the subcommand to configure each filter seperately!"
+            ),
             color=var.C_MAIN
         )
 
@@ -151,8 +153,8 @@ class AutoMod(commands.Cog):
 
                 def message_check(message):
                     return (
-                        message.author == ctx.author
-                        and message.channel.id == ctx.channel.id
+                            message.author == ctx.author
+                            and message.channel.id == ctx.channel.id
                     )
 
                 user_msg = await self.bot.wait_for(
@@ -311,7 +313,7 @@ class AutoMod(commands.Cog):
                 ).add_field(
                     name="Format",
                     value=f"```{await get_prefix(ctx)}addmodrole <role>```"
-                 )
+                )
             )
 
     @commands.command(name="removemodrole")
@@ -389,8 +391,8 @@ class AutoMod(commands.Cog):
         if channel is not None:
             guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
             if (
-                guild_doc is not None
-                and channel.id not in guild_doc["Settings"]["blacklists"]
+                    guild_doc is not None
+                    and channel.id not in guild_doc["Settings"]["blacklists"]
             ):
                 current_list = guild_doc["Settings"]["blacklists"]
                 new_list = current_list.copy()
@@ -431,12 +433,13 @@ class AutoMod(commands.Cog):
 
     @commands.command(name="automodwhitelist")
     @has_command_permission()
-    async def auto_mod_whitelist(self, ctx, channel: discord.TextChannel = None):
+    async def auto_mod_whitelist(self, ctx,
+                                 channel: discord.TextChannel = None):
         if channel is not None:
             guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
             if (
-                guild_doc is not None
-                and channel.id in guild_doc["Settings"]["blacklists"]
+                    guild_doc is not None
+                    and channel.id in guild_doc["Settings"]["blacklists"]
             ):
                 current_list = guild_doc["Settings"]["blacklists"]
                 new_list = current_list.copy()
@@ -466,12 +469,15 @@ class AutoMod(commands.Cog):
         else:
             await ctx.send(
                 embed=discord.Embed(
-                title="Not enough arguments",
-                description="You need to define the channel too!",
-                color=var.C_RED
-            ).add_field(
-                name="Format",
-                value=f"```{await get_prefix(ctx)}automodblacklist <#channel>```"
+                    title="Not enough arguments",
+                    description="You need to define the channel too!",
+                    color=var.C_RED
+                ).add_field(
+                    name="Format",
+                    value=(
+                        f"```{await get_prefix(ctx)}automodblacklist"
+                        " <#channel>```"
+                    )
                 )
             )
 
@@ -483,12 +489,12 @@ class AutoMod(commands.Cog):
             embed = discord.Embed(
                 title="All Auto-Moderation whitelists",
                 description="Messages in these channel are immune from automod",
-                 color=var.C_MAIN
+                color=var.C_MAIN
             )
 
-            desc = ""
-            for i in guild_doc["Settings"]["blacklists"]:
-                desc += f"{i.mention} "
+            desc = "".join(
+                f"{i.mention} " for i in guild_doc["Settings"]["blacklists"]
+            )
 
             if desc != "":
                 await ctx.send(embed=embed)
@@ -497,7 +503,7 @@ class AutoMod(commands.Cog):
 
         else:
             await ctx.send(
-                "This server does not have automod setted up right now")
+                "This server does not have automod setup right now")
 
     @commands.command(name="ignorebots")
     @has_command_permission()
@@ -519,7 +525,6 @@ class AutoMod(commands.Cog):
             def disable_check(reaction, user):
                 if str(reaction.emoji) == var.E_DISABLE:
                     return user == ctx.author and reaction.message == bot_msg
-
 
             await self.bot.wait_for("reaction_add", check=disable_check)
             await db.AUTO_MOD.update_one(
@@ -642,12 +647,12 @@ class AutoMod(commands.Cog):
         else:
             await ctx.send(
                 embed=discord.Embed(
-                title="Not enough arguments",
-                description="You need to define the word too!",
-                color=var.C_RED
-            ).add_field(
-                name="Format",
-                value=f"```{await get_prefix(ctx)}addbadword <word>```"
+                    title="Not enough arguments",
+                    description="You need to define the word too!",
+                    color=var.C_RED
+                ).add_field(
+                    name="Format",
+                    value=f"```{await get_prefix(ctx)}addbadword <word>```"
                 )
             )
 
@@ -712,9 +717,9 @@ class AutoMod(commands.Cog):
                 color=var.C_TEAL
             )
 
-            all_banned_words = ""
-            for i in guild_doc["BadWords"]["words"]:
-                all_banned_words += f"`{i}` "
+            all_banned_words = "".join(
+                f"`{i}` " for i in guild_doc["BadWords"]["words"]
+            )
 
             if all_banned_words == "":
                 await ctx.send(
@@ -740,73 +745,70 @@ class AutoMod(commands.Cog):
                 guild_doc is not None
                 and message.author != self.bot.user
                 and message.channel.id not in guild_doc["Settings"]["blacklists"]
-                and not any(
-                    item in guild_doc["Settings"]["modroles"]
+                and all(
+                    item not in guild_doc["Settings"]["modroles"]
                     for item in [i.id for i in message.author.roles]
                 )
+                and (not message.author.bot or guild_doc["Settings"]["ignorebots"])
             ):
-                if (
-                    not message.author.bot or message.author.bot
-                    and guild_doc["Settings"]["ignorebots"]
-                ):
 
-                    if guild_doc["Links"]["status"]:
-                        regex = re.compile(
-                            r"(?:http|ftp)s?://"  # http:// or https://
-                            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
-                            r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
-                            r"(?::\d+)?",  # optional port
-                            # r"([a-zA-Z0-9\-]+)",
-                            flags=re.IGNORECASE
+                if guild_doc["Links"]["status"]:
+                    regex = re.compile(
+                        r"(?:http|ftp)s?://"  # http:// or https://
+                        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+                        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+                        r"(?::\d+)?",  # optional port
+                        # r"([a-zA-Z0-9\-]+)",
+                        flags=re.IGNORECASE
+                    )
+
+                    if regex.findall(message.content):
+                        await message.delete()
+                        res = guild_doc["Links"]["response"]
+                        await message.channel.send(
+                            f"{message.author.mention} {res}",
+                            delete_after=2
                         )
 
-                        if regex.findall(message.content):
-                            await message.delete()
-                            res = guild_doc["Links"]["response"]
-                            await message.channel.send(
-                                f"{message.author.mention} {res}",
-                                delete_after=2
-                            )
+                if guild_doc["Invites"]["status"]:
+                    regex = re.compile(
+                        r"(?:discord(?:[\.,]|dot)gg|"  # Could be discord.gg/
+                        r"discord(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discord.com/invite/
+                        r"discordapp(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discordapp.com/invite/
+                        r"discord(?:[\.,]|dot)me|"  # or discord.me
+                        r"discord(?:[\.,]|dot)li|"  # or discord.li
+                        r"discord(?:[\.,]|dot)io"  # or discord.io.
+                        r")(?:[\/]|slash)"  # / or 'slash'
+                        r"([a-zA-Z0-9\-]+)",  # the invite code itself
+                        flags=re.IGNORECASE
+                    )
 
-                    if guild_doc["Invites"]["status"]:
-                        regex = re.compile(
-                            r"(?:discord(?:[\.,]|dot)gg|"  # Could be discord.gg/
-                            r"discord(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discord.com/invite/
-                            r"discordapp(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discordapp.com/invite/
-                            r"discord(?:[\.,]|dot)me|"  # or discord.me
-                            r"discord(?:[\.,]|dot)li|"  # or discord.li
-                            r"discord(?:[\.,]|dot)io"  # or discord.io.
-                            r")(?:[\/]|slash)"  # / or 'slash'
-                            r"([a-zA-Z0-9\-]+)",  # the invite code itself
-                            flags=re.IGNORECASE
+                    if regex.findall(message.content):
+                        await message.delete()
+                        res = guild_doc["Invites"]["response"]
+                        await message.channel.send(
+                            f"{message.author.mention} {res}",
+                            delete_after=2
                         )
 
-                        if regex.findall(message.content):
-                            await message.delete()
-                            res = guild_doc["Invites"]["response"]
-                            await message.channel.send(
-                                f"{message.author.mention} {res}",
-                                delete_after=2
-                            )
+                if guild_doc["Mentions"]["status"]:
+                    amount = guild_doc["Mentions"]["amount"]
+                    if len(message.mentions) >= amount:
+                        await message.delete()
+                        res = guild_doc["Mentions"]["response"]
+                        await message.channel.send(
+                            f"{message.author.mention} {res}",
+                            delete_after=2)
 
-                    if guild_doc["Mentions"]["status"]:
-                        amount = guild_doc["Mentions"]["amount"]
-                        if len(message.mentions) >= amount:
-                            await message.delete()
-                            res = guild_doc["Mentions"]["response"]
-                            await message.channel.send(
-                                f"{message.author.mention} {res}",
-                                delete_after=2)
-
-                    if guild_doc["BadWords"]["status"]:
-                        bad_words = guild_doc["BadWords"]["words"]
-                        if len([i for i in bad_words if
-                                i in message.content]) > 0:
-                            await message.delete()
-                            res = guild_doc["BadWords"]["response"]
-                            await message.channel.send(
-                                f"{message.author.mention} {res}",
-                                delete_after=2)
+                if guild_doc["BadWords"]["status"]:
+                    bad_words = guild_doc["BadWords"]["words"]
+                    if len([i for i in bad_words if
+                            i in message.content]) > 0:
+                        await message.delete()
+                        res = guild_doc["BadWords"]["response"]
+                        await message.channel.send(
+                            f"{message.author.mention} {res}",
+                            delete_after=2)
 
 
 def setup(bot):

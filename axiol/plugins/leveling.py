@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 import axiol.variables as var
 import axiol.database as db
-from axiol.functions import get_prefix, get_xprange
+from axiol.functions import get_prefix, get_xp_range
 from axiol.ext.permissions import has_command_permission
 
 
@@ -32,11 +32,7 @@ class Leveling(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def rank(self, ctx, rank_user: discord.User = None):
-        if rank_user is None:
-            user = ctx.author
-        else:
-            user = rank_user
-
+        user = ctx.author if rank_user is None else rank_user
         guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
         userdata = await guild_col.find_one({"_id": user.id})
 
@@ -71,8 +67,7 @@ class Leveling(commands.Cog):
                 color=var.C_TEAL
             ).add_field(
                 name="Rank",
-                value=f"{rank}/{await guild_col.estimated_document_count() - 1}",
-                inline=True
+                value=f"{rank}/{await guild_col.estimated_document_count() - 1}"
             ).add_field(
                 name="XP",
                 value=f"{xp}/{int(200 * ((1 / 2) * lvl))}",
@@ -157,7 +152,7 @@ class Leveling(commands.Cog):
             embed.set_footer(text=f"Page {page_rn}/{all_pages}")
             embed.clear_fields()
 
-            rank_count = (current_page) * 10
+            rank_count = current_page * 10
             user_amount = current_page * 10
             rankings = guild_col.find(
                 # Removing ID 0 (Config doc, unrelated to user xp)
@@ -256,7 +251,7 @@ class Leveling(commands.Cog):
         bl = [
             self.bot.get_channel(i)
             for i in settings_doc["blacklistedchannels"]
-            if self.bot.get_channel(i) != None
+            if self.bot.get_channel(i) is not None
         ]
 
         blacklisted_channels = ', '.join(bl) if not bl == [] else None
@@ -710,7 +705,7 @@ class Leveling(commands.Cog):
 
             existing_data = settings.get("rewards")
 
-            if not level in existing_data.keys():
+            if level not in existing_data.keys():
                 await ctx.send("This level does not have any rewards setted up")
 
             else:
@@ -788,7 +783,7 @@ class Leveling(commands.Cog):
                     break
                 init_lvl += 1
 
-            xp_range = await get_xprange(message.guild.id)
+            xp_range = await get_xp_range(message.guild.id)
             xp = userdata["xp"] + random.randint(xp_range[0], xp_range[1])
             await guild_level_col.update_one(userdata, {"$set": {"xp": xp}})
 

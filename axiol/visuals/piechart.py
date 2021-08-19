@@ -11,7 +11,7 @@ class PieChart(commands.Cog):
     @commands.command(
         aliases=["piegraph", "rankpiechart", "rankpiegraph"]
     )
-    async def piechart(self, ctx):
+    async def pie_chart(self, ctx):
         bot_msg = await ctx.send(
             f"Fetching data {var.E_LOADING} Just a second!"
         )

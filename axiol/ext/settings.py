@@ -102,7 +102,7 @@ class Settings(commands.Cog):
                     title=f"{plugin_type} Plugin",
                 )
 
-                if guild_doc.get(plugin_type) == True:
+                if guild_doc.get(plugin_type):
                     embed.description = (
                         f"{var.E_ENABLE} {plugin_type} is currently enabled"
                     )

@@ -212,20 +212,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @has_command_permission()
     async def unmute(self, ctx, member: discord.Member = None):
-        if member is not None:
-            if not discord.utils.get(ctx.guild.roles, name='Muted'):
-                await ctx.send(
-                    "There is no muted role yet hence I cannot unmute, "
-                    "Muting someone automatically makes one."
-                )
-
-            else:
-                muted_role = discord.utils.get(ctx.guild.roles, name='Muted')
-
-                await member.remove_roles(muted_role)
-                await ctx.send(f"Unmuted `{member}` :sound:")
-
-        else:
+        if member is None:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -242,6 +229,17 @@ class Moderation(commands.Cog):
                     )
                 )
             )
+        elif not discord.utils.get(ctx.guild.roles, name='Muted'):
+            await ctx.send(
+                "There is no muted role yet hence I cannot unmute, "
+                "Muting someone automatically makes one."
+            )
+
+        else:
+            muted_role = discord.utils.get(ctx.guild.roles, name='Muted')
+
+            await member.remove_roles(muted_role)
+            await ctx.send(f"Unmuted `{member}` :sound:")
 
     @unmute.error
     async def unmute_error(self, ctx, error):
@@ -605,7 +603,7 @@ class Moderation(commands.Cog):
 
     @commands.command(name="massroleremove")
     @has_command_permission()
-    async def massrole_remove(
+    async def mass_role_remove(
         self, ctx, role: discord.Role = None, role2: discord.Role = None
     ):
         if role is not None and role2 is not None:
@@ -882,7 +880,9 @@ class Moderation(commands.Cog):
             await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
-                    description="You need to define the member to view their warns",
+                    description=(
+                        "You need to define the member to view their warns"
+                    ),
                     color=var.C_RED
                 ).add_field(
                     name="Format",

@@ -14,7 +14,7 @@ class Owner(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def cog_check(ctx):
+    def cog_check(ctx, **kwargs):
         return ctx.author.id == 791950104680071188
 
     @commands.command(aliases=["eval"])

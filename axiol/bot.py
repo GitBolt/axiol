@@ -18,7 +18,7 @@ async def guild_prefix(_bot, message):
 
 
 intents = discord.Intents().all()
-bot = commands.Bot(command_prefix=";", help_command=None,
+bot = commands.Bot(command_prefix=guild_prefix, help_command=None,
                    intents=intents)
 
 

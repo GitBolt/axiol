@@ -93,7 +93,7 @@ class TypeRacer:
         raw_wpm = round((len(user_content) / 5 / time_taken) * 60, 2)
         error_rate = round(len(mistakes) / time_taken, 2)
         wpm = round(raw_wpm - error_rate, 2)
-        wpm = wpm if wpm >= 0 else 0
+        wpm = max(wpm, 0)
 
         return wpm, accuracy
 
@@ -126,16 +126,20 @@ class TypeRacer:
     async def start(self):
         count = 5
 
-        embed = discord.Embed(
-            title="All players joined!",
-            description=f"Match starting in {count}...",
-            color=var.C_MAIN,
-        ).add_field(
-            name="Started", value=f"{self.time_elapsed()} ago", inline=False
-        ).add_field(
-            name="Players", value="\n".join(
-                [str(player) for player in self.players]
-            ), inline=False
+        embed = (
+            discord.Embed(
+                title="All players joined!",
+                description=f"Match starting in {count}...",
+                color=var.C_MAIN,
+            )
+            .add_field(
+                name="Started", value=f"{self.time_elapsed()} ago", inline=False
+            )
+            .add_field(
+                name="Players",
+                value="\n".join(str(player) for player in self.players),
+                inline=False,
+            )
         )
 
         msgs = {}
@@ -209,16 +213,15 @@ class Fun(commands.Cog):
         if guild_doc.get("Fun"):
             return True
 
-        else:
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"{var.E_DISABLE} "
-                        "The Fun plugin is disabled in this server"
-                    ),
-                    color=var.C_ORANGE
-                )
+        await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    f"{var.E_DISABLE} "
+                    "The Fun plugin is disabled in this server"
+                ),
+                color=var.C_ORANGE
             )
+        )
 
     def check_playing(self, player: discord.Member):
         return any(player in match.players for match in self.matches)
@@ -275,55 +278,52 @@ class Fun(commands.Cog):
                     )
                 )
             )
+            return
 
-        else:
-            highest_players = max(x.players for x in self.matches)
-            match = [
-                match
-                for match in self.matches
-                if match.players == highest_players
-            ][0]
+        highest_players = max(x.players for x in self.matches)
+        match = [
+            match
+            for match in self.matches
+            if match.players == highest_players
+        ][0]
 
-            match.add_player(ctx.author)
+        match.add_player(ctx.author)
 
-            await ctx.send(
-                embed=discord.Embed(
-                    title="You have been added to the queue!",
-                    description=f"The queue currently has **{len(match.players)}** players.",
-                    color=var.C_BLUE
-                ).add_field(
-                    name="Code",
-                    value=match.code,
-                    inline=False
-                ).add_field(
-                    name="Started",
-                    value=match.time_elapsed() + " ago",
-                    inline=False
-                ).add_field(
-                    name="Players required",
-                    value=match.required_amount,
-                    inline=False
-                )
+        await ctx.send(
+            embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=f"The queue currently has **{len(match.players)}** players.",
+                color=var.C_BLUE
+            ).add_field(
+                name="Code", value=match.code, inline=False
+            ).add_field(
+                name="Started",
+                value=match.time_elapsed() + " ago",
+                inline=False
+            ).add_field(
+                name="Players required",
+                value=match.required_amount,
+                inline=False
             )
+        )
 
-            await match.join_alert(ctx.author)
-            if len(match.players) >= match.required_amount:
-                await match.start()
-                self.matches.remove(match)
+        await match.join_alert(ctx.author)
+        if len(match.players) >= match.required_amount:
+            await match.start()
+            self.matches.remove(match)
 
     @type_racer.command(aliases=["quit", "leave"])
     @has_command_permission()
     async def exit(self, ctx):
         match = self.get_match(ctx.author)
-        if match:
-            match.remove_player(ctx.author)
-            await ctx.send(
-                "You removed yourself from the queue of "
-                f"the match with code __{match.code}__"
-            )
-
-        else:
+        if not match:
             await ctx.send("You are not in any match queue right now.")
+
+        match.remove_player(ctx.author)
+        await ctx.send(
+            "You removed yourself from the queue of "
+            f"the match with code __{match.code}__"
+        )
 
     @type_racer.command(aliases=["start"])
     @has_command_permission()
@@ -353,6 +353,7 @@ class Fun(commands.Cog):
         player_amount = int(player_amount)
         match = TypeRacer(self.bot, ctx.author, player_amount)
         self.matches.append(match)
+
         await ctx.send(embed=discord.Embed(
             title="You have started a new match!",
             description=(
@@ -399,38 +400,38 @@ class Fun(commands.Cog):
         if self.get_match(ctx.author):
             return await ctx.send("You are already in a match queue!")
 
-        if code in [x.code for x in self.matches]:
-            match = [match for match in self.matches if match.code == code][0]
-            match.add_player(ctx.author)
-
-            await ctx.send(
-                embed=discord.Embed(
-                    title="You have been added to the queue!",
-                    description=(
-                        "The queue currently has "
-                        f"**{len(match.players)}** players."
-                    ),
-                    color=var.C_BLUE
-                ).add_field(
-                    name="Code", value=match.code,
-                ).add_field(
-                    name="Started",
-                    value=match.time_elapsed() + " ago",
-                    inline=False
-                ).add_field(
-                    name="Players required",
-                    value=match.required_amount
-                )
-            )
-
-            await match.join_alert(ctx.author)
-
-            if len(match.players) >= match.required_amount:
-                await match.start()
-                self.matches.remove(match)
-
-        else:
+        if code not in [x.code for x in self.matches]:
             await ctx.send("Invalid code.")
+            return
+
+        match = [match for match in self.matches if match.code == code][0]
+        match.add_player(ctx.author)
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="You have been added to the queue!",
+                description=(
+                    "The queue currently has "
+                    f"**{len(match.players)}** players."
+                ),
+                color=var.C_BLUE
+            ).add_field(
+                name="Code", value=match.code,
+            ).add_field(
+                name="Started",
+                value=match.time_elapsed() + " ago",
+                inline=False
+            ).add_field(
+                name="Players required",
+                value=match.required_amount
+            )
+        )
+
+        await match.join_alert(ctx.author)
+
+        if len(match.players) >= match.required_amount:
+            await match.start()
+            self.matches.remove(match)
 
     @type_racer.command()
     @commands.is_owner()
@@ -723,415 +724,414 @@ class Fun(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def embed(self, ctx, channel: discord.TextChannel = None):
-        if channel is not None:
-            embed = discord.Embed(
-                title="Create an embed",
-                description=(
-                    f"React to the colour circle emojis below to quickly "
-                    f"choose an embed colour! To add a custom hex color react"
-                    f" to 🖌️\n When you are done selecting embed colour press "
-                    f"the {var.E_CONTINUE} emoji to continue editing"
-                ),
-                color=var.C_MAIN
-            ).set_footer(
-                text=(
-                    "This message will become the live preview of "
-                    "the embed you are creating!"
-                )
-            )
-
-            preview = await ctx.send(embed=embed)
-            emojis = [
-                var.E_RED,
-                var.E_PINK,
-                var.E_GREEN,
-                var.E_BLUE,
-                var.E_ORANGE,
-                var.E_YELLOW
-            ]
-
-            colors = [
-                0xFF0000,
-                0xFF58BC,
-                0x24FF00,
-                0x00E0FF,
-                0xFF5C00,
-                0xFFC700
-            ]
-
-            await preview.add_reaction("🖌️")
-
-            for i in emojis:
-                await preview.add_reaction(i)
-
-            await preview.add_reaction(var.E_CONTINUE)
-
-            def preview_reaction_check(r, u):
-                return u == ctx.author and r.message == preview
-
-            def msg_check(message):
-                return (
-                    message.author == ctx.author
-                    and message.channel.id == ctx.channel.id
-                )
-
-            while True:
-                reaction, user = await self.bot.wait_for(
-                    'reaction_add',  check=preview_reaction_check
-                )
-
-                if str(reaction.emoji) == "🖌️":
-                    await ctx.send(
-                        "Send a hex colour code to make it the embed colour! "
-                        "You can use either 3 or 6 hex characters"
-                    )
-
-                    user_msg = await self.bot.wait_for(
-                        'message', check=msg_check
-                    )
-
-                    match = re.search(
-                        r'^#(?:[0-9a-fA-F]{3}){1,2}$', user_msg.content.lower()
-                    )
-
-                    if match:
-                        hexed = int(
-                            hex(int(user_msg.content.replace("#", ""), 16)), 0
-                        )
-
-                        embed.color = hexed
-                        await preview.edit(embed=embed)
-
-                    else:
-                        try:
-                            await preview.remove_reaction("🖌️", ctx.author)
-
-                        except discord.Forbidden:
-                            pass
-
-                        await ctx.send("Invalid hex code, try again")
-
-                elif str(reaction.emoji) == var.E_CONTINUE:
-                    break
-
-                else:
-                    index = emojis.index(str(reaction))
-                    embed.color = colors[index]
-                    try:
-                        await preview.remove_reaction(emojis[index], ctx.author)
-
-                    except discord.Forbidden:
-                        pass
-
-                    await preview.edit(embed=embed)
-
-            try:
-                await preview.clear_reactions()
-
-            except discord.Forbidden:
-                pass
-
-            title_bot_msg = await ctx.send(
-                embed=discord.Embed(
-                    title="Title",
-                    description=(
-                        f"Now send a message to make it the title of the "
-                        f"[embed](https://discord.com/channels/{ctx.guild.id}"
-                        f"/{preview.channel.id}/{preview.id})"
-                    ),
-                    color=var.C_BLUE
-                )
-            )
-
-            user_msg = await self.bot.wait_for('message', check=msg_check)
-            embed.title = user_msg.content
-            await preview.edit(embed=embed)
-            await title_bot_msg.delete()
-
-            desc_bot_msg = await ctx.send(
-                embed=discord.Embed(
-                    title="Description",
-                    description=(
-                        f"Now send a message to make it the description of the"
-                        f" [embed](https://discord.com/channels/{ctx.guild.id}"
-                        f"/{preview.channel.id}/{preview.id})"
-                    ),
-                    color=var.C_BLUE
-                ).add_field(
-                    name="** **",
-                    value="Type `skip` if you don't want to set this")
-                )
-
-            user_msg = await self.bot.wait_for('message', check=msg_check)
-
-            if user_msg.content == "skip" or user_msg.content == "`skip`":
-                embed.description = None
-                await preview.edit(embed=embed)
-                await desc_bot_msg.delete()
-
-            else:
-                embed.description = user_msg.content
-                await preview.edit(embed=embed)
-                await desc_bot_msg.delete()
-
-            thumbnail_bot_msg = await ctx.send(
-                embed=discord.Embed(
-                    title="Thumbnail",
-                    description=(
-                        f"Now send a message to make it the thumbnail of the "
-                        f"[embed](https://discord.com/channels/{ctx.guild.id}"
-                        f"/{preview.channel.id}/{preview.id})"
-                    ),
-                    color=var.C_BLUE
-                ).add_field(
-                    name="** **",
-                    value="Type `skip` if you don't want to set this"
-                )
-            )
-
-            user_msg = await self.bot.wait_for('message', check=msg_check)
-
-            if user_msg.content.lower() in ["skip", "`skip`", "```skip```"]:
-                await thumbnail_bot_msg.delete()
-
-            elif user_msg.attachments:
-                embed.set_thumbnail(url=user_msg.attachments[0].url)
-                await preview.edit(embed=embed)
-                await thumbnail_bot_msg.delete()
-
-            elif user_msg.content.lower().startswith("https"):
-                embed.set_thumbnail(url=user_msg.content)
-                await thumbnail_bot_msg.delete()
-
-            else:
-                await ctx.send(
-                    "Uh oh it looks like the message "
-                    "you sent is not any link or image"
-                )
-
-            embed.set_footer(text="")
-            await preview.edit(embed=embed)
-            await preview.add_reaction(var.E_ACCEPT)
-
-            edit = await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"React to the {var.E_ACCEPT} emoji in the original"
-                        f" [preview](https://discord.com/channels/"
-                        f"{ctx.guild.id}/{preview.channel.id}/{preview.id}) "
-                        f"to send your embed! To edit more react to the"
-                        f" respective emojis below"
-                    ),
-                    color=var.C_BLUE
-                ).add_field(
-                    name="Add field", value="React to 🇦", inline=False
-                ).add_field(
-                    name="Footer", value="React to 🇫", inline=False
-                ).add_field(
-                    name="Image", value="React to 🇮", inline=False
-                ).add_field(
-                    name="Set Author", value="React to 🇺", inline=False
-                )
-            )
-
-            def edit_reaction_check(r, u):
-                return (
-                    user == ctx.author
-                    and r.message == edit
-                    or r.message == preview
-                )
-
-            edit_emojis = ["🇦", "🇫", "🇮", "🇺"]
-
-            for i in edit_emojis:
-                await edit.add_reaction(i)
-
-            while True:
-                reaction, user = await self.bot.wait_for(
-                    'reaction_add', check=edit_reaction_check
-                )
-
-                if str(reaction.emoji) == var.E_ACCEPT:
-                    await channel.send(embed=embed)
-                    await ctx.send("Embed sent in " + channel.mention + " !")
-                    break
-
-                if str(reaction.emoji) == "🇦":
-                    field_bot_msg = await ctx.send(
-                        "Send a message and seperate your **Field name "
-                        "and value** with `|`\nFor example: This is my field "
-                        "name | This is the field value!"
-                    )
-
-                    user_msg = await self.bot.wait_for(
-                        'message', check=msg_check
-                    )
-
-                    field_list = user_msg.content.split("|")
-                    if len(field_list) != 2:
-                        await ctx.send(
-                            "Invalid format, make sure to add `|` between "
-                            "your field name and value"
-                        )
-
-                    else:
-                        embed.add_field(
-                            name=field_list[0],
-                            value=field_list[1],
-                            inline=False
-                        )
-
-                        await preview.edit(embed=embed)
-                        await field_bot_msg.delete()
-
-                    try:
-                        await edit.remove_reaction("🇦", ctx.author)
-
-                    except discord.Forbidden:
-                        pass
-
-                if str(reaction.emoji) == "🇫":
-                    footer_bot_msg = await ctx.send(
-                        "Send a message to make it the **Footer**!"
-                    )
-
-                    user_msg = await self.bot.wait_for(
-                        'message', check=msg_check
-                    )
-
-                    embed.set_footer(text=user_msg.content)
-                    await preview.edit(embed=embed)
-                    await footer_bot_msg.delete()
-
-                    try:
-                        await edit.clear_reaction("🇫")
-
-                    except discord.Forbidden:
-                        pass
-
-                if str(reaction.emoji) == "🇮":
-                    while True:
-                        image_bot_msg = await ctx.send(
-                            "Now send an image or link to add that **Image** "
-                            "to the embed!\nType `skip` if you don't want to "
-                            "set this"
-                        )
-
-                        user_msg = await self.bot.wait_for(
-                            'message', check=msg_check
-                        )
-
-                        try:
-                            if user_msg.content in [
-                                "skip", "`skip`", "```skip```"
-                            ]:
-                                await ctx.send(
-                                    "Skipped image, react to 🇮 again to set it."
-                                )
-
-                                await edit.remove_reaction("🇮", ctx.author)
-                                break
-
-                            elif user_msg.attachments:
-                                embed.set_image(url=user_msg.attachments[0].url)
-                                await preview.edit(embed=embed)
-                                await thumbnail_bot_msg.delete()
-
-                                try:
-                                    edit.clear_reaction("🇮")
-
-                                except discord.Forbidden:
-                                    pass
-
-                                break
-
-                            else:
-                                embed.set_image(url=user_msg.content)
-                                await preview.edit(embed=embed)
-                                await image_bot_msg.delete()
-
-                                try:
-                                    await edit.clear_reaction("🇮")
-
-                                except discord.Forbidden:
-                                    pass
-
-                                break
-
-                        except:
-                            await ctx.send(
-                                embed=discord.Embed(
-                                    title="Invalid image",
-                                    description="Send the image file or link again",
-                                    color=var.C_RED
-                                ).set_footer(
-                                    text=(
-                                        "Make sure your message contains "
-                                        "only the image, nothing else"
-                                    )
-                                )
-                            )
-
-                if str(reaction.emoji) == "🇺":
-                    while True:
-
-                        if user_msg.content in ["skip", "`skip`", "```skip```"]:
-                            break
-
-                        else:
-                            author_bot_msg = await ctx.send(
-                                "Now send userID or member mention to set them"
-                                " as the **author** of the embed\n Type `skip`"
-                                " if you don't want to set this"
-                            )
-
-                            user_msg = await self.bot.wait_for(
-                                "message", check=msg_check
-                            )
-
-                            userid = user_msg.content.strip("!@<>")
-                            try:
-                                author_user = await self.bot.fetch_user(userid)
-
-                                embed.set_author(
-                                    name=author_user,
-                                    icon_url=author_user.avatar_url
-                                )
-
-                                await author_bot_msg.delete()
-
-                                try:
-                                    await edit.clear_reaction("🇺")
-
-                                except discord.Forbidden:
-                                    pass
-
-                                await preview.edit(embed=embed)
-                                break
-
-                            except Exception:
-                                await ctx.send(
-                                    embed=discord.Embed(
-                                        title="Invalid user",
-                                        description=(
-                                            "Send the userID or mention again"
-                                        ),
-                                        color=var.C_RED
-                                    ).set_footer(
-                                        text=(
-                                            "Make sure your message contains"
-                                            " only the user, nothing else"
-                                        )
-                                    )
-                                )
-
-        else:
+        if channel is None:
             await ctx.send(
                 f"You also need to define the channel too! Format:\n"
                 f"```{await get_prefix(ctx)}embed <#channel>```\n"
                 f"Don't worry, the embed won't be sent right"
                 f" away to the channel :D"
             )
+            return
+
+        embed = discord.Embed(
+            title="Create an embed",
+            description=(
+                f"React to the colour circle emojis below to quickly "
+                f"choose an embed colour! To add a custom hex color react"
+                f" to 🖌️\n When you are done selecting embed colour press "
+                f"the {var.E_CONTINUE} emoji to continue editing"
+            ),
+            color=var.C_MAIN
+        ).set_footer(
+            text=(
+                "This message will become the live preview of "
+                "the embed you are creating!"
+            )
+        )
+
+        preview = await ctx.send(embed=embed)
+        emojis = [
+            var.E_RED,
+            var.E_PINK,
+            var.E_GREEN,
+            var.E_BLUE,
+            var.E_ORANGE,
+            var.E_YELLOW
+        ]
+
+        colors = [
+            0xFF0000,
+            0xFF58BC,
+            0x24FF00,
+            0x00E0FF,
+            0xFF5C00,
+            0xFFC700
+        ]
+
+        await preview.add_reaction("🖌️")
+
+        for i in emojis:
+            await preview.add_reaction(i)
+
+        await preview.add_reaction(var.E_CONTINUE)
+
+        def preview_reaction_check(r, u):
+            return u == ctx.author and r.message == preview
+
+        def msg_check(message):
+            return (
+                message.author == ctx.author
+                and message.channel.id == ctx.channel.id
+            )
+
+        while True:
+            reaction, user = await self.bot.wait_for(
+                'reaction_add',  check=preview_reaction_check
+            )
+
+            if str(reaction.emoji) == "🖌️":
+                await ctx.send(
+                    "Send a hex colour code to make it the embed colour! "
+                    "You can use either 3 or 6 hex characters"
+                )
+
+                user_msg = await self.bot.wait_for(
+                    'message', check=msg_check
+                )
+
+                match = re.search(
+                    r'^#(?:[0-9a-fA-F]{3}){1,2}$', user_msg.content.lower()
+                )
+
+                if match:
+                    hexed = int(
+                        hex(int(user_msg.content.replace("#", ""), 16)), 0
+                    )
+
+                    embed.color = hexed
+                    await preview.edit(embed=embed)
+
+                else:
+                    try:
+                        await preview.remove_reaction("🖌️", ctx.author)
+
+                    except discord.Forbidden:
+                        pass
+
+                    await ctx.send("Invalid hex code, try again")
+
+            elif str(reaction.emoji) == var.E_CONTINUE:
+                break
+
+            else:
+                index = emojis.index(str(reaction))
+                embed.color = colors[index]
+                try:
+                    await preview.remove_reaction(emojis[index], ctx.author)
+
+                except discord.Forbidden:
+                    pass
+
+                await preview.edit(embed=embed)
+
+        try:
+            await preview.clear_reactions()
+
+        except discord.Forbidden:
+            pass
+
+        title_bot_msg = await ctx.send(
+            embed=discord.Embed(
+                title="Title",
+                description=(
+                    f"Now send a message to make it the title of the "
+                    f"[embed](https://discord.com/channels/{ctx.guild.id}"
+                    f"/{preview.channel.id}/{preview.id})"
+                ),
+                color=var.C_BLUE
+            )
+        )
+
+        user_msg = await self.bot.wait_for('message', check=msg_check)
+        embed.title = user_msg.content
+        await preview.edit(embed=embed)
+        await title_bot_msg.delete()
+
+        desc_bot_msg = await ctx.send(
+            embed=discord.Embed(
+                title="Description",
+                description=(
+                    f"Now send a message to make it the description of the"
+                    f" [embed](https://discord.com/channels/{ctx.guild.id}"
+                    f"/{preview.channel.id}/{preview.id})"
+                ),
+                color=var.C_BLUE
+            ).add_field(
+                name="** **",
+                value="Type `skip` if you don't want to set this")
+            )
+
+        user_msg = await self.bot.wait_for('message', check=msg_check)
+
+        if user_msg.content == "skip" or user_msg.content == "`skip`":
+            embed.description = None
+            await preview.edit(embed=embed)
+            await desc_bot_msg.delete()
+
+        else:
+            embed.description = user_msg.content
+            await preview.edit(embed=embed)
+            await desc_bot_msg.delete()
+
+        thumbnail_bot_msg = await ctx.send(
+            embed=discord.Embed(
+                title="Thumbnail",
+                description=(
+                    f"Now send a message to make it the thumbnail of the "
+                    f"[embed](https://discord.com/channels/{ctx.guild.id}"
+                    f"/{preview.channel.id}/{preview.id})"
+                ),
+                color=var.C_BLUE
+            ).add_field(
+                name="** **",
+                value="Type `skip` if you don't want to set this"
+            )
+        )
+
+        user_msg = await self.bot.wait_for('message', check=msg_check)
+
+        if user_msg.content.lower() in ["skip", "`skip`", "```skip```"]:
+            await thumbnail_bot_msg.delete()
+
+        elif user_msg.attachments:
+            embed.set_thumbnail(url=user_msg.attachments[0].url)
+            await preview.edit(embed=embed)
+            await thumbnail_bot_msg.delete()
+
+        elif user_msg.content.lower().startswith("https"):
+            embed.set_thumbnail(url=user_msg.content)
+            await thumbnail_bot_msg.delete()
+
+        else:
+            await ctx.send(
+                "Uh oh it looks like the message "
+                "you sent is not any link or image"
+            )
+
+        embed.set_footer(text="")
+        await preview.edit(embed=embed)
+        await preview.add_reaction(var.E_ACCEPT)
+
+        edit = await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    f"React to the {var.E_ACCEPT} emoji in the original"
+                    f" [preview](https://discord.com/channels/"
+                    f"{ctx.guild.id}/{preview.channel.id}/{preview.id}) "
+                    f"to send your embed! To edit more react to the"
+                    f" respective emojis below"
+                ),
+                color=var.C_BLUE
+            ).add_field(
+                name="Add field", value="React to 🇦", inline=False
+            ).add_field(
+                name="Footer", value="React to 🇫", inline=False
+            ).add_field(
+                name="Image", value="React to 🇮", inline=False
+            ).add_field(
+                name="Set Author", value="React to 🇺", inline=False
+            )
+        )
+
+        def edit_reaction_check(r, u):
+            return (
+                user == ctx.author
+                and r.message == edit
+                or r.message == preview
+            )
+
+        edit_emojis = ["🇦", "🇫", "🇮", "🇺"]
+
+        for i in edit_emojis:
+            await edit.add_reaction(i)
+
+        while True:
+            reaction, user = await self.bot.wait_for(
+                'reaction_add', check=edit_reaction_check
+            )
+
+            if str(reaction.emoji) == var.E_ACCEPT:
+                await channel.send(embed=embed)
+                await ctx.send("Embed sent in " + channel.mention + " !")
+                break
+
+            if str(reaction.emoji) == "🇦":
+                field_bot_msg = await ctx.send(
+                    "Send a message and seperate your **Field name "
+                    "and value** with `|`\nFor example: This is my field "
+                    "name | This is the field value!"
+                )
+
+                user_msg = await self.bot.wait_for(
+                    'message', check=msg_check
+                )
+
+                field_list = user_msg.content.split("|")
+                if len(field_list) != 2:
+                    await ctx.send(
+                        "Invalid format, make sure to add `|` between "
+                        "your field name and value"
+                    )
+
+                else:
+                    embed.add_field(
+                        name=field_list[0],
+                        value=field_list[1],
+                        inline=False
+                    )
+
+                    await preview.edit(embed=embed)
+                    await field_bot_msg.delete()
+
+                try:
+                    await edit.remove_reaction("🇦", ctx.author)
+
+                except discord.Forbidden:
+                    pass
+
+            if str(reaction.emoji) == "🇫":
+                footer_bot_msg = await ctx.send(
+                    "Send a message to make it the **Footer**!"
+                )
+
+                user_msg = await self.bot.wait_for(
+                    'message', check=msg_check
+                )
+
+                embed.set_footer(text=user_msg.content)
+                await preview.edit(embed=embed)
+                await footer_bot_msg.delete()
+
+                try:
+                    await edit.clear_reaction("🇫")
+
+                except discord.Forbidden:
+                    pass
+
+            if str(reaction.emoji) == "🇮":
+                while True:
+                    image_bot_msg = await ctx.send(
+                        "Now send an image or link to add that **Image** "
+                        "to the embed!\nType `skip` if you don't want to "
+                        "set this"
+                    )
+
+                    user_msg = await self.bot.wait_for(
+                        'message', check=msg_check
+                    )
+
+                    try:
+                        if user_msg.content in [
+                            "skip", "`skip`", "```skip```"
+                        ]:
+                            await ctx.send(
+                                "Skipped image, react to 🇮 again to set it."
+                            )
+
+                            await edit.remove_reaction("🇮", ctx.author)
+                            break
+
+                        elif user_msg.attachments:
+                            embed.set_image(url=user_msg.attachments[0].url)
+                            await preview.edit(embed=embed)
+                            await thumbnail_bot_msg.delete()
+
+                            try:
+                                edit.clear_reaction("🇮")
+
+                            except discord.Forbidden:
+                                pass
+
+                            break
+
+                        else:
+                            embed.set_image(url=user_msg.content)
+                            await preview.edit(embed=embed)
+                            await image_bot_msg.delete()
+
+                            try:
+                                await edit.clear_reaction("🇮")
+
+                            except discord.Forbidden:
+                                pass
+
+                            break
+
+                    except:
+                        await ctx.send(
+                            embed=discord.Embed(
+                                title="Invalid image",
+                                description="Send the image file or link again",
+                                color=var.C_RED
+                            ).set_footer(
+                                text=(
+                                    "Make sure your message contains "
+                                    "only the image, nothing else"
+                                )
+                            )
+                        )
+
+            if str(reaction.emoji) == "🇺":
+                while True:
+
+                    if user_msg.content in ["skip", "`skip`", "```skip```"]:
+                        break
+
+                    author_bot_msg = await ctx.send(
+                        "Now send userID or member mention to set them"
+                        " as the **author** of the embed\n Type `skip`"
+                        " if you don't want to set this"
+                    )
+
+                    user_msg = await self.bot.wait_for(
+                        "message", check=msg_check
+                    )
+
+                    userid = user_msg.content.strip("!@<>")
+                    try:
+                        author_user = await self.bot.fetch_user(userid)
+
+                        embed.set_author(
+                            name=author_user,
+                            icon_url=author_user.avatar_url
+                        )
+
+                        await author_bot_msg.delete()
+
+                        try:
+                            await edit.clear_reaction("🇺")
+
+                        except discord.Forbidden:
+                            pass
+
+                        await preview.edit(embed=embed)
+                        break
+
+                    except Exception:
+                        await ctx.send(
+                            embed=discord.Embed(
+                                title="Invalid user",
+                                description=(
+                                    "Send the userID or mention again"
+                                ),
+                                color=var.C_RED
+                            ).set_footer(
+                                text=(
+                                    "Make sure your message contains"
+                                    " only the user, nothing else"
+                                )
+                            )
+                        )
 
 
 def setup(bot):

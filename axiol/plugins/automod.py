@@ -17,16 +17,15 @@ class AutoMod(commands.Cog):
         if guild_doc.get("AutoMod"):
             return True
 
-        else:
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"{var.E_DISABLE} The Auto-Moderation plugin"
-                        " is disabled in this server"
-                    ),
-                    color=var.C_ORANGE
-                )
+        await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    f"{var.E_DISABLE} The Auto-Moderation plugin"
+                    " is disabled in this server"
+                ),
+                color=var.C_ORANGE
             )
+        )
 
     @commands.group(
         pass_context=True, invoke_without_command=True, aliases=["filter"]
@@ -279,32 +278,7 @@ class AutoMod(commands.Cog):
     @commands.command(name="addmodrole")
     @has_command_permission()
     async def add_mod_role(self, ctx, role: discord.Role = None):
-        if role is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            current_list = guild_doc["Settings"]["modroles"]
-            new_list = current_list.copy()
-
-            if role.id not in current_list:
-                new_list.append(role.id)
-
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"Settings.modroles": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        title="Successfully added mod role",
-                        description=(
-                            f"{role.mention} is immune from auto moderation now!"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            else:
-                await ctx.send("This role is already a mod role")
-
-        else:
+        if role is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -315,37 +289,36 @@ class AutoMod(commands.Cog):
                     value=f"```{await get_prefix(ctx)}addmodrole <role>```"
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+        current_list = guild_doc["Settings"]["modroles"]
+        new_list = current_list.copy()
+
+        if role.id in current_list:
+            await ctx.send("This role is already a mod role")
+            return
+
+        new_list.append(role.id)
+
+        await db.AUTO_MOD.update_one(
+            guild_doc, {"$set": {"Settings.modroles": new_list}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Successfully added mod role",
+                description=(
+                    f"{role.mention} is immune from auto moderation now!"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="removemodrole")
     @has_command_permission()
     async def remove_mod_role(self, ctx, role: discord.Role = None):
-        if role is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            current_list = guild_doc["Settings"]["modroles"]
-            new_list = current_list.copy()
-
-            if role.id in current_list:
-                new_list.remove(role.id)
-
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"Settings.modroles": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        title="Successfully removed mod role",
-                        description=(
-                            f"{role.mention} is not immune "
-                            "from auto moderation now!"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            else:
-                await ctx.send("This role is not a mod role")
-
-        else:
+        if role is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -356,67 +329,64 @@ class AutoMod(commands.Cog):
                     value=f"```{await get_prefix(ctx)}addmodrole <role>```"
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+        current_list = guild_doc["Settings"]["modroles"]
+        new_list = current_list.copy()
+
+        if role.id not in current_list:
+            await ctx.send("This role is not a mod role")
+            return
+
+        new_list.remove(role.id)
+
+        await db.AUTO_MOD.update_one(
+            guild_doc, {"$set": {"Settings.modroles": new_list}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Successfully removed mod role",
+                description=(
+                    f"{role.mention} is not immune from auto moderation now!"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="allmodroles")
     @has_command_permission()
     async def all_mod_roles(self, ctx):
         guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-        if guild_doc is not None:
-            embed = discord.Embed(
-                title="Moderator roles",
-                description="These roles are immune to auto-moderation by me!",
-                color=var.C_MAIN
-            )
+        if guild_doc is None:
+            await ctx.send("Auto moderation is not setted up yet")
+            return
 
-            value = ""
-            for i in guild_doc["Settings"]["modroles"]:
-                role = ctx.guild.get_role(i)
-                value += f'{role.mention} '
+        embed = discord.Embed(
+            title="Moderator roles",
+            description="These roles are immune to auto-moderation by me!",
+            color=var.C_MAIN
+        )
 
-            if value != "":
-                embed.add_field(name="Immune roles", value=value)
-                await ctx.send(embed=embed)
+        value = ""
+        for i in guild_doc["Settings"]["modroles"]:
+            role = ctx.guild.get_role(i)
+            value += f'{role.mention} '
 
-            else:
-                await ctx.send("There are no mod roles yet")
+        if value != "":
+            embed.add_field(name="Immune roles", value=value)
+            await ctx.send(embed=embed)
 
         else:
-            await ctx.send("Auto moderation is not setted up yet")
+            await ctx.send("There are no mod roles yet")
 
     @commands.command(name="automodblacklist")
     @has_command_permission()
     async def automod_black_list(
-            self, ctx, channel: discord.TextChannel = None
+        self, ctx, channel: discord.TextChannel = None
     ):
-        if channel is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            if (
-                    guild_doc is not None
-                    and channel.id not in guild_doc["Settings"]["blacklists"]
-            ):
-                current_list = guild_doc["Settings"]["blacklists"]
-                new_list = current_list.copy()
-                new_list.append(channel.id)
-
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"Settings.blacklists": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        title="Successfully blacklisted",
-                        description=(
-                            f"{channel.mention} is immune "
-                            "from auto moderation now!"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            else:
-                await ctx.send("This channel is already blacklisted")
-
-        else:
+        if channel is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -430,43 +400,42 @@ class AutoMod(commands.Cog):
                     )
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+
+        if (
+            guild_doc is None
+            or channel.id in guild_doc["Settings"]["blacklists"]
+        ):
+            await ctx.send("This channel is already blacklisted")
+            return
+
+        current_list = guild_doc["Settings"]["blacklists"]
+        new_list = current_list.copy()
+        new_list.append(channel.id)
+
+        await db.AUTO_MOD.update_one(
+            guild_doc, {"$set": {"Settings.blacklists": new_list}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Successfully blacklisted",
+                description=(
+                    f"{channel.mention} is immune "
+                    "from auto moderation now!"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="automodwhitelist")
     @has_command_permission()
-    async def auto_mod_whitelist(self, ctx,
-                                 channel: discord.TextChannel = None):
-        if channel is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            if (
-                    guild_doc is not None
-                    and channel.id in guild_doc["Settings"]["blacklists"]
-            ):
-                current_list = guild_doc["Settings"]["blacklists"]
-                new_list = current_list.copy()
-                new_list.remove(channel.id)
-
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"Settings.blacklists": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        title="Successfully whitelisted",
-                        description=(
-                            f"{channel.mention} is whitelisted hence affected "
-                            "with auto moderation now!"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            else:
-                await ctx.send(
-                    "This channel is not blacklisted hence"
-                    " can't whitelist either"
-                )
-
-        else:
+    async def auto_mod_whitelist(
+            self, ctx,  channel: discord.TextChannel = None
+    ):
+        if channel is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -480,30 +449,61 @@ class AutoMod(commands.Cog):
                     )
                 )
             )
+
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+
+        if (
+            guild_doc is None
+            or channel.id not in guild_doc["Settings"]["blacklists"]
+        ):
+            await ctx.send(
+                "This channel is not blacklisted hence can't whitelist either"
+            )
+            return
+
+        current_list = guild_doc["Settings"]["blacklists"]
+        new_list = current_list.copy()
+        new_list.remove(channel.id)
+
+        await db.AUTO_MOD.update_one(
+            guild_doc, {"$set": {"Settings.blacklists": new_list}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Successfully whitelisted",
+                description=(
+                    f"{channel.mention} is whitelisted hence affected "
+                    "with auto moderation now!"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="allautomodwhitelists")
     async def all_auto_mod_whitelists(self, ctx):
         guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
 
-        if guild_doc is not None:
-            embed = discord.Embed(
-                title="All Auto-Moderation whitelists",
-                description="Messages in these channel are immune from automod",
-                color=var.C_MAIN
-            )
+        if guild_doc is None:
+            await ctx.send("This server does not have automod setup right now")
+            return
 
-            desc = "".join(
-                f"{i.mention} " for i in guild_doc["Settings"]["blacklists"]
-            )
+        embed = discord.Embed(
+            title="All Auto-Moderation whitelists",
+            description="Messages in these channel are immune from automod",
+            color=var.C_MAIN
+        )
 
-            if desc != "":
-                await ctx.send(embed=embed)
-            else:
-                await ctx.send("There are no blacklisted channels right now")
+        desc = "".join(
+            f"{i.mention} " for i in guild_doc["Settings"]["blacklists"]
+        )
 
+        if desc != "":
+            await ctx.send(embed=embed)
         else:
-            await ctx.send(
-                "This server does not have automod setup right now")
+            await ctx.send("There are no blacklisted channels right now")
 
     @commands.command(name="ignorebots")
     @has_command_permission()
@@ -582,23 +582,7 @@ class AutoMod(commands.Cog):
     @commands.command(name="mentionamount")
     @has_command_permission()
     async def mention_amount(self, ctx, amount: int = None):
-        if amount is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            await db.AUTO_MOD.update_one(
-                guild_doc,
-                {"$set": {"Mentions.amount": amount}}
-            )
-
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        "Successfully changed the amount of "
-                        f"mentions to be deleted to **{amount}**"
-                    ),
-                    color=var.C_GREEN
-                )
-            )
-        else:
+        if amount is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -609,42 +593,28 @@ class AutoMod(commands.Cog):
                     value=f"```{await get_prefix(ctx)}mentionamount <amount>```"
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+        await db.AUTO_MOD.update_one(
+            guild_doc,
+            {"$set": {"Mentions.amount": amount}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    "Successfully changed the amount of "
+                    f"mentions to be deleted to **{amount}**"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="addbadword")
     @has_command_permission()
     async def add_bad_word(self, ctx, word: str = None):
-        if word is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            current_list = guild_doc["BadWords"]["words"]
-            new_list = current_list.copy()
-
-            if word not in new_list:
-                new_list.append(word)
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"BadWords.words": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Successfully added the word **{word}**"
-                            " in badwords list"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            else:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            "This word already exists in the bad word list"
-                        ),
-                        color=var.C_RED
-                    )
-                )
-
-        else:
+        if word is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -655,43 +625,42 @@ class AutoMod(commands.Cog):
                     value=f"```{await get_prefix(ctx)}addbadword <word>```"
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+        current_list = guild_doc["BadWords"]["words"]
+        new_list = current_list.copy()
+
+        if word in new_list:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        "This word already exists in the bad word list"
+                    ),
+                    color=var.C_RED
+                )
+            )
+            return
+
+        new_list.append(word)
+        await db.AUTO_MOD.update_one(
+            guild_doc, {"$set": {"BadWords.words": new_list}}
+        )
+
+        await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    f"Successfully added the word **{word}**"
+                    " in badwords list"
+                ),
+                color=var.C_GREEN
+            )
+        )
 
     @commands.command(name="removebadword")
     @has_command_permission()
     async def remove_bad_word(self, ctx, word: str = None):
-        if word is not None:
-            guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-            current_list = guild_doc["BadWords"]["words"]
-            new_list = current_list.copy()
-
-            try:
-                new_list.remove(word)
-                await db.AUTO_MOD.update_one(
-                    guild_doc, {"$set": {"BadWords.words": new_list}}
-                )
-
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Successfully added the word **{word}**"
-                            " in badwords list"
-                        ),
-                        color=var.C_GREEN
-                    )
-                )
-
-            except ValueError:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"The word **{word}** does not exist in the bad "
-                            f"word list hence can't remove it either"
-                        ),
-                        color=var.C_RED
-                    )
-                )
-
-        else:
+        if word is None:
             await ctx.send(
                 embed=discord.Embed(
                     title="Not enough arguments",
@@ -702,35 +671,67 @@ class AutoMod(commands.Cog):
                     value=f"```{await get_prefix(ctx)}removebadword <word>```"
                 )
             )
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+        current_list = guild_doc["BadWords"]["words"]
+        new_list = current_list.copy()
+
+        try:
+            new_list.remove(word)
+            await db.AUTO_MOD.update_one(
+                guild_doc, {"$set": {"BadWords.words": new_list}}
+            )
+
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"Successfully added the word **{word}**"
+                        " in badwords list"
+                    ),
+                    color=var.C_GREEN
+                )
+            )
+
+        except ValueError:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"The word **{word}** does not exist in the bad "
+                        f"word list hence can't remove it either"
+                    ),
+                    color=var.C_RED
+                )
+            )
 
     @commands.command(name="allbadwords")
     @has_command_permission()
     async def all_bad_words(self, ctx):
         guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
 
-        if guild_doc is not None:
-            embed = discord.Embed(
-                title="Bad Words",
-                description=(
-                    "All other forms of each bad words are also deleted"
-                ),
-                color=var.C_TEAL
-            )
+        if guild_doc is None:
+            await ctx.send("This server does not have automod setted up")
+            return
 
-            all_banned_words = "".join(
-                f"`{i}` " for i in guild_doc["BadWords"]["words"]
-            )
+        embed = discord.Embed(
+            title="Bad Words",
+            description=(
+                "All other forms of each bad words are also deleted"
+            ),
+            color=var.C_TEAL
+        )
 
-            if all_banned_words == "":
-                await ctx.send(
-                    "This server does not have any bad word right now.")
+        all_banned_words = "".join(
+            f"`{i}` " for i in guild_doc["BadWords"]["words"]
+        )
 
-            else:
-                embed.add_field(name="All bad words", value=all_banned_words)
-                await ctx.send(embed=embed)
+        if all_banned_words == "":
+            await ctx.send(
+                "This server does not have any bad word right now.")
 
         else:
-            await ctx.send("This server does not have automod setted up")
+            embed.add_field(name="All bad words", value=all_banned_words)
+            await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -739,76 +740,79 @@ class AutoMod(commands.Cog):
 
         plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
 
-        if plugin_doc["AutoMod"]:
-            guild_doc = await db.AUTO_MOD.find_one({'_id': message.guild.id})
-            if (
-                guild_doc is not None
-                and message.author != self.bot.user
-                and message.channel.id not in guild_doc["Settings"]["blacklists"]
-                and all(
-                    item not in guild_doc["Settings"]["modroles"]
-                    for item in [i.id for i in message.author.roles]
+        if not plugin_doc["AutoMod"]:
+            return
+
+        guild_doc = await db.AUTO_MOD.find_one({'_id': message.guild.id})
+        if not (
+            guild_doc is not None
+            and message.author != self.bot.user
+            and message.channel.id not in guild_doc["Settings"]["blacklists"]
+            and all(
+                item not in guild_doc["Settings"]["modroles"]
+                for item in [i.id for i in message.author.roles]
+            )
+            and (not message.author.bot or guild_doc["Settings"]["ignorebots"])
+        ):
+            return
+
+        if guild_doc["Links"]["status"]:
+            regex = re.compile(
+                r"(?:http|ftp)s?://"  # http:// or https://
+                r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+                r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
+                r"(?::\d+)?",  # optional port
+                # r"([a-zA-Z0-9\-]+)",
+                flags=re.IGNORECASE
+            )
+
+            if regex.findall(message.content):
+                await message.delete()
+                res = guild_doc["Links"]["response"]
+                await message.channel.send(
+                    f"{message.author.mention} {res}",
+                    delete_after=2
                 )
-                and (not message.author.bot or guild_doc["Settings"]["ignorebots"])
-            ):
 
-                if guild_doc["Links"]["status"]:
-                    regex = re.compile(
-                        r"(?:http|ftp)s?://"  # http:// or https://
-                        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
-                        r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
-                        r"(?::\d+)?",  # optional port
-                        # r"([a-zA-Z0-9\-]+)",
-                        flags=re.IGNORECASE
-                    )
+        if guild_doc["Invites"]["status"]:
+            regex = re.compile(
+                r"(?:discord(?:[\.,]|dot)gg|"  # Could be discord.gg/
+                r"discord(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discord.com/invite/
+                r"discordapp(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discordapp.com/invite/
+                r"discord(?:[\.,]|dot)me|"  # or discord.me
+                r"discord(?:[\.,]|dot)li|"  # or discord.li
+                r"discord(?:[\.,]|dot)io"  # or discord.io.
+                r")(?:[\/]|slash)"  # / or 'slash'
+                r"([a-zA-Z0-9\-]+)",  # the invite code itself
+                flags=re.IGNORECASE
+            )
 
-                    if regex.findall(message.content):
-                        await message.delete()
-                        res = guild_doc["Links"]["response"]
-                        await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2
-                        )
+            if regex.findall(message.content):
+                await message.delete()
+                res = guild_doc["Invites"]["response"]
+                await message.channel.send(
+                    f"{message.author.mention} {res}",
+                    delete_after=2
+                )
 
-                if guild_doc["Invites"]["status"]:
-                    regex = re.compile(
-                        r"(?:discord(?:[\.,]|dot)gg|"  # Could be discord.gg/
-                        r"discord(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discord.com/invite/
-                        r"discordapp(?:[\.,]|dot)com(?:\/|slash)invite|"  # or discordapp.com/invite/
-                        r"discord(?:[\.,]|dot)me|"  # or discord.me
-                        r"discord(?:[\.,]|dot)li|"  # or discord.li
-                        r"discord(?:[\.,]|dot)io"  # or discord.io.
-                        r")(?:[\/]|slash)"  # / or 'slash'
-                        r"([a-zA-Z0-9\-]+)",  # the invite code itself
-                        flags=re.IGNORECASE
-                    )
+        if guild_doc["Mentions"]["status"]:
+            amount = guild_doc["Mentions"]["amount"]
+            if len(message.mentions) >= amount:
+                await message.delete()
+                res = guild_doc["Mentions"]["response"]
+                await message.channel.send(
+                    f"{message.author.mention} {res}",
+                    delete_after=2)
 
-                    if regex.findall(message.content):
-                        await message.delete()
-                        res = guild_doc["Invites"]["response"]
-                        await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2
-                        )
-
-                if guild_doc["Mentions"]["status"]:
-                    amount = guild_doc["Mentions"]["amount"]
-                    if len(message.mentions) >= amount:
-                        await message.delete()
-                        res = guild_doc["Mentions"]["response"]
-                        await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2)
-
-                if guild_doc["BadWords"]["status"]:
-                    bad_words = guild_doc["BadWords"]["words"]
-                    if len([i for i in bad_words if
-                            i in message.content]) > 0:
-                        await message.delete()
-                        res = guild_doc["BadWords"]["response"]
-                        await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2)
+        if guild_doc["BadWords"]["status"]:
+            bad_words = guild_doc["BadWords"]["words"]
+            if len([i for i in bad_words if
+                    i in message.content]) > 0:
+                await message.delete()
+                res = guild_doc["BadWords"]["response"]
+                await message.channel.send(
+                    f"{message.author.mention} {res}",
+                    delete_after=2)
 
 
 def setup(bot):

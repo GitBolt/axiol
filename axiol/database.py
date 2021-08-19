@@ -1,23 +1,22 @@
 import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
+MONGO_CLIENT = AsyncIOMotorClient(os.environ["MONGO_URL"])
 
-MONGOCLIENT = AsyncIOMotorClient(os.environ["MONGO_URL"])
+# Databases
+DATABASE = MONGO_CLIENT["Axiol"]  # Main DB
+LEVEL_DATABASE = MONGO_CLIENT["Leveling"]
+KARMA_DATABASE = MONGO_CLIENT["Karma"]
+CUSTOM_DATABASE = MONGO_CLIENT["Custom"]
+WARNINGS_DATABASE = MONGO_CLIENT["Warnings"]
 
-#Databases
-DATABASE = MONGOCLIENT["Axiol"] #Main DB
-LEVELDATABASE = MONGOCLIENT["Leveling"]
-KARMADATABASE = MONGOCLIENT["Karma"]
-CUSTOMDATABASE = MONGOCLIENT["Custom"]
-WARNINGSDATABASE = MONGOCLIENT["Warnings"]
-
-#Collections
+# Collections
 PLUGINS = DATABASE["Plugins"]
 PREFIXES = DATABASE["Prefixes"]
-REACTIONROLES = DATABASE["Reaction Roles"]
+REACTION_ROLES = DATABASE["Reaction Roles"]
 WELCOME = DATABASE["Welcome"]
 VERIFY = DATABASE["Verify"]
 CHATBOT = DATABASE["Chatbot"]
 PERMISSIONS = DATABASE["Permissions"]
-AUTOMOD = DATABASE["AutoMod"]
+AUTO_MOD = DATABASE["AutoMod"]
 GIVEAWAY = DATABASE["Giveaway"]

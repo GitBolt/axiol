@@ -37,7 +37,7 @@ class Karma(commands.Cog):
         else:
             user = karmauser
 
-        GuildCol = db.KARMADATABASE[str(ctx.guild.id)]
+        GuildCol = db.KARMA_DATABASE[str(ctx.guild.id)]
         userdata = await GuildCol.find_one({"_id": user.id})
 
         karmas = [x async for x in GuildCol.find({
@@ -73,7 +73,7 @@ class Karma(commands.Cog):
     @commands.command(aliases=["kb"])
     @has_command_permission()
     async def karmaboard(self, ctx):
-        GuildCol = db.KARMADATABASE[str(ctx.guild.id)]
+        GuildCol = db.KARMA_DATABASE[str(ctx.guild.id)]
         karmas = [x async for x in GuildCol.find({
 
                 "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
@@ -193,7 +193,7 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kblacklist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.KARMADATABASE[(str(ctx.guild.id))]
+            GuildCol = db.KARMA_DATABASE[(str(ctx.guild.id))]
             settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
@@ -222,7 +222,7 @@ class Karma(commands.Cog):
     @has_command_permission()
     async def kwhitelist(self, ctx, channel:discord.TextChannel=None):
         if channel is not None:
-            GuildCol = db.KARMADATABASE[(str(ctx.guild.id))]
+            GuildCol = db.KARMA_DATABASE[(str(ctx.guild.id))]
             settings = await GuildCol.find_one({"_id": 0})
 
             newsettings = settings.get("blacklists").copy()
@@ -253,7 +253,7 @@ class Karma(commands.Cog):
         if not message.guild:
             return
         PluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
-        GuildCol = db.KARMADATABASE[str(message.guild.id)]
+        GuildCol = db.KARMA_DATABASE[str(message.guild.id)]
         SettingsDoc = await GuildCol.find_one({"_id": 0})
         if PluginDoc["Karma"] and not message.author.bot:
 

@@ -178,7 +178,7 @@ class Help(commands.Cog):
                 helpname = i.lower()
                 if i.lower() == "reactionroles": #Reaction roles command doesn't have space in between reaction and roles
                     helpname = i.lower().replace(" ", "")
-                embed.add_field(name=f"{prefix}help {helpname}", value=f"{var.DICT_PLUGINEMOJIS.get(i)} {i} Help", inline=False)
+                embed.add_field(name=f"{prefix}help {helpname}", value=f"{var.DICT_PLUGIN_EMOJIS.get(i)} {i} Help", inline=False)
 
         embed.add_field(name=f"{prefix}help extras", value=f"▶️ Non plugin commands", inline=False)
         embed.add_field(name=f"{prefix}help settings", value=f"{var.E_SETTINGS} Configure settings", inline=False)
@@ -186,7 +186,7 @@ class Help(commands.Cog):
 
         for i in GuildDoc:
             if GuildDoc.get(i):
-                await helpmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
+                await helpmsg.add_reaction(var.DICT_PLUGIN_EMOJIS.get(i))
         await helpmsg.add_reaction("▶️")
         await helpmsg.add_reaction(var.E_SETTINGS)
         
@@ -211,9 +211,9 @@ class Help(commands.Cog):
         try:
             while True:
                 reaction, user = await self.bot.wait_for('reaction_add', check=check, timeout=30.0)
-                if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
+                if str(reaction.emoji) in var.DICT_PLUGIN_EMOJIS.values():
 
-                    helptype = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
+                    helptype = list(var.DICT_PLUGIN_EMOJIS.keys())[list(var.DICT_PLUGIN_EMOJIS.values()).index(str(reaction.emoji))]
                     await helpmsg.edit(embed=await HelpDict.get(helptype)(ctx))
                     try:
                         await helpmsg.remove_reaction(str(reaction.emoji), ctx.author)
@@ -241,7 +241,7 @@ class Help(commands.Cog):
                 await helpmsg.remove_reaction(var.E_SETTINGS, self.bot.user)
                 for i in GuildDoc:
                     if GuildDoc.get(i) == True:
-                        await helpmsg.remove_reaction(var.DICT_PLUGINEMOJIS.get(i), self.bot.user)
+                        await helpmsg.remove_reaction(var.DICT_PLUGIN_EMOJIS.get(i), self.bot.user)
                 await helpmsg.remove_reaction("▶️", self.bot.user)
 
 

@@ -11,93 +11,120 @@ class Chatbot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #Simple check to see if this cog (plugin) is enabled
+    # Simple check to see if this cog (plugin) is enabled
     async def cog_check(self, ctx):
-        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Chatbot"):
+        guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+
+        if guild_doc.get("Chatbot"):
             return True
+
         else:
-            await ctx.send(embed=discord.Embed(
-                description=f"{var.E_DISABLE} The Chatbot plugin is disabled in this server",
-                color=var.C_ORANGE
-            ))
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Chatbot plugin is"
+                        " disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
+            )
 
-    @commands.command(aliases=["enablechatbot"])
+    @commands.command(name="setchatbot", aliases=["enablechatbot"])
     @has_command_permission()
-    async def setchatbot(self, ctx, channel:discord.TextChannel=None):
-    
+    async def set_chat_bot(self, ctx, channel: discord.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
-            await db.CHATBOT.insert_one({
-                "_id": ctx.guild.id,
-                "channels": [ctx.channel.id]                                    
-                })
+            await db.CHATBOT.insert_one(
+                {
+                    "_id": ctx.guild.id,
+                    "channels": [ctx.channel.id]
+                }
+            )
+
         if channel is None:
             channel = ctx.channel
-            
-        GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-        channelist = GuildDoc.get("channels")
-        newlist = channelist.copy()
-        newlist.append(channel.id)
-        newdata = {"$set":{
-             "channels": newlist
-         }}
 
-        await db.CHATBOT.update_one(GuildDoc, newdata)
+        guild_doc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+        channel_list = guild_doc.get("channels")
+
+        new_list = channel_list.copy()
+        new_list.append(channel.id)
+        new_data = {
+            "$set": {
+                "channels": new_list
+            }
+        }
+
+        await db.CHATBOT.update_one(guild_doc, new_data)
         await ctx.send(f"{var.E_ACCEPT} Enabled Chatbot for {channel.mention}")
-    
 
-    @commands.command(aliases=["disablechatbot"])
+    @commands.command(name="removechatbot", aliases=["disablechatbot"])
     @has_command_permission()
-    async def removechatbot(self, ctx, channel:discord.TextChannel=None):
-
+    async def remove_chat_bot(self, ctx, channel: discord.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
-            await db.CHATBOT.insert_one({
-                "_id": ctx.guild.id,
-                "channels": []                                    
-                })
+            await db.CHATBOT.insert_one(
+                {
+                    "_id": ctx.guild.id,
+                    "channels": []
+                }
+            )
+
         if channel is None:
             channel = ctx.channel
 
-        GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-        if channel.id in GuildDoc.get("channels"):
-            channelist = GuildDoc.get("channels")
-            newlist = channelist.copy()
-            newlist.remove(channel.id)
-            newdata = {"$set":{
-                "channels": newlist
-            }}
-            await db.CHATBOT.update_one(GuildDoc, newdata)
+        guild_doc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+
+        if channel.id in guild_doc.get("channels"):
+            channel_list = guild_doc.get("channels")
+            new_list = channel_list.copy()
+            new_list.remove(channel.id)
+            new_data = {
+                "$set": {
+                    "channels": new_list
+                }
+            }
+
+            await db.CHATBOT.update_one(guild_doc, new_data)
             await ctx.send(f"Disabled Chatbot from {channel.mention}")
+
         else:
             await ctx.send("This channel is not a bot chatting channel")
 
-
-    @commands.command()
+    @commands.command(name="chatbotchannels")
     @has_command_permission()
-    async def chatbotchannels(self, ctx):
-        GuildDoc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
+    async def chat_bot_channels(self, ctx):
+        guild_doc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
         embed = discord.Embed(
             title="All chatbot channels in this server",
             color=var.C_TEAL
         )
-        if GuildDoc is not None and GuildDoc.get("channels") != []:
-            for i in GuildDoc.get("channels"):
-                embed.add_field(name="** **", value=self.bot.get_channel(i).mention)
+
+        if guild_doc is not None and guild_doc.get("channels") != []:
+            for i in guild_doc.get("channels"):
+                embed.add_field(
+                    name="** **",
+                    value=self.bot.get_channel(i).mention
+                )
+
             await ctx.send(embed=embed)
+
         else:
             await ctx.send("This server does not have any chat bot channel")
 
-
-    @commands.command()
+    @commands.command(name="chatbotreport")
     @has_command_permission()
-    async def chatbotreport(self, ctx, *, desc):
-        channel = self.bot.get_channel(843548616505294848) #Support server suggestions channel
-        await channel.send(embed=discord.Embed(
-            title="Chatbot suggestion",
-            description=desc,
-            color=var.C_MAIN
-        ).add_field(name="By", value=ctx.author
-        ).add_field(name="Guild ID", value=ctx.guild.id)
+    async def chat_bot_report(self, ctx, *, desc):
+        # Support server suggestions channel
+        channel = self.bot.get_channel(843548616505294848)
+
+        await channel.send(
+            embed=discord.Embed(
+                title="Chatbot suggestion",
+                description=desc,
+                color=var.C_MAIN
+            ).add_field(
+                name="By", value=ctx.author
+            ).add_field(
+                name="Guild ID", value=ctx.guild.id)
         )
 
     @commands.Cog.listener()
@@ -105,30 +132,47 @@ class Chatbot(commands.Cog):
         if not message.guild:
             return
 
-        GuildPluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
+        guild_plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
         ctx = await self.bot.get_context(message)
 
-        if GuildPluginDoc["Chatbot"]:
-            GuildChatbotDoc = await db.CHATBOT.find_one({"_id": message.guild.id})
+        if guild_plugin_doc["Chatbot"]:
+            guild_chatbot_doc = await db.CHATBOT.find_one(
+                {"_id": message.guild.id}
+            )
+
             def channels():
-                if GuildChatbotDoc is not None and GuildChatbotDoc.get("channels") != []:
-                    channels = GuildChatbotDoc.get("channels")
+                if (
+                    guild_chatbot_doc is not None
+                    and guild_chatbot_doc.get("channels") != []
+                ):
+                    channels = guild_chatbot_doc.get("channels")
+
                 else:
                     channels = []
+
                 return channels
 
-            if (self.bot.user in message.mentions and message.author.bot == False
-            or message.channel.id in channels() and message.author.bot == False):
-                
+            if (
+                self.bot.user in message.mentions
+                and message.author.bot == False
+                or message.channel.id in channels()
+                and message.author.bot == False
+            ):
+
                 content = message.content.replace("<@!843484459113775114>", "")
-                async with request("POST", f"https://axiol.up.railway.app/ai/chatbot", json={"content": content}) as response:
+                async with request(
+                    "POST",
+                    f"https://axiol.up.railway.app/ai/chatbot",
+                    json={"content": content}
+                ) as response:
                     res = await response.json()
 
                 if res["response"] == "help":
                     await ctx.invoke(self.bot.get_command('help'))
 
                 elif res["tag"] == "prefix":
-                    await message.channel.send(res["response"].replace("~", await get_prefix(ctx)))
+                    await message.channel.send(
+                        res["response"].replace("~", await get_prefix(ctx)))
 
                 else:
                     await message.channel.send(res["response"])

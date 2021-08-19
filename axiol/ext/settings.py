@@ -7,9 +7,13 @@ import database as db
 from functions import get_prefix
 
 
-def user_or_admin(myid):
+def user_or_admin(my_id):
     async def predicate(ctx: Context):
-        return ctx.author.id == myid or ctx.author.guild_permissions.administrator 
+        return (
+            ctx.author.id == my_id
+            or ctx.author.guild_permissions.administrator
+        )
+
     return check(predicate)
 
 
@@ -17,216 +21,354 @@ class Settings(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(aliases=["plugin", "extensions", "extentions", "addons"])
-    @user_or_admin(791950104680071188) #This me
+    @user_or_admin(791950104680071188)  # This me
     async def plugins(self, ctx):
-        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id":False}) #Getting guild's plugin document and removing the ID
-        enabled_amount = len([keys for keys, values in GuildDoc.items() if values == True])
-        total_amount = len(GuildDoc)
+        guild_doc = await db.PLUGINS.find_one(
+            {"_id": ctx.guild.id}, {"_id": False}
+        )  # Getting guild's plugin document and removing the ID
+
+        enabled_amount = len(
+            [keys for keys, values in guild_doc.items() if values == True]
+        )
+
+        total_amount = len(guild_doc)
 
         embed = discord.Embed(
-        title="All available plugins",
-        description="React to the respective emojis below to enable/disable them!",
-        color=var.C_MAIN
-        ).set_footer(text=f"{enabled_amount}/{total_amount} plugins are enabled in this server"
-        ).set_thumbnail(url="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png")
-        
-        for i in GuildDoc:
-            status = "Enabled" if GuildDoc.get(i) == True else "Disabled"
-            embed.add_field(name=i, value=f"{var.DICT_PLUGINEMOJIS.get(i)} {status}", inline=False)
+            title="All available plugins",
+            description=(
+                "React to the respective emojis below to enable/disable them!"
+            ),
+            color=var.C_MAIN
+        ).set_footer(
+            text=(
+                f"{enabled_amount}/{total_amount}"
+                " plugins are enabled in this server"
+            )
+        ).set_thumbnail(
+            url=(
+                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "845662999686414336/Logo1.png"
+            )
+        )
 
-        botmsg = await ctx.send(embed=embed)
-        for i in GuildDoc:
-            await botmsg.add_reaction(var.DICT_PLUGINEMOJIS.get(i))
-        
-        def reactioncheck(reaction, user):
-            if str(reaction.emoji) in var.DICT_PLUGINEMOJIS.values():
-                return user == ctx.author and reaction.message == botmsg
+        for i in guild_doc:
+            status = "Enabled" if guild_doc.get(i) == True else "Disabled"
+            embed.add_field(
+                name=i,
+                value=f"{var.DICT_PLUGIN_EMOJIS.get(i)} {status}",
+                inline=False
+            )
 
-        def enablecheck(reaction, user):
-            if str(reaction.emoji) == var.E_ENABLE:
-                return user == ctx.author and reaction.message == enabledbotmsg
+        bot_msg = await ctx.send(embed=embed)
 
-        def disablecheck(reaction, user):
-            if str(reaction.emoji) == var.E_DISABLE:
-                return user == ctx.author and reaction.message == enabledbotmsg
+        for i in guild_doc:
+            await bot_msg.add_reaction(var.DICT_PLUGIN_EMOJIS.get(i))
+
+        def reaction_check(r, user):
+            if str(r.emoji) in var.DICT_PLUGIN_EMOJIS.values():
+                return user == ctx.author and r.message == bot_msg
+
+        def enable_check(r, user):
+            if str(r.emoji) == var.E_ENABLE:
+                return user == ctx.author and r.message == enabled_bot_msg
+
+        def disable_check(r, user):
+            if str(r.emoji) == var.E_DISABLE:
+                return user == ctx.author and r.message == enabled_bot_msg
 
         while True:
             try:
-                reaction, _ = await self.bot.wait_for('reaction_add', check=reactioncheck, timeout=60.0)
-                GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+                reaction, _ = await self.bot.wait_for(
+                    'reaction_add', check=reaction_check, timeout=60.0
+                )
+
+                guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+
                 try:
-                    await botmsg.clear_reactions()
+                    await bot_msg.clear_reactions()
+
                 except discord.Forbidden:
                     pass
-                plugin_type = list(var.DICT_PLUGINEMOJIS.keys())[list(var.DICT_PLUGINEMOJIS.values()).index(str(reaction.emoji))]
+
+                plugin_type = (
+                    list(var.DICT_PLUGIN_EMOJIS.keys())[
+                        list(var.DICT_PLUGIN_EMOJIS.values())
+                        .index(str(reaction.emoji))
+                    ]
+                )
 
                 embed = discord.Embed(
-                title=f"{plugin_type} Plugin",
+                    title=f"{plugin_type} Plugin",
                 )
-                if GuildDoc.get(plugin_type) == True:
-                    embed.description=f"{var.E_ENABLE} {plugin_type} is currently enabled"
-                    embed.color=var.C_GREEN
-                    enabledbotmsg = await ctx.send(embed=embed)
-                    await enabledbotmsg.add_reaction(var.E_DISABLE)
 
-                    await self.bot.wait_for('reaction_add', check=disablecheck)
-                    newdata = {"$set":{
-                        plugin_type: False
-                    }}
-                    await db.PLUGINS.update_one(GuildDoc, newdata)
+                if guild_doc.get(plugin_type) == True:
+                    embed.description = (
+                        f"{var.E_ENABLE} {plugin_type} is currently enabled"
+                    )
 
-                    embed.title=f"{plugin_type} disabled"
-                    embed.description=f"{var.E_DISABLE} {plugin_type} plugin has been disabled"
-                    embed.color=var.C_RED
-                    await enabledbotmsg.edit(embed=embed)
+                    embed.color = var.C_GREEN
+
+                    enabled_bot_msg = await ctx.send(embed=embed)
+                    await enabled_bot_msg.add_reaction(var.E_DISABLE)
+
+                    await self.bot.wait_for('reaction_add', check=disable_check)
+
+                    new_data = {
+                        "$set": {
+                            plugin_type: False
+                        }
+                    }
+
+                    await db.PLUGINS.update_one(guild_doc, new_data)
+
+                    embed.title = f"{plugin_type} disabled"
+                    embed.description = (
+                        f"{var.E_DISABLE} {plugin_type}"
+                        f" plugin has been disabled"
+                    )
+
+                    embed.color = var.C_RED
+                    await enabled_bot_msg.edit(embed=embed)
+
                     try:
-                        await enabledbotmsg.clear_reactions()
+                        await enabled_bot_msg.clear_reactions()
+                        
                     except discord.Forbidden:
                         pass
 
                 else:
-                    embed.description=f"{var.E_DISABLE} {plugin_type} is currently disabled"
+                    embed.description = (
+                        f"{var.E_DISABLE} {plugin_type} is currently disabled"
+                    )
+
                     embed.color = var.C_RED
-                    enabledbotmsg = await ctx.send(embed=embed)
-                    await enabledbotmsg.add_reaction(var.E_ENABLE)
+                    enabled_bot_msg = await ctx.send(embed=embed)
+                    await enabled_bot_msg.add_reaction(var.E_ENABLE)
 
-                    await self.bot.wait_for('reaction_add', check=enablecheck)
-                    newdata = {"$set":{
-                        plugin_type: True
-                    }}
-                    await db.PLUGINS.update_one(GuildDoc, newdata)
+                    await self.bot.wait_for('reaction_add', check=enable_check)
 
-                    embed.title=f"{plugin_type} enabled"
-                    embed.description=f"{var.E_ENABLE} {plugin_type} extension has been enabled"
-                    embed.color=var.C_GREEN
-                    await enabledbotmsg.edit(embed=embed)
+                    new_data = {
+                        "$set": {
+                            plugin_type: True
+                        }
+                    }
+
+                    await db.PLUGINS.update_one(guild_doc, new_data)
+
+                    embed.title = f"{plugin_type} enabled"
+                    embed.description = (
+                        f"{var.E_ENABLE} {plugin_type}"
+                        " extension has been enabled"
+                    )
+
+                    embed.color = var.C_GREEN
+                    await enabled_bot_msg.edit(embed=embed)
                     try:
-                        await enabledbotmsg.clear_reactions()
+                        await enabled_bot_msg.clear_reactions()
                     except discord.Forbidden:
                         pass
 
-                    #Since welcome and verification is not enabled by default ->
-                    #The time plugin is enabled, there is no information available in the db ->
-                    #Hence we ask for the channel and insert the data ->
-                    #With leveling we just insert the default configs
-                    if str(reaction.emoji) == "👋" and await db.WELCOME.find_one({"_id": ctx.guild.id}) is None:
+                    # Since welcome and verification is not enabled by
+                    # default, the time plugin is enabled,
+                    # there is no information available in the db.
+
+                    # Hence we ask for the channel and insert the data
+                    # With leveling we just insert the default configs
+                    if (
+                        str(reaction.emoji) == "👋"
+                        and (
+                            await db.WELCOME.find_one({"_id": ctx.guild.id})
+                            is None
+                        )
+                    ):
                         await ctx.invoke(self.bot.get_command('welcomesetup'))
-                
-                    if str(reaction.emoji) =="✅" and await db.VERIFY.find_one({"_id": ctx.guild.id}) is None:
+
+                    if (
+                        str(reaction.emoji) == "✅"
+                        and (
+                            await db.VERIFY.find_one({"_id": ctx.guild.id})
+                            is None
+                        )
+                    ):
                         await ctx.invoke(self.bot.get_command('verifysetup'))
 
-                    if str(reaction.emoji) == "🎭"and str(ctx.guild.id) not in await db.KARMADATBASE.list_collection_names():
-                        GuildDoc = await db.KARMADATBASE.create_collection(str(ctx.guild.id))
-                        GuildDoc.insert_one({
-                            "_id": 0,
-                            "blacklists": [],
-                            })   
-
-                    if str(reaction.emoji) == var.E_LEVELING and str(ctx.guild.id) not in await db.LEVELDATABASE.list_collection_names():
-                        GuildDoc = await db.LEVELDATABASE.create_collection(str(ctx.guild.id))
-                        GuildDoc.insert_one({
-
-                            "_id": 0,
-                            "xprange": [15, 25],
-                            "alertchannel": None,
-                            "blacklistedchannels": [],
-                            "alerts": True,
-                            "rewards": {}
-                            })  
-
-                    if str(reaction.emoji) =="🛡️" and await db.AUTOMOD.find_one({"_id":ctx.guild.id}) is None:
-                        await db.AUTOMOD.insert_one({
-                            "_id": ctx.guild.id,
-                            "BadWords":{
-                                "status": True,
-                                "words": ["fuck", "bitch", "porn", "slut", "asshole"],
-                                "response": "You aren't allowed to say that!"
-                            },
-                            "Invites": {
-                                "status": True,
-                                "response": "You can't send invites here!"
-                            },
-                            "Links": {
-                                "status": True,
-                                "response": "You can't send links here!"
-                            },
-                            "Mentions": {
-                                "status": False,
-                                "response": "You can't mention so many people!",
-                                "amount": 5
-                            },
-                            "Settings": {
-                                "ignorebots": False,
+                    if (
+                        str(reaction.emoji) == "🎭"
+                        and (
+                            str(ctx.guild.id)
+                            not in await db.KARMADATBASE.list_collection_names()
+                        )
+                    ):
+                        guild_doc = await db.KARMADATBASE.create_collection(
+                            str(ctx.guild.id))
+                        guild_doc.insert_one(
+                            {
+                                "_id": 0,
                                 "blacklists": [],
-                                "modroles": []
                             }
-                        })         
+                        )
+
+                    if (
+                        str(reaction.emoji) == var.E_LEVELING
+                        and (
+                            str(ctx.guild.id) not in
+                            await db.LEVEL_DATABASE.list_collection_names()
+                        )
+                    ):
+                        guild_doc = await db.LEVEL_DATABASE.create_collection(
+                            str(ctx.guild.id))
+                        guild_doc.insert_one(
+                            {
+                                "_id": 0,
+                                "xprange": [15, 25],
+                                "alertchannel": None,
+                                "blacklistedchannels": [],
+                                "alerts": True,
+                                "rewards": {}
+                            }
+                        )
+
+                    if (
+                        str(reaction.emoji) == "🛡️"
+                        and (
+                            await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
+                            is None
+                        )
+                    ):
+                        await db.AUTO_MOD.insert_one(
+                            {
+                                "_id": ctx.guild.id,
+                                "BadWords": {
+                                    "status": True,
+                                    "words": ["fuck", "bitch", "porn", "slut",
+                                              "asshole"],
+                                    "response":
+                                        "You aren't allowed to say that!"
+                                },
+                                "Invites": {
+                                    "status": True,
+                                    "response": "You can't send invites here!"
+                                },
+                                "Links": {
+                                    "status": True,
+                                    "response": "You can't send links here!"
+                                },
+                                "Mentions": {
+                                    "status": False,
+                                    "response":
+                                        "You can't mention so many people!",
+                                    "amount": 5
+                                },
+                                "Settings": {
+                                    "ignorebots": False,
+                                    "blacklists": [],
+                                    "modroles": []
+                                }
+                            }
+                        )
+
             except asyncio.TimeoutError:
                 try:
-                    await botmsg.clear_reactions()
+                    await bot_msg.clear_reactions()
                 except discord.Forbidden:
                     pass
 
-
     @commands.command()
-    @user_or_admin(791950104680071188) #This me
+    @user_or_admin(791950104680071188)  # This me
     async def prefix(self, ctx):
         embed = discord.Embed(
-        title="Prefix :D that's the way you control me aye!",
-        description=f"The prefix for this server is\n```{await get_prefix(ctx)}```\nWanna change it? React to the {var.E_SETTINGS} emoji below!",
-        color=var.C_MAIN
+            title="Prefix :D that's the way you control me aye!",
+            description=(
+                f"The prefix for this server is\n"
+                f"```{await get_prefix(ctx)}```\n"
+                f"Wanna change it? React to the {var.E_SETTINGS} emoji below!"
+            ),
+            color=var.C_MAIN
         )
-        botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction(var.E_SETTINGS)
 
-        def reactioncheck(reaction, user):
-            return user == ctx.author and reaction.message == botmsg
+        bot_msg = await ctx.send(embed=embed)
+        await bot_msg.add_reaction(var.E_SETTINGS)
 
-        await self.bot.wait_for('reaction_add', check=reactioncheck)
-        await ctx.send(embed=discord.Embed(
-                    description="Next message which you will send will become the prefix :eyes:\n"+
-                    f"To cancel it enter\n```{await get_prefix(ctx)}cancel```",
-                    color=var.C_ORANGE
-                    ).set_footer(text="Automatic cancellation after 1 minute")
-                    )
+        def reaction_check(reaction, user):
+            return user == ctx.author and reaction.message == bot_msg
+
+        await self.bot.wait_for('reaction_add', check=reaction_check)
+
+        await ctx.send(
+            embed=discord.Embed(
+                description=(
+                    "Next message which you will send will become the prefix "
+                    ":eyes:\nTo cancel it enter\n"
+                    "```{await get_prefix(ctx)}cancel```"
+                ),
+                color=var.C_ORANGE
+            ).set_footer(text="Automatic cancellation after 1 minute")
+        )
+
         try:
-            await botmsg.clear_reactions()
+            await bot_msg.clear_reactions()
+
         except discord.Forbidden:
             pass
 
-        def messagecheck(message):
-            return message.author == ctx.author and message.channel.id == ctx.channel.id
+        def message_check(message):
+            return (
+                message.author == ctx.author
+                and message.channel.id == ctx.channel.id
+            )
 
         try:
-            usermsg = await self.bot.wait_for('message', check=messagecheck, timeout=60.0)
+            user_msg = await self.bot.wait_for(
+                'message', check=message_check, timeout=60.0
+            )
 
-            if usermsg.content == await get_prefix(ctx)+"cancel": #Cancel
+            # Cancel
+            if user_msg.content == await get_prefix(ctx) + "cancel":
                 await ctx.send("Cancelled prefix change :ok_hand:")
-                
-            elif usermsg.content == var.DEFAULT_PREFIX: #Same prefixes so deleting the doc
+
+            # Same prefixes so deleting the doc
+            elif user_msg.content == var.DEFAULT_PREFIX:
                 await db.PREFIXES.delete_one({"_id": ctx.guild.id})
-                await ctx.send(f"Changed your prefix to the default one\n```{var.DEFAULT_PREFIX}```")
+                await ctx.send(
+                    "Changed your prefix to the default one\n"
+                    f"```{var.DEFAULT_PREFIX}```"
+                )
 
-            elif await get_prefix(ctx) == var.DEFAULT_PREFIX: #If current prefix is default then insert new
-                await db.PREFIXES.insert_one({
-                    "_id": ctx.guild.id, 
-                    "prefix": usermsg.content
-                    })
-                await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
+            # If current prefix is default then insert new
+            elif await get_prefix(ctx) == var.DEFAULT_PREFIX:
+                await db.PREFIXES.insert_one(
+                    {
+                        "_id": ctx.guild.id,
+                        "prefix": user_msg.content
+                    }
+                )
 
-            else: #Exists so just update it
-                GuildDoc = await db.PREFIXES.find_one({"_id": usermsg.guild.id})
-                newdata = {"$set": {
-                    "prefix": usermsg.content
-                    }}
-                
-                await db.PREFIXES.update_one(GuildDoc, newdata)
-                await ctx.send(f"Updated your new prefix, it's\n```{usermsg.content}```")
+                await ctx.send(
+                    f"Updated your new prefix, it's\n```{user_msg.content}```"
+                )
+
+            else:  # Exists so just update it
+                guild_doc = await db.PREFIXES.find_one(
+                    {"_id": user_msg.guild.id}
+                )
+
+                new_data = {
+                    "$set": {
+                        "prefix": user_msg.content
+                    }
+                }
+
+                await db.PREFIXES.update_one(guild_doc, new_data)
+                await ctx.send(
+                    f"Updated your new prefix, it's\n```{user_msg.content}```"
+                )
 
         except asyncio.TimeoutError:
-            await ctx.send(f"You took too long to enter your new prefix {ctx.author.mention} ;-;")
+            await ctx.send(
+                "You took too long to enter your "
+                f"new prefix {ctx.author.mention} ;-;"
+            )
 
 
 def setup(bot):

@@ -89,10 +89,14 @@ async def on_guild_join(guild):
     # Support server Log
     embed = discord.Embed(
         title="I just joined a new server!",
-        description=f"Thanks to this kind person for inviting me to `{guild.name}` :D",
+        description=(
+            f"Thanks to this kind person for inviting me to `{guild.name}` :D"
+        ),
         color=var.C_GREEN
-    ).add_field(name="Member count", value=guild.member_count
-                )
+    ).add_field(
+        name="Member count", value=guild.member_count
+    )
+
     await bot.get_channel(848207106821980213).send(embed=embed)
 
 
@@ -103,8 +107,8 @@ async def on_guild_remove(guild):
         title="I just got removed from a server",
         description=f"Someone removed me from `{guild.name}` :(",
         color=var.C_RED
-    ).add_field(name="Member count", value=guild.member_count
-                )
+    ).add_field(name="Member count", value=guild.member_count)
+
     await bot.get_channel(848207106821980213).send(embed=embed)
 
 

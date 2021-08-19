@@ -16,8 +16,7 @@ class Karma(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    async def cog_check(ctx, **kwargs):
+    async def cog_check(self, ctx):
         """Simple check to see if this cog (plugin) is enabled."""
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 

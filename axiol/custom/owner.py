@@ -13,8 +13,8 @@ class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    def cog_check(ctx, **kwargs):
+ 
+    def cog_check(self, ctx):
         return ctx.author.id == 791950104680071188
 
     @commands.command(aliases=["eval"])

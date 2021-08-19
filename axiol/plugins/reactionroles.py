@@ -1,10 +1,10 @@
 import discord
 from typing import Union
 from discord.ext import commands
-import database as db
-import variables as var
-from functions import get_prefix
-from ext.permissions import has_command_permission
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
+from axiol.ext.permissions import has_command_permission
 
 
 class ReactionRoles(commands.Cog):
@@ -12,7 +12,7 @@ class ReactionRoles(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def cog_check(ctx):
+    async def cog_check(ctx, **kwargs):
         """Simple check to see if this cog (plugin) is enabled."""
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
         if guild_doc.get("ReactionRoles"):
@@ -80,7 +80,7 @@ class ReactionRoles(commands.Cog):
         if bot_role.position >= role.position:
             guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
 
-            if guild_doc == None:
+            if guild_doc is None:
                 await db.REACTION_ROLES.insert_one(
                     {
                         "_id": ctx.guild.id,
@@ -110,7 +110,7 @@ class ReactionRoles(commands.Cog):
                                 "emoji") == str(emoji):
                             return True
 
-                if check() == True:
+                if check():
                     await ctx.send(
                         "You have already setup this reaction role"
                         f" using {emoji} on that message :D "
@@ -383,12 +383,9 @@ class ReactionRoles(commands.Cog):
         if msg is not None:
             guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
             if guild_doc is not None:
-                all_msg_ids = []
                 unique_list = guild_doc["unique_messages"]
 
-                for i in guild_doc["reaction_roles"]:
-                    all_msg_ids.append(i.get("messageid"))
-
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids:
                     new_list = unique_list.copy()
 
@@ -449,12 +446,9 @@ class ReactionRoles(commands.Cog):
         if msg is not None:
             guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
             if guild_doc is not None:
-                all_msg_ids = []
                 unique_list = guild_doc["unique_messages"]
 
-                for i in guild_doc["reaction_roles"]:
-                    all_msg_ids.append(i.get("messageid"))
-
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids and msg.id in unique_list:
                     new_list = unique_list.copy()
 
@@ -525,7 +519,7 @@ class ReactionRoles(commands.Cog):
                     guild = self.bot.get_guild(payload.guild_id)
                     assign_role = guild.get_role(role_id)
 
-                    if payload.member.bot == False:
+                    if not payload.member.bot:
                         await payload.member.add_roles(assign_role)
 
         if (

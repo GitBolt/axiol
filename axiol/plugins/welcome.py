@@ -1,11 +1,11 @@
 import asyncio
 import discord
 from discord.ext import commands
-import variables as var
-import database as db
-from functions import get_prefix
-from greetings import greeting
-from ext.permissions import has_command_permission
+import axiol.variables as var
+import axiol.database as db
+from axiol.functions import get_prefix
+from axiol.greetings import greeting
+from axiol.ext.permissions import has_command_permission
 
 
 class Welcome(commands.Cog):
@@ -14,7 +14,7 @@ class Welcome(commands.Cog):
 
     # Simple check to see if this cog (plugin) is enabled
     @staticmethod
-    async def cog_check(ctx):
+    async def cog_check(ctx, **kwargs):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
         if guild_doc.get("Welcome"):
             return True
@@ -465,7 +465,7 @@ class Welcome(commands.Cog):
     @has_command_permission()
     async def w_reset(self, ctx):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
-        newdata = {
+        new_data = {
             "$set": {
                 "message": None,
                 "welcomegreeting": "Hope you enjoy your stay here ✨",
@@ -478,7 +478,7 @@ class Welcome(commands.Cog):
             }
         }
 
-        await db.WELCOME.update_one(guild_doc, newdata)
+        await db.WELCOME.update_one(guild_doc, new_data)
         await ctx.send(
             embed=discord.Embed(
                 description=(
@@ -505,7 +505,7 @@ class Welcome(commands.Cog):
             channel = self.bot.get_channel(welcome_doc.get("channelid"))
 
             def get_content():
-                if welcome_doc.get("message") == None:
+                if welcome_doc.get("message") is None:
                     content = greeting(member.mention)
 
                 else:
@@ -523,7 +523,7 @@ class Welcome(commands.Cog):
 
             auto_roles = welcome_doc["assignroles"]
 
-            if auto_roles != []:
+            if auto_roles:
                 for i in auto_roles:
                     auto_role = member.guild.get_role(i)
                     await member.add_roles(auto_role)

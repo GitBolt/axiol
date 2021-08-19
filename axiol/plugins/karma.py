@@ -2,10 +2,10 @@ import nltk
 import discord
 from discord.ext import commands
 from nltk.sentiment import SentimentIntensityAnalyzer
-import database as db
-import variables as var
-from functions import get_prefix
-from ext.permissions import has_command_permission
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
+from axiol.ext.permissions import has_command_permission
 
 
 nltk.download('vader_lexicon')
@@ -17,7 +17,7 @@ class Karma(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def cog_check(ctx):
+    async def cog_check(ctx, **kwargs):
         """Simple check to see if this cog (plugin) is enabled."""
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
@@ -37,11 +37,7 @@ class Karma(commands.Cog):
     @commands.command()
     @has_command_permission()
     async def karma(self, ctx, karma_user: discord.User = None):
-        if karma_user is None:
-            user = ctx.author
-        else:
-            user = karma_user
-
+        user = ctx.author if karma_user is None else karma_user
         guild_col = db.KARMA_DATABASE[str(ctx.guild.id)]
         userdata = await guild_col.find_one({"_id": user.id})
 
@@ -63,15 +59,12 @@ class Karma(commands.Cog):
                 title=f"Karma for {user.name}",
                 color=var.C_MAIN
             ).add_field(
-                name="Karma", value=userdata["karma"], inline=True
+                name="Karma", value=userdata["karma"]
             ).add_field(
                 name="Position", value=f"{position}/{len(karmas)}", inline=False
             ).set_thumbnail(url=user.avatar_url)
 
-            total_karma = 0
-            for i in karmas:
-                total_karma += i["karma"]
-
+            total_karma = sum(i["karma"] for i in karmas)
             average = total_karma/len(karmas)
 
             if userdata["karma"] > average:
@@ -294,7 +287,7 @@ class Karma(commands.Cog):
 
             new_settings = settings.get("blacklists").copy()
 
-            if not channel.id in new_settings:
+            if channel.id not in new_settings:
                 await ctx.send("This channel is not blacklisted")
 
             else:
@@ -346,23 +339,22 @@ class Karma(commands.Cog):
                 polarity = sia.polarity_scores(message.content)
                 result = max(polarity, key=polarity.get)
 
-                def getkarma():
+                def get_karma():
                     if result == "neg":
                         return -polarity[result]
 
                     elif result == "pos":
                         return polarity[result]
 
-                    else:
-                        return 0
+                    return 0
 
                 if userdata is None:
                     await guild_col.insert_one(
-                        {"_id": message.author.id, "karma": getkarma()}
+                        {"_id": message.author.id, "karma": get_karma()}
                     )
 
                 else:
-                    new_karma = getkarma()
+                    new_karma = get_karma()
                     new_karma += userdata["karma"]
                     await guild_col.update_one(
                         userdata, {"$set": {"karma": new_karma}}

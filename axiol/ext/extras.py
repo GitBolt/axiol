@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import variables as var
-from functions import get_prefix
-import database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
+import axiol.database as db
 
 
 class Extras(commands.Cog):
@@ -95,7 +95,7 @@ class Extras(commands.Cog):
             color=var.C_MAIN
         ).add_field(
             name="Server Count",
-            value=guild_count,
+            value=str(guild_count),
             inline=False
         ).add_field(
             name="Members",
@@ -133,16 +133,19 @@ class Extras(commands.Cog):
         )
 
         embed.add_field(
-            name="Channels", value=len(ctx.guild.channels), inline=False
+            name="Channels", value=str(len(ctx.guild.channels)), inline=False
         )
 
         embed.add_field(
             name="Voice Channels",
-            value=len(ctx.guild.voice_channels),
+            value=str(len(ctx.guild.voice_channels)),
             inline=False
         )
 
-        embed.add_field(name="Roles", value=len(ctx.guild.roles), inline=False)
+        embed.add_field(
+            name="Roles", value=str(len(ctx.guild.roles)), inline=False
+        )
+
         embed.add_field(
             name="Boost Level", value=ctx.guild.premium_tier, inline=False
         )
@@ -159,11 +162,8 @@ class Extras(commands.Cog):
         if guild_verify_doc is not None:
             role = ctx.guild.get_role(guild_verify_doc.get("roleid"))
 
-            count = 0
-            for member in ctx.guild.members:
-                if role in member.roles:
-                    count += 1
-            embed.add_field(name="Non Verified Members", value=count)
+            count = sum(role in member.roles for member in ctx.guild.members)
+            embed.add_field(name="Non Verified Members", value=str(count))
 
         await ctx.send(embed=embed)
 

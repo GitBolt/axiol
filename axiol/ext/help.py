@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
-import variables as var
-import database as db
-from functions import get_prefix
+import axiol.variables as var
+import axiol.database as db
+from axiol.functions import get_prefix
 import asyncio
 
 
 async def levelhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title=f"{var.E_LEVELING}  Leveling",
         description="Ah yes leveling, MEE6 who?",
         color=var.C_MAIN
@@ -53,13 +53,11 @@ async def levelhelp(ctx: commands.Context):
             "attachments/843519647055609856/845662999686414336/Logo1.png"
     )
 
-    return embed
-
 
 async def modhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    embed = discord.Embed(
+    return discord.Embed(
         title="🔨 Moderation",
         description="Reasons in every command except warn is optional :)",
         color=var.C_MAIN
@@ -130,12 +128,10 @@ async def modhelp(ctx: commands.Context):
                 "843519647055609856/845662999686414336/Logo1.png"
         )
 
-    return embed
-
 
 async def rrhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title="✨ Reaction Roles",
         description=(
             "Whether it be default, custom, animated or even deleted after "
@@ -174,12 +170,10 @@ async def rrhelp(ctx: commands.Context):
             "843530558126817280/Logo.png"
     )
 
-    return embed
-
 
 async def welcomehelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title="👋 Welcome",
         description="Greet new members with a nice welcome :D",
         color=var.C_MAIN
@@ -218,7 +212,6 @@ async def welcomehelp(ctx: commands.Context):
         url="https://cdn.discordapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
     )
-    return embed
 
 
 async def verifyhelp(ctx: commands.Context):
@@ -270,44 +263,49 @@ async def verifyhelp(ctx: commands.Context):
 
 async def chatbothelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
-        title="🤖 Chatbot",
-        description=(
-            "I will reply to pings in every channel however setting up "
-            "a bot chat channel won't require you ping me!"
-        ),
-        color=var.C_MAIN,
-    ).add_field(
-        name=prefix + "setchatbot `<#channel>`",
-        value="Makes a channel for chatting with me! All messages sent there will be replied by me :D",
-        inline=False
-    ).add_field(
-        name=prefix + "removechatbot `<#channel>`",
-        value="Removes a chatbot channel",
-        inline=False
-    ).add_field(
-        name=prefix + "chatbotchannels",
-        value="Shows all channels where chat bot is enabled",
-        inline=False
-    ).add_field(
-        name=prefix + "chatbotreport `<description>`",
-        value=(
-            "Sends report/bug related to the chatbot directly to the"
-            " [Support server](https://discord.gg/KTn4TgwkUT)!"
+    return (
+        discord.Embed(
+            title="🤖 Chatbot",
+            description=(
+                "I will reply to pings in every channel however setting up "
+                "a bot chat channel won't require you ping me!"
+            ),
+            color=var.C_MAIN,
         )
-    ).set_thumbnail(
-        url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
-            "845662999686414336/Logo1.png"
+        .add_field(
+            name=prefix + "setchatbot `<#channel>`",
+            value="Makes a channel for chatting with me! All messages sent there will be replied by me :D",
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "removechatbot `<#channel>`",
+            value="Removes a chatbot channel",
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "chatbotchannels",
+            value="Shows all channels where chat bot is enabled",
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "chatbotreport `<description>`",
+            value=(
+                "Sends report/bug related to the chatbot directly to the"
+                " [Support server](https://discord.gg/KTn4TgwkUT)!"
+            ),
+        )
+        .set_thumbnail(
+            url=(
+                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "845662999686414336/Logo1.png"
+            )
         )
     )
-
-    return embed
 
 
 async def automodhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title="🛡️ Auto Moderation",
         description="I will try my best to keep the chats clean!",
         color=var.C_MAIN,
@@ -358,13 +356,11 @@ async def automodhelp(ctx: commands.Context):
         )
     )
 
-    return embed
-
 
 async def karmahelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    embed = discord.Embed(
+    return discord.Embed(
         title="🎭 Karma",
         description="Let's see who is the nicest member!",
         color=var.C_MAIN,
@@ -400,12 +396,10 @@ async def karmahelp(ctx: commands.Context):
         )
     )
 
-    return embed
-
 
 async def settingshelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title=f"{var.E_SETTINGS} Settings",
         description="Configure my settings and plugins for this server :D",
         color=var.C_MAIN
@@ -442,69 +436,73 @@ async def settingshelp(ctx: commands.Context):
         )
     )
 
-    return embed
-
 
 async def funhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
-        title=f"🎯 Fun",
-        description="Let's have some fun!",
-        color=var.C_MAIN
-    ).add_field(
-        name=prefix + "typeracer",
-        value=(
-            "Quickly join a type racing queue with most players! "
-            "Make sure that I can DM you for this to work"
-        ),
-        inline=False
-    ).add_field(
-        name=prefix + "typeracer new `<player_count>`",
-        value=(
-            "Create your own type racing match,"
-            " share the code with your friends for them to join!"
-        ),
-        inline=False
-    ).add_field(
-        name=prefix + "typeracer join `<code>`",
-        value=(
-            "Join a type racing match. Make sure the code is valid!"
-        ),
-        inline=False
-    ).add_field(
-        name=prefix + "typeracer exit",
-        value="Leave the type racing queue in which you are currently in",
-        inline=False
-    ).add_field(
-        name=prefix + "typingtest `<type>`",
-        value=(
-            "Starts a solo typing test! There are two types: `time` and `word`"
-        ),
-        inline=False
-    ).add_field(
-        name=prefix + "avatar `<user>`",
-        value=(
-            "Shows avatar of any user! "
-            "Works with users outside the server if User ID is correct"
-        ),
-        inline=False
-    ).add_field(
-        name=prefix + "embed `<#channel>`",
-        value="Generate an embed!",
-        inline=False
-    ).set_thumbnail(
-        url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
+    return (
+        discord.Embed(
+            title=f"🎯 Fun",
+            description="Let's have some fun!",
+            color=var.C_MAIN,
+        )
+        .add_field(
+            name=prefix + "typeracer",
+            value=(
+                "Quickly join a type racing queue with most players! "
+                "Make sure that I can DM you for this to work"
+            ),
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "typeracer new `<player_count>`",
+            value=(
+                "Create your own type racing match,"
+                " share the code with your friends for them to join!"
+            ),
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "typeracer join `<code>`",
+            value=("Join a type racing match. Make sure the code is valid!"),
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "typeracer exit",
+            value="Leave the type racing queue in which you are currently in",
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "typingtest `<type>`",
+            value=(
+                "Starts a solo typing test! There are two types: `time` and `word`"
+            ),
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "avatar `<user>`",
+            value=(
+                "Shows avatar of any user! "
+                "Works with users outside the server if User ID is correct"
+            ),
+            inline=False,
+        )
+        .add_field(
+            name=prefix + "embed `<#channel>`",
+            value="Generate an embed!",
+            inline=False,
+        )
+        .set_thumbnail(
+            url=(
+                "https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
+            )
         )
     )
-
-    return embed
 
 
 async def giveawayhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    embed = discord.Embed(
+    return discord.Embed(
         title=f"🎉 Giveaway",
         description="",
         color=var.C_MAIN
@@ -529,12 +527,11 @@ async def giveawayhelp(ctx: commands.Context):
             "845662999686414336/Logo1.png"
         )
     )
-    return embed
 
 
 async def extrahelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    return discord.Embed(
         title="▶️ Extras",
         description=(
             "Commands that are useful but don't belong to other categories!"
@@ -566,8 +563,6 @@ async def extrahelp(ctx: commands.Context):
             "845662999686414336/Logo1.png"
         )
     )
-
-    return embed
 
 
 class Help(commands.Cog):
@@ -705,7 +700,7 @@ class Help(commands.Cog):
                 await help_msg.remove_reaction(var.E_SETTINGS, self.bot.user)
 
                 for i in guild_doc:
-                    if guild_doc.get(i) == True:
+                    if guild_doc.get(i):
                         await help_msg.remove_reaction(
                             var.DICT_PLUGIN_EMOJIS.get(i), self.bot.user
                         )
@@ -716,7 +711,7 @@ class Help(commands.Cog):
     async def leveling(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Leveling") == True:
+        if guild_doc.get("Leveling"):
             await ctx.send(embed=await levelhelp(ctx))
 
         else:
@@ -748,16 +743,21 @@ class Help(commands.Cog):
                 )
             )
 
-    @help.command(name="reactionroles", aliases=["reaction_roles", "rr", "reaction-roles"])
+    @help.command(
+        name="reactionroles", aliases=["reaction_roles", "rr", "reaction-roles"]
+    )
     async def reaction_roles(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("ReactionRoles") == True:
+        if guild_doc.get("ReactionRoles"):
             await ctx.send(embed=await rrhelp(ctx))
 
         else:
             await ctx.send(embed=discord.Embed(
-                description=f"{var.E_DISABLE} The Reaction Roles plugin is disabled in this server",
+                description=(
+                    f"{var.E_DISABLE} The Reaction Roles plugin"
+                    f" is disabled in this server"
+                ),
                 color=var.C_ORANGE
             ))
 
@@ -765,7 +765,7 @@ class Help(commands.Cog):
     async def welcome(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Welcome") == True:
+        if guild_doc.get("Welcome"):
             await ctx.send(embed=await welcomehelp(ctx))
 
         else:
@@ -783,7 +783,7 @@ class Help(commands.Cog):
     async def verification(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Verification") == True:
+        if guild_doc.get("Verification"):
             await ctx.send(embed=await verifyhelp(ctx))
 
         else:
@@ -801,7 +801,7 @@ class Help(commands.Cog):
     async def chatbot(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Chatbot") == True:
+        if guild_doc.get("Chatbot"):
             await ctx.send(embed=await chatbothelp(ctx))
 
         else:
@@ -819,7 +819,7 @@ class Help(commands.Cog):
     async def automod(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("AutoMod") == True:
+        if guild_doc.get("AutoMod"):
             await ctx.send(embed=await automodhelp(ctx))
 
         else:
@@ -837,7 +837,7 @@ class Help(commands.Cog):
     async def karma(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Karma") == True:
+        if guild_doc.get("Karma"):
             await ctx.send(embed=await karmahelp(ctx))
 
         else:
@@ -855,7 +855,7 @@ class Help(commands.Cog):
     async def fun(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Fun") == True:
+        if guild_doc.get("Fun"):
             await ctx.send(embed=await funhelp(ctx))
 
         else:
@@ -870,7 +870,7 @@ class Help(commands.Cog):
     async def giveaway(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
-        if guild_doc.get("Giveaway") == True:
+        if guild_doc.get("Giveaway"):
             await ctx.send(embed=await giveawayhelp(ctx))
 
         else:

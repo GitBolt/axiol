@@ -2,9 +2,9 @@ import asyncio
 import discord
 from discord.ext import commands
 from discord.ext.commands import check, Context
-import variables as var
-import database as db
-from functions import get_prefix
+import axiol.variables as var
+import axiol.database as db
+from axiol.functions import get_prefix
 
 
 def user_or_admin(my_id):
@@ -102,7 +102,7 @@ class Settings(commands.Cog):
                     title=f"{plugin_type} Plugin",
                 )
 
-                if guild_doc.get(plugin_type) == True:
+                if guild_doc.get(plugin_type):
                     embed.description = (
                         f"{var.E_ENABLE} {plugin_type} is currently enabled"
                     )

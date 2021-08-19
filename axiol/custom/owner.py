@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-import database as db
-from functions import update_db
+import axiol.database as db
+from axiol.functions import update_db
 import io
 import contextlib
 import textwrap
@@ -14,7 +14,7 @@ class Owner(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def cog_check(ctx):
+    def cog_check(ctx, **kwargs):
         return ctx.author.id == 791950104680071188
 
     @commands.command(aliases=["eval"])

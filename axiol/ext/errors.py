@@ -3,7 +3,7 @@ import traceback
 import discord
 import asyncio
 from discord.ext import commands
-from variables import C_RED
+from axiol.variables import C_RED
 
 
 class Errors(commands.Cog):
@@ -31,7 +31,6 @@ class Errors(commands.Cog):
                 )
             )
 
-        # Missing Permissions
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send(
                 embed=discord.Embed(
@@ -44,7 +43,6 @@ class Errors(commands.Cog):
                 )
             )
 
-        # Member not found (left)
         elif isinstance(error, commands.MemberNotFound):
             await ctx.send(
                 embed=discord.Embed(
@@ -59,7 +57,6 @@ class Errors(commands.Cog):
                 )
             )
 
-        # User not found (account deleted)
         elif isinstance(error, commands.UserNotFound):
             await ctx.send(
                 embed=discord.Embed(
@@ -73,7 +70,6 @@ class Errors(commands.Cog):
                 )
             )
 
-        # Message not found
         elif isinstance(error, commands.MessageNotFound):
             await ctx.send(
                 embed=discord.Embed(
@@ -86,7 +82,6 @@ class Errors(commands.Cog):
                 )
             )
 
-        # Message not found
         elif isinstance(error, commands.GuildNotFound):
             await ctx.send(
                 embed=discord.Embed(
@@ -133,7 +128,7 @@ class Errors(commands.Cog):
             if isinstance(error.original, asyncio.TimeoutError):
                 await ctx.send(
                     "Time is up! You failed to respond under time "
-                    "therefore the proccess has been cancelled."
+                    "therefore the process has been cancelled."
                 )
 
             else:
@@ -141,11 +136,7 @@ class Errors(commands.Cog):
                     type(error), error, error.__traceback__, file=sys.stderr
                 )
 
-        # Cog check failure
-        elif isinstance(error, commands.CheckFailure):
-            pass
-
-        else:
+        elif not isinstance(error, commands.CheckFailure):
             traceback.print_exception(
                 type(error), error, error.__traceback__, file=sys.stderr
             )

@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-import database as db
-import variables as var
-from functions import get_prefix
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
 
 
 def has_command_permission():
@@ -15,7 +15,7 @@ def has_command_permission():
             permitted_roles = [i for i in guild_doc[plugin_name][cmd_name]]
             author_roles = [i.id for i in ctx.author.roles]
 
-            if permitted_roles == []:
+            if not permitted_roles:
                 return True
 
             else:
@@ -182,7 +182,7 @@ class Permissions(commands.Cog):
                         )
                     elif (
                         data[1].strip("<>@&").isnumeric() == False or
-                        ctx.guild.get_role(int(data[1].strip("<>@&"))) == None
+                        ctx.guild.get_role(int(data[1].strip("<>@&"))) is None
                     ):
                         await ctx.send(
                             embed=discord.Embed(

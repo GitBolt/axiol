@@ -2,10 +2,10 @@ import random
 import asyncio
 import discord
 from discord.ext import commands
-import database as db
-import variables as var
-from functions import get_prefix
-from ext.permissions import has_command_permission
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
+from axiol.ext.permissions import has_command_permission
 
 
 class Verification(commands.Cog):
@@ -60,7 +60,7 @@ class Verification(commands.Cog):
         try:
             ch = self.bot.get_channel(int(user_msg.content.strip("<>#")))
 
-        except:
+        except Exception:
             await db.PLUGINS.update_one(
                 await db.PLUGINS.find_one({"_id": ctx.guild.id}),
                 {"$set": {"Welcome": False}})
@@ -169,7 +169,7 @@ class Verification(commands.Cog):
                         )
                     )
 
-            except:
+            except Exception:
                 await db.PLUGINS.update_one(
                     await db.PLUGINS.find_one({"_id": ctx.guild.id}),
                     {"$set": {"Verification": False}}
@@ -234,7 +234,7 @@ class Verification(commands.Cog):
             try:
                 await alert_bot_msg.clear_reactions()
 
-            except:
+            except Exception:
                 pass
 
             existing_n_verified = discord.utils.get(
@@ -658,12 +658,11 @@ class Verification(commands.Cog):
                     message.guild.name
                 )
 
-            else:
-                if (
-                    message.channel.id == guild_verify_doc["channel"]
-                    and message.author != self.bot.user
-                ):
-                    await message.delete()
+            elif (
+                message.channel.id == guild_verify_doc["channel"]
+                and message.author != self.bot.user
+            ):
+                await message.delete()
 
     @commands.Cog.listener()
     async def on_member_join(self, member):

@@ -3,8 +3,8 @@
 import discord
 from discord.ext import commands, tasks
 import string
-from functions import get_randomtext
-import variables as var
+from axiol.functions import get_random_text
+import axiol.variables as var
 
 
 class LogicallyAnswered(commands.Cog):
@@ -22,7 +22,7 @@ class LogicallyAnswered(commands.Cog):
             ctx.message.guild.roles
         )
 
-        if msg != None and role in ctx.author.roles:
+        if msg is not None and role in ctx.author.roles:
             # Polls channel
             channel = self.bot.get_channel(789214004950204416)
 
@@ -41,19 +41,19 @@ class LogicallyAnswered(commands.Cog):
             await msg.add_reaction("❌")
             await msg.add_reaction("🤷‍♂️")
 
-        elif msg == None and not role in ctx.author.roles:
+        elif msg is None and role not in ctx.author.roles:
             await ctx.send(
                 "You neither specified your message nor you are level 30+,"
                 " sorry you can't use the command right now."
             )
 
-        elif msg == None:
+        elif msg is None:
             await ctx.send(
                 "__You need to specify the message to start a poll!__\n"
                 " Format: ```!poll <yourmessage>```"
             )
 
-        elif not role in ctx.author.roles:
+        else:
             await ctx.send(
                 "You don't have level 30+ role yet, "
                 "you can't use the command right now."
@@ -111,8 +111,10 @@ class LogicallyAnswered(commands.Cog):
                 await message.add_reaction('✅')
                 await message.add_reaction('❌')
 
-            if (str(message.channel) == '📝〢one-word-story' and
-                    message.author.bot == False):
+            if (
+                str(message.channel) == '📝〢one-word-story'
+                and not message.author.bot
+            ):
 
                 last_message = await message.channel.history(limit=2).flatten()
                 last_message_author = last_message[1].author
@@ -129,7 +131,7 @@ class LogicallyAnswered(commands.Cog):
                     try:
                         await message.delete()
 
-                    except:
+                    except Exception:
                         pass
 
                 if (
@@ -142,12 +144,12 @@ class LogicallyAnswered(commands.Cog):
                     try:
                         await message.delete()
 
-                    except:
+                    except Exception:
                         pass
 
             if (
                 str(message.channel) == "💯〢counting-to-420k"
-                and message.author.bot == False
+                and not message.author.bot
             ):
 
                 fetch = await message.channel.history(limit=2).flatten()
@@ -176,9 +178,9 @@ async def one_word_story(self):
 
     first_word = bot_embeds[0]["fields"][0]["value"]
     messages = await channel.history(after=bot_msg).flatten()
-    previous_story = " ".join([msg.content for msg in messages])
+    previous_story = " ".join(msg.content for msg in messages)
 
-    new_word = await get_randomtext(0)
+    new_word = await get_random_text(0)
 
     embed = discord.Embed(
         title=f"Create a new story!",

@@ -132,7 +132,7 @@ class Welcome(commands.Cog):
                 }
             }
 
-            db.WELCOME.update_one(guild_doc, new_data)
+            await db.WELCOME.update_one(guild_doc, new_data)
 
             await ctx.send(embed=discord.Embed(
                 title="Changed welcome channel",

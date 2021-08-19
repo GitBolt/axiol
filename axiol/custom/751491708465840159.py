@@ -59,7 +59,7 @@ class LogicallyAnswered(commands.Cog):
                 "you can't use the command right now."
             )
 
-    @commands.group(pass_context=True, invoke_without_command=True)
+    @commands.group(invoke_without_command=True)
     async def ows(self, ctx):
         status = one_word_story.is_running()
         seconds = one_word_story.seconds
@@ -137,7 +137,7 @@ class LogicallyAnswered(commands.Cog):
                     or "-" in list(message.content)
                     or "_" in list(message.content)
                     or "." in list(message.content)
-                        or "+" in list(message.content)
+                    or "+" in list(message.content)
                 ):
                     try:
                         await message.delete()
@@ -168,7 +168,7 @@ class LogicallyAnswered(commands.Cog):
 
 
 @tasks.loop(hours=12)
-async def one_word_story(self, _ctx):
+async def one_word_story(self):
     channel = self.bot.get_channel(803308171577393172)
     bot_msg = await channel.history().find(lambda m: m.author == self.bot.user)
 
@@ -178,13 +178,13 @@ async def one_word_story(self, _ctx):
     messages = await channel.history(after=bot_msg).flatten()
     previous_story = " ".join([msg.content for msg in messages])
 
-    new_word = await get_randomtext(0).strip(".")
+    new_word = await get_randomtext(0)
 
     embed = discord.Embed(
         title=f"Create a new story!",
         description=f">>> **Previous story**\n{first_word} {previous_story}",
         color=var.C_MAIN
-    ).add_field(name="New word", value=new_word)
+    ).add_field(name="New word", value=new_word.strip("."))
 
     await channel.send(embed=embed)
 

@@ -30,9 +30,9 @@ class BarGraph(commands.Cog):
 
             await ctx.trigger_typing()
             async with request(
-                    "GET",
-                    f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}"
-                    f"?limit={limit}"
+                "GET",
+                f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}"
+                f"?limit={limit}"
             ) as res:
                 response = await res.json()
 

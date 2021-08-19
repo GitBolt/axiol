@@ -16,90 +16,117 @@ class Karma(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #Simple check to see if this cog (plugin) is enabled
-    async def cog_check(self, ctx):
-        GuildDoc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
-        if GuildDoc.get("Karma"):
+    @staticmethod
+    async def cog_check(ctx):
+        """Simple check to see if this cog (plugin) is enabled."""
+        guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
+
+        if guild_doc.get("Karma"):
             return True
         else:
-            await ctx.send(embed=discord.Embed(
-                description=f"{var.E_DISABLE} The Karma plugin is disabled in this server",
-                color=var.C_ORANGE
-            ))
-
-
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Karma plugin is"
+                        " disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
+            )
 
     @commands.command()
     @has_command_permission()
-    async def karma(self, ctx, karmauser:discord.User=None):
-        if karmauser is None:
+    async def karma(self, ctx, karma_user: discord.User = None):
+        if karma_user is None:
             user = ctx.author
         else:
-            user = karmauser
+            user = karma_user
 
-        GuildCol = db.KARMA_DATABASE[str(ctx.guild.id)]
-        userdata = await GuildCol.find_one({"_id": user.id})
+        guild_col = db.KARMA_DATABASE[str(ctx.guild.id)]
+        userdata = await guild_col.find_one({"_id": user.id})
 
-        karmas = [x async for x in GuildCol.find({
-
-                "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                
-            }).sort("karma", -1)]
+        karmas = [
+            x async for x in guild_col.find(
+                {
+                    "_id": {"$ne": 0},
+                    # Removing ID 0 (Config doc, unrelated to user xp)
+                }
+            ).sort("karma", -1)
+        ]
 
         if userdata is None:
-                await ctx.send("This user does not have any karma yet...")
+            await ctx.send("This user does not have any karma yet...")
         else:
-            position = karmas.index(userdata) + 1 #Index starts with zero
+            # Index starts with zero
+            position = karmas.index(userdata) + 1
             embed = discord.Embed(
-            title=f"Karma for {user.name}",
-            color=var.C_MAIN
-            ).add_field(name="Karma", value=userdata["karma"], inline=True
-            ).add_field(name="Position", value=f"{position}/{len(karmas)}", inline=False
-            ).set_thumbnail(url=user.avatar_url
-            )
-            totalkarma = 0
+                title=f"Karma for {user.name}",
+                color=var.C_MAIN
+            ).add_field(
+                name="Karma", value=userdata["karma"], inline=True
+            ).add_field(
+                name="Position", value=f"{position}/{len(karmas)}", inline=False
+            ).set_thumbnail(url=user.avatar_url)
+
+            total_karma = 0
             for i in karmas:
-                totalkarma += i["karma"]
-            average = totalkarma/len(karmas)
+                total_karma += i["karma"]
+
+            average = total_karma/len(karmas)
+
             if userdata["karma"] > average:
-                embed.description=f"Your karma is better than the average {user.name}! :)"
+                embed.description = (
+                    f"Your karma is better than the average {user.name}! :)"
+                )
+
             if userdata["karma"] < average:
-                embed.description = f"Your karma is lower than the average {user.name}, is it because you don't talk much or you are not nice enough? :eyes:"
+                embed.description = (
+                    f"Your karma is lower than the average {user.name}, "
+                    f"is it because you don't talk much or you are not nice "
+                    f"enough? :eyes:"
+                )
+
             if position == 1:
-                embed.description = f"Woohoo {user.name}, you are the nicest person in the server!"
+                embed.description = (
+                    f"Woohoo {user.name}, you are the nicest "
+                    f"person in the server!"
+                )
+
             await ctx.channel.send(embed=embed)
 
-
-    @commands.command(aliases=["kb"])
+    @commands.command(name="karmaboard", aliases=["kb"])
     @has_command_permission()
-    async def karmaboard(self, ctx):
-        GuildCol = db.KARMA_DATABASE[str(ctx.guild.id)]
-        karmas = [x async for x in GuildCol.find({
+    async def karma_board(self, ctx):
+        guild_col = db.KARMA_DATABASE[str(ctx.guild.id)]
 
-                "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                
-            }).sort("karma", -1)]
+        karmas = [
+            # Removing ID 0 (Config doc, unrelated to user xp)
+            x async for x in
+            guild_col.find({"_id": {"$ne": 0}}).sort("karma", -1)
+        ]
 
         if len(karmas) < 10:
-            exactpages = 1
+            exact_pages = 1
         else:
-            exactpages = len(karmas) / 10
-        if type(exactpages) != int:
-            all_pages = round(exactpages) + 1
-        else:
-            all_pages = exactpages
+            exact_pages = len(karmas) / 10
 
-        totalkarma = 0
+        if type(exact_pages) != int:
+            all_pages = round(exact_pages) + 1
+
+        else:
+            all_pages = exact_pages
+
+        total_karma = 0
         for i in karmas:
-            totalkarma += i["karma"]
-        average = totalkarma/len(karmas)
+            total_karma += i["karma"]
+
+        average = total_karma/len(karmas)
 
         embed = discord.Embed(
-        title=f"Karma Board", 
-        description=f"The average karma in this server is **{average}**",
-        color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url
-        )
+            title=f"Karma Board",
+            description=f"The average karma in this server is **{average}**",
+            color=var.C_BLUE
+        ).set_thumbnail(url=ctx.guild.icon_url)
 
         count = 0
         for i in karmas:
@@ -107,174 +134,240 @@ class Karma(commands.Cog):
             try:
                 user = self.bot.get_user(i.get("_id"))
                 karma = i.get("karma")
-                embed.add_field(name=f"{count}: {user}", value=f"Total Karma: {karma}", inline=False)
-            except:
+                embed.add_field(
+                    name=f"{count}: {user}",
+                    value=f"Total Karma: {karma}",
+                    inline=False
+                )
+
+            except Exception:
                 print(f"Not found {i}")
+
             if count == 10:
                 break
             
         embed.set_footer(text=f"Page 1/{all_pages}")
-        botmsg = await ctx.send(embed=embed)
-        await botmsg.add_reaction("◀️")
-        await botmsg.add_reaction("⬅️")
-        await botmsg.add_reaction("➡️")
-        await botmsg.add_reaction("▶️")
+        bot_msg = await ctx.send(embed=embed)
+        await bot_msg.add_reaction("◀️")
+        await bot_msg.add_reaction("⬅️")
+        await bot_msg.add_reaction("➡️")
+        await bot_msg.add_reaction("▶️")
 
-        def reactioncheck(reaction, user):
-            return user == ctx.author and reaction.message == botmsg
+        def reaction_check(r, u):
+            return u == ctx.author and r.message == bot_msg
 
         async def pagination(ctx, current_page, embed, GuildCol, all_pages):
-            pagern = current_page + 1
-            embed.set_footer(text=f"Page {pagern}/{all_pages}")
+            page_rn = current_page + 1
+            embed.set_footer(text=f"Page {page_rn}/{all_pages}")
             embed.clear_fields()
 
-            rankcount = (current_page)*10
+            rank_count = current_page * 10
             user_amount = current_page*10
 
-            karmas = [x async for x in GuildCol.find({
-
-                    "_id": { "$ne": 0 }, #Removing ID 0 (Config doc, unrelated to user xp) 
-                    
-                }).sort("karma", -1).limit(user_amount)]
+            karmas = [
+                x async for x in GuildCol.find(
+                    # Removing ID 0 (Config doc, unrelated to user xp)
+                    {"_id": { "$ne": 0 }}
+                ).sort("karma", -1).limit(user_amount)
+            ]
 
             for i in karmas:
-                rankcount += 1
+                rank_count += 1
                 user = self.bot.get_user(i.get("_id"))
                 karma = i.get("karma")
-                embed.add_field(name=f"{rankcount}: {user}", value=f"Total Karma: {karma}", inline=False)
-                if rankcount == (current_page)*10 + 10:
+
+                embed.add_field(
+                    name=f"{rank_count}: {user}",
+                    value=f"Total Karma: {karma}",
+                    inline=False
+                )
+
+                if rank_count == current_page *10 + 10:
                     break
 
         current_page = 0
         while True:
-            reaction, user = await self.bot.wait_for("reaction_add", check=reactioncheck)
+            reaction, user = await self.bot.wait_for(
+                "reaction_add", check=reaction_check
+            )
+
             if str(reaction.emoji) == "◀️":
                 try:
-                    await botmsg.remove_reaction("◀️", ctx.author)
+                    await bot_msg.remove_reaction("◀️", ctx.author)
+
                 except discord.Forbidden:
                     pass
+
                 current_page = 0
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
-                await botmsg.edit(embed=embed)
+                await pagination(ctx, current_page, embed, guild_col, all_pages)
+                await bot_msg.edit(embed=embed)
 
             if str(reaction.emoji) == "➡️":
                 try:
-                    await botmsg.remove_reaction("➡️", ctx.author)
+                    await bot_msg.remove_reaction("➡️", ctx.author)
+
                 except discord.Forbidden:
                     pass
+
                 current_page += 1
                 if current_page > all_pages:
                     current_page -= 1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
-                await botmsg.edit(embed=embed)
+
+                await pagination(ctx, current_page, embed, guild_col, all_pages)
+                await bot_msg.edit(embed=embed)
 
             if str(reaction.emoji) == "⬅️":
                 try:
-                    await botmsg.remove_reaction("⬅️", ctx.author)
+                    await bot_msg.remove_reaction("⬅️", ctx.author)
+
                 except discord.Forbidden:
                     pass
+
                 current_page -= 1
                 if current_page < 0:
                     current_page += 1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
-                await botmsg.edit(embed=embed)
+
+                await pagination(ctx, current_page, embed, guild_col, all_pages)
+                await bot_msg.edit(embed=embed)
 
             if str(reaction.emoji) == "▶️":
                 try:
-                    await botmsg.remove_reaction("▶️", ctx.author)
+                    await bot_msg.remove_reaction("▶️", ctx.author)
+
                 except discord.Forbidden:
                     pass
+
                 current_page = all_pages-1
-                await pagination(ctx, current_page, embed, GuildCol, all_pages)
-                await botmsg.edit(embed=embed)
+                await pagination(ctx, current_page, embed, guild_col, all_pages)
+                await bot_msg.edit(embed=embed)
 
-
-    @commands.command()
+    @commands.command(name="kblacklist")
     @has_command_permission()
-    async def kblacklist(self, ctx, channel:discord.TextChannel=None):
+    async def k_blacklist(self, ctx, channel: discord.TextChannel = None):
         if channel is not None:
-            GuildCol = db.KARMA_DATABASE[(str(ctx.guild.id))]
-            settings = await GuildCol.find_one({"_id": 0})
+            guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
+            settings = await guild_col.find_one({"_id": 0})
 
-            newsettings = settings.get("blacklists").copy()
-            if channel.id in newsettings:
+            new_settings = settings.get("blacklists").copy()
+            if channel.id in new_settings:
                 await ctx.send("This channel is already blacklisted")
+
             else:
-                newsettings.append(channel.id)
-                newdata = {"$set":{
-                    "blacklists": newsettings
-                    }}
-                await GuildCol.update_one(settings, newdata)
+                new_settings.append(channel.id)
+                new_data = {
+                    "$set": {
+                        "blacklists": new_settings
+                    }
+                }
 
-                await ctx.send(embed=discord.Embed(
-                            description=f"{channel.mention} has been blacklisted, hence users won't gain any karma in that channel.",
-                            color=var.C_GREEN)
-                            )
+                await guild_col.update_one(settings, new_data)
+
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"{channel.mention} has been blacklisted, "
+                            f"hence users won't gain any karma in that channel."
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
         else:
-            await ctx.send(embed=discord.Embed(
-            description="🚫 You need to define the channel to blacklist it!",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"```{await get_prefix(ctx)}kblacklist <#channel>```"
-            )
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        "🚫 You need to define the channel to blacklist it!"
+                    ),
+                    color=var.C_RED
+                ).add_field(
+                    name="Format",
+                    value=f"```{await get_prefix(ctx)}kblacklist <#channel>```"
+                )
             )
 
-    @commands.command()
+    @commands.command(name="kwhitelist")
     @has_command_permission()
-    async def kwhitelist(self, ctx, channel:discord.TextChannel=None):
+    async def k_whitelist(self, ctx, channel: discord.TextChannel = None):
         if channel is not None:
-            GuildCol = db.KARMA_DATABASE[(str(ctx.guild.id))]
-            settings = await GuildCol.find_one({"_id": 0})
+            guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
+            settings = await guild_col.find_one({"_id": 0})
 
-            newsettings = settings.get("blacklists").copy()
-            if not channel.id in newsettings:
+            new_settings = settings.get("blacklists").copy()
+
+            if not channel.id in new_settings:
                 await ctx.send("This channel is not blacklisted")
+
             else:
-                newsettings.remove(channel.id)
-                newdata = {"$set":{
-                    "blacklists": newsettings
-                    }}
-                await GuildCol.update_one(settings, newdata)
+                new_settings.remove(channel.id)
+                new_data = {
+                    "$set": {
+                        "blacklists": new_settings
+                    }
+                }
 
-                await ctx.send(embed=discord.Embed(
-                            description=f"{channel.mention} has been whitelisted, hence users would be able to gain karma again in that channel.",
-                            color=var.C_GREEN)
-                            )
+                await guild_col.update_one(settings, new_data)
+
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"{channel.mention} has been whitelisted, hence "
+                            "users would be able to gain karma again in that "
+                            "channel."
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
         else:
-            await ctx.send(embed=discord.Embed(
-            description="🚫 You need to define the channel to whitelist it!",
-            color=var.C_RED
-            ).add_field(name="Format", value=f"```{await get_prefix(ctx)}kwhitelist <#channel>```"
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        "🚫 You need to define the channel to whitelist it!"
+                    ),
+                    color=var.C_RED
+                ).add_field(
+                    name="Format",
+                    value=f"```{await get_prefix(ctx)}kwhitelist <#channel>```"
+                )
             )
-            )
-
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if not message.guild:
             return
-        PluginDoc = await db.PLUGINS.find_one({"_id": message.guild.id})
-        GuildCol = db.KARMA_DATABASE[str(message.guild.id)]
-        SettingsDoc = await GuildCol.find_one({"_id": 0})
-        if PluginDoc["Karma"] and not message.author.bot:
 
-            if not message.channel.id in SettingsDoc["blacklists"]:
-                userdata = await GuildCol.find_one({"_id": message.author.id})
+        plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
+        guild_col = db.KARMA_DATABASE[str(message.guild.id)]
+        settings_doc = await guild_col.find_one({"_id": 0})
+
+        if plugin_doc["Karma"] and not message.author.bot:
+            if not message.channel.id in settings_doc["blacklists"]:
+                userdata = await guild_col.find_one({"_id": message.author.id})
                 polarity = sia.polarity_scores(message.content)
                 result = max(polarity, key=polarity.get)
+
                 def getkarma():
                     if result == "neg":
                         return -polarity[result]
+
                     elif result == "pos":
                         return polarity[result]
+
                     else:
                         return 0
 
                 if userdata is None:
-                    await GuildCol.insert_one({"_id": message.author.id, "karma": getkarma()})
+                    await guild_col.insert_one(
+                        {"_id": message.author.id, "karma": getkarma()}
+                    )
+
                 else:
-                    newkarma = getkarma()
-                    newkarma += userdata["karma"]
-                    await GuildCol.update_one(userdata, {"$set": {"karma": newkarma}})
+                    new_karma = getkarma()
+                    new_karma += userdata["karma"]
+                    await guild_col.update_one(
+                        userdata, {"$set": {"karma": new_karma}}
+                    )
+
 
 def setup(bot):
     bot.add_cog(Karma(bot))

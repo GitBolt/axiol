@@ -12,18 +12,18 @@ class PieChart(commands.Cog):
         aliases=["piegraph", "rankpiechart", "rankpiegraph"]
     )
     async def piechart(self, ctx):
-        botmsg = await ctx.send(
+        bot_msg = await ctx.send(
             f"Fetching data {var.E_LOADING} Just a second!"
         )
 
         await ctx.trigger_typing()
         async with request(
-                "GET",
-                f"https://axiol.up.railway.app/piechart/{ctx.guild.id}"
+            "GET",
+            f"https://axiol.up.railway.app/piechart/{ctx.guild.id}"
         ) as res:
             response = await res.json()
             await ctx.send(response["message"])
-            await botmsg.delete()
+            await bot_msg.delete()
 
 
 def setup(bot):

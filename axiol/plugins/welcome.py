@@ -13,7 +13,8 @@ class Welcome(commands.Cog):
         self.bot = bot
 
     # Simple check to see if this cog (plugin) is enabled
-    async def cog_check(self, ctx):
+    @staticmethod
+    async def cog_check(ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
         if guild_doc.get("Welcome"):
             return True
@@ -29,13 +30,15 @@ class Welcome(commands.Cog):
                 )
             )
 
-    # This command isn't really used, just putted this here to invoke on
-    # first welcome plugin enable
     @commands.command(name="welcomesetup")
     @has_command_permission()
     async def welcome_setup(self, ctx):
+        """This command isn't really used.
+        just put this here to invoke on first welcome plugin enable
+        """
         await ctx.send(
-            "Now send the channel where you want me to send welcome message.")
+            "Now send the channel where you want me to send welcome message."
+        )
 
         def message_check(message):
             return (

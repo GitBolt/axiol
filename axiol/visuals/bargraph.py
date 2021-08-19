@@ -22,22 +22,22 @@ class BarGraph(commands.Cog):
                     color=var.C_RED
                 )
             )
+            return
 
-        else:
-            bot_msg = await ctx.send(
-                f"Fetching data {var.E_LOADING} Just a second!"
-            )
+        bot_msg = await ctx.send(
+            f"Fetching data {var.E_LOADING} Just a second!"
+        )
 
-            await ctx.trigger_typing()
-            async with request(
-                "GET",
-                f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}"
-                f"?limit={limit}"
-            ) as res:
-                response = await res.json()
+        await ctx.trigger_typing()
+        async with request(
+            "GET",
+            f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}"
+            f"?limit={limit}"
+        ) as res:
+            response = await res.json()
 
-                await ctx.send(response["message"])
-                await bot_msg.delete()
+            await ctx.send(response["message"])
+            await bot_msg.delete()
 
 
 def setup(bot):

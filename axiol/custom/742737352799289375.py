@@ -1,4 +1,5 @@
 import discord
+import runs as runs
 from discord.ext import commands
 from discord.ext.commands import check, Context
 import database as db
@@ -25,41 +26,7 @@ class ChemistryHelp(commands.Cog):
     @commands.command(name="chem_addmsg")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_add_msg(self, ctx, *, msg: str = None):
-        if msg is not None:
-
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-
-            data = guild_col.find_one({"_id": 0})
-            if data is None:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
-                await guild_col.insert_one({
-                    "_id": 0,
-                    trigger: response
-                })
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Added the message **{msg}**"
-                            f" with response **{response}**"
-                        ),
-                        color=var.C_BLUE)
-                )
-
-            else:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                response = msg.split("|")[1].lstrip(' ').rstrip(' ')
-
-                await guild_col.update(data, {"$set": {trigger: response}})
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Added the message **{trigger}**"
-                            f" with response **{response}**"
-                        ),
-                        color=var.C_BLUE)
-                )
-        else:
+        if msg is None:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -71,6 +38,40 @@ class ChemistryHelp(commands.Cog):
                     name="Format",
                     value=f"`{await get_prefix(ctx)}addmsg <msg> | <response>`"
                 )
+            )
+            return
+
+        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+
+        data = guild_col.find_one({"_id": 0})
+        if data is None:
+            trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+            response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
+            await guild_col.insert_one({
+                "_id": 0,
+                trigger: response
+            })
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"Added the message **{msg}**"
+                        f" with response **{response}**"
+                    ),
+                    color=var.C_BLUE)
+            )
+
+        else:
+            trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+            response = msg.split("|")[1].lstrip(' ').rstrip(' ')
+
+            await guild_col.update(data, {"$set": {trigger: response}})
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"Added the message **{trigger}**"
+                        f" with response **{response}**"
+                    ),
+                    color=var.C_BLUE)
             )
 
     @commands.command(name="chem_removemsg")
@@ -84,197 +85,142 @@ class ChemistryHelp(commands.Cog):
 
         if data is None:
             await ctx.send("You haven't setted up any message yet...")
+            return
 
-        elif msg.lower() in data.keys():
-            res = data.get(msg.lower())
-            await guild_col.update_one(
-                data, {"$unset": {msg.lower(): ""}}
-            )
-
-            await ctx.send(
-                f"Successfully removed the message **msg**"
-                f" which was having the response **{res}**"
-            )
-
-        else:
+        if msg.lower() not in data.keys():
             await ctx.send("This message has no responses setted up")
+            return
+
+        res = data.get(msg.lower())
+        await guild_col.update_one(
+            data, {"$unset": {msg.lower(): ""}}
+        )
+
+        await ctx.send(
+            f"Successfully removed the message **msg**"
+            f" which was having the response **{res}**"
+        )
 
     @commands.command(name="chem_allmsgs")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_all_msgs(self, ctx):
         guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
         data = guild_col.find_one({"_id": 0})
-        if data is not None:
-            rr_amount = len(data)
 
-            if rr_amount <= 10:
-                exact_pages = 1
-            else:
-                exact_pages = rr_amount / 10
+        if data is None:
+            await ctx.send("There are no message reactions yet")
+            return
 
-            if type(exact_pages) != int:
-                all_pages = round(exact_pages) + 1
-            else:
-                all_pages = exact_pages
+        rr_amount = len(data)
 
-            embed = discord.Embed(
-                title="All message responses",
-                color=var.C_MAIN
-            )
+        exact_pages = 1 if rr_amount <= 10 else (rr_amount / 10)
 
-            async def pagination(current_page, all_pages, embed):
-                page_rn = current_page + 1
-                embed.set_footer(text=f"Page {page_rn}/{all_pages}")
-                embed.clear_fields()
+        if type(exact_pages) != int:
+            all_pages = round(exact_pages) + 1
+        else:
+            all_pages = exact_pages
 
-                rr_count = current_page * 10
-                rr_amount = current_page * 10
+        embed = discord.Embed(
+            title="All message responses",
+            color=var.C_MAIN
+        )
 
-                for i in list(data.items())[rr_amount:]:
-                    rr_count += 1
-                    embed.add_field(name=i[0], value=i[1], inline=False)
+        async def pagination(current_page, all_pages, embed):
+            page_rn = current_page + 1
+            embed.set_footer(text=f"Page {page_rn}/{all_pages}")
+            embed.clear_fields()
 
-                    if rr_count == current_page * 10 + 10:
-                        break
+            rr_count = current_page * 10
+            rr_amount = current_page * 10
 
-            rr_count = 0
-
-            for i in data:
+            for i in list(data.items())[rr_amount:]:
                 rr_count += 1
-                embed.add_field(name=i, value=data.get(i), inline=False)
-                if rr_count == 10:
+                embed.add_field(name=i[0], value=i[1], inline=False)
+
+                if rr_count == current_page * 10 + 10:
                     break
 
-            embed.set_footer(text=f"Page 1/{all_pages}")
-            bot_msg = await ctx.send(embed=embed)
-            await bot_msg.add_reaction("◀️")
-            await bot_msg.add_reaction("⬅️")
-            await bot_msg.add_reaction("➡️")
-            await bot_msg.add_reaction("▶️")
+        rr_count = 0
 
-            def reaction_check(r, u):
-                if (
-                    str(r.emoji) == "◀️"
-                    or str(r.emoji) == "⬅️"
-                    or str(r.emoji) == "➡️"
-                        or str(r.emoji) == "▶️"
-                ):
-                    return u == ctx.author and reaction.message == bot_msg
+        for i in data:
+            rr_count += 1
+            embed.add_field(name=i, value=data.get(i), inline=False)
 
-            current_page = 0
+            if rr_count == 10:
+                break
 
-            while True:
-                reaction, user = await self.bot.wait_for(
-                    "reaction_add", check=reaction_check
-                )
+        embed.set_footer(text=f"Page 1/{all_pages}")
+        bot_msg = await ctx.send(embed=embed)
+        await bot_msg.add_reaction("◀️")
+        await bot_msg.add_reaction("⬅️")
+        await bot_msg.add_reaction("➡️")
+        await bot_msg.add_reaction("▶️")
 
-                if str(reaction.emoji) == "◀️":
-                    try:
-                        await bot_msg.remove_reaction("◀️", ctx.author)
+        def reaction_check(r, u):
+            return (
+                    u == ctx.author
+                    and r.message == bot_msg
+                    and str(r.emoji) in "◀️⬅️➡️▶️"
+            )
 
-                    except discord.Forbidden:
-                        pass
+        current_page = 0
 
-                    current_page = 0
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
+        while True:
+            reaction, user = await self.bot.wait_for(
+                "reaction_add", check=reaction_check
+            )
 
-                if str(reaction.emoji) == "➡️":
-                    try:
-                        await bot_msg.remove_reaction("➡️", ctx.author)
+            if str(reaction.emoji) == "◀️":
+                try:
+                    await bot_msg.remove_reaction("◀️", ctx.author)
 
-                    except discord.Forbidden:
-                        pass
+                except discord.Forbidden:
+                    pass
 
+                current_page = 0
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
+
+            elif str(reaction.emoji) == "➡️":
+                try:
+                    await bot_msg.remove_reaction("➡️", ctx.author)
+
+                except discord.Forbidden:
+                    pass
+
+                current_page += 1
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
+
+            elif str(reaction.emoji) == "⬅️":
+                try:
+                    await bot_msg.remove_reaction("⬅️", ctx.author)
+
+                except discord.Forbidden:
+                    pass
+
+                current_page -= 1
+                if current_page < 0:
                     current_page += 1
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
 
-                if str(reaction.emoji) == "⬅️":
-                    try:
-                        await bot_msg.remove_reaction("⬅️", ctx.author)
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
 
-                    except discord.Forbidden:
-                        pass
+            elif str(reaction.emoji) == "▶️":
+                try:
+                    await bot_msg.remove_reaction("▶️", ctx.author)
 
-                    current_page -= 1
-                    if current_page < 0:
-                        current_page += 1
+                except discord.Forbidden:
+                    pass
 
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
-
-                if str(reaction.emoji) == "▶️":
-                    try:
-                        await bot_msg.remove_reaction("▶️", ctx.author)
-
-                    except discord.Forbidden:
-                        pass
-
-                    current_page = all_pages - 1
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
-
-        else:
-            await ctx.send("There are no message reactions yet")
+                current_page = all_pages - 1
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
 
     @commands.command(name="chem_addreact")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_add_react(self, ctx, *, msg: str = None):
-        if msg is not None:
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-
-            data = guild_col.find_one({"_id": 1})
-
-            if data is None:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
-
-                try:
-                    await ctx.message.add_reaction(emoji)
-                    await ctx.send(
-                        embed=discord.Embed(
-                            description=(
-                                f"Added the message **{msg}**"
-                                f" with reaction **{emoji}**"
-                            ),
-                            color=var.C_BLUE)
-                    )
-
-                except Exception:
-                    await ctx.send(
-                        "Sorry but it seems like either the emoji is invalid"
-                        " or it's a custom emoji from a server where I am not"
-                        " in hence can't use this emoji either :("
-                    )
-
-                await guild_col.insert_one({"_id": 1, trigger: emoji})
-
-            else:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
-
-                try:
-                    await ctx.message.add_reaction(emoji)
-                    await ctx.send(
-                        embed=discord.Embed(
-                            description=(
-                                f"Added the message **{msg}**"
-                                f" with reaction **{emoji}**"
-                            ),
-                            color=var.C_BLUE)
-                    )
-
-                except Exception:
-                    await ctx.send(
-                        "Sorry but it seems like either the emoji is invalid "
-                        "or it's a custom emoji from a server where I am not "
-                        "in hence can't use this emoji either :("
-                    )
-
-                await guild_col.update(data, {"$set": {trigger: emoji}})
-
-        else:
+        if msg is None:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -287,35 +233,84 @@ class ChemistryHelp(commands.Cog):
                     value=f"`{await get_prefix(ctx)}addreaction <msg> <emoji>`"
                 )
             )
+            return
+
+        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        data = guild_col.find_one({"_id": 1})
+
+        if data is None:
+            trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+            emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
+
+            try:
+                await ctx.message.add_reaction(emoji)
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"Added the message **{msg}**"
+                            f" with reaction **{emoji}**"
+                        ),
+                        color=var.C_BLUE)
+                )
+
+            except Exception:
+                await ctx.send(
+                    "Sorry but it seems like either the emoji is invalid"
+                    " or it's a custom emoji from a server where I am not"
+                    " in hence can't use this emoji either :("
+                )
+
+            await guild_col.insert_one({"_id": 1, trigger: emoji})
+            return
+
+        trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+        emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
+
+        try:
+            await ctx.message.add_reaction(emoji)
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"Added the message **{msg}** with reaction **{emoji}**"
+                    ),
+                    color=var.C_BLUE
+                )
+            )
+
+        except Exception:
+            await ctx.send(
+                "Sorry but it seems like either the emoji is invalid "
+                "or it's a custom emoji from a server where I am not "
+                "in hence can't use this emoji either :("
+            )
+
+        await guild_col.update(data, {"$set": {trigger: emoji}})
 
     @commands.command(name="chem_removereact")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_remove_react(self, ctx, *, msg: str = None):
-        if msg is not None:
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-            data = await guild_col.find_one({"_id": 1})
+        if msg is None:
+            return
 
-            if data is not None:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
+        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        data = await guild_col.find_one({"_id": 1})
 
-                if trigger in data.keys():
-                    await guild_col.update(
-                        data, {"$unset": {trigger.lower(): emoji}}
-                    )
+        if data is None:
+            await ctx.send("You haven't setted up any reaction yet...")
+            return
 
-                    await ctx.send(
-                        f"Successfully removed {emoji}"
-                        f" reaction from **{trigger}** message"
-                    )
+        trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
+        emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
-                else:
-                    await ctx.send(
-                        "This message and emoji combination does not exist"
-                    )
+        if trigger not in data.keys():
+            await ctx.send("This message and emoji combination does not exist")
+            return
 
-            else:
-                await ctx.send("You haven't setted up any reaction yet...")
+        await guild_col.update(data, {"$unset": {trigger.lower(): emoji}})
+
+        await ctx.send(
+            f"Successfully removed {emoji} reaction from **{trigger}** message"
+        )
 
     @commands.command(name="chem_allreacts")
     @is_user(565059698399641600, 791950104680071188)
@@ -323,118 +318,114 @@ class ChemistryHelp(commands.Cog):
         guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
         data = await guild_col.find_one({"_id": 1})
 
-        if data is not None:
-            rr_amount = len(data)
-            if rr_amount <= 10:
-                exact_pages = 1
-            else:
-                exact_pages = rr_amount / 10
+        if data is None:
+            await ctx.send("There are no message reactions yet")
+            return
 
-            if type(exact_pages) != int:
-                all_pages = round(exact_pages) + 1
+        rr_amount = len(data)
+        exact_pages = 1 if rr_amount <= 10 else (rr_amount / 10)
 
-            else:
-                all_pages = exact_pages
+        if type(exact_pages) != int:
+            all_pages = round(exact_pages) + 1
+        else:
+            all_pages = exact_pages
 
-            embed = discord.Embed(
-                title="All message reactions",
-                color=var.C_MAIN
-            )
+        embed = discord.Embed(
+            title="All message reactions",
+            color=var.C_MAIN
+        )
 
-            async def pagination(current_page, all_pages, embed):
-                page_rn = current_page + 1
-                embed.set_footer(text=f"Page {page_rn}/{all_pages}")
-                embed.clear_fields()
+        async def pagination(current_page, all_pages, embed):
+            page_rn = current_page + 1
+            embed.set_footer(text=f"Page {page_rn}/{all_pages}")
+            embed.clear_fields()
 
-                rr_count = current_page * 10
-                rr_amount = current_page * 10
+            rr_count = current_page * 10
+            rr_amount = current_page * 10
 
-                for i in list(data.items())[rr_amount:]:
-                    rr_count += 1
-                    embed.add_field(name=i[0], value=i[1], inline=False)
-
-                    if rr_count == (current_page) * 10 + 10:
-                        break
-
-            rr_count = 0
-            for i in data:
+            for i in list(data.items())[rr_amount:]:
                 rr_count += 1
-                embed.add_field(name=i, value=data.get(i), inline=False)
+                embed.add_field(name=i[0], value=i[1], inline=False)
 
-                if rr_count == 10:
+                if rr_count == (current_page) * 10 + 10:
                     break
 
-            embed.set_footer(text=f"Page 1/{all_pages}")
-            bot_msg = await ctx.send(embed=embed)
-            await bot_msg.add_reaction("◀️")
-            await bot_msg.add_reaction("⬅️")
-            await bot_msg.add_reaction("➡️")
-            await bot_msg.add_reaction("▶️")
+        rr_count = 0
+        for i in data:
+            rr_count += 1
+            embed.add_field(name=i, value=data.get(i), inline=False)
 
-            def reaction_check(r, u):
-                if (
+            if rr_count == 10:
+                break
+
+        embed.set_footer(text=f"Page 1/{all_pages}")
+        bot_msg = await ctx.send(embed=embed)
+        await bot_msg.add_reaction("◀️")
+        await bot_msg.add_reaction("⬅️")
+        await bot_msg.add_reaction("➡️")
+        await bot_msg.add_reaction("▶️")
+
+        def reaction_check(r, u):
+            if (
                     str(r.emoji) == "◀️"
                     or str(r.emoji) == "⬅️"
                     or str(r.emoji) == "➡️"
                     or str(r.emoji) == "▶️"
-                ):
-                    return u == ctx.author and reaction.message == bot_msg
+            ):
+                return u == ctx.author and reaction.message == bot_msg
 
-            current_page = 0
-            while True:
-                reaction, _ = await self.bot.wait_for(
-                    "reaction_add", check=reaction_check
-                )
+        current_page = 0
+        while True:
+            reaction, _ = await self.bot.wait_for(
+                "reaction_add", check=reaction_check
+            )
 
-                if str(reaction.emoji) == "◀️":
-                    try:
-                        await bot_msg.remove_reaction("◀️", ctx.author)
+            if str(reaction.emoji) == "◀️":
+                try:
+                    await bot_msg.remove_reaction("◀️", ctx.author)
 
-                    except discord.Forbidden:
-                        pass
+                except discord.Forbidden:
+                    pass
 
-                    current_page = 0
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
+                current_page = 0
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
 
-                if str(reaction.emoji) == "➡️":
-                    try:
-                        await bot_msg.remove_reaction("➡️", ctx.author)
+            if str(reaction.emoji) == "➡️":
+                try:
+                    await bot_msg.remove_reaction("➡️", ctx.author)
 
-                    except discord.Forbidden:
-                        pass
+                except discord.Forbidden:
+                    pass
 
+                current_page += 1
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
+
+            if str(reaction.emoji) == "⬅️":
+                try:
+                    await bot_msg.remove_reaction("⬅️", ctx.author)
+
+                except discord.Forbidden:
+                    pass
+
+                current_page -= 1
+                if current_page < 0:
                     current_page += 1
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
 
-                if str(reaction.emoji) == "⬅️":
-                    try:
-                        await bot_msg.remove_reaction("⬅️", ctx.author)
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
 
-                    except discord.Forbidden:
-                        pass
+            if str(reaction.emoji) == "▶️":
+                try:
+                    await bot_msg.remove_reaction("▶️", ctx.author)
 
-                    current_page -= 1
-                    if current_page < 0:
-                        current_page += 1
+                except discord.Forbidden:
+                    pass
 
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
-
-                if str(reaction.emoji) == "▶️":
-                    try:
-                        await bot_msg.remove_reaction("▶️", ctx.author)
-
-                    except discord.Forbidden:
-                        pass
-
-                    current_page = all_pages - 1
-                    await pagination(current_page, all_pages, embed)
-                    await bot_msg.edit(embed=embed)
-
-        else:
-            await ctx.send("There are no message reactions yet")
+                current_page = all_pages - 1
+                await pagination(current_page, all_pages, embed)
+                await bot_msg.edit(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -458,8 +449,8 @@ class ChemistryHelp(commands.Cog):
                 )
 
             if (
-                reaction_data is not None
-                and message.content.lower() in reaction_data.keys()
+                    reaction_data is not None
+                    and message.content.lower() in reaction_data.keys()
             ):
                 await message.add_reaction(
                     reaction_data.get(message.content.lower()))

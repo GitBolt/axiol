@@ -94,79 +94,82 @@ class LogicallyAnswered(commands.Cog):
             allowed = list(string.ascii_lowercase + string.digits)
             return msg <= allowed
 
-        if message.guild.id == 751491708465840159:
+        if message.guild.id != 751491708465840159:
+            return
 
-            if str(message.channel) == '💡〢suggestions':
-                await message.add_reaction('<:upvote:776831295946620948>')
-                await message.add_reaction('<:downvote:776831143453786164>')
+        if str(message.channel) == '💡〢suggestions':
+            await message.add_reaction('<:upvote:776831295946620948>')
+            await message.add_reaction('<:downvote:776831143453786164>')
 
-            if str(message.channel) == '✋〢video-requests':
-                await message.add_reaction('👍')
-                await message.add_reaction('👎')
+        if str(message.channel) == '✋〢video-requests':
+            await message.add_reaction('👍')
+            await message.add_reaction('👎')
 
-            if str(message.channel) == '👋〢welcome':
-                await message.add_reaction('<:elonwave:806962782330552340>')
+        if str(message.channel) == '👋〢welcome':
+            await message.add_reaction('<:elonwave:806962782330552340>')
 
-            if str(message.channel) == '🗳〢vote':
-                await message.add_reaction('✅')
-                await message.add_reaction('❌')
+        if str(message.channel) == '🗳〢vote':
+            await message.add_reaction('✅')
+            await message.add_reaction('❌')
 
-            if (
-                str(message.channel) == '📝〢one-word-story'
-                and not message.author.bot
-            ):
+        if (
+            str(message.channel) == '📝〢one-word-story'
+            and not message.author.bot
+        ):
 
-                last_message = await message.channel.history(limit=2).flatten()
-                last_message_author = last_message[1].author
-                if last_message_author == message.author:
-                    await message.channel.send(
-                        (
-                            f"{message.author.mention} "
-                            "You can't send two messages in a row! "
-                            "Wait for someone else to send a message first"
-                        ),
-                        delete_after=3
-                    )
+            last_message = await message.channel.history(limit=2).flatten()
+            last_message_author = last_message[1].author
+            if last_message_author == message.author:
+                await message.channel.send(
+                    (
+                        f"{message.author.mention} "
+                        "You can't send two messages in a row! "
+                        "Wait for someone else to send a message first"
+                    ),
+                    delete_after=3
+                )
 
-                    try:
-                        await message.delete()
-
-                    except Exception:
-                        pass
-
-                if (
-                    " " in list(message.content)
-                    or "-" in list(message.content)
-                    or "_" in list(message.content)
-                    or "." in list(message.content)
-                    or "+" in list(message.content)
-                ):
-                    try:
-                        await message.delete()
-
-                    except Exception:
-                        pass
-
-            if (
-                str(message.channel) == "💯〢counting-to-420k"
-                and not message.author.bot
-            ):
-
-                fetch = await message.channel.history(limit=2).flatten()
-                last_message = fetch[1].content
-
-                increment = int(last_message) + 1
-
-                if message.content != str(increment):
+                try:
                     await message.delete()
-                    await message.channel.send(
-                        (
-                            f"{message.author.mention}"
-                            " The number you sent is not the correct"
-                            " increment of previous one!"
-                        ),
-                        delete_after=2
-                    )
+
+                except Exception:
+                    pass
+
+            if (
+                " " in list(message.content)
+                or "-" in list(message.content)
+                or "_" in list(message.content)
+                or "." in list(message.content)
+                or "+" in list(message.content)
+            ):
+                try:
+                    await message.delete()
+
+                except Exception:
+                    pass
+
+        elif (
+            str(message.channel) == "💯〢counting-to-420k"
+            and not message.author.bot
+        ):
+
+            fetch = await message.channel.history(limit=2).flatten()
+            last_message = fetch[1].content
+
+            increment = int(last_message) + 1
+
+            if message.content == str(increment):
+                return
+
+            await message.delete()
+            await message.channel.send(
+                (
+                    f"{message.author.mention}"
+                    " The number you sent is not the correct"
+                    " increment of previous one!"
+                ),
+                delete_after=2
+            )
 
 
 @tasks.loop(hours=12)

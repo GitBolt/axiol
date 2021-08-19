@@ -1,7 +1,7 @@
-import discord
 from aiohttp import request
 from discord.ext import commands
-import variables as var
+
+import axiol.variables as var
 
 
 class PieChart(commands.Cog):

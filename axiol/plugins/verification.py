@@ -2,10 +2,10 @@ import random
 import asyncio
 import discord
 from discord.ext import commands
-import database as db
-import variables as var
-from functions import get_prefix
-from ext.permissions import has_command_permission
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
+from axiol.ext.permissions import has_command_permission
 
 
 class Verification(commands.Cog):

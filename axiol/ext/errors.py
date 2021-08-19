@@ -3,7 +3,7 @@ import traceback
 import discord
 import asyncio
 from discord.ext import commands
-from variables import C_RED
+from axiol.variables import C_RED
 
 
 class Errors(commands.Cog):

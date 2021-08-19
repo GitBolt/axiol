@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import check, Context
-import database as db
-import variables as var
-from functions import get_prefix
+import axiol.database as db
+import axiol.variables as var
+from axiol.functions import get_prefix
 
 
 def is_user(*user_ids):

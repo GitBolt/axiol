@@ -1,7 +1,7 @@
-import asyncio
 import random
-from variables import DEFAULT_PREFIX
+
 from database import PREFIXES, LEVEL_DATABASE, PLUGINS, PERMISSIONS
+from variables import DEFAULT_PREFIX
 
 
 async def get_prefix(ctx):

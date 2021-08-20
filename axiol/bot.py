@@ -4,7 +4,7 @@ import os
 import dotenv
 
 from discord.ext import commands
-from classes.logging import log
+from classes.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
 

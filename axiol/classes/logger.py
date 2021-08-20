@@ -75,6 +75,7 @@ class Logger:
             Failure details, error __cause__ and/or solve hint.
         """
         self.__log('red', 'Error', message)
+        quit()
 
     def db(self, message: str) -> None:
         """Log a db call.

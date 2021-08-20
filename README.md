@@ -39,13 +39,11 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 - Fork → Clone → Edit → Commit → Pull request </br>
 *It is recommended to make a new branch for your changes*
 
-<hr>
-
-### :grey_question: Support Server & testing area
+## :grey_question: Support Server & testing area
 ![Discord](https://img.shields.io/discord/843516084266729512)
 > [join](https://discord.gg/Rzz5WS9jXW)
 
-### :star2: Bot lists
+## :star2: Bot lists
 - [Top.gg](https://top.gg/bot/843484459113775114/vote)
 - [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)
 - [Bots.gg](https://discord.bots.gg/bots/843484459113775114)

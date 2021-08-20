@@ -87,6 +87,7 @@ async def on_guild_join(guild):
         })
 
     # Support server Log
+    bot_count = len([b for b in guild.members if b.bot])
     embed = discord.Embed(
         title="I just joined a new server!",
         description=(
@@ -94,7 +95,11 @@ async def on_guild_join(guild):
         ),
         color=var.C_GREEN
     ).add_field(
+        name="ID", value=guild.id
+    ).add_field(
         name="Member count", value=guild.member_count
+    ).add_field(
+        name="Human to bot percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%"
     )
 
     await bot.get_channel(848207106821980213).send(embed=embed)
@@ -103,11 +108,19 @@ async def on_guild_join(guild):
 # Support server Log
 @bot.event
 async def on_guild_remove(guild):
+    
+    bot_count = len([b for b in guild.members if b.bot])
     embed = discord.Embed(
         title="I just got removed from a server",
         description=f"Someone removed me from `{guild.name}` :(",
         color=var.C_RED
-    ).add_field(name="Member count", value=guild.member_count)
+    ).add_field(
+        name="ID", value=guild.id
+    ).add_field(
+        name="Member count", value=guild.member_count
+    ).add_field(
+        name="Human to bot percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%"
+    )
 
     await bot.get_channel(848207106821980213).send(embed=embed)
 

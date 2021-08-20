@@ -9,6 +9,6 @@ venv
 
 
 # Bot configuration and private cog
-.old/custom/private.py
-.env
 .old/
+.env
+*private*

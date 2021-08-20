@@ -18,15 +18,16 @@ class Welcome(commands.Cog):
         if guild_doc.get("Welcome"):
             return True
 
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_DISABLE} The Welcome plugin is "
-                    f"disabled in this server"
-                ),
-                color=var.C_ORANGE
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Welcome plugin is "
+                        f"disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
             )
-        )
 
     @commands.command(name="welcomesetup")
     @has_command_permission()
@@ -126,7 +127,25 @@ class Welcome(commands.Cog):
     async def w_channel(self, ctx, channel: discord.TextChannel = None):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
-        if channel is None:
+        if channel is not None:
+            new_data = {
+                "$set": {
+                    "channelid": channel.id
+                }
+            }
+
+            await db.WELCOME.update_one(guild_doc, new_data)
+
+            await ctx.send(embed=discord.Embed(
+                title="Changed welcome channel",
+                description=(
+                    f"{var.E_ACCEPT} Now users will be"
+                    f" greeted in {channel.mention}"
+                ),
+                color=var.C_GREEN)
+            )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -137,24 +156,6 @@ class Welcome(commands.Cog):
                     name="Format",
                     value=f"`{await get_prefix(ctx)}wchannel <#channel>`")
             )
-            return
-
-        new_data = {
-            "$set": {
-                "channelid": channel.id
-            }
-        }
-
-        await db.WELCOME.update_one(guild_doc, new_data)
-
-        await ctx.send(embed=discord.Embed(
-            title="Changed welcome channel",
-            description=(
-                f"{var.E_ACCEPT} Now users will be"
-                f" greeted in {channel.mention}"
-            ),
-            color=var.C_GREEN)
-        )
 
     @commands.command(name="wmessage")
     @has_command_permission()
@@ -263,30 +264,29 @@ class Welcome(commands.Cog):
 
             if user_msg.content == "cancel" or user_msg.content == "`cancel`":
                 await ctx.send("Cancelled welcome message change :ok_hand:")
-                return
 
-            new_data = {
-                "$set": {
-                    "welcomegreeting": user_msg.content
+            else:
+                new_data = {
+                    "$set": {
+                        "welcomegreeting": user_msg.content
+                    }
                 }
-            }
 
-            await db.WELCOME.update_one(guild_doc, new_data)
+                await db.WELCOME.update_one(guild_doc, new_data)
 
-            await ctx.send(
-                embed=discord.Embed(
-                    title=(
-                        f"{var.E_ACCEPT} Successfully changed "
-                        f"the greeting message!"
-                    ),
-                    description=(
-                        f"The new greeting message is:\n"
-                        f"**{user_msg.content}**"
-                    ),
-                    color=var.C_GREEN
+                await ctx.send(
+                    embed=discord.Embed(
+                        title=(
+                            f"{var.E_ACCEPT} Successfully changed "
+                            f"the greeting message!"
+                        ),
+                        description=(
+                            f"The new greeting message is:\n"
+                            f"**{user_msg.content}**"
+                        ),
+                        color=var.C_GREEN
+                    )
                 )
-            )
-
         except asyncio.TimeoutError:
             await ctx.send(
                 f"**{ctx.author.name}** you took too long"
@@ -368,7 +368,29 @@ class Welcome(commands.Cog):
     async def w_role(self, ctx, role: discord.Role = None):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
-        if role is None:
+        if role is not None:
+            role_list = guild_doc.get("assignroles")
+            updated_list = role_list.copy()
+            updated_list.append(role.id)
+
+            new_data = {
+                "$set": {
+                    "assignroles": updated_list
+                }
+            }
+
+            await db.WELCOME.update_one(guild_doc, new_data)
+
+            await ctx.send(embed=discord.Embed(
+                title="Successfully added auto assign role",
+                description=(
+                    f"{var.E_ACCEPT} Users will be automatically "
+                    f"given {role.mention} when they join"
+                ),
+                color=var.C_GREEN)
+            )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description="🚫 You need to define the role",
@@ -380,28 +402,6 @@ class Welcome(commands.Cog):
                     text="For role either role ID or role mention can be used"
                 )
             )
-            return
-
-        role_list = guild_doc.get("assignroles")
-        updated_list = role_list.copy()
-        updated_list.append(role.id)
-
-        new_data = {
-            "$set": {
-                "assignroles": updated_list
-            }
-        }
-
-        await db.WELCOME.update_one(guild_doc, new_data)
-
-        await ctx.send(embed=discord.Embed(
-            title="Successfully added auto assign role",
-            description=(
-                f"{var.E_ACCEPT} Users will be automatically "
-                f"given {role.mention} when they join"
-            ),
-            color=var.C_GREEN)
-        )
 
     @commands.command(name="wbots")
     @has_command_permission()
@@ -507,7 +507,6 @@ class Welcome(commands.Cog):
         def get_content():
             if welcome_doc.get("message") is None:
                 content = greeting(member.mention)
-
             else:
                 content = f"{member.mention} {welcome_doc.get('message')}"
 

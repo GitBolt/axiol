@@ -19,15 +19,16 @@ class Moderation(commands.Cog):
         if guild_doc.get("Moderation"):
             return True
 
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_DISABLE} The Moderation plugin "
-                    "is disabled in this server"
-                ),
-                color=var.C_ORANGE
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Moderation plugin "
+                        "is disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
             )
-        )
 
     @commands.command()
     @commands.has_permissions(ban_members=True)
@@ -97,8 +98,41 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @has_command_permission()
     async def unban(self, ctx, user: discord.User = None):
-        if user is None:
-            return await ctx.send(
+        if user is not None:
+            bans = await ctx.guild.bans()
+            banned_users = [ban.user for ban in bans]
+
+            if user in banned_users:
+                await ctx.guild.unban(user)
+                await ctx.send(f'Successfully unbanned `{user}` :ok_hand:')
+
+                try:
+                    await user.send(
+                        embed=discord.Embed(
+                            title=(
+                                f"You have been unbanned from {ctx.guild.name}!"
+                            ),
+                            description="Yay I would be happy to see you back!",
+                            color=var.C_GREEN
+                        ).add_field(
+                            name="Unbanned by", value=ctx.author)
+                        )
+
+                except discord.Forbidden:
+                    pass
+            else:
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"The user `{user}` is not banned, "
+                            "therefore cannot unban them."
+                        ),
+                        color=var.C_ORANGE
+                    )
+                )
+
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     description="🚫 You need to define the user to unban them",
                     color=var.C_RED
@@ -106,38 +140,8 @@ class Moderation(commands.Cog):
                     name="Format",
                     value=f"`{await get_prefix(ctx)}unban <user>`"
                 ).set_footer(
-                    text="For user either User mention or User ID can be used"
+                    text="For user either User mention or User ID can be used")
                 )
-            )
-        try:
-            await ctx.guild.unban(user)
-            await ctx.send(f'Successfully unbanned `{user}` and notifed with DM :ok_hand:')
-
-        except discord.errors.NotFound:
-            return await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"The user `{user}` is not banned, "
-                        "therefore cannot unban them."
-                    ),
-                    color=var.C_ORANGE
-                )
-            )
-
-        try:
-            await user.send(
-                embed=discord.Embed(
-                    title=(
-                        f"You have been unbanned from {ctx.guild.name}!"
-                    ),
-                    description="Yay I would be happy to see you back!",
-                    color=var.C_GREEN
-                ).add_field(
-                    name="Unbanned by", value=ctx.author)
-                )
-
-        except discord.Forbidden:
-            pass
 
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
@@ -157,8 +161,23 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @has_command_permission()
     async def mute(self, ctx, member: discord.Member = None):
-        if member is None:
-            return await ctx.send(
+        if member is not None:
+            if not discord.utils.get(ctx.guild.roles, name='Muted'):
+                muted_role = await ctx.guild.create_role(
+                    name="Muted", colour=discord.Colour(0xa8a8a8)
+                )
+
+                for i in ctx.guild.text_channels:
+                    await i.set_permissions(muted_role, send_messages=False)
+
+            else:
+                muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+
+            await member.add_roles(muted_role)
+            await ctx.send(f"Applied chat mute to `{member}` :mute:")
+
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define member in order to mute them"
@@ -174,20 +193,6 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-
-        if not discord.utils.get(ctx.guild.roles, name='Muted'):
-            muted_role = await ctx.guild.create_role(
-                name="Muted", colour=discord.Colour(0xa8a8a8)
-            )
-
-            for i in ctx.guild.text_channels:
-                await i.set_permissions(muted_role, send_messages=False)
-
-        else:
-            muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
-
-        await member.add_roles(muted_role)
-        await ctx.send(f"Applied chat mute to `{member}` :mute:")
 
     @mute.error
     async def mute_error(self, ctx, error):
@@ -225,7 +230,6 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-
         elif not discord.utils.get(ctx.guild.roles, name='Muted'):
             await ctx.send(
                 "There is no muted role yet hence I cannot unmute, "
@@ -360,9 +364,19 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["clean", "clear"])
     @commands.has_permissions(manage_messages=True)
     @has_command_permission()
-    async def purge(self, ctx, limit: Union[int, None] = None):
-        if limit is None:
-            return await ctx.send(
+    async def purge(self, ctx, limit: int = None):
+        if limit is not None:
+            await ctx.channel.purge(limit=limit + 1)
+
+            info = await ctx.send(embed=discord.Embed(
+                description=f"Deleted {limit} messages",
+                color=var.C_ORANGE)
+            )
+            await asyncio.sleep(1)
+            await info.delete()
+
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the amount"
@@ -374,14 +388,6 @@ class Moderation(commands.Cog):
                     value=f"`{await get_prefix(ctx)}purge <amount>`"
                 )
             )
-
-        await ctx.channel.purge(limit=limit + 1)
-
-        info = await ctx.send(embed=discord.Embed(
-            description=f"Deleted {limit} messages",
-            color=var.C_ORANGE),
-            delete_after=1
-        )
 
     @purge.error
     async def purge_error(self, ctx, error):
@@ -399,8 +405,33 @@ class Moderation(commands.Cog):
     async def addrole(
         self, ctx, member: discord.Member = None, role: discord.Role = None
     ):
-        if not member or role is None:
-            return await ctx.send(
+        if member and role is not None:
+            try:
+                await member.add_roles(role)
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"Successfully updated {member.mention} "
+                            f"with {role.mention} role"
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
+            except discord.Forbidden:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="Missing permissions",
+                        description=(
+                            f"I don't have permissions to update the roles"
+                            f" of {member.mention}, either I don't have the"
+                            f" permission or the member is above me"
+                        ),
+                        color=var.C_RED
+                    )
+                )
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
@@ -416,38 +447,38 @@ class Moderation(commands.Cog):
                 )
             )
 
-        try:
-            await member.add_roles(role)
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"Successfully updated {member.mention} "
-                        f"with {role.mention} role"
-                    ),
-                    color=var.C_GREEN
-                )
-            )
-
-        except discord.Forbidden:
-            await ctx.send(
-                embed=discord.Embed(
-                    title="Missing permissions",
-                    description=(
-                        f"I don't have permissions to update the roles"
-                        f" of {member.mention}, either I don't have the"
-                        f" permission or the member is above me"
-                    ),
-                    color=var.C_RED
-                )
-            )
-
     @commands.command(name="removerole")
     @has_command_permission()
     async def remove_role(
         self, ctx, member: discord.Member = None, role: discord.Role = None
     ):
-        if not member or role is None:
-            return await ctx.send(
+        if member and role is not None:
+            try:
+                await member.remove_roles(role)
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=(
+                            f"Successfully updated {member.mention} "
+                            f"by removing {role.mention} role"
+                        ),
+                        color=var.C_GREEN
+                    )
+                )
+
+            except discord.Forbidden:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="Missing permissions",
+                        description=(
+                            f"I don't have permissions to update the roles of"
+                            f" {member.mention}, either I don't have the"
+                            f" permission or the member is above me"
+                        ),
+                        color=var.C_RED
+                    )
+                )
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
@@ -466,38 +497,95 @@ class Moderation(commands.Cog):
                 )
             )
 
-        try:
-            await member.remove_roles(role)
-            await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"Successfully updated {member.mention} "
-                        f"by removing {role.mention} role"
-                    ),
-                    color=var.C_GREEN
-                )
-            )
-
-        except discord.Forbidden:
-            await ctx.send(
-                embed=discord.Embed(
-                    title="Missing permissions",
-                    description=(
-                        f"I don't have permissions to update the roles of"
-                        f" {member.mention}, either I don't have the"
-                        f" permission or the member is above me"
-                    ),
-                    color=var.C_RED
-                )
-            )
-
     @commands.command(name="massrole")
     @has_command_permission()
     async def mass_role(
         self, ctx, role: discord.Role = None, role2: discord.Role = None
     ):
-        if role is None or role2 is None:
-            return await ctx.send(
+        if role is not None and role2 is not None:
+            bot_msg = await ctx.send(
+                embed=discord.Embed(
+                    title="Confirmation",
+                    description=(
+                        f"Are you sure you want to update all members"
+                        f" with the role {role.mention} with {role2.mention}?"
+                    ),
+                    color=var.C_BLUE
+                ).add_field(
+                    name=(
+                        "Note that this action is irreversible "
+                        "and cannot be stopped once started"
+                    ),
+                    value=(
+                        f"{var.E_ACCEPT} to accept\n"
+                        f"{var.E_ENABLE} to accept with live stats\n"
+                        f"{var.E_DECLINE} to decline"
+                    )
+                )
+            )
+
+            await bot_msg.add_reaction(var.E_ACCEPT)
+            await bot_msg.add_reaction(var.E_ENABLE)
+            await bot_msg.add_reaction(var.E_DECLINE)
+
+            def reaction_check(r, u):
+                return u == ctx.author and r.message == bot_msg
+
+            reaction, _ = await self.bot.wait_for(
+                "reaction_add", check=reaction_check
+            )
+
+            updates = False
+
+            try:
+                await bot_msg.clear_reactions()
+            except Exception:
+                pass
+
+            if str(reaction.emoji) == var.E_DECLINE:
+                return await ctx.send("Cancelled mass role update")
+
+            if str(reaction.emoji) == var.E_ENABLE:
+                updates = True
+
+            if (
+                str(reaction.emoji) == var.E_ENABLE
+                or str(reaction.emoji) == var.E_ACCEPT
+            ):
+
+                count = 0
+
+                for member in [
+                    member
+                    for member in ctx.guild.members
+                    if role in member.roles
+                ]:
+                    try:
+                        await member.add_roles(role2)
+                        count += 1
+
+                        if updates:
+                            await ctx.send(f"{member} updated")
+
+                    except discord.Forbidden:
+                        await ctx.send(
+                            embed=discord.Embed(
+                                description=(
+                                    f"Error giving role to {member.mention}"
+                                ),
+                                color=var.C_ORANGE
+                            )
+                        )
+
+                    await asyncio.sleep(1)
+
+                await ctx.send(
+                    f"Done, updated **{count}** members "
+                    f"with the {role2.name} role"
+                )
+
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -514,94 +602,90 @@ class Moderation(commands.Cog):
                 )
             )
 
-        bot_msg = await ctx.send(
-            embed=discord.Embed(
-                title="Confirmation",
-                description=(
-                    f"Are you sure you want to update all members"
-                    f" with the role {role.mention} with {role2.mention}?"
-                ),
-                color=var.C_BLUE
-            ).add_field(
-                name=(
-                    "Note that this action is irreversible "
-                    "and cannot be stopped once started"
-                ),
-                value=(
-                    f"{var.E_ACCEPT} to accept\n"
-                    f"{var.E_ENABLE} to accept with live stats\n"
-                    f"{var.E_DECLINE} to decline"
-                )
-            )
-        )
-
-        await bot_msg.add_reaction(var.E_ACCEPT)
-        await bot_msg.add_reaction(var.E_ENABLE)
-        await bot_msg.add_reaction(var.E_DECLINE)
-
-        def reaction_check(r, u):
-            return u == ctx.author and r.message == bot_msg
-
-        reaction, _ = await self.bot.wait_for(
-            "reaction_add", check=reaction_check
-        )
-
-        updates = False
-
-        try:
-            await bot_msg.clear_reactions()
-        except Exception:
-            pass
-
-        if str(reaction.emoji) == var.E_DECLINE:
-            return await ctx.send("Cancelled mass role update")
-
-        if str(reaction.emoji) == var.E_ENABLE:
-            updates = True
-
-        if (
-            str(reaction.emoji) != var.E_ENABLE
-            and str(reaction.emoji) != var.E_ACCEPT
-        ):
-            return
-
-        count = 0
-
-        for member in [
-            member for member in ctx.guild.members
-            if role in member.roles
-        ]:
-            try:
-                await member.add_roles(role2)
-                count += 1
-
-                if updates:
-                    await ctx.send(f"{member} updated")
-
-            except discord.Forbidden:
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Error giving role to {member.mention}"
-                        ),
-                        color=var.C_ORANGE
-                    )
-                )
-
-            await asyncio.sleep(1)
-
-        await ctx.send(
-            f"Done, updated **{count}** members "
-            f"with the {role2.name} role"
-        )
-
     @commands.command(name="massroleremove")
     @has_command_permission()
     async def mass_role_remove(
         self, ctx, role: discord.Role = None, role2: discord.Role = None
     ):
-        if role is None or role2 is None:
-            return await ctx.send(
+        if role is not None and role2 is not None:
+            bot_msg = await ctx.send(
+                embed=discord.Embed(
+                    title="Confirmation",
+                    description=(
+                        f"Are you sure you want to update"
+                        f" all members with the role {role.mention}"
+                        f" by removing {role2.mention}?"
+                    ),
+                    color=var.C_BLUE
+                ).add_field(
+                    name=(
+                        "Note that this action is irreversable"
+                        " and cannot be stopped once started"
+                    ),
+                    value=(
+                        f"{var.E_ACCEPT} to accept\n{var.E_ENABLE}"
+                        f" to accept with live stats\n{var.E_DECLINE} to decline"
+                    )
+                )
+            )
+
+            await bot_msg.add_reaction(var.E_ACCEPT)
+            await bot_msg.add_reaction(var.E_ENABLE)
+            await bot_msg.add_reaction(var.E_DECLINE)
+
+            def reaction_check(r, u):
+                return u == ctx.author and r.message == bot_msg
+
+            reaction, _ = await self.bot.wait_for(
+                "reaction_add", check=reaction_check
+            )
+
+            updates = False
+
+            try:
+                await bot_msg.clear_reactions()
+
+            except Exception:
+                pass
+
+            if str(reaction.emoji) == var.E_DECLINE:
+                return await ctx.send("Cancelled mass role update")
+
+            if str(reaction.emoji) == var.E_ENABLE:
+                updates = True
+
+            if str(reaction.emoji) == var.E_ENABLE or str(
+                    reaction.emoji) == var.E_ACCEPT:
+                count = 0
+                for member in [
+                    member
+                    for member in ctx.guild.members
+                    if role in member.roles
+                ]:
+                    try:
+                        await member.remove_roles(role2)
+                        count += 1
+                        if updates:
+                            await ctx.send(f"{member} updated")
+
+                    except discord.Forbidden:
+                        await ctx.send(
+                            embed=discord.Embed(
+                                description=(
+                                    f"Error giving role to {member.mention}"
+                                ),
+                                color=var.C_ORANGE
+                            )
+                        )
+                    await asyncio.sleep(1)
+
+                await ctx.send(
+                    f"Done,"
+                    f" updated **{count}** members with the {role2.name} role"
+                )
+        else:
+
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -619,82 +703,6 @@ class Moderation(commands.Cog):
                 ).set_footer(
                     text="For role, either ping or ID can be used"
                 )
-            )
-
-        bot_msg = await ctx.send(
-            embed=discord.Embed(
-                title="Confirmation",
-                description=(
-                    f"Are you sure you want to update"
-                    f" all members with the role {role.mention}"
-                    f" by removing {role2.mention}?"
-                ),
-                color=var.C_BLUE
-            ).add_field(
-                name=(
-                    "Note that this action is irreversable"
-                    " and cannot be stopped once started"
-                ),
-                value=(
-                    f"{var.E_ACCEPT} to accept\n{var.E_ENABLE}"
-                    f" to accept with live stats\n{var.E_DECLINE} to decline"
-                )
-            )
-        )
-
-        await bot_msg.add_reaction(var.E_ACCEPT)
-        await bot_msg.add_reaction(var.E_ENABLE)
-        await bot_msg.add_reaction(var.E_DECLINE)
-
-        def reaction_check(r, u):
-            return u == ctx.author and r.message == bot_msg
-
-        reaction, _ = await self.bot.wait_for(
-            "reaction_add", check=reaction_check
-        )
-
-        updates = False
-
-        try:
-            await bot_msg.clear_reactions()
-
-        except Exception:
-            pass
-
-        if str(reaction.emoji) == var.E_DECLINE:
-            return await ctx.send("Cancelled mass role update")
-
-        if str(reaction.emoji) == var.E_ENABLE:
-            updates = True
-
-        if str(reaction.emoji) == var.E_ENABLE or str(
-                reaction.emoji) == var.E_ACCEPT:
-            count = 0
-            for member in [
-                member
-                for member in ctx.guild.members
-                if role in member.roles
-            ]:
-                try:
-                    await member.remove_roles(role2)
-                    count += 1
-                    if updates:
-                        await ctx.send(f"{member} updated")
-
-                except discord.Forbidden:
-                    await ctx.send(
-                        embed=discord.Embed(
-                            description=(
-                                f"Error giving role to {member.mention}"
-                            ),
-                            color=var.C_ORANGE
-                        )
-                    )
-                await asyncio.sleep(1)
-
-            await ctx.send(
-                f"Done,"
-                f" updated **{count}** members with the {role2.name} role"
             )
 
     @commands.command()
@@ -758,8 +766,77 @@ class Moderation(commands.Cog):
     async def remove_warn(
         self, ctx, member: discord.Member = None, position=None
     ):
-        if not member or position is None:
-            return await ctx.send(
+        if member and position is not None:
+            try:
+                position = int(position)
+
+            except ValueError:
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=f"The position should be a number!",
+                        color=var.C_RED)
+                    )
+                return
+
+            guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
+            user_doc = await guild_col.find_one({"_id": member.id})
+
+            if user_doc is None:
+                await ctx.send(
+                    embed=discord.Embed(
+                        description=f"{member.mention} does not have any warns",
+                        color=var.C_RED
+                    ).set_footer(
+                        text=(
+                            "Note that this warn's position has been taken by"
+                            " the warn below it, therefore moving all warns "
+                            "below this one position above"
+                        )
+                    )
+                )
+
+            else:
+                warns = user_doc["warns"]
+                if len(warns) - 1 >= position - 1:
+                    reason = warns[position - 1]
+                    new_warns = warns.copy()
+                    new_warns.pop(position - 1)
+                    new_data = {
+                        "$set": {
+                            "warns": new_warns
+                        }
+                    }
+
+                    await guild_col.update_one(user_doc, new_data)
+                    await ctx.send(
+                        embed=discord.Embed(
+                            description=(
+                                f"{var.E_ACCEPT} Removed {position} warn with "
+                                f"the reason **{reason}** from {member.mention}"
+                            ),
+                            color=var.C_GREEN
+                        ).set_footer(
+                            text=(
+                                "Note that if there are any warns below this "
+                                "one then they are moved one position up to "
+                                "take the removed warn's place"
+                            )
+                        )
+                    )
+
+                else:
+                    await ctx.send(
+                        embed=discord.Embed(
+                            description=(
+                                f"{member.mention} does not have"
+                                f" {position} warn(s)"
+                            ),
+                            color=var.C_RED
+                        )
+                    )
+
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -778,76 +855,30 @@ class Moderation(commands.Cog):
                 )
             )
 
-        try:
-            position = int(position)
-
-        except ValueError:
-            return await ctx.send(
-                embed=discord.Embed(
-                    description=f"The position should be a number!",
-                    color=var.C_RED)
-                )
-
-        guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
-        user_doc = await guild_col.find_one({"_id": member.id})
-
-        if user_doc is None:
-            return await ctx.send(
-                embed=discord.Embed(
-                    description=f"{member.mention} does not have any warns",
-                    color=var.C_RED
-                ).set_footer(
-                    text=(
-                        "Note that this warn's position has been taken by"
-                        " the warn below it, therefore moving all warns "
-                        "below this one position above"
-                    )
-                )
-            )
-
-        warns = user_doc["warns"]
-        if 1 < position - 1:
-            return await ctx.send(
-                embed=discord.Embed(
-                    description=(
-                        f"{member.mention} does not have"
-                        f" {position} warn(s)"
-                    ),
-                    color=var.C_RED
-                )
-            )
-
-        reason = warns[position - 1]
-        new_warns = warns.copy()
-        new_warns.pop(position - 1)
-        new_data = {
-            "$set": {
-                "warns": new_warns
-            }
-        }
-
-        await guild_col.update_one(user_doc, new_data)
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_ACCEPT} Removed {position} warn with "
-                    f"the reason **{reason}** from {member.mention}"
-                ),
-                color=var.C_GREEN
-            ).set_footer(
-                text=(
-                    "Note that if there are any warns below this "
-                    "one then they are moved one position up to "
-                    "take the removed warn's place"
-                )
-            )
-        )
-
     @commands.command()
     @has_command_permission()
     async def warns(self, ctx, member: discord.Member = None):
-        if member is None:
-            return await ctx.send(
+        if member is not None:
+            guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
+            userdata = await guild_col.find_one({"_id": member.id})
+
+            if userdata is None:
+                await ctx.send(f"{member} does not have any warnings")
+
+            else:
+                warns = userdata["warns"]
+                embed = discord.Embed(
+                    title=f"{member} warns", color=var.C_MAIN
+                )
+                for i in warns:
+                    embed.add_field(
+                        name=f"Warn {warns.index(i) + 1}", value=i,
+                        inline=False
+                    )
+
+                await ctx.send(embed=embed)
+        else:
+            await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -859,24 +890,6 @@ class Moderation(commands.Cog):
                     value=f"```{await get_prefix(ctx)}warns <member>```"
                 )
             )
-            
-        guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
-        userdata = await guild_col.find_one({"_id": member.id})
-
-        if userdata is None:
-            return await ctx.send(f"{member} does not have any warnings")
-
-        warns = userdata["warns"]
-        embed = discord.Embed(
-            title=f"{member} warns", color=var.C_MAIN
-        )
-        for i in warns:
-            embed.add_field(
-                name=f"Warn {warns.index(i) + 1}", value=i,
-                inline=False
-            )
-
-        await ctx.send(embed=embed)
 
 
 def setup(bot):

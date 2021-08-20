@@ -17,15 +17,16 @@ class ReactionRoles(commands.Cog):
         if guild_doc.get("ReactionRoles"):
             return True
 
-        await ctx.send(
-            embed=discord.Embed(
-                description=(
-                    f"{var.E_DISABLE} The Reaction Roles plugin"
-                    " is disabled in this server"
-                ),
-                color=var.C_ORANGE
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    description=(
+                        f"{var.E_DISABLE} The Reaction Roles plugin"
+                        " is disabled in this server"
+                    ),
+                    color=var.C_ORANGE
+                )
             )
-        )
 
     @commands.command()
     @has_command_permission()
@@ -75,7 +76,71 @@ class ReactionRoles(commands.Cog):
         except Exception:
             raise commands.MessageNotFound(ctx)
 
-        if bot_role.position < role.position:
+        if bot_role.position >= role.position:
+            guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
+
+            if guild_doc is None:
+                await db.REACTION_ROLES.insert_one(
+                    {
+                        "_id": ctx.guild.id,
+                        "reaction_roles": [{
+                            "messageid": msg.id,
+                            "roleid": role.id,
+                            "emoji": str(emoji)
+                        }],
+                        "unique_messages": []
+
+                    }
+                )
+
+                await msg.add_reaction(emoji)
+                await ctx.send(
+                    f"Reaction role for {role} using {emoji} setted up!"
+                    f" https://discord.com/channels/{ctx.message.guild.id}"
+                    f"/{msg.channel.id}/{msg.id}"
+                )
+
+            else:
+                guildrr_list = guild_doc["reaction_roles"]
+
+                def check():
+                    for i in guildrr_list:
+                        if i.get("messageid") == msg.id and i.get(
+                                "emoji") == str(emoji):
+                            return True
+
+                if check():
+                    await ctx.send(
+                        "You have already setup this reaction role"
+                        f" using {emoji} on that message :D "
+                        "I can see it in the database!"
+                    )
+
+                else:
+                    new_list = guildrr_list.copy()
+                    new_list.append(
+                        {
+                            "messageid": msg.id,
+                            "roleid": role.id,
+                            "emoji": str(emoji)
+                        }
+                    )
+
+                    new_data = {
+                        "$set": {
+                            "reaction_roles": new_list
+                        }
+                    }
+
+                    await db.REACTION_ROLES.update_one(guild_doc, new_data)
+                    await msg.add_reaction(emoji)
+                    await ctx.send(
+                        f"Reaction role for {role} using {emoji} setted up!"
+                        f" https://discord.com/channels/{ctx.message.guild.id}"
+                        f"/{msg.channel.id}/{msg.id}"
+                    )
+        else:
+
             await ctx.send(
                 embed=discord.Embed(
                     title="Role position error",
@@ -96,70 +161,6 @@ class ReactionRoles(commands.Cog):
                         "843519647055609856/850711272726986802/unknown.png"
                     )
                 )
-            )
-            return
-
-        guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
-
-        if guild_doc is None:
-            await db.REACTION_ROLES.insert_one(
-                {
-                    "_id": ctx.guild.id,
-                    "reaction_roles": [{
-                        "messageid": msg.id,
-                        "roleid": role.id,
-                        "emoji": str(emoji)
-                    }],
-                    "unique_messages": []
-
-                }
-            )
-
-            await msg.add_reaction(emoji)
-            await ctx.send(
-                f"Reaction role for {role} using {emoji} setted up!"
-                f" https://discord.com/channels/{ctx.message.guild.id}"
-                f"/{msg.channel.id}/{msg.id}"
-            )
-            return
-
-        guildrr_list = guild_doc["reaction_roles"]
-
-        def check():
-            for i in guildrr_list:
-                if i.get("messageid") == msg.id and i.get(
-                        "emoji") == str(emoji):
-                    return True
-
-        if check():
-            await ctx.send(
-                "You have already setup this reaction role"
-                f" using {emoji} on that message :D "
-                "I can see it in the database!"
-            )
-
-        else:
-            new_list = guildrr_list.copy()
-            new_list.append(
-                {
-                    "messageid": msg.id,
-                    "roleid": role.id,
-                    "emoji": str(emoji)
-                }
-            )
-
-            new_data = {
-                "$set": {
-                    "reaction_roles": new_list
-                }
-            }
-
-            await db.REACTION_ROLES.update_one(guild_doc, new_data)
-            await msg.add_reaction(emoji)
-            await ctx.send(
-                f"Reaction role for {role} using {emoji} setted up!"
-                f" https://discord.com/channels/{ctx.message.guild.id}"
-                f"/{msg.channel.id}/{msg.id}"
             )
 
     @commands.command(name="removerr")
@@ -209,41 +210,41 @@ class ReactionRoles(commands.Cog):
                 ):
                     return True
 
-        if not rr_exists():
-            await ctx.send("This reaction role does not exist")
-            return
+        if rr_exists():
+            def get_pair(lst):
+                for rr_pairs in lst:
+                    if (
+                        message_id == rr_pairs.get("messageid")
+                        and str(emoji) == rr_pairs.get("emoji")
+                    ):
+                        return rr_pairs
 
-        def get_pair(lst):
-            for rr_pairs in lst:
-                if (
-                    message_id == rr_pairs.get("messageid")
-                    and str(emoji) == rr_pairs.get("emoji")
-                ):
-                    return rr_pairs
-
-        rr_list = guild_doc["reaction_roles"]
-        new_list = rr_list.copy()
-        pair = get_pair(new_list)
-        new_list.remove(pair)
-        new_data = {
-            "$set": {
-                "reaction_roles": new_list
+            rr_list = guild_doc["reaction_roles"]
+            new_list = rr_list.copy()
+            pair = get_pair(new_list)
+            new_list.remove(pair)
+            new_data = {
+                "$set": {
+                    "reaction_roles": new_list
+                }
             }
-        }
 
-        role = ctx.guild.get_role(pair["roleid"])
-        await db.REACTION_ROLES.update_one(guild_doc, new_data)
+            role = ctx.guild.get_role(pair["roleid"])
+            await db.REACTION_ROLES.update_one(guild_doc, new_data)
 
-        await ctx.send(
-            embed=discord.Embed(
-                title="Reaction role removed",
-                description=(
-                    f"Reaction role for {role} using {emoji} "
-                    f"on message with ID {message_id} has been removed"
-                ),
-                color=var.C_GREEN
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Reaction role removed",
+                    description=(
+                        f"Reaction role for {role} using {emoji} "
+                        f"on message with ID {message_id} has been removed"
+                    ),
+                    color=var.C_GREEN
+                )
             )
-        )
+
+        else:
+            await ctx.send("This reaction role does not exist")
 
     @commands.command(name="allrr", aliases=['rrall'])
     @has_command_permission()
@@ -251,134 +252,179 @@ class ReactionRoles(commands.Cog):
         guild = self.bot.get_guild(ctx.guild.id)
         guild_doc = await db.REACTION_ROLES.find_one({"_id": guild.id})
 
-        if guild_doc is None or not guild_doc["reaction_roles"]:
-            await ctx.send(
-                "This server does not have any active reaction roles right now"
-            )
-            return
+        if guild_doc is not None and guild_doc["reaction_roles"] != []:
+            rr_amount = len(guild_doc.get("reaction_roles"))
 
-        rr_amount = len(guild_doc.get("reaction_roles"))
+            if rr_amount <= 10:
+                exact_pages = 1
 
-        if rr_amount <= 10:
-            exact_pages = 1
+            else:
+                exact_pages = rr_amount / 10
+            all_pages = round(exact_pages)
 
-        else:
-            exact_pages = rr_amount / 10
-        all_pages = round(exact_pages)
-
-        embed = discord.Embed(
-            title="All active reaction roles",
-            color=var.C_MAIN
-        )
-
-        rr_count = 0
-        for i in guild_doc["reaction_roles"]:
-            rr_count += 1
-            message_id = i.get("messageid")
-            role = guild.get_role(i.get("roleid"))
-            emoji = i.get("emoji")
-
-            embed.add_field(
-                name="** **",
-                value=(
-                    f"{emoji} for {role.mention} "
-                    f"in message ID `{message_id}`"
-                ),
-                inline=False
+            embed = discord.Embed(
+                title="All active reaction roles",
+                color=var.C_MAIN
             )
 
-            if rr_count == 10:
-                break
-
-        embed.set_footer(text=f"Page 1/{all_pages}")
-
-        bot_msg = await ctx.send(embed=embed)
-        await bot_msg.add_reaction("◀️")
-        await bot_msg.add_reaction("⬅️")
-        await bot_msg.add_reaction("➡️")
-        await bot_msg.add_reaction("▶️")
-
-        async def reaction_roles_pagination(current_page, embed):
-            page_rn = current_page + 1
-            embed.set_footer(text=f"Page {page_rn}/{all_pages}")
-            embed.clear_fields()
-
-            rr_count = current_page * 10
-            rr_amount = current_page * 10
-
-            for i in guild_doc["reaction_roles"][rr_amount:]:
+            rr_count = 0
+            for i in guild_doc["reaction_roles"]:
                 rr_count += 1
                 message_id = i.get("messageid")
-                role = ctx.guild.get_role(i.get("roleid"))
+                role = guild.get_role(i.get("roleid"))
                 emoji = i.get("emoji")
 
                 embed.add_field(
-                    name=f"** **",
+                    name="** **",
                     value=(
-                        f"{emoji} for {role.mention}\n"
-                        f"MessageID: `{message_id}`"
+                        f"{emoji} for {role.mention} "
+                        f"in message ID `{message_id}`"
                     ),
-                     inline=False
+                    inline=False
                 )
 
-                if rr_count == (current_page) * 10 + 10:
+                if rr_count == 10:
                     break
 
-        def reaction_check(r, u):
-            if (
-                str(r.emoji) == "◀️"
-                or str(r.emoji) == "⬅️"
-                or str(r.emoji) == "➡️"
-                or str(r.emoji) == "▶️"
-            ):
-                return u == ctx.author and r.message == bot_msg
+            embed.set_footer(text=f"Page 1/{all_pages}")
 
-        current_page = 0
-        while True:
-            reaction, user = await self.bot.wait_for("reaction_add",
-                                                     check=reaction_check)
-            if str(reaction.emoji) == "◀️":
-                try:
-                    await bot_msg.remove_reaction("◀️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page = 0
-                await reaction_roles_pagination(current_page, embed)
-                await bot_msg.edit(embed=embed)
+            bot_msg = await ctx.send(embed=embed)
+            await bot_msg.add_reaction("◀️")
+            await bot_msg.add_reaction("⬅️")
+            await bot_msg.add_reaction("➡️")
+            await bot_msg.add_reaction("▶️")
 
-            if str(reaction.emoji) == "➡️":
-                try:
-                    await bot_msg.remove_reaction("➡️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page += 1
-                await reaction_roles_pagination(current_page, embed)
-                await bot_msg.edit(embed=embed)
+            async def reaction_roles_pagination(current_page, embed):
+                page_rn = current_page + 1
+                embed.set_footer(text=f"Page {page_rn}/{all_pages}")
+                embed.clear_fields()
 
-            if str(reaction.emoji) == "⬅️":
-                try:
-                    await bot_msg.remove_reaction("⬅️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page -= 1
-                if current_page < 0:
+                rr_count = current_page * 10
+                rr_amount = current_page * 10
+
+                for i in guild_doc["reaction_roles"][rr_amount:]:
+                    rr_count += 1
+                    message_id = i.get("messageid")
+                    role = ctx.guild.get_role(i.get("roleid"))
+                    emoji = i.get("emoji")
+
+                    embed.add_field(
+                        name=f"** **",
+                        value=(
+                            f"{emoji} for {role.mention}\n"
+                            f"MessageID: `{message_id}`"
+                        ),
+                         inline=False
+                    )
+
+                    if rr_count == (current_page) * 10 + 10:
+                        break
+
+            def reaction_check(r, u):
+                if (
+                    str(r.emoji) == "◀️"
+                    or str(r.emoji) == "⬅️"
+                    or str(r.emoji) == "➡️"
+                    or str(r.emoji) == "▶️"
+                ):
+                    return u == ctx.author and r.message == bot_msg
+
+            current_page = 0
+            while True:
+                reaction, user = await self.bot.wait_for("reaction_add",
+                                                         check=reaction_check)
+                if str(reaction.emoji) == "◀️":
+                    try:
+                        await bot_msg.remove_reaction("◀️", ctx.author)
+                    except discord.Forbidden:
+                        pass
+                    current_page = 0
+                    await reaction_roles_pagination(current_page, embed)
+                    await bot_msg.edit(embed=embed)
+
+                if str(reaction.emoji) == "➡️":
+                    try:
+                        await bot_msg.remove_reaction("➡️", ctx.author)
+                    except discord.Forbidden:
+                        pass
                     current_page += 1
-                await reaction_roles_pagination(current_page, embed)
-                await bot_msg.edit(embed=embed)
+                    await reaction_roles_pagination(current_page, embed)
+                    await bot_msg.edit(embed=embed)
 
-            if str(reaction.emoji) == "▶️":
-                try:
-                    await bot_msg.remove_reaction("▶️", ctx.author)
-                except discord.Forbidden:
-                    pass
-                current_page = all_pages - 1
-                await reaction_roles_pagination(current_page, embed)
-                await bot_msg.edit(embed=embed)
+                if str(reaction.emoji) == "⬅️":
+                    try:
+                        await bot_msg.remove_reaction("⬅️", ctx.author)
+                    except discord.Forbidden:
+                        pass
+                    current_page -= 1
+                    if current_page < 0:
+                        current_page += 1
+                    await reaction_roles_pagination(current_page, embed)
+                    await bot_msg.edit(embed=embed)
+
+                if str(reaction.emoji) == "▶️":
+                    try:
+                        await bot_msg.remove_reaction("▶️", ctx.author)
+                    except discord.Forbidden:
+                        pass
+                    current_page = all_pages - 1
+                    await reaction_roles_pagination(current_page, embed)
+                    await bot_msg.edit(embed=embed)
+
+        else:
+            await ctx.send(
+                "This server does not have any active reaction roles right now")
 
     @commands.command(name="uniquerr")
     @has_command_permission()
     async def unique_rr(self, ctx, msg: discord.Message = None):
-        if msg is None:
+
+        if msg is not None:
+            guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
+            if guild_doc is not None:
+                unique_list = guild_doc["unique_messages"]
+
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
+                if msg.id in all_msg_ids:
+                    new_list = unique_list.copy()
+
+                    new_list.append(msg.id)
+                    new_data = {
+                        "$set": {
+                            "unique_messages": new_list
+                        }
+                    }
+
+                    await db.REACTION_ROLES.update_one(guild_doc, new_data)
+                    await ctx.send(
+                        embed=discord.Embed(
+                            title=(
+                                "Successfully marked the message "
+                                "with unique reactions"
+                            ),
+                            description=(
+                                "Now users can only react to one emoji and "
+                                "take one role in [this message]"
+                                f"(https://discord.com/channels/{ctx.guild.id}"
+                                f"/{msg.channel.id}/{msg.id})"
+                            ),
+                            color=var.C_GREEN
+                        )
+                    )
+
+                else:
+                    await ctx.send(
+                        "Hmm it looks like that the message id "
+                        "you entered does not have any reaction role."
+                    )
+
+            else:
+                await ctx.send(
+                    "Cannot mark that message with unique reactions "
+                    "since this server does not have any reaction roles yet :("
+                )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -391,57 +437,58 @@ class ReactionRoles(commands.Cog):
                     value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
                 )
             )
-            return
-
-        guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
-
-        if guild_doc is None:
-            await ctx.send(
-                "Cannot mark that message with unique reactions "
-                "since this server does not have any reaction roles yet :("
-            )
-            return
-
-        unique_list = guild_doc["unique_messages"]
-
-        all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
-        if msg.id in all_msg_ids:
-            new_list = unique_list.copy()
-
-            new_list.append(msg.id)
-            new_data = {
-                "$set": {
-                    "unique_messages": new_list
-                }
-            }
-
-            await db.REACTION_ROLES.update_one(guild_doc, new_data)
-            await ctx.send(
-                embed=discord.Embed(
-                    title=(
-                        "Successfully marked the message "
-                        "with unique reactions"
-                    ),
-                    description=(
-                        "Now users can only react to one emoji and "
-                        "take one role in [this message]"
-                        f"(https://discord.com/channels/{ctx.guild.id}"
-                        f"/{msg.channel.id}/{msg.id})"
-                    ),
-                    color=var.C_GREEN
-                )
-            )
-
-        else:
-            await ctx.send(
-                "Hmm it looks like that the message id "
-                "you entered does not have any reaction role."
-            )
 
     @commands.command(name="removeunique")
     @has_command_permission()
     async def remove_unique(self, ctx, msg: discord.Message = None):
-        if msg is None:
+
+        if msg is not None:
+            guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
+            if guild_doc is not None:
+                unique_list = guild_doc["unique_messages"]
+
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
+                if msg.id in all_msg_ids and msg.id in unique_list:
+                    new_list = unique_list.copy()
+
+                    new_list.remove(msg.id)
+                    new_data = {
+                        "$set": {
+                            "unique_messages": new_list
+                        }
+                    }
+
+                    await db.REACTION_ROLES.update_one(guild_doc, new_data)
+
+                    await ctx.send(
+                        embed=discord.Embed(
+                            title=(
+                                "Successfully unmarked the "
+                                "message with unique reactions"
+                            ),
+                            description=(
+                                "Now users can react and take multiple roles "
+                                "in [this message](https://discord.com/channels"
+                                f"/{ctx.guild.id}/{msg.channel.id}/{msg.id})"
+                            ),
+                            color=var.C_GREEN
+                        )
+                    )
+
+                else:
+                    await ctx.send(
+                        "Hmm it looks like that the message id you entered does"
+                        " not have any reaction role so can't remove the unique"
+                        " mark either."
+                    )
+
+            else:
+                await ctx.send(
+                    "Cannot remove the unique mark from that message since you"
+                    " don't have any reaction roles yet :("
+                )
+
+        else:
             await ctx.send(
                 embed=discord.Embed(
                     description=(
@@ -453,54 +500,6 @@ class ReactionRoles(commands.Cog):
                     name="Format",
                     value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
                 )
-            )
-            return
-
-        guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
-
-        if guild_doc is None:
-            await ctx.send(
-                "Cannot remove the unique mark from that message since you"
-                " don't have any reaction roles yet :("
-            )
-
-            return
-
-        unique_list = guild_doc["unique_messages"]
-        all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
-
-        if msg.id in all_msg_ids and msg.id in unique_list:
-            new_list = unique_list.copy()
-
-            new_list.remove(msg.id)
-            new_data = {
-                "$set": {
-                    "unique_messages": new_list
-                }
-            }
-
-            await db.REACTION_ROLES.update_one(guild_doc, new_data)
-
-            await ctx.send(
-                embed=discord.Embed(
-                    title=(
-                        "Successfully unmarked the "
-                        "message with unique reactions"
-                    ),
-                    description=(
-                        "Now users can react and take multiple roles "
-                        "in [this message](https://discord.com/channels"
-                        f"/{ctx.guild.id}/{msg.channel.id}/{msg.id})"
-                    ),
-                    color=var.C_GREEN
-                )
-            )
-
-        else:
-            await ctx.send(
-                "Hmm it looks like that the message id you entered does"
-                " not have any reaction role so can't remove the unique"
-                " mark either."
             )
 
     @commands.Cog.listener()
@@ -541,25 +540,23 @@ class ReactionRoles(commands.Cog):
     async def on_raw_reaction_remove(self, payload):
         guild_doc = await db.REACTION_ROLES.find_one({"_id": payload.guild_id})
 
-        if guild_doc is not None and guild_doc["reaction_roles"] is None:
-            return
+        if guild_doc is not None and guild_doc["reaction_roles"] is not None:
+            for i in guild_doc["reaction_roles"]:
+                if (
+                    payload.message_id == i.get("messageid")
+                    and str(payload.emoji) == i.get("emoji")
+                ):
+                    role_id = i.get("roleid")
 
-        for i in guild_doc["reaction_roles"]:
-            if (
-                payload.message_id == i.get("messageid")
-                and str(payload.emoji) == i.get("emoji")
-            ):
-                role_id = i.get("roleid")
+                    member = (
+                        self.bot.get_guild(payload.guild_id)
+                            .get_member(payload.user_id)
+                    )
 
-                member = (
-                    self.bot.get_guild(payload.guild_id)
-                        .get_member(payload.user_id)
-                )
-
-                if member is not None:
-                    guild = self.bot.get_guild(payload.guild_id)
-                    remove_role = guild.get_role(role_id)
-                    await member.remove_roles(remove_role)
+                    if member is not None:
+                        guild = self.bot.get_guild(payload.guild_id)
+                        remove_role = guild.get_role(role_id)
+                        await member.remove_roles(remove_role)
 
 
 def setup(bot):

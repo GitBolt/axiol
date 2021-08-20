@@ -15,8 +15,8 @@ DB_PATH: Optional[str] = (
 if DB_PATH is None:
     log.error(
         'No mongo db path has been provided.'
-        'make sure to create an `.env` file '
-        'or add in environ key'
+        ' Make sure to create an `.env` file'
+        ' or add in environ key'
     )
 
 
@@ -31,7 +31,16 @@ except InvalidURI:
     )
 
 
-class Database:
+class StaticClassList:
+
+    def __init__(self):
+        log.warn(
+            'Classes from db wrapper should not be instantiated.'
+            f' Consider using `{self.__class__.__name__}`.'
+        )
+
+
+class Database(StaticClassList):
     MAIN = MONGO_CLIENT["Axiol"]
     LEVEL = MONGO_CLIENT["Leveling"]
     KARMA = MONGO_CLIENT["Karma"]
@@ -39,7 +48,7 @@ class Database:
     WARNINGS = MONGO_CLIENT["Warnings"]
 
 
-class Collections:
+class Collections(StaticClassList):
     PLUGINS = Database.MAIN["Plugins"]
     PREFIXES = Database.MAIN["Prefixes"]
     REACTION_ROLES = Database.MAIN["Reaction Roles"]

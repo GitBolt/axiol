@@ -15,12 +15,10 @@
 
 """
 
-
 from datetime import datetime
 
 import colorama
 from termcolor import colored
-
 
 COMMON_LOG_FORMAT: str = "%d/%b/%Y-%Hh:%Mm:%Ss"
 

@@ -1,8 +1,10 @@
 import discord
+from aiohttp import request
 from discord.ext import commands
 import database as db
 from functions import update_db
 import io
+import json
 import contextlib
 import textwrap
 
@@ -107,6 +109,26 @@ class Owner(commands.Cog):
             f"**{doc_name.upper()}** Document for **{guild.name}**\n"
             f"```json\n{doc}```"
         )
+
+    @commands.command()
+    async def backup_db(self, ctx):
+        headers = {
+            "X-Master-Key": "$2b$10$sHW.6D.jlcsj.XuCzJcytOdqPpcZQKNhVZaOgJhEGia1P5ZlCGEUq", 
+            "Content-Type": "application/json"
+                }
+        count = 0
+        # Just plugin document for now
+        async for i in db.PLUGINS.find({}):
+            async with request(
+                    "POST",
+                    "https://api.jsonbin.io/v3/b",
+                    data=json.dumps(i),
+                    headers=headers
+                    ):
+                count += 1
+        
+        await ctx.send(f"Backed up {count} plugin documents.")
+
 
     @commands.command()
     async def update_db(self, ctx):

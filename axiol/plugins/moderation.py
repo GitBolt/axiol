@@ -1,5 +1,6 @@
 import discord
 import asyncio
+from typing import Union
 from discord.ext import commands
 import variables as var
 import database as db
@@ -97,7 +98,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def unban(self, ctx, user: discord.User = None):
         if user is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description="🚫 You need to define the user to unban them",
                     color=var.C_RED
@@ -108,13 +109,12 @@ class Moderation(commands.Cog):
                     text="For user either User mention or User ID can be used"
                 )
             )
-            return
+        try:
+            await ctx.guild.unban(user)
+            await ctx.send(f'Successfully unbanned `{user}` and notifed with DM :ok_hand:')
 
-        bans = await ctx.guild.bans()
-        banned_users = [ban.user for ban in bans]
-
-        if user not in banned_users:
-            await ctx.send(
+        except discord.errors.NotFound:
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         f"The user `{user}` is not banned, "
@@ -123,10 +123,6 @@ class Moderation(commands.Cog):
                     color=var.C_ORANGE
                 )
             )
-            return
-
-        await ctx.guild.unban(user)
-        await ctx.send(f'Successfully unbanned `{user}` :ok_hand:')
 
         try:
             await user.send(
@@ -162,7 +158,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def mute(self, ctx, member: discord.Member = None):
         if member is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define member in order to mute them"
@@ -178,7 +174,6 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-            return
 
         if not discord.utils.get(ctx.guild.roles, name='Muted'):
             muted_role = await ctx.guild.create_role(
@@ -365,13 +360,13 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["clean", "clear"])
     @commands.has_permissions(manage_messages=True)
     @has_command_permission()
-    async def purge(self, ctx, limit: int = None):
+    async def purge(self, ctx, limit: Union[int, None] = None):
         if limit is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the amount"
-                        " to delete messages too!"
+                        " to delete messages too! Make sure the amount is numerical."
                     ),
                     color=var.C_RED
                 ).add_field(
@@ -379,16 +374,14 @@ class Moderation(commands.Cog):
                     value=f"`{await get_prefix(ctx)}purge <amount>`"
                 )
             )
-            return
 
         await ctx.channel.purge(limit=limit + 1)
 
         info = await ctx.send(embed=discord.Embed(
             description=f"Deleted {limit} messages",
-            color=var.C_ORANGE)
+            color=var.C_ORANGE),
+            delete_after=1
         )
-        await asyncio.sleep(1)
-        await info.delete()
 
     @purge.error
     async def purge_error(self, ctx, error):
@@ -407,7 +400,7 @@ class Moderation(commands.Cog):
         self, ctx, member: discord.Member = None, role: discord.Role = None
     ):
         if not member or role is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
@@ -422,7 +415,6 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-            return
 
         try:
             await member.add_roles(role)
@@ -455,7 +447,7 @@ class Moderation(commands.Cog):
         self, ctx, member: discord.Member = None, role: discord.Role = None
     ):
         if not member or role is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
@@ -473,7 +465,6 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-            return
 
         try:
             await member.remove_roles(role)
@@ -506,7 +497,7 @@ class Moderation(commands.Cog):
         self, ctx, role: discord.Role = None, role2: discord.Role = None
     ):
         if role is None or role2 is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -522,7 +513,6 @@ class Moderation(commands.Cog):
                     text="For role, either ping or ID can be used"
                 )
             )
-            return
 
         bot_msg = await ctx.send(
             embed=discord.Embed(
@@ -611,7 +601,7 @@ class Moderation(commands.Cog):
         self, ctx, role: discord.Role = None, role2: discord.Role = None
     ):
         if role is None or role2 is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -630,7 +620,6 @@ class Moderation(commands.Cog):
                     text="For role, either ping or ID can be used"
                 )
             )
-            return
 
         bot_msg = await ctx.send(
             embed=discord.Embed(
@@ -770,7 +759,7 @@ class Moderation(commands.Cog):
         self, ctx, member: discord.Member = None, position=None
     ):
         if not member or position is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -788,24 +777,22 @@ class Moderation(commands.Cog):
                     text="Note that position here is just a number"
                 )
             )
-            return
 
         try:
             position = int(position)
 
         except ValueError:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=f"The position should be a number!",
                     color=var.C_RED)
                 )
-            return
 
         guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
         user_doc = await guild_col.find_one({"_id": member.id})
 
         if user_doc is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=f"{member.mention} does not have any warns",
                     color=var.C_RED
@@ -817,11 +804,10 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-            return
 
         warns = user_doc["warns"]
         if 1 < position - 1:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         f"{member.mention} does not have"
@@ -830,7 +816,6 @@ class Moderation(commands.Cog):
                     color=var.C_RED
                 )
             )
-            return
 
         reason = warns[position - 1]
         new_warns = warns.copy()
@@ -862,7 +847,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def warns(self, ctx, member: discord.Member = None):
         if member is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
@@ -874,14 +859,12 @@ class Moderation(commands.Cog):
                     value=f"```{await get_prefix(ctx)}warns <member>```"
                 )
             )
-            return
-
+            
         guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
         userdata = await guild_col.find_one({"_id": member.id})
 
         if userdata is None:
-            await ctx.send(f"{member} does not have any warnings")
-            return
+            return await ctx.send(f"{member} does not have any warnings")
 
         warns = userdata["warns"]
         embed = discord.Embed(

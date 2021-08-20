@@ -36,8 +36,7 @@ class Leveling(commands.Cog):
         userdata = await guild_col.find_one({"_id": user.id})
 
         if userdata is None:
-            await ctx.send("This user does not have any rank yet...")
-            return
+            return await ctx.send("This user does not have any rank yet...")
 
         xp = userdata["xp"]
         lvl = 0
@@ -241,7 +240,7 @@ class Leveling(commands.Cog):
                 await leaderboard_pagination(current_page, embed, all_pages)
                 await bot_msg.edit(embed=embed)
 
-    @commands.command()
+    @commands.command(name="levelinfo")
     @has_command_permission()
     async def level_info(self, ctx):
         guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
@@ -376,13 +375,12 @@ class Leveling(commands.Cog):
             return
 
         if amount > 10000000:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
-                    description="🚫 Ayo that's too much",
+                    description="🚫 Ayo that's too much, the maximum amount of xp you can give at once is `10000000`.",
                     color=var.C_RED
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
         data = await guild_col.find_one({"_id": user.id})
@@ -423,7 +421,7 @@ class Leveling(commands.Cog):
             self, ctx, user: discord.Member = None, amount: int = None
     ):
         if not user or amount is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the member "
@@ -437,7 +435,6 @@ class Leveling(commands.Cog):
                     text="For user either user mention or user ID can be used"
                 )
             )
-            return
 
         if amount > 10000000:
             await ctx.send(
@@ -460,7 +457,7 @@ class Leveling(commands.Cog):
             await guild_col.update_one(data, new_data)
             await ctx.send(f"Successfully removed {amount} xp from {user}!")
 
-    @commands.command()
+    @commands.command(name="xprange")
     @has_command_permission()
     async def xp_range(self, ctx, min_val: int = None, max_val: int = None):
         if min_val and max_val is not None:
@@ -497,7 +494,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def blacklist(self, ctx, channel: discord.TextChannel = None):
         if channel is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the channel to blacklist it"
@@ -508,7 +505,6 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}blacklist <#channel>`"
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         settings = await guild_col.find_one({"_id": 0})
@@ -538,7 +534,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def whitelist(self, ctx, channel: discord.TextChannel = None):
         if channel is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the channel to whitelist it"
@@ -549,7 +545,6 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}whitelist <#channel>`"
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         settings = await guild_col.find_one({"_id": 0})
@@ -557,8 +552,7 @@ class Leveling(commands.Cog):
         new_settings = settings.get("blacklistedchannels").copy()
 
         if channel.id not in new_settings:
-            await ctx.send(f"{channel.mention} was not blacklisted")
-            return
+            return await ctx.send(f"{channel.mention} was not blacklisted")
 
         new_settings.remove(channel.id)
 
@@ -616,11 +610,11 @@ class Leveling(commands.Cog):
 
         await guild_col.update_one(guild_config, new_data)
 
-    @commands.command()
+    @commands.command(name="alertchannel")
     @has_command_permission()
     async def alert_channel(self, ctx, channel: discord.TextChannel = None):
         if channel is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the channel "
@@ -632,7 +626,6 @@ class Leveling(commands.Cog):
                     value=f"`{await get_prefix(ctx)}alertchannel <#channel>`"
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         settings = await guild_col.find_one({"_id": 0})
@@ -657,7 +650,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def reward(self, ctx, level: str = None, role: discord.Role = None):
         if not level or role is None or not level.isnumeric():
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the level"
@@ -676,7 +669,6 @@ class Leveling(commands.Cog):
                     )
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         settings = await guild_col.find_one({"_id": 0})
@@ -704,7 +696,7 @@ class Leveling(commands.Cog):
     @has_command_permission()
     async def remove_reward(self, ctx, level: str = None):
         if level is None:
-            await ctx.send(
+            return await ctx.send(
                 embed=discord.Embed(
                     description=(
                         "🚫 You need to define the level to remove it's reward!"
@@ -721,7 +713,6 @@ class Leveling(commands.Cog):
                     )
                 )
             )
-            return
 
         guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
         settings = await guild_col.find_one({"_id": 0})

@@ -13,8 +13,7 @@ async def guild_prefix(_bot, message):
     prefix_doc = await db.PREFIXES.find_one({"_id": message.guild.id})
     if prefix_doc is None:
         return var.DEFAULT_PREFIX
-    else:
-        return prefix_doc["prefix"]
+    return prefix_doc["prefix"]
 
 
 intents = discord.Intents().all()

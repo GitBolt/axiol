@@ -16,8 +16,6 @@ The default prefix is a dot `.` </br>
 Make sure to read the [Docs](/DOCS.md)
 
 ### Contributing
-~~Have I mentioned that the database structure is so weird that you can only work locally after fixing tens of errors?~~ Haha gottem code stealers</br>
-Make sure to check out [these functions](axiol/functions.py) to get the bot working locally in case you are interested in contributing to it </br>
 Any contribution to the documentation even if it fixes a small typo is appreciated
 
 - Fork → Clone → Edit → Commit → Pull request </br>

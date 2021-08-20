@@ -332,15 +332,15 @@ class Karma(commands.Cog):
         plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
         guild_col = db.KARMA_DATABASE[str(message.guild.id)]
         settings_doc = await guild_col.find_one({"_id": 0})
+        
+        if plugin_doc["Karma"] and not message.author.bot:
 
-        if (
-            message.author.bot
-            or not message.channel.id
-            or message.channel.id in settings_doc["blacklists"]
-        ):
-            return
+            if (not message.channel.id or 
+                message.channel.id in settings_doc["blacklists"]
+            ):
+                return
 
-        userdata = await guild_col.find_one({"_id": message.author.id})
+        user_data = await guild_col.find_one({"_id": message.author.id})
         polarity = sia.polarity_scores(message.content)
         result = max(polarity, key=polarity.get)
 
@@ -353,16 +353,16 @@ class Karma(commands.Cog):
 
             return 0
 
-        if userdata is None:
+        if user_data is None:
             await guild_col.insert_one(
                 {"_id": message.author.id, "karma": get_karma()}
             )
 
         else:
             new_karma = get_karma()
-            new_karma += userdata["karma"]
+            new_karma += user_data["karma"]
             await guild_col.update_one(
-                userdata, {"$set": {"karma": new_karma}}
+                user_data, {"$set": {"karma": new_karma}}
             )
 
 

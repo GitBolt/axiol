@@ -20,4 +20,4 @@ greeting_list: List[str] = [
 
 
 def greeting(member) -> str:
-    return random.choice(greeting_list).format(member)
+    return random.choice(greeting_list).format(member=member)

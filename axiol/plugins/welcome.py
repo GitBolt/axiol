@@ -494,14 +494,13 @@ class Welcome(commands.Cog):
         welcome_guild_ids = [
             doc["_id"] async for doc in db.PLUGINS.find({"Welcome": True})
         ]
-
-        if member.guild.id not in welcome_guild_ids:
-            return
-
         welcome_doc = await db.WELCOME.find_one({"_id": member.guild.id})
 
-        if not welcome_doc["greet_bots"]:
+
+        if (member.guild.id not in welcome_guild_ids) or (
+            member.bot and not welcome_doc["greet_bots"]):
             return
+
 
         channel = self.bot.get_channel(welcome_doc.get("channelid"))
 

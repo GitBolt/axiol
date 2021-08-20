@@ -300,7 +300,7 @@ class Settings(commands.Cog):
                 description=(
                     "Next message which you will send will become the prefix "
                     ":eyes:\nTo cancel it enter\n"
-                    "```{await get_prefix(ctx)}cancel```"
+                    f"```{await get_prefix(ctx)}cancel```"
                 ),
                 color=var.C_ORANGE
             ).set_footer(text="Automatic cancellation after 1 minute")

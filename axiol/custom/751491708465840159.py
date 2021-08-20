@@ -72,7 +72,7 @@ class LogicallyAnswered(commands.Cog):
 
     @ows.command()
     async def start(self, ctx):
-        one_word_story.start(self, ctx)
+        one_word_story.start(self)
         await ctx.send(
             f"{var.E_ENABLE} Started the background process for one word story"
         )
@@ -89,10 +89,6 @@ class LogicallyAnswered(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-
-        def message_check(msg):
-            allowed = list(string.ascii_lowercase + string.digits)
-            return msg <= allowed
 
         if message.guild.id != 751491708465840159:
             return

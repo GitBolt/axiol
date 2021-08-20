@@ -45,6 +45,8 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 ![Discord](https://img.shields.io/discord/843516084266729512)
 > [join](https://discord.gg/Rzz5WS9jXW)
 
+<hr>
+
 ### :star2: Bot lists
 - [Top.gg](https://top.gg/bot/843484459113775114/vote)
 - [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)

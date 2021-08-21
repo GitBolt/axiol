@@ -1,11 +1,21 @@
+from __future__ import annotations
+
 import os
-from typing import Optional
+from abc import ABC
+from typing import Optional, Tuple, TYPE_CHECKING
 
 import dotenv
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import InvalidURI
-
 from classes.logger import log
+
+if TYPE_CHECKING:
+    from motor.motor_asyncio import (
+        AsyncIOMotorCollection,
+        AsyncIOMotorDatabase
+    )
+
 
 DB_PATH: Optional[str] = (
     os.environ.get('MONGO_DB_URL')
@@ -19,6 +29,7 @@ if DB_PATH is None:
         ' or add in environ key'
     )
 
+MONGO_CLIENT = None
 
 try:
     MONGO_CLIENT = AsyncIOMotorClient(DB_PATH)
@@ -30,31 +41,68 @@ except InvalidURI:
         ' as been set properly.'
     )
 
+else:
+    log.success('Connected to the mongo db database.')
 
-class StaticClassList:
 
-    def __init__(self):
-        log.warn(
-            'Classes from db wrapper should not be instantiated.'
-            f' Consider using `{self.__class__.__name__}`.'
+class StaticClassList(ABC):
+    __instances = set()
+
+    def __init__(self, base) -> None:
+        cls_name: str = self.__class__.__name__
+
+        if cls_name in self.__instances:
+            log.warn(
+                'Classes from db wrapper should not be instantiated.'
+                f' Consider using {self.__class__.__name__.lower()}.'
+            )
+
+        else:
+            self.__instances.add(cls_name)
+
+        for attr_name in self.__slots__:
+            setattr(
+                self, attr_name,
+                base['_'.join(map(str.capitalize, attr_name.split()))]
+            )
+
+    def __repr__(self) -> str:
+        return (
+            f'<{self.__class__.__name__}(StaticClassList)'
+            f'[{", ".join(self.__slots__)}]>'
         )
 
 
 class Database(StaticClassList):
-    MAIN = MONGO_CLIENT["Axiol"]
-    LEVEL = MONGO_CLIENT["Leveling"]
-    KARMA = MONGO_CLIENT["Karma"]
-    CUSTOM = MONGO_CLIENT["Custom"]
-    WARNINGS = MONGO_CLIENT["Warnings"]
+    """A class to group all mongo databases."""
+    __slots__: Tuple[str, ...] = (
+        "axiol", "leveling", "karma", "custom", "warnings"
+    )
+
+    axiol: AsyncIOMotorDatabase
+    leveling: AsyncIOMotorDatabase
+    karma: AsyncIOMotorDatabase
+    custom: AsyncIOMotorDatabase
+    warnings: AsyncIOMotorDatabase
+
+
+database: Database = Database(MONGO_CLIENT)
 
 
 class Collections(StaticClassList):
-    PLUGINS = Database.MAIN["Plugins"]
-    PREFIXES = Database.MAIN["Prefixes"]
-    REACTION_ROLES = Database.MAIN["Reaction Roles"]
-    WELCOME = Database.MAIN["Welcome"]
-    VERIFY = Database.MAIN["Verify"]
-    CHATBOT = Database.MAIN["Chatbot"]
-    PERMISSIONS = Database.MAIN["Permissions"]
-    AUTO_MOD = Database.MAIN["AutoMod"]
-    GIVEAWAY = Database.MAIN["Giveaway"]
+    """A class to group all mongo collections from main database."""
+    __slots__: Tuple[str, ...] = (
+        "plugins", "prefixes", "reaction_roles", "welcome", "verify",
+        "chatbot", "chatbot", "permissions"
+    )
+
+    plugins: AsyncIOMotorCollection
+    prefixes: AsyncIOMotorCollection
+    reaction_roles: AsyncIOMotorCollection
+    welcome: AsyncIOMotorCollection
+    verify: AsyncIOMotorCollection
+    chatbot: AsyncIOMotorCollection
+    permissions: AsyncIOMotorCollection
+
+
+collections: Collections = Collections(database.axiol)

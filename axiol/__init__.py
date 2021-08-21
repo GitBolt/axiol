@@ -10,3 +10,5 @@ DOTENV_PATH: str = os.path.abspath(
         '.env'
     )
 )
+
+PREVENT_DOUBLE_RUNTIME_ERROR: bool = True

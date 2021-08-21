@@ -30,4 +30,4 @@ class Bot(commands.Bot):
         log.success(f"Logging in as {self.user}.")
 
     async def on_ready(self) -> None:
-        log.info(f"{self.user} is ready for use.")
+        log.inform(f"{self.user} is ready for use.")

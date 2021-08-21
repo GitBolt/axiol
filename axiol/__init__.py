@@ -11,4 +11,8 @@ DOTENV_PATH: str = os.path.abspath(
     )
 )
 
+
+# WARNING --------------------------------------------------------------
+# This is cancelling any fatal exceptions from bot class when activated.
+# If you have any problem with this, consider setting it to False.
 PREVENT_DOUBLE_RUNTIME_ERROR: bool = True

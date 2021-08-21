@@ -1,10 +1,11 @@
 """Axiol Bot Core."""
-
 import os
-import dotenv
+import sys
 
-from axiol import DOTENV_PATH
+import dotenv
 from discord.ext import commands
+
+from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
 from classes.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
@@ -32,3 +33,8 @@ class Bot(commands.Bot):
 
     async def on_ready(self) -> None:
         log.inform(f"{self.user} is ready for use.")
+
+    if PREVENT_DOUBLE_RUNTIME_ERROR:
+        def __del__(self):
+            # Prevents RuntimeError when Ctrl-C.
+            sys.stderr.close()

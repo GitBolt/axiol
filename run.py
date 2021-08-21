@@ -3,7 +3,7 @@ from axiol.bot import Bot
 
 def main() -> None:
     """Main entry point."""
-    client = Bot()
+    client = Bot('>>')   # Avoid conflit with Axiol Beta, will be change to `,`.
     client.run()
 
 

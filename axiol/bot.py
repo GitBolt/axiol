@@ -3,6 +3,7 @@
 import os
 import dotenv
 
+from axiol import DOTENV_PATH
 from discord.ext import commands
 from classes.logger import log
 
@@ -12,10 +13,10 @@ TOKEN_KEY: str = 'TOKEN'
 class Bot(commands.Bot):
     """Axiol custom bot class."""
 
-    def __init__(self) -> None:
+    def __init__(self, prefix) -> None:
         log.inform("Initializing bot...")
 
-        super(Bot, self).__init__(command_prefix=',')
+        super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
 
     def run(self) -> None:
@@ -23,7 +24,7 @@ class Bot(commands.Bot):
 
         super(Bot, self).run(
             os.environ.get(TOKEN_KEY)
-            or dotenv.dotenv_values('.env').get(TOKEN_KEY)
+            or dotenv.dotenv_values(DOTENV_PATH).get(TOKEN_KEY)
         )
 
     async def on_connect(self) -> None:

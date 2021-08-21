@@ -4,7 +4,7 @@
 
 1 - download the files from the repository 
 ```git
-git clone https://github.com/GitBolt/Axiol
+git clone https://github.com/GitBolt/Axiol.git
 ```
 
 2 - Setup your python environment:

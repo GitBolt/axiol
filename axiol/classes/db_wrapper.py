@@ -16,7 +16,6 @@ if TYPE_CHECKING:
         AsyncIOMotorDatabase
     )
 
-
 DB_PATH: Optional[str] = (
     os.environ.get('MONGO_DB_URL')
     or dotenv.dotenv_values('.env').get('MONGO_DB_URL')
@@ -56,9 +55,9 @@ class StaticClassList(ABC):
                 'Classes from db wrapper should not be instantiated.'
                 f' Consider using {self.__class__.__name__.lower()}.'
             )
+            return
 
-        else:
-            self.__instances.add(cls_name)
+        self.__instances.add(cls_name)
 
         for attr_name in self.__slots__:
             setattr(
@@ -106,3 +105,5 @@ class Collections(StaticClassList):
 
 
 collections: Collections = Collections(database.axiol)
+
+__all__ = (collections, database)

@@ -125,7 +125,7 @@ class Verification(commands.Cog):
                         ctx.guild.default_role, view_channel=False
                     )
 
-                    db.VERIFY.insert_one(
+                    await db.VERIFY.insert_one(
                         {
                             "_id": ctx.guild.id,
                             "type": "command",

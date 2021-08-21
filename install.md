@@ -21,7 +21,12 @@ python -m pip install requirements.txt
 - Adds the `TOKEN` and `MONGO_DB_URL` to your environment variables
 - **Or** cope the `.env.example` to `.env` and and complte it.
 
-4 - Runs the `run.py` module.
+4 - Runs `db_setup.py` (in `axiol/functions`)
+```py
+python -m db_setup.py
+```
+
+5 - Runs the `run.py` module.
 ```py
 python -m main.py
 ```

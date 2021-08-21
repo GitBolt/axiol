@@ -9,11 +9,12 @@
 </div>
 
 # Axiol
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/GitBolt/Axiol/badges/quality-score.png?b=pkg-rewrite)](https://scrutinizer-ci.com/g/GitBolt/Axiol/?branch=pkg-rewrite)
 ![GitHub](https://img.shields.io/github/license/GitBolt/Axiol)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/GitBolt/Axiol)
 ![GitHub repo size](https://img.shields.io/github/repo-size/GitBolt/Axiol)
 ![Lines of code](https://img.shields.io/tokei/lines/Github/GitBolt/Axiol)
-![Code Style](https://img.shields.io/badge/code%20style-pep8-blue)
+![Code Style](https://img.shields.io/badge/code%20style-pep8-green)
 
 *Axiol is an advanced, highly customizable, and interactive Discord Bot coded in written pure Python.*
 

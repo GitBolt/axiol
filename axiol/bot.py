@@ -6,7 +6,8 @@ import dotenv
 from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
-from classes.logger import log
+from axiol.cogs import loader
+from core.classes.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -19,6 +20,9 @@ class Bot(commands.Bot):
 
         super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
+
+        for cog_loader in loader.cogs:
+            cog_loader(self)
 
     def run(self) -> None:
         log.inform("Starting bot...")

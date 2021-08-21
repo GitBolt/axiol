@@ -1,6 +1,6 @@
 from axiol.bot import Bot
-from axiol.classes.logger import log
-from axiol.classes.db_wrapper import collections, database
+from core.classes.logger import log
+from core.classes.db_wrapper import collections, database
 
 
 class Updater(Bot):

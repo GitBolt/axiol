@@ -4,14 +4,14 @@
 Development Lead
 ----------------
 
-* Bolt <GitBolt>
+* [GitBolt](https://github.com/gitbolt) <Bolt>
 
 Rewrite Lead
 -----------
-* Yohann Boniface <Sigmanificient>
+* [Sigmanificient](https://github.com/Sigmanificient) <Yohann Boniface>
 
 Contributors
 ------------
-* Lynx <Sly-Little-Fox>
-* romiovictor123 <ramnreddy15>
-* kylebomb
+* [Sly-Little-Fox](https://github.com/sly-little-fox) <Lynx>
+* [ramnreddy15](https://github.com/ramnreddy15) <romiovictor123>
+* [kylebomb](https://discord.com/users/592868434065227799) <kyle>

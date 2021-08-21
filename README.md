@@ -42,7 +42,7 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 
 ## :grey_question: Support Server & testing area
 ![Discord](https://img.shields.io/discord/843516084266729512)
-> [join](https://discord.gg/Rzz5WS9jXW)
+> [Join](https://discord.gg/6xVasmDVaE)
 
 ## :star2: Bot lists
 - [Top.gg](https://top.gg/bot/843484459113775114/vote)

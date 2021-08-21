@@ -115,15 +115,19 @@ async def modhelp(ctx: commands.Context):
         name=prefix + "removerole `<member>` `<role>`",
         value="Removes the role defined from the member",
         inline=False
-        ).add_field(
-            name=prefix + "massrole `<role1>` `<role2>`",
-            value="Members having role1 will be given role2",
-            inline=False
-        ).add_field(
-            name=prefix + "massroleremove `<role1>` `<role2>`",
-            value="Members having role1 will loose role2 if they have it",
-            inline=False
-        ).set_thumbnail(
+    ).add_field(
+        name=prefix + "massrole `<role1>` `<role2>`",
+        value="Members having role1 will be given role2",
+        inline=False
+    ).add_field(
+        name=prefix + "massroleremove `<role1>` `<role2>`",
+        value="Members having role1 will loose role2 if they have it",
+        inline=False
+    ).add_field(
+        name=prefix+"modlog",
+        value="Toggle moderation action logs!",
+        inline=False
+    ).set_thumbnail(
             url="https://cdn.discordapp.com/attachments/"
                 "843519647055609856/845662999686414336/Logo1.png"
         )

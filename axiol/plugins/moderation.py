@@ -60,6 +60,24 @@ class Moderation(commands.Cog):
             except discord.Forbidden:
                 pass
 
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🔨 Ban",
+                    description=f"{user.mention} has been banned by {ctx.author.mention}",
+                    color=var.C_GREEN
+                ).add_field(
+                    name="Reason",
+                    value=reason
+                )
+                )
+
+
+
         elif user == ctx.author:
             await ctx.send("You can't ban yourself :eyes:")
 
@@ -120,6 +138,20 @@ class Moderation(commands.Cog):
 
                 except discord.Forbidden:
                     pass
+                
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🔨 Unban",
+                    description=f"{user.mention} has been unbanned by {ctx.author.mention}",
+                    color=var.C_BLUE
+                )
+                )
+
             else:
                 await ctx.send(
                     embed=discord.Embed(
@@ -176,6 +208,18 @@ class Moderation(commands.Cog):
             await member.add_roles(muted_role)
             await ctx.send(f"Applied chat mute to `{member}` :mute:")
 
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🔈 Mute",
+                    description=f"{member.mention} has been muted by {ctx.author.mention}",
+                    color=var.C_GREEN
+                )
+                )
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -242,6 +286,19 @@ class Moderation(commands.Cog):
             await member.remove_roles(muted_role)
             await ctx.send(f"Unmuted `{member}` :sound:")
 
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🔈 Unmute",
+                    description=f"{member.mention} has been unmuted by {ctx.author.mention}",
+                    color=var.C_BLUE
+                )
+                )
+
     @unmute.error
     async def unmute_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
@@ -283,6 +340,18 @@ class Moderation(commands.Cog):
             except discord.Forbidden:
                 pass
 
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🧹 Kick",
+                    description=f"{member.mention} has been kicked by {ctx.author.mention}",
+                    color=var.C_GREEN
+                )
+                )
         elif member == ctx.author:
             await ctx.send("You can't kick yourself :eyes:")
 
@@ -318,6 +387,7 @@ class Moderation(commands.Cog):
     @has_command_permission()
     async def nick(self, ctx, member: discord.Member = None, *, nick=None):
         if member and nick is not None:
+            previous_nick = member.nick
             await member.edit(nick=nick)
             await ctx.send(
                 embed=discord.Embed(
@@ -328,7 +398,21 @@ class Moderation(commands.Cog):
                     color=var.C_GREEN
                 )
             )
-
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🧹 Nickname change",
+                    description=f"{member.mention}'s nickname has been changed by {ctx.author.mention} to {nick}",
+                    color=var.C_GREEN
+                ).add_field(
+                    name="Previous nick",
+                    value=previous_nick
+                )
+                )
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -375,6 +459,18 @@ class Moderation(commands.Cog):
             await asyncio.sleep(1)
             await info.delete()
 
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="🧹 Purge",
+                    description=f"{ctx.author.mention} has deleted {limit} messages from {ctx.channel.mention}",
+                    color=var.C_GREEN
+                )
+                )
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -742,6 +838,21 @@ class Moderation(commands.Cog):
                     text=f"Moderator: {ctx.author}"
                 )
             )
+            guild_log_doc = await db.LOGGING.find_one(
+                            {"_id": ctx.guild.id}
+            )
+            if guild_log_doc["modlog"]:
+                channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                
+                await channel.send(embed=discord.Embed(
+                    title="⚠️ Warn",
+                    description=f"{member.mention} has been warned by {ctx.author.mention}",
+                    color=var.C_GREEN
+                ).add_field(
+                    name="Total warns now",
+                    value=len(new_warns)
+                )
+                )
 
         elif member is not None and reason is None:
             await ctx.send("Reason is required too!")
@@ -800,7 +911,7 @@ class Moderation(commands.Cog):
                 if len(warns) - 1 >= position - 1:
                     reason = warns[position - 1]
                     new_warns = warns.copy()
-                    new_warns.pop(position - 1)
+                    removed_warn = new_warns.pop(position - 1)
                     new_data = {
                         "$set": {
                             "warns": new_warns
@@ -823,7 +934,21 @@ class Moderation(commands.Cog):
                             )
                         )
                     )
-
+                    guild_log_doc = await db.LOGGING.find_one(
+                                    {"_id": ctx.guild.id}
+                    )
+                    if guild_log_doc["modlog"]:
+                        channel = self.bot.get_channel(guild_log_doc["channel_id"])
+                        
+                        await channel.send(embed=discord.Embed(
+                            title="⚠️ Remove warn",
+                            description=f"{member.mention} has been unwarned by {ctx.author.mention}",
+                            color=var.C_BLUE
+                        ).add_field(
+                            name="Removed warn",
+                            value=removed_warn
+                        )
+                        )
                 else:
                     await ctx.send(
                         embed=discord.Embed(
@@ -875,8 +1000,19 @@ class Moderation(commands.Cog):
                         name=f"Warn {warns.index(i) + 1}", value=i,
                         inline=False
                     )
-
                 await ctx.send(embed=embed)
+                guild_doc = await db.LOGGING.find_one(
+                                    {"_id": ctx.guild.id}
+                                )
+                if guild_doc["modlog"]:
+                    channel = self.bot.get_channel(guild_doc["channel_id"])
+
+                    await channel.send(embed=discord.Embed(
+                        title="New warn",
+                        description=f"{member.mention} has been warned by {ctx.author.mention}",
+                        color=var.C_GREEN
+                    ))
+
         else:
             await ctx.send(
                 embed=discord.Embed(
@@ -891,6 +1027,91 @@ class Moderation(commands.Cog):
                 )
             )
 
+    @commands.command()
+    async def modlog(self, ctx):
+        guild_doc = await db.LOGGING.find_one({
+                        "_id": ctx.guild.id
+                    })
+
+        status = False if not guild_doc or not guild_doc["modlog"] else True
+
+        def check(reaction, user):
+            return user == ctx.author and reaction.message == bot_msg
+
+        def message_check(message):
+            return (
+                message.author == ctx.author
+                and message.channel.id == ctx.channel.id
+            )  
+
+        embed = discord.Embed(title="Mod log")
+        if status:
+            embed.description = (
+                "Moderation log is currently enabled"
+                f"\nReact to the {var.E_DISABLE} emoji to disable it."
+            )
+            embed.color = var.C_GREEN
+
+        else:
+            embed.description = (
+                "Moderation log is currently disabled"
+                f"\nReact to the {var.E_ENABLE} emoji to disable it."
+            )
+            embed.color = var.C_RED
+
+        bot_msg = await ctx.send(embed=embed)
+        
+        await bot_msg.add_reaction(
+            var.E_DISABLE 
+            if status else 
+            var.E_ENABLE
+            )
+        reaction, _ = await self.bot.wait_for(
+                                        "reaction_add", 
+                                        check=check, 
+                                        timeout=60
+                                        )
+
+        if str(reaction.emoji) == var.E_ENABLE:
+            if not guild_doc:
+                await ctx.send("Send the channel where you would like to log moderation events!")
+                while True:
+                    user_msg = await self.bot.wait_for("message", 
+                                                    check=message_check, 
+                                                    timeout=60
+                                                    )
+                    try:
+                        channel = self.bot.get_channel(
+                            int(user_msg.content.strip("<>#"))
+                            )
+                        break
+                    except Exception:
+                        await ctx.send("Invalid channel ID, try again.")
+
+
+                await db.LOGGING.insert_one(
+                    {
+                    "_id": ctx.guild.id,
+                    "channel_id": channel.id, 
+                    "modlog": True
+                    }
+                )
+            else:
+                await db.LOGGING.insert(
+                    guild_doc,
+                    {"set":{'modlog': True}}
+                )
+                
+        elif str(reaction.emoji) == var.E_DISABLE:
+            await db.LOGGING.update_db(
+                guild_doc,
+                {"set": {'modlog': True}}
+            )
+
+        await ctx.send(embed=discord.Embed(
+            description=f"Successfully {'disabled' if status else 'enabled'} moderation logging.",
+            color=var.C_RED if status else var.C_GREEN
+        ))
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

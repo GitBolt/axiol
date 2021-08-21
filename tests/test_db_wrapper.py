@@ -1,7 +1,7 @@
 import time
 import unittest
 
-from axiol.classes.db_wrapper import Database, Collections
+from core.classes.db_wrapper import Database, Collections
 from tests.utils import captured_output
 
 

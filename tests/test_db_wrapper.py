@@ -1,23 +1,8 @@
-import sys
 import time
 import unittest
-from contextlib import contextmanager
-from io import StringIO
-
 
 from axiol.classes.db_wrapper import Database, Collections
-
-
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
+from tests.utils import captured_output
 
 
 class MyTestCase(unittest.TestCase):

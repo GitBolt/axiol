@@ -1,4 +1,5 @@
 import sys
+import time
 import unittest
 from contextlib import contextmanager
 from io import StringIO
@@ -28,7 +29,10 @@ class MyTestCase(unittest.TestCase):
 
             output = out.getvalue().strip()
             self.assertTrue('Warning' in output)
+
             print(output)
+
+        time.sleep(0.01)  # avoid output issue
 
 
 if __name__ == '__main__':

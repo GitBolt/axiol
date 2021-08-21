@@ -18,8 +18,8 @@ if TYPE_CHECKING:
     )
 
 DB_PATH: Optional[str] = (
-    os.environ.get('MONGO_DB_URL')
-    or dotenv.dotenv_values(DOTENV_PATH).get('MONGO_DB_URL')
+    os.environ.get('MONGO_URL')
+    or dotenv.dotenv_values(DOTENV_PATH).get('MONGO_URL')
 )
 
 if DB_PATH is None:

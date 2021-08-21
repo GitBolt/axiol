@@ -6,6 +6,7 @@ from typing import Optional, Tuple, TYPE_CHECKING
 
 import dotenv
 
+from axiol import DOTENV_PATH
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import InvalidURI
 from classes.logger import log
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
 
 DB_PATH: Optional[str] = (
     os.environ.get('MONGO_DB_URL')
-    or dotenv.dotenv_values('.env').get('MONGO_DB_URL')
+    or dotenv.dotenv_values(DOTENV_PATH).get('MONGO_DB_URL')
 )
 
 if DB_PATH is None:

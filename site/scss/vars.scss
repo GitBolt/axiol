@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400&display=swap');
+
+$font: 'Poppins', sans-serif;
+
+//colours
+$bg: #121212;
+
+$main: #005ed8;
+$lightmain: #0084ff;
+$disabledbtn: #2E4567;
+
+
+@mixin primary_button($height, $width){
+    padding: $height $width;
+    background: $main;
+    color: white;
+    font-family: $font;
+    font-size: calc(1.2vw + 10px);
+    text-align: center;
+    line-height: $height;
+    border-radius: calc(1.5vh - 5px);
+    transition: all .2s ease-in-out;
+    box-shadow: 0px 0px 40px $main;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0px 0px 30px $lightmain;
+        background: $lightmain;
+        transform: translate(0px, -5px);
+    }
+  }
+
+  @mixin secondary_button($height, $width){
+    padding: $height $width;
+    border: 2px solid $main;
+    background: none;
+    color: white;
+    font-family: $font;
+    font-size: calc(1.2vw + 10px);
+    text-align: center;
+    line-height: $height;
+    border-radius: calc(1.5vh - 5px);
+    transition: all .2s ease-in-out;
+    box-shadow: 0px 0px 40px $main;
+    &:hover{
+        cursor: pointer;
+        box-shadow: 0px 0px 30px $lightmain;
+        border: 2px solid $lightmain;
+        transform: translate(0px, calc(-5px));
+    }
+  }

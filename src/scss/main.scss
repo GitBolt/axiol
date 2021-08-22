@@ -8,20 +8,22 @@
     list-style: none;
     text-decoration: none;
 }
-html, body{
+
+html, body {
     height: 100%;
     width: 100%;
     overflow-x: hidden;
-    background-color: $bg;   
+    background-color: $bg;
     font-family: $font
 }
 
-h1{
+h1 {
     color: white;
     font-size: calc(2vw + 20px);
     margin-bottom: 20px;
 }
-p{
+
+p {
     color: rgb(204, 204, 204);
     font-size: calc(1vw + 8px);
     padding: 0px 10px;
@@ -29,22 +31,25 @@ p{
     word-wrap: break-word;
 }
 
-.main{
+.main {
     align-items: center;
     text-align: center;
     margin-top: 5%;
-}  
-.buttons a{
+}
+
+.buttons a {
     display: inline-block;
     margin: 3%;
 }
-.buttons{
+
+.buttons {
     margin-top: 40px;
 }
 
 .invite-btn {
     @include primary_button(calc(.8vw + 8px), calc(4vw + 20px));
 }
+
 .support-btn {
     @include secondary_button(calc(.8vw + 8px), calc(4vw + 20px));
 }

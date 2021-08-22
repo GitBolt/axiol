@@ -1,0 +1,42 @@
+@use "variables";
+
+@mixin primary_button($height, $width) {
+    padding: $height $width;
+    background: variables.$main;
+    color: white;
+    font-family: inherit;
+    font-size: calc(1.2vw + 10px);
+    text-align: center;
+    line-height: $height;
+    border-radius: calc(1.5vh - 5px);
+    transition: all .2s ease-in-out;
+    box-shadow: 0 0 40px variables.$main;
+
+    &:hover {
+        cursor: pointer;
+        box-shadow: 0 0 30px variables.$light_main;
+        background: variables.$light_main;
+        transform: translate(0px, -5px);
+    }
+}
+
+@mixin secondary_button($height, $width) {
+    padding: $height $width;
+    border: 2px solid variables.$main;
+    background: none;
+    color: white;
+    font-family: inherit;
+    font-size: calc(1.2vw + 10px);
+    text-align: center;
+    line-height: $height;
+    border-radius: calc(1.5vh - 5px);
+    transition: all .2s ease-in-out;
+    box-shadow: 0 0 40px variables.$main;
+
+    &:hover {
+        cursor: pointer;
+        box-shadow: 0 0 30px variables.$light_main;
+        border: 2px solid variables.$light_main;
+        transform: translate(0px, calc(-5px));
+    }
+}

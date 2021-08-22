@@ -1,12 +1,10 @@
 @use "../abstracts/mixins";
 
 .buttons {
-    margin-top: 40px;
-
-    a {
-        display: inline-block;
-        margin: 3%;
-    }
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 20px;
 }
 
 .invite-btn {

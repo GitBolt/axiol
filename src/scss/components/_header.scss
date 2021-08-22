@@ -1,0 +1,19 @@
+@use "../abstracts/variables";
+
+.nav {
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+    padding: 10px;
+
+    a {
+        margin: 1rem;
+        color: rgba(variables.$text, 75%);
+        font-size: 1em;
+        transition: .2s ease;
+
+        &:hover {
+            color: variables.$text;
+        }
+    }
+}

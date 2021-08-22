@@ -1,0 +1,10 @@
+{
+    "SCSS": {
+        "program": "sass",
+        "arguments": [
+            "$FileName$:$ContentRoot$/css/$FileNameWithoutExtension$.css",
+            "--style:compressed"
+        ],
+        "refresh": "$ContentRoot$/css/$FileNameWithoutExtension$.css:$FileNameWithoutExtension$.css.map"
+    }
+}

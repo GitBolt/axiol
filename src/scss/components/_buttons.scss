@@ -1,0 +1,18 @@
+@use "../abstracts/mixins";
+
+.buttons {
+    margin-top: 40px;
+
+    a {
+        display: inline-block;
+        margin: 3%;
+    }
+}
+
+.invite-btn {
+    @include mixins.primary_button(calc(.8vw + 8px), calc(4vw + 20px));
+}
+
+.support-btn {
+    @include mixins.secondary_button(calc(.8vw + 8px), calc(4vw + 20px));
+}

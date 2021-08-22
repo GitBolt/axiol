@@ -24,7 +24,7 @@ E_CONTINUE = "<:Continue:847850081587167234>"
 
 # Extra Emoji
 E_LOADING = "<a:Loading:854065859667165235>"
-E_LEVELING = "<:Leveling:860554921312518166>"
+E_LEVELING = "<:leveling:879026839794892881>"
 E_BOT = "<:BotVerification:846990577442095114>"
 
 # Colour Emojis

@@ -90,7 +90,7 @@ class Extras(commands.Cog):
             description=(
                 f"[Donation](https://paypal.me/palbolt) "
                 f"[Vote](https://top.gg/bot/843484459113775114/vote) "
-                f"[Support](https://discord.gg/hxc73psNsB)"
+                f"[Support](https://discord.gg/Rzz5WS9jXW)"
             ),
             color=var.C_MAIN
         ).add_field(

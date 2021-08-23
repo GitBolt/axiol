@@ -6,14 +6,17 @@ body {
 }
 
 h1 {
+    width: max-content;
+    height: max-content;
     color: white;
     font-size: 3em;
     margin-bottom: 20px;
 }
 
+
 p {
     color: rgb(204, 204, 204);
-    font-size: 1em;
+    font-size: 1.2em;
     padding: 0 10px;
     text-align: center;
 }

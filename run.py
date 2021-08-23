@@ -1,4 +1,4 @@
-from axiol.bot import Bot
+from core.bot import Bot
 
 
 def main() -> None:

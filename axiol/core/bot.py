@@ -7,7 +7,7 @@ from discord.ext import commands
 
 from axiol.cogs import Cogs
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
-from core.classes.logger import log
+from utils.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -21,7 +21,7 @@ class Bot(commands.Bot):
         super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
 
-        for cog in Cogs:
+        for cog in cogs:
             self.load_extension(str(cog).lower())
 
     def run(self) -> None:

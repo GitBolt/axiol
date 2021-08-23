@@ -1,7 +1,7 @@
 import time
 import unittest
 
-from core.classes.db_wrapper import Database, Collections
+from database.db_wrapper import Database, Collections
 from tests.utils import captured_output
 
 

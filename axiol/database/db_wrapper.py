@@ -9,7 +9,7 @@ import dotenv
 from axiol import DOTENV_PATH
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import InvalidURI
-from core.classes.logger import log
+from utils.logger import log
 
 if TYPE_CHECKING:
     from motor.motor_asyncio import (

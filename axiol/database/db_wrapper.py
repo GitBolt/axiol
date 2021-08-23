@@ -7,9 +7,11 @@ from typing import Optional, Tuple, TYPE_CHECKING
 import dotenv
 
 from axiol import DOTENV_PATH
+from axiol.utils.logger import log
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import InvalidURI
-from utils.logger import log
+
 
 if TYPE_CHECKING:
     from motor.motor_asyncio import (

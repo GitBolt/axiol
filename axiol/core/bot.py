@@ -6,7 +6,7 @@ import dotenv
 from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
-from utils.logger import log
+from axiol.utils.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
 

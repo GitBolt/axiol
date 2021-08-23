@@ -5,6 +5,10 @@ from database.db_wrapper import collections, database
 
 class Updater(Bot):
 
+    def __init__(self):
+        super(Updater, self).__init__(prefix=' ')
+        self.remove_command('help')
+
     async def on_ready(self):
         log.inform("Starting DB Update...")
         await update_db([guild.id for guild in self.guilds])
@@ -19,18 +23,8 @@ async def update_db(guild_ids):
     leveling_update = []
 
     for guild_id in guild_ids:
-        guild_plugins = (
-            await collections.plugins
-            .find_one({"_id": guild_id})
-        )
-
         plugin_count = (
             await collections.plugins
-            .count_documents({"_id": guild_id}, limit=1)
-        )
-
-        permission_count = (
-            await collections.permissions
             .count_documents({"_id": guild_id}, limit=1)
         )
 
@@ -54,6 +48,11 @@ async def update_db(guild_ids):
             plugins_update.append(guild_id)
             log.success(f"{guild_id} - Plugins 🔧")
 
+        permission_count = (
+            await collections.permissions
+            .count_documents({"_id": guild_id}, limit=1)
+        )
+
         if not permission_count:
             collections.permissions.insert_one(
                 {
@@ -74,6 +73,11 @@ async def update_db(guild_ids):
 
             permissions_update.append(guild_id)
             log.success(f"{guild_id} - Permissions 🔨")
+
+        guild_plugins = (
+            await collections.plugins
+            .find_one({"_id": guild_id})
+        )
 
         if (
             guild_plugins.get("Leveling")
@@ -122,7 +126,7 @@ async def update_db(guild_ids):
 
 
 def main():
-    client = Updater(' ')  # Setting up a impossible prefix to avoid problems
+    client = Updater()  # Setting up a impossible prefix to avoid problems
     client.run()
 
 

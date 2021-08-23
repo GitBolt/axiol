@@ -5,7 +5,7 @@ import sys
 import dotenv
 from discord.ext import commands
 
-from axiol.cogs import Cogs
+from axiol.cogs import cogs
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
 from utils.logger import log
 
@@ -22,7 +22,7 @@ class Bot(commands.Bot):
         self.remove_command('help')
 
         for cog in cogs:
-            self.load_extension(str(cog).lower())
+            self.load_extension(cog)
 
     def run(self) -> None:
         log.inform("Starting bot...")
@@ -33,7 +33,7 @@ class Bot(commands.Bot):
         )
 
     def load_extension(self, name: str, *, _package=None) -> None:
-        cog_path: str = str(name).lower()
+        cog_path: str = f'cogs.{name}'
         cog_name: str = cog_path.split('.')[1]
 
         log.inform(f"Loading {cog_name} extension...")

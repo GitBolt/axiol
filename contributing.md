@@ -12,6 +12,53 @@ Before you begin:
 - any kind of bug fixes and optimizations.
 - implementing `master` features in the `pkg-rewrite` branch.
 
+### Project Structure
+
+<!-- Not jsonpath, but man the colors! -->
+```jsonpath
+$
+├── .idea
+├── .githus
+├── assets/                       'img & fonts'
+├── docs/                         'Github documentation'
+│   ├── AUTHORS.md
+│   ├── CONTRIBUTING.md
+│   ├── INSTALL.md
+│   └── README.md
+├── axiol/
+│   ├── cogs/
+│   │   ├── custom/               'all custom-based/privates cogs'
+│   │   ├── handlers/             'main non-user togglabe cogs.'
+│   │   │   ├── errors.py
+│   │   │   ├── extras.py
+│   │   │   ├── help.py
+│   │   │   ├── permissions.py
+│   │   │   └── settings.py
+│   │   └── plugins/              'bot taggable cogs'
+│   │       ├── (...)
+│   │       └── __init__.py
+│   ├── core/                     'base classes that derive the discord.py package'                
+│   ├── database/                 'everything related to pymongo db'
+│   │   ├── db_setup.py
+│   │   └── wrapper.py
+│   ├── utils/                    'groups of utilities functions'
+│   └── __init__.py
+├── tests/                        'python unittest files'
+├── .editorconfig
+├── (.env)                        'python unittest files'
+├── .env.example
+├── .gitignore
+├── docker-compose.yaml
+├── Dockerfile
+├── LICENSE
+├── Pipfile
+├── Pipfile.lock
+├── requirements.txt
+├── run.py                        'main python script to start the bot'
+├── tokei.toml
+└── VERSION
+```
+
 ### Don't see your issue? Open one
 
 If you spot something new, open an issue using the template. We'll use the issue

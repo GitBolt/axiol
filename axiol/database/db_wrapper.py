@@ -1,3 +1,7 @@
+"""Connects and communicate with the database server using pymongo.
+Only `collections` and `database` should be imported from this module.
+"""
+
 from __future__ import annotations
 
 import os
@@ -31,7 +35,7 @@ if DB_PATH is None:
         ' or add in environ key'
     )
 
-MONGO_CLIENT = None
+MONGO_CLIENT: Optional[AsyncIOMotorClient] = None
 
 try:
     MONGO_CLIENT = AsyncIOMotorClient(DB_PATH)

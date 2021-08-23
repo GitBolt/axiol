@@ -1,6 +1,7 @@
 """Axiol Bot Core."""
 import os
 import sys
+from typing import List
 
 import dotenv
 from discord.ext import commands
@@ -14,13 +15,13 @@ TOKEN_KEY: str = 'TOKEN'
 class Bot(commands.Bot):
     """Axiol custom bot class."""
 
-    def __init__(self, prefix) -> None:
+    def __init__(self, prefix: str) -> None:
         log.inform("Initializing bot...")
 
         super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
 
-    def load_extensions(self, cog_list):
+    def load_extensions(self, cog_list: List[str]) -> None:
         log.inform("Loading bot extensions...")
         for cog in cog_list:
             self.load_extension(cog)
@@ -58,6 +59,9 @@ class Bot(commands.Bot):
         log.inform(f"{self.user} is ready for use.")
 
     if PREVENT_DOUBLE_RUNTIME_ERROR:
+        log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")
+
         def __del__(self):
+            log.warn("Bot has been shutdown, cleaning stderr.")
             # Prevents RuntimeError when Ctrl-C.
             sys.stderr.close()

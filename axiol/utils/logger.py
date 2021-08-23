@@ -65,15 +65,20 @@ class Logger:
         """
         self.__log('yellow', 'Warning', message)
 
-    def error(self, message: str) -> None:
-        """Log a fatal operation or missing core element
-            cause impossibility to run or continue.
+    def error(self, message: str, fatal: bool = True) -> None:
+        """Log a operation fail or missing core element
+            causing instabilities to run or reducing available features.
+
+        :param fatal:
+            Whether the program can continue to run or not.
 
         :param message:
             Failure details, error __cause__ and/or solve hint.
         """
         self.__log('red', 'Error', message)
-        quit()
+
+        if fatal:
+            quit()
 
     def db(self, message: str) -> None:
         """Log a db call.

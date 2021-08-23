@@ -10,6 +10,9 @@ pillow = "*"
 nltk = "*"
 "discord.py" = "*"
 motor = "*"
+colorama = "*"
+termcolor = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

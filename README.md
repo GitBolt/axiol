@@ -16,7 +16,7 @@
 ![Lines of code](https://img.shields.io/tokei/lines/Github/GitBolt/Axiol)
 ![Code Style](https://img.shields.io/badge/code%20style-pep8-green)
 
-*Axiol is an advanced, highly customizable, and interactive Discord Bot coded in written pure Python.*
+*Axiol is an advanced, highly customizable, and interactive Discord Bot coded in pure Python.*
 
 | :pushpin: | [Invite the bot to your server](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot) |
 | ------------- | :----------------------------------------------------------------------------------------------------------------------------- |
@@ -48,3 +48,5 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 - [Top.gg](https://top.gg/bot/843484459113775114/vote)
 - [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)
 - [Bots.gg](https://discord.bots.gg/bots/843484459113775114)
+- [Disbotlist.xyz](https://disbotlist.xyz/bot/843484459113775114)
+- [Discord.boats](https://discord.boats/bot/843484459113775114)

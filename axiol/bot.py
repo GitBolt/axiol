@@ -94,11 +94,11 @@ async def on_guild_join(guild):
         ),
         color=var.C_GREEN
     ).add_field(
-        name="ID", value=guild.id
+        name="ID", value=guild.id, inline=False
     ).add_field(
-        name="Member count", value=guild.member_count
+        name="Member count", value=guild.member_count, inline=False
     ).add_field(
-        name="Human to bot percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%"
+        name="Bot to human percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%", inline=False
     )
 
     await bot.get_channel(848207106821980213).send(embed=embed)
@@ -114,11 +114,11 @@ async def on_guild_remove(guild):
         description=f"Someone removed me from `{guild.name}` :(",
         color=var.C_RED
     ).add_field(
-        name="ID", value=guild.id
+        name="ID", value=guild.id, inline=False
     ).add_field(
-        name="Member count", value=guild.member_count
+        name="Member count", value=guild.member_count, inline=False
     ).add_field(
-        name="Human to bot percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%"
+        name="Bot to human percentage", value=f"{round(bot_count / guild.member_count * 100, 2)}%", inline=False
     )
 
     await bot.get_channel(848207106821980213).send(embed=embed)

@@ -5,18 +5,19 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-h1 {
-    width: max-content;
-    height: max-content;
+h1, h2 {
     color: white;
-    font-size: 3em;
-    margin-bottom: 20px;
 }
 
 
 p {
     color: rgb(204, 204, 204);
     font-size: 1.2em;
-    padding: 0 10px;
-    text-align: center;
+}
+
+#line{
+    background: white;
+    height: 2px;
+    width: 100%;
+    margin: 10px 10px;
 }

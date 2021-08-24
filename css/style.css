@@ -13,19 +13,20 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-h1 {
-  width: max-content;
-  height: max-content;
+h1, h2 {
   color: white;
-  font-size: 3em;
-  margin-bottom: 20px;
 }
 
 p {
   color: #cccccc;
   font-size: 1.2em;
-  padding: 0 10px;
-  text-align: center;
+}
+
+#line {
+  background: white;
+  height: 2px;
+  width: 100%;
+  margin: 10px 10px;
 }
 
 .buttons {
@@ -100,46 +101,38 @@ body {
 
 .main {
   display: grid;
-  grid-template-rows: repeat(3, 200px);
-  grid-template-columns: repeat(4, 25%);
-  margin-left: 10%;
-  margin-top: 2%;
-  grid-column-gap: 1rem;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 50%);
+  grid-column-gap: 2rem;
+}
+
+h1 {
+  justify-self: center;
+  grid-column: 1/4;
 }
 
 img {
-  width: calc(8vw + 100px);
-  grid-row: 2;
-  grid-column: 1;
+  justify-self: end;
+  width: calc(10vw + 50px);
+  grid-row: 2/4;
 }
 
 .description {
-  grid-column: 2;
+  grid-column: 2/6;
   grid-row: 2;
-  margin-top: -10%;
-  margin-left: -30%;
-  width: 200%;
-}
-
-.description > p, h2 {
-  text-align: left;
-}
-
-.description > h2 {
-  color: white;
-  font-size: 2.5em;
-}
-
-#line {
-  height: 2px;
-  background: white;
 }
 
 .buttons {
+  grid-column: 2/5;
   grid-row: 3;
-  grid-column: 2;
-  margin-top: -30%;
-  margin-left: -30%;
+}
+
+.features {
+  display: flex;
+  grid-column: 2/6;
+  grid-row: 6;
+  justify-content: space-around;
+  flex-wrap: wrap;
 }
 
 /*# sourceMappingURL=style.css.map */

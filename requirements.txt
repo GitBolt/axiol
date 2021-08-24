@@ -1,5 +1,5 @@
 discord.py~=1.7.0
-embed-templator>=1.0.1
+embed-templator>=1.0.3
 python-dotenv~=0.19.0
 colorama~=0.4.4
 termcolor~=1.1.0

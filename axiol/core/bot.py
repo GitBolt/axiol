@@ -7,6 +7,7 @@ import dotenv
 from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
+from axiol.core.embed import Embed
 from axiol.utils.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
@@ -20,6 +21,7 @@ class Bot(commands.Bot):
 
         super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
+        log.inform("Loaded Embed Templator")
 
     def load_extensions(self, cog_list: List[str]) -> None:
         log.inform("Loading bot extensions...")

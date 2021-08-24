@@ -1,36 +1,34 @@
-from axiol.bot import Bot
-from core.classes.logger import log
-from core.classes.db_wrapper import collections, database
+"""A module reserved to setup the mongo database."""
+
+from typing import Generator, List, Dict, Union
+
+from axiol.core.bot import Bot
+from axiol.database.db_wrapper import collections, database
+from axiol.utils.logger import log
 
 
 class Updater(Bot):
 
-    async def on_ready(self):
+    def __init__(self) -> None:
+        super(Updater, self).__init__(prefix=' ')
+        self.remove_command('help')
+
+    async def on_ready(self) -> None:
         log.inform("Starting DB Update...")
-        await update_db([guild.id for guild in self.guilds])
+        await update_db(guild.id for guild in self.guilds)
         await self.close()
         quit()
 
 
-async def update_db(guild_ids):
+async def update_db(guild_ids: Generator[int, int, None]) -> None:
     """Updating leveling, plugin, prefix and permission data."""
-    plugins_update = []
-    permissions_update = []
-    leveling_update = []
+    plugins_update: List[int] = []
+    permissions_update: List[int] = []
+    leveling_update: List[int] = []
 
     for guild_id in guild_ids:
-        guild_plugins = (
+        plugin_count: int = (
             await collections.plugins
-            .find_one({"_id": guild_id})
-        )
-
-        plugin_count = (
-            await collections.plugins
-            .count_documents({"_id": guild_id}, limit=1)
-        )
-
-        permission_count = (
-            await collections.permissions
             .count_documents({"_id": guild_id}, limit=1)
         )
 
@@ -54,6 +52,11 @@ async def update_db(guild_ids):
             plugins_update.append(guild_id)
             log.success(f"{guild_id} - Plugins 🔧")
 
+        permission_count: int = (
+            await collections.permissions
+            .count_documents({"_id": guild_id}, limit=1)
+        )
+
         if not permission_count:
             collections.permissions.insert_one(
                 {
@@ -74,6 +77,11 @@ async def update_db(guild_ids):
 
             permissions_update.append(guild_id)
             log.success(f"{guild_id} - Permissions 🔨")
+
+        guild_plugins: Dict[str, Union[bool, int]] = (
+            await collections.plugins
+            .find_one({"_id": guild_id})
+        )
 
         if (
             guild_plugins.get("Leveling")
@@ -114,15 +122,15 @@ async def update_db(guild_ids):
             log.warn(f"{guild_id} - Prefix ⚪ ({e.__cause__})")
 
     log.inform(
-        "Update results\n"
-        f"{len(plugins_update)} plugins\n"
-        f"{len(permissions_update)} permissions\n"
-        f"{len(leveling_update)} leveling"
+        "Update results: ["
+        f"{len(plugins_update)} plugins, "
+        f"{len(permissions_update)} permissions, "
+        f"{len(leveling_update)} leveling]"
     )
 
 
-def main():
-    client = Updater(' ')  # Setting up a impossible prefix to avoid problems
+def main() -> None:
+    client = Updater()  # Setting up a impossible prefix to avoid problems
     client.run()
 
 

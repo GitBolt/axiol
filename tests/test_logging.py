@@ -1,6 +1,6 @@
 import unittest
 
-from core.classes.logger import log
+from utils.logger import log
 from tests.utils import captured_output
 
 

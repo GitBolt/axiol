@@ -1,13 +1,14 @@
 """Axiol Bot Core."""
 import os
 import sys
+from typing import List
 
 import dotenv
 from discord.ext import commands
 
-from axiol.cogs import Cogs
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
-from core.classes.logger import log
+from axiol.core.embed import Embed
+from axiol.utils.logger import log
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -15,14 +16,17 @@ TOKEN_KEY: str = 'TOKEN'
 class Bot(commands.Bot):
     """Axiol custom bot class."""
 
-    def __init__(self, prefix) -> None:
+    def __init__(self, prefix: str) -> None:
         log.inform("Initializing bot...")
 
         super(Bot, self).__init__(command_prefix=prefix)
         self.remove_command('help')
+        log.inform("Loaded Embed Templator")
 
-        for cog in Cogs:
-            self.load_extension(str(cog).lower())
+    def load_extensions(self, cog_list: List[str]) -> None:
+        log.inform("Loading bot extensions...")
+        for cog in cog_list:
+            self.load_extension(cog)
 
     def run(self) -> None:
         log.inform("Starting bot...")
@@ -33,7 +37,7 @@ class Bot(commands.Bot):
         )
 
     def load_extension(self, name: str, *, _package=None) -> None:
-        cog_path: str = str(name).lower()
+        cog_path: str = f'cogs.{name}'
         cog_name: str = cog_path.split('.')[1]
 
         log.inform(f"Loading {cog_name} extension...")
@@ -57,6 +61,9 @@ class Bot(commands.Bot):
         log.inform(f"{self.user} is ready for use.")
 
     if PREVENT_DOUBLE_RUNTIME_ERROR:
+        log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")
+
         def __del__(self):
+            log.warn("Bot has been shutdown, cleaning stderr.")
             # Prevents RuntimeError when Ctrl-C.
             sys.stderr.close()

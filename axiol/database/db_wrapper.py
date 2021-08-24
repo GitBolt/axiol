@@ -1,3 +1,7 @@
+"""Connects and communicate with the database server using pymongo.
+Only `collections` and `database` should be imported from this module.
+"""
+
 from __future__ import annotations
 
 import os
@@ -7,9 +11,11 @@ from typing import Optional, Tuple, TYPE_CHECKING
 import dotenv
 
 from axiol import DOTENV_PATH
+from axiol.utils.logger import log
+
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import InvalidURI
-from core.classes.logger import log
+
 
 if TYPE_CHECKING:
     from motor.motor_asyncio import (
@@ -29,7 +35,7 @@ if DB_PATH is None:
         ' or add in environ key'
     )
 
-MONGO_CLIENT = None
+MONGO_CLIENT: Optional[AsyncIOMotorClient] = None
 
 try:
     MONGO_CLIENT = AsyncIOMotorClient(DB_PATH)

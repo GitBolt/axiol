@@ -1,7 +1,7 @@
 import unittest
 
-from utils.logger import log
-from tests.utils import captured_output
+from axiol.utils.logger import log
+from axiol.utils.functions import captured_output
 
 
 class MyTestCase(unittest.TestCase):

@@ -1,4 +1,4 @@
-from core.bot import Bot
+from axiol.core.bot import Bot
 from axiol.cogs import cogs
 
 

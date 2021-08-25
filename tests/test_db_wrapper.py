@@ -1,8 +1,8 @@
 import time
 import unittest
 
-from database.db_wrapper import Database, Collections
-from tests.utils import captured_output
+from axiol.database.db_wrapper import Database, Collections
+from axiol.utils.functions import captured_output
 
 
 class MyTestCase(unittest.TestCase):

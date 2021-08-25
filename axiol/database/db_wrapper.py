@@ -72,6 +72,12 @@ class StaticClassList(ABC):
                 base['_'.join(map(str.capitalize, attr_name.split()))]
             )
 
+    def __getattribute__(self, item):
+        if item in object.__getattribute__(self, '__slots__'):
+            log.db(f"Get ={item}=> {self.__class__.__name__}")
+
+        return object.__getattribute__(self, item)
+
     def __repr__(self) -> str:
         return (
             f'<{self.__class__.__name__}(StaticClassList)'

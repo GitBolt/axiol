@@ -7,9 +7,11 @@ import dotenv
 from discord import Message
 from discord.ext import commands
 
-from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
+from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR, OWNER_ID
+from axiol.core.context import TimedContext
+from axiol.database.db_wrapper import collections
+from axiol.tasks.update_presence import update_presence
 from axiol.utils.logger import log
-from core.context import TimedContext
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -20,7 +22,12 @@ class Bot(commands.Bot):
     def __init__(self, prefix: str) -> None:
         log.inform("Initializing bot...")
 
-        super(Bot, self).__init__(command_prefix=prefix)
+        self.default_prefix = prefix
+        super(Bot, self).__init__(
+            command_prefix=self.get_prefix,
+            owner_id=OWNER_ID
+        )
+
         self.remove_command('help')
         log.inform("Loaded Embed Templator")
 
@@ -38,7 +45,7 @@ class Bot(commands.Bot):
         )
 
     def load_extension(self, name: str, *, _package=None) -> None:
-        cog_path: str = f'cogs.{name}'
+        cog_path: str = f'axiol.cogs.{name}'
         cog_name: str = cog_path.split('.')[1]
 
         log.inform(f"Loading {cog_name} extension...")
@@ -55,8 +62,24 @@ class Bot(commands.Bot):
         else:
             log.success(f"loaded {cog_name}")
 
+    async def get_prefix(self, message):
+        """Return current guild prefix"""
+        if not message.guild:
+            return self.default_prefix
+
+        prefix_doc = (
+            await collections.prefixes
+            .find_one({"_id": message.guild.id})
+        )
+
+        if prefix_doc is None:
+            return self.default_prefix
+
+        return prefix_doc.get("prefix", self.default_prefix)
+
     async def on_connect(self) -> None:
         log.success(f"Logging in as {self.user}.")
+        update_presence.start(self)
 
     async def get_context(self, message: Message, *, cls=TimedContext):
         return await super().get_context(message, cls=cls)
@@ -65,8 +88,6 @@ class Bot(commands.Bot):
         log.inform(f"{self.user} is ready for use.")
 
     if PREVENT_DOUBLE_RUNTIME_ERROR:
-        log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")
-
         def __del__(self) -> NoReturn:
             log.warn("Bot has been shutdown, cleaning stderr.")
             # Prevents RuntimeError when Ctrl-C.

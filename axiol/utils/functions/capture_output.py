@@ -1,6 +1,6 @@
 import sys
 from contextlib import contextmanager
-from captured_output import StringIO
+from io import StringIO
 from typing import Tuple
 
 

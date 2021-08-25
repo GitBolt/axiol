@@ -13,6 +13,6 @@ async def update_presence(client: Bot):
     await client.change_presence(
         activity=Activity(
             type=ActivityType.watching,
-            name=f"{client.command_prefix}help | {client.latency * 1000:,.3f}ms"
+            name=f"{client.default_prefix}help | {client.latency * 1000:,.3f}ms"
         )
     )

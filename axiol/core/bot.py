@@ -8,6 +8,7 @@ from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
 from axiol.utils.logger import log
+from core.context import TimedContext
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -55,6 +56,9 @@ class Bot(commands.Bot):
 
     async def on_connect(self) -> None:
         log.success(f"Logging in as {self.user}.")
+
+    async def get_context(self, message, *, cls=TimedContext):
+        return await super().get_context(message, cls=cls)
 
     async def on_ready(self) -> None:
         log.inform(f"{self.user} is ready for use.")

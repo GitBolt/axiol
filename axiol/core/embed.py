@@ -16,6 +16,7 @@ class Embed(embed_templator.Embed):
             icon_url=self.client.user.avatar_url,
             text=lucky or '   '.join(
                 (
+                    f"⚙️ {self.ctx.time() * 1000:.2f} ms",
                     f"⏳ {self.client.latency * 1000:.2f}ms",
                     f"🔑 {self.ctx.prefix}help",
                 )

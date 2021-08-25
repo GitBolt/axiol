@@ -7,7 +7,7 @@ import dotenv
 from discord import Message
 from discord.ext import commands
 
-from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
+from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR, OWNER_ID
 from axiol.core.context import TimedContext
 from axiol.database.db_wrapper import collections
 from axiol.tasks.update_presence import update_presence
@@ -23,7 +23,11 @@ class Bot(commands.Bot):
         log.inform("Initializing bot...")
 
         self.default_prefix = prefix
-        super(Bot, self).__init__(command_prefix=self.get_prefix)
+        super(Bot, self).__init__(
+            command_prefix=self.get_prefix,
+            owner_id=OWNER_ID
+        )
+
         self.remove_command('help')
         log.inform("Loaded Embed Templator")
 

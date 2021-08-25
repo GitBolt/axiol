@@ -7,6 +7,8 @@ __version__: str = '2.0.0'
 
 TEST_SERVER_ID: int = 843516084266729512
 
+OWNER_ID: int = 812699388815605791
+
 DEVS_ID: Tuple[int, int, int] = (
     812699388815605791,
     723971496107573328,

@@ -63,7 +63,3 @@ class Owner(commands.Cog):
 
 def setup(client):
     client.add_cog(Owner(client))
-
-
-a, b = a[:] = [[]], []
-a = b = c = []

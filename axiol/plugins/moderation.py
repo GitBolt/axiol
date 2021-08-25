@@ -63,7 +63,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -142,7 +142,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -211,7 +211,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -289,7 +289,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -343,7 +343,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -401,7 +401,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -462,7 +462,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -841,7 +841,7 @@ class Moderation(commands.Cog):
             guild_log_doc = await db.LOGGING.find_one(
                             {"_id": ctx.guild.id}
             )
-            if guild_log_doc["modlog"]:
+            if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
                 await channel.send(embed=discord.Embed(
@@ -937,7 +937,7 @@ class Moderation(commands.Cog):
                     guild_log_doc = await db.LOGGING.find_one(
                                     {"_id": ctx.guild.id}
                     )
-                    if guild_log_doc["modlog"]:
+                    if guild_log_doc is not None and guild_log_doc["modlog"]:
                         channel = self.bot.get_channel(guild_log_doc["channel_id"])
                         
                         await channel.send(embed=discord.Embed(

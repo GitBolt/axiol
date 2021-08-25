@@ -6,20 +6,20 @@
 
     padding: $height $width;
 
-    font-size: 1.2em;
+    font-size: 1em;
     font-family: inherit;
 
     text-align: center;
     line-height: $height;
 
-    border-radius: 0.5em;
-    box-shadow: 0 0 40px variables.$main;
+    border-radius: 0.3em;
+    box-shadow: 0 0 30px variables.$main;
 
     transition: all .2s ease-in-out;
 
     &:hover {
         background: variables.$light_main;
-        box-shadow: 0 0 30px variables.$light_main;
+        box-shadow: 0 0 20px variables.$light_main;
 
         cursor: pointer;
         transform: translate(0px, -5px);
@@ -33,20 +33,21 @@
     padding: $height $width;
     border: 2px solid variables.$main;
 
-    font-size: 1.2em;
+    font-size: 1em;
     font-family: inherit;
 
     text-align: center;
     line-height: $height;
 
-    border-radius: 0.5em;
-    box-shadow: 0 0 40px variables.$main;
+    border-radius: 0.3em;
+    box-shadow: 0 0 30px variables.$main;
 
     transition: all .2s ease-in-out;
 
     &:hover {
+        border: 2px solid variables.$light_main;
         background: variables.$light_main;
-        box-shadow: 0 0 30px variables.$light_main;
+        box-shadow: 0 0 20px variables.$light_main;
 
         cursor: pointer;
         transform: translate(0px, -5px);

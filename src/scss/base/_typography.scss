@@ -11,13 +11,14 @@ h1, h2 {
 
 
 p {
-    color: rgb(204, 204, 204);
+    color: rgb(230, 230, 230);
     font-size: 1.2em;
 }
 
 #line{
-    background: white;
-    height: 2px;
+    background: rgb(170, 170, 170);
+    height: 1px;
     width: 100%;
     margin: 10px 10px;
+    grid-area: line;
 }

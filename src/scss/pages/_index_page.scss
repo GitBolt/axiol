@@ -1,36 +1,71 @@
 .main {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: repeat(5, 50%);
-    grid-column-gap: 2rem;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(10, 50%);
+    grid-gap: 2rem;
+    grid-template-areas: 
+    "head_text head_text . ."
+    ". . . ."
+    "logo desc desc desc"
+    "logo buttons buttons buttons"
+    ". . . ."
+    ". features features features"
+    ". line line line"
+    ". . source .";
 }
+
+
 h1 {
     justify-self: center;
-    grid-column: 1 / 4;
+    font-size: 2em;
+    grid-area: head_text;
 }
 
 img {
-    justify-self: end;
-    width: calc(10vw + 50px);
-    grid-row: 2 / 4;
+    justify-self: flex-end;
+    align-self: center;
+    width: 10em;
+    grid-area: logo;
     
 }
 
 .description {
-    grid-column: 2 / 6;
-    grid-row: 2;
+    grid-area: desc;
+    & > h2{
+        font-size: 2.5em;
+    }
+
 }
 
 .buttons {
-    grid-column: 2 / 5;
-    grid-row: 3;
+    grid-area: buttons
 }
 
 .features {
+    grid-area: features;
     display: flex;
-    grid-column: 2/6;
-    grid-row: 6;
-    justify-content: space-around;
+    gap: 10px;
     flex-wrap: wrap;
+    justify-content: center;
+}
 
+.source{
+    grid-area: source;
+    display: flex;
+    justify-self: center;
+    gap: 5px;
+    & > img{
+        width: 2rem;
+        transition: .4s ease-in-out;
+    }
+    & > p{
+        transition: .4s ease-in-out;
+    }
+    &:hover > img{
+        transform: rotate(-360deg);
+    }
+    &:hover > p{
+        transform: translate(10px);
+
+    }
 }

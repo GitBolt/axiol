@@ -4,12 +4,13 @@
     gap: 30px;
     display: flex;
     align-items: center;
+    color: white;
 }
 
 .invite-btn {
-    @include mixins.primary_button(calc(.8vw + 5px), 15%);
+    @include mixins.primary_button(.8em, 4em);
 }
 
 .support-btn {
-    @include mixins.secondary_button(calc(.8vw + 5px), 10%);
+    @include mixins.secondary_button(.8em, 2em);
 }

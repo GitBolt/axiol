@@ -404,41 +404,43 @@ class Giveaway(commands.Cog):
     async def check_gw(self):
         await self.bot.wait_until_ready()
 
-        try:
-            async for i in db.GIVEAWAY.find({}):
-                channel = self.bot.get_channel(i["channel_id"])
+        async for i in db.GIVEAWAY.find({}):
+            channel = self.bot.get_channel(i["channel_id"])
+            try:
                 message = await channel.fetch_message(i["message_id"])
-                end_time = i["end_time"]
+            except Exception:
+                await db.GIVEAWAY.delete_one(i)
+                print(f"Deleted from giveaway: {i}")
+                continue
 
-                embed_data = message.embeds[0].to_dict()
-                readable = str(
-                    datetime.datetime.fromtimestamp(end_time)
-                    - datetime.datetime.fromtimestamp(time.time())
+            end_time = i["end_time"]
+
+            embed_data = message.embeds[0].to_dict()
+            readable = str(
+                datetime.datetime.fromtimestamp(end_time)
+                - datetime.datetime.fromtimestamp(time.time())
+            )
+
+            if time.time() > end_time:
+                await self.end_gw(i)
+
+            else:
+                main_time = readable.split(":")[0] + " Hours"
+                secondary_time = readable.split(":")[1] + " Minutes"
+
+                embed = discord.Embed(
+                    title=embed_data["title"],
+                    description=embed_data["description"],
+                    color=var.C_MAIN,
+                    timestamp=datetime.datetime.now()
+                ).add_field(
+                    name=embed_data["fields"][0]["name"],
+                    value=main_time + " " + secondary_time
+                ).set_thumbnail(
+                    url=embed_data["thumbnail"]["url"]
                 )
 
-                if time.time() > end_time:
-                    await self.end_gw(i)
-
-                else:
-                    main_time = readable.split(":")[0] + " Hours"
-                    secondary_time = readable.split(":")[1] + " Minutes"
-
-                    embed = discord.Embed(
-                        title=embed_data["title"],
-                        description=embed_data["description"],
-                        color=var.C_MAIN,
-                        timestamp=datetime.datetime.now()
-                    ).add_field(
-                        name=embed_data["fields"][0]["name"],
-                        value=main_time + " " + secondary_time
-                    ).set_thumbnail(
-                        url=embed_data["thumbnail"]["url"]
-                    )
-
-                    await message.edit(embed=embed)
-
-        except Exception as e:
-            print("Exception in giveaway task:", e)
+                await message.edit(embed=embed)
 
 
 def setup(bot):

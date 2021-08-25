@@ -17,15 +17,8 @@ class Test(commands.Cog):
 
     @commands.command()
     async def my(self, ctx: Context):
-
         await ctx.send(
             embed=Embed(ctx)(description="Cabbage")
-        )
-
-    @commands.command()
-    async def hello(self, ctx: Context):
-        await ctx.send(
-            embed=Embed(ctx)(description="world!")
         )
 
 

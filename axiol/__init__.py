@@ -1,5 +1,5 @@
 import os
-from utils.logger import log
+from axiol.utils.logger import log
 
 __version__: str = '2.0.0'
 

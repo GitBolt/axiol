@@ -5,7 +5,7 @@ from discord import ActivityType, Activity
 from discord.ext import tasks
 
 if TYPE_CHECKING:
-    from core.bot import Bot
+    from axiol.core.bot import Bot
 
 
 @tasks.loop(minutes=1)

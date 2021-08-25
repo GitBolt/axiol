@@ -19,13 +19,13 @@ class Test(commands.Cog):
     async def my(self, ctx: Context):
 
         await ctx.send(
-            embed=Embed(description="Cabbage")
+            embed=Embed(ctx)(description="Cabbage")
         )
 
     @commands.command()
     async def hello(self, ctx: Context):
         await ctx.send(
-            embed=Embed(description="world!")
+            embed=Embed(ctx)(description="world!")
         )
 
 

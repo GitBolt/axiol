@@ -66,12 +66,18 @@ class Giveaway(commands.Cog):
             announcement = await channel.send(
                 (
                     f"Congratulations, you have won **{embed_data['title']}**!"
-                    + ", ".join(w.mention for w in winners)
+                    + ", ".join(w.mention for w in winners) +
+                    f"\nhttps://discord.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
                 )
             )
 
         else:
-            announcement = await channel.send("Aw man, no one participated :(")
+            announcement = await channel.send(
+                    (
+                    "Aw man, no one participated :("
+                    + f"\nhttps://discord.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
+                    )    
+                )
 
         return announcement.id
 

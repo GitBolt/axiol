@@ -9,7 +9,8 @@ from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
 from axiol.utils.logger import log
-from core.context import TimedContext
+from axiol.core.context import TimedContext
+from axiol.tasks.update_presence import update_presence
 
 TOKEN_KEY: str = 'TOKEN'
 
@@ -57,6 +58,7 @@ class Bot(commands.Bot):
 
     async def on_connect(self) -> None:
         log.success(f"Logging in as {self.user}.")
+        update_presence.start(self)
 
     async def get_context(self, message: Message, *, cls=TimedContext):
         return await super().get_context(message, cls=cls)
@@ -65,8 +67,6 @@ class Bot(commands.Bot):
         log.inform(f"{self.user} is ready for use.")
 
     if PREVENT_DOUBLE_RUNTIME_ERROR:
-        log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")
-
         def __del__(self) -> NoReturn:
             log.warn("Bot has been shutdown, cleaning stderr.")
             # Prevents RuntimeError when Ctrl-C.

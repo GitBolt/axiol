@@ -1,4 +1,5 @@
 import os
+from utils.logger import log
 
 __version__: str = '2.0.0'
 
@@ -17,3 +18,6 @@ DOTENV_PATH: str = os.path.abspath(
 # This is cancelling any fatal exceptions from bot class when activated.
 # If you have any problem with this, consider setting it to False.
 PREVENT_DOUBLE_RUNTIME_ERROR: bool = True
+
+if PREVENT_DOUBLE_RUNTIME_ERROR:
+    log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")

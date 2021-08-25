@@ -6,4 +6,4 @@ class TimedContext(Context):
 
     def __init__(self, **attrs):
         super().__init__(**attrs)
-        self.time = Chronometer()
+        self.time: Chronometer = Chronometer()

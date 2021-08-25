@@ -1,9 +1,10 @@
 """Axiol Bot Core."""
 import os
 import sys
-from typing import List
+from typing import List, NoReturn
 
 import dotenv
+from discord import Message
 from discord.ext import commands
 
 from axiol import DOTENV_PATH, PREVENT_DOUBLE_RUNTIME_ERROR
@@ -57,7 +58,7 @@ class Bot(commands.Bot):
     async def on_connect(self) -> None:
         log.success(f"Logging in as {self.user}.")
 
-    async def get_context(self, message, *, cls=TimedContext):
+    async def get_context(self, message: Message, *, cls=TimedContext):
         return await super().get_context(message, cls=cls)
 
     async def on_ready(self) -> None:
@@ -66,7 +67,7 @@ class Bot(commands.Bot):
     if PREVENT_DOUBLE_RUNTIME_ERROR:
         log.warn("PREVENT DOUBLE RUNTIME ERROR mode activated.")
 
-        def __del__(self):
+        def __del__(self) -> NoReturn:
             log.warn("Bot has been shutdown, cleaning stderr.")
             # Prevents RuntimeError when Ctrl-C.
             sys.stderr.close()

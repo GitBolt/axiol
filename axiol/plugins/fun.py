@@ -1112,7 +1112,7 @@ class Fun(commands.Cog):
 
                         userid = user_msg.content.strip("!@<>")
                         try:
-                            author_user = await self.bot.fetch_user(userid)
+                            author_user = await self.bot.fetch_user(int(userid))
 
                             embed.set_author(
                                 name=author_user,

@@ -1,9 +1,18 @@
 import os
+from typing import Tuple
+
 from axiol.utils.logger import log
 
 __version__: str = '2.0.0'
 
 TEST_SERVER_ID: int = 843516084266729512
+
+DEVS_ID: Tuple[int, int, int] = (
+    812699388815605791,
+    723971496107573328,
+    791950104680071188
+)
+
 
 DOTENV_PATH: str = os.path.abspath(
     os.path.join(

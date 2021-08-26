@@ -1,16 +1,15 @@
 @use "../abstracts/mixins";
 
 .buttons {
-    gap: 30px;
+    gap: 2%;
     display: flex;
     align-items: center;
-    color: white;
 }
 
 .invite-btn {
-    @include mixins.primary_button(.8em, 4em);
+    @include mixins.primary_button(.8em, 3rem);
 }
 
 .support-btn {
-    @include mixins.secondary_button(.8em, 2em);
+    @include mixins.secondary_button(.8em, 1rem);
 }

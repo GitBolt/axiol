@@ -7,10 +7,10 @@
     padding: 10px;
 
     a {
-        margin: 1rem;
+        margin: 2vw;
         color: rgba(variables.$text, 75%);
         font-size: 1.2em;
-        transition: .2s ease;
+        transition: .1s ease;
 
         &:hover {
             color: variables.$text;

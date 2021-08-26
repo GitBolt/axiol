@@ -30,21 +30,20 @@ p {
   background: #aaaaaa;
   height: 1px;
   width: 100%;
-  margin: 10px 10px;
+  margin: 1rem 0;
   grid-area: line;
 }
 
 .buttons {
-  gap: 30px;
+  gap: 2%;
   display: flex;
   align-items: center;
-  color: white;
 }
 
 .invite-btn {
   background: #005ed8;
   color: white;
-  padding: 0.8em 4em;
+  padding: 0.8em 3rem;
   font-size: 1em;
   font-family: inherit;
   text-align: center;
@@ -63,7 +62,7 @@ p {
 .support-btn {
   background: transparent;
   color: white;
-  padding: 0.8em 2em;
+  padding: 0.8em 1rem;
   border: 2px solid #005ed8;
   font-size: 1em;
   font-family: inherit;
@@ -88,10 +87,10 @@ p {
   padding: 10px;
 }
 .nav a {
-  margin: 1rem;
+  margin: 2vw;
   color: rgba(255, 255, 255, 0.75);
   font-size: 1.2em;
-  transition: 0.2s ease;
+  transition: 0.1s ease;
 }
 .nav a:hover {
   color: #fff;
@@ -109,26 +108,28 @@ body {
 main {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(10, 0.2fr);
+  grid-template-rows: repeat(10, 0.1fr);
   grid-gap: 2rem;
   grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source .";
 }
 
 h1 {
+  grid-area: head_text;
+  margin-top: 2rem;
   justify-self: center;
   font-size: 2em;
-  grid-area: head_text;
 }
 
 img {
+  grid-area: logo;
   justify-self: flex-end;
   align-self: center;
-  width: 10em;
-  grid-area: logo;
+  width: 12em;
 }
 
 .description {
   grid-area: desc;
+  padding: 0px 10px;
 }
 .description > h2 {
   font-size: 2.5em;
@@ -136,6 +137,7 @@ img {
 
 .buttons {
   grid-area: buttons;
+  width: 100%;
 }
 
 .features {
@@ -149,7 +151,6 @@ img {
 .source {
   grid-area: source;
   display: flex;
-  justify-self: center;
   gap: 1rem;
 }
 .source > img {
@@ -157,6 +158,7 @@ img {
   transition: 0.4s ease-in-out;
 }
 .source > p {
+  margin: auto 0;
   transition: 0.4s ease-in-out;
 }
 .source:hover > img {
@@ -164,6 +166,37 @@ img {
 }
 .source:hover > p {
   transform: translate(10px);
+}
+
+@media only screen and (max-width: 1000px) {
+  h1 {
+    grid-column: 1/4;
+  }
+
+  img {
+    margin-left: 50px;
+    align-self: flex-start;
+  }
+}
+@media only screen and (max-width: 700px) {
+  h1, .description {
+    justify-self: center;
+    grid-column: 1/6;
+    text-align: center;
+  }
+
+  img {
+    margin: 0;
+    grid-row: 2;
+    grid-column: 3;
+    justify-self: center;
+  }
+
+  .buttons {
+    grid-column: 2/5;
+    justify-content: center;
+    justify-self: center;
+  }
 }
 
 /*# sourceMappingURL=style.css.map */

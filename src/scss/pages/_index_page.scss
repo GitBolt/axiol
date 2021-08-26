@@ -1,7 +1,7 @@
 main {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(10, .2fr);
+    grid-template-rows: repeat(10, .1fr);
     grid-gap: 2rem;
     grid-template-areas: 
     "head_text head_text . ."
@@ -16,21 +16,22 @@ main {
 
 
 h1 {
+    grid-area: head_text;
+    margin-top: 2rem;
     justify-self: center;
     font-size: 2em;
-    grid-area: head_text;
 }
 
 img {
+    grid-area: logo;
     justify-self: flex-end;
     align-self: center;
-    width: 10em;
-    grid-area: logo;
-    
+    width: 12em;
 }
 
 .description {
     grid-area: desc;
+    padding: 0px 10px;
     & > h2{
         font-size: 2.5em;
     }
@@ -38,7 +39,8 @@ img {
 }
 
 .buttons {
-    grid-area: buttons
+    grid-area: buttons;
+    width: 100%;
 }
 
 .features {
@@ -49,23 +51,55 @@ img {
     justify-content: center;
 }
 
-.source{
+.source {
     grid-area: source;
     display: flex;
-    justify-self: center;
     gap: 1rem;
-    & > img{
+    & > img {
         width: 2rem;
         transition: .4s ease-in-out;
     }
-    & > p{
+    & > p {
+        margin: auto 0;
         transition: .4s ease-in-out;
     }
-    &:hover > img{
+    &:hover > img {
         transform: rotate(-360deg);
     }
-    &:hover > p{
+    &:hover > p {
         transform: translate(10px);
 
     }
+}
+
+@media only screen and (max-width: 1000px) {
+    h1 {
+        grid-column: 1/4;
+    }
+    
+    img {
+        margin-left: 50px;
+        align-self: flex-start;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    h1, .description {
+        justify-self: center;
+        grid-column: 1/6;
+        text-align: center;
+    }
+    img {
+        margin: 0;
+        grid-row: 2;
+        grid-column: 3;
+        justify-self: center;
+    }
+
+    .buttons {
+        grid-column: 2/5;
+        justify-content: center;
+        justify-self: center;
+    }
+
 }

@@ -34,6 +34,10 @@ p {
   grid-area: line;
 }
 
+#seperator {
+  margin: 10px;
+}
+
 .buttons {
   gap: 2%;
   display: flex;
@@ -94,6 +98,57 @@ p {
 }
 .nav a:hover {
   color: #fff;
+}
+
+.spike1 {
+  position: absolute;
+  padding: 40px 0px;
+  transition: 0.5s ease;
+  right: 5vw;
+  top: 8vh;
+}
+.spike1:hover {
+  transform: translate(-50px, 20px);
+}
+.spike1 > * {
+  background: #00aeff;
+  width: 10vw;
+  height: 2px;
+  transform: rotate(-20deg);
+}
+
+.spike2 {
+  position: absolute;
+  padding: 40px 0px;
+  transition: 0.5s ease;
+  left: -5vw;
+  top: 40vh;
+}
+.spike2:hover {
+  transform: translate(40px, -20px);
+}
+.spike2 > * {
+  background: #00aeff;
+  width: 10vw;
+  height: 2px;
+  transform: rotate(-20deg);
+}
+
+.spike3 {
+  position: absolute;
+  padding: 40px 0px;
+  transition: 0.5s ease;
+  right: 20vw;
+  top: 80vh;
+}
+.spike3:hover {
+  transform: translate(60px, 10px);
+}
+.spike3 > * {
+  background: #00aeff;
+  width: 10vw;
+  height: 2px;
+  transform: rotate(10deg);
 }
 
 html {

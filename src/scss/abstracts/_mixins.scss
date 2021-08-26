@@ -53,3 +53,18 @@
         transform: translate(0px, -5px);
     }
 }
+
+@mixin spike($angle, $rotation1, $rotation2) {
+    position: absolute;
+    padding: 40px 0px;
+    transition: .5s ease;
+    &:hover {
+        transform: translate($rotation1, $rotation2);
+    }
+    & > * {
+        background: variables.$lighest_main;
+        width: 10vw;
+        height: 2px;
+        transform: rotate($angle);
+    }
+}

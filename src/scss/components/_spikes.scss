@@ -1,0 +1,20 @@
+@use "../abstracts/mixins";
+
+.spike1 {
+   @include mixins.spike(-20deg, -50px, 20px);
+   right: 5vw;
+   top: 8vh;
+}
+
+.spike2 {
+   @include mixins.spike(-20deg, 40px, -20px);
+   left: -5vw;
+   top: 40vh;
+}
+
+.spike3 {
+   @include mixins.spike(10deg, 60px, 10px);
+   right: 20vw;
+   top: 80vh;
+}
+

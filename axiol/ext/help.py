@@ -476,9 +476,9 @@ async def funhelp(ctx: commands.Context):
             inline=False,
         )
         .add_field(
-            name=prefix + "typingtest `<type>`",
+            name=prefix + "typingtest `<duration>`",
             value=(
-                "Starts a solo typing test! There are two types: `time` and `word`"
+                "Starts a solo typing test! If duration is not specified then a quick test with small text and 60 seconds duration is started"
             ),
             inline=False,
         )

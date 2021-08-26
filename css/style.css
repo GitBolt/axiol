@@ -1,11 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400&display=swap");
-body {
+body, * {
   margin: 0;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+button {
+  outline: none;
 }
 
 body {
@@ -18,38 +22,40 @@ h1, h2 {
 }
 
 p {
-  color: #cccccc;
+  color: #e6e6e6;
   font-size: 1.2em;
 }
 
 #line {
-  background: white;
-  height: 2px;
+  background: #aaaaaa;
+  height: 1px;
   width: 100%;
   margin: 10px 10px;
+  grid-area: line;
 }
 
 .buttons {
   gap: 30px;
   display: flex;
   align-items: center;
+  color: white;
 }
 
 .invite-btn {
   background: #005ed8;
   color: white;
-  padding: calc(.8vw + 5px) 15%;
-  font-size: 1.2em;
+  padding: 0.8em 4em;
+  font-size: 1em;
   font-family: inherit;
   text-align: center;
-  line-height: calc(.8vw + 5px);
-  border-radius: 0.5em;
-  box-shadow: 0 0 40px #005ed8;
+  line-height: 0.8em;
+  border-radius: 0.3em;
+  box-shadow: 0 0 30px #005ed8;
   transition: all 0.2s ease-in-out;
 }
 .invite-btn:hover {
   background: #0084ff;
-  box-shadow: 0 0 30px #0084ff;
+  box-shadow: 0 0 20px #0084ff;
   cursor: pointer;
   transform: translate(0px, -5px);
 }
@@ -57,19 +63,20 @@ p {
 .support-btn {
   background: transparent;
   color: white;
-  padding: calc(.8vw + 5px) 10%;
+  padding: 0.8em 2em;
   border: 2px solid #005ed8;
-  font-size: 1.2em;
+  font-size: 1em;
   font-family: inherit;
   text-align: center;
-  line-height: calc(.8vw + 5px);
-  border-radius: 0.5em;
-  box-shadow: 0 0 40px #005ed8;
+  line-height: 0.8em;
+  border-radius: 0.3em;
+  box-shadow: 0 0 30px #005ed8;
   transition: all 0.2s ease-in-out;
 }
 .support-btn:hover {
+  border: 2px solid #0084ff;
   background: #0084ff;
-  box-shadow: 0 0 30px #0084ff;
+  box-shadow: 0 0 20px #0084ff;
   cursor: pointer;
   transform: translate(0px, -5px);
 }
@@ -99,40 +106,64 @@ body {
   min-width: 100%;
 }
 
-.main {
+main {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(5, 50%);
-  grid-column-gap: 2rem;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(10, 0.2fr);
+  grid-gap: 2rem;
+  grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source .";
 }
 
 h1 {
   justify-self: center;
-  grid-column: 1/4;
+  font-size: 2em;
+  grid-area: head_text;
 }
 
 img {
-  justify-self: end;
-  width: calc(10vw + 50px);
-  grid-row: 2/4;
+  justify-self: flex-end;
+  align-self: center;
+  width: 10em;
+  grid-area: logo;
 }
 
 .description {
-  grid-column: 2/6;
-  grid-row: 2;
+  grid-area: desc;
+}
+.description > h2 {
+  font-size: 2.5em;
 }
 
 .buttons {
-  grid-column: 2/5;
-  grid-row: 3;
+  grid-area: buttons;
 }
 
 .features {
+  grid-area: features;
   display: flex;
-  grid-column: 2/6;
-  grid-row: 6;
-  justify-content: space-around;
+  gap: 15px;
   flex-wrap: wrap;
+  justify-content: center;
+}
+
+.source {
+  grid-area: source;
+  display: flex;
+  justify-self: center;
+  gap: 1rem;
+}
+.source > img {
+  width: 2rem;
+  transition: 0.4s ease-in-out;
+}
+.source > p {
+  transition: 0.4s ease-in-out;
+}
+.source:hover > img {
+  transform: rotate(-360deg);
+}
+.source:hover > p {
+  transform: translate(10px);
 }
 
 /*# sourceMappingURL=style.css.map */

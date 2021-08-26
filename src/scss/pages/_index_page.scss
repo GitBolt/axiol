@@ -1,7 +1,7 @@
-.main {
+main {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(10, 50%);
+    grid-template-rows: repeat(10, .2fr);
     grid-gap: 2rem;
     grid-template-areas: 
     "head_text head_text . ."
@@ -44,7 +44,7 @@ img {
 .features {
     grid-area: features;
     display: flex;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
     justify-content: center;
 }
@@ -53,7 +53,7 @@ img {
     grid-area: source;
     display: flex;
     justify-self: center;
-    gap: 5px;
+    gap: 1rem;
     & > img{
         width: 2rem;
         transition: .4s ease-in-out;

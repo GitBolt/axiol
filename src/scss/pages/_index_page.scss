@@ -4,7 +4,8 @@ main {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(10, .1fr);
-    grid-gap: 2rem;
+    grid-row-gap: 1.2rem;
+    grid-column-gap: 2rem;
 
     grid-template-areas: 
     "head_text head_text . ."
@@ -23,7 +24,6 @@ main {
 h1 {
     grid-area: head_text;
     justify-self: center;
-    margin-top: 2rem;
     font-size: 2em;
 }
 
@@ -89,13 +89,13 @@ h1 {
     }
 
     & > .items {
-        height: 30vh;
+        height: 25vh;
         overflow-y: hidden;
         
         & > .update{
             margin-left: 8vw;
             & > h3 {
-                margin-top: 1.5em;
+                margin-top: 1.2em;
                 padding: 0px 10px;
                 color: variables.$light_main;
             }
@@ -123,11 +123,7 @@ h1 {
                     border-left: 1rem solid variables.$lightest_main;
                 }
                 & > h3{
-                    transform: translate(0px, -5px);
                     color: variables.$lightest_main;
-                }
-                & > p{
-                    transform: translate(0px, -5px);
                 }
             }
         }
@@ -138,7 +134,7 @@ h1 {
 .servers { 
     grid-area: servers;
     justify-self: flex-end;
-    width: 25em;
+    width: 50%;
 }
 
 

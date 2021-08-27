@@ -35,7 +35,7 @@ p {
   grid-area: line;
 }
 
-#seperator {
+#separator {
   margin: 10px;
 }
 
@@ -89,7 +89,7 @@ p {
   display: flex;
   justify-content: center;
   flex-flow: row wrap;
-  padding: 10px;
+  padding: 30px;
 }
 .nav a {
   margin: 2vw;
@@ -127,7 +127,7 @@ p {
   padding: 40px 0px;
   transition: 0.5s ease;
   left: -5vw;
-  top: 50vh;
+  top: 40vh;
 }
 .spike2:hover {
   transform: translate(30%, -20%);
@@ -177,14 +177,14 @@ main {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(10, 0.1fr);
-  grid-gap: 2rem;
+  grid-row-gap: 1.2rem;
+  grid-column-gap: 2rem;
   grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source ." "updates updates servers servers" "updates updates servers servers";
 }
 
 h1 {
   grid-area: head_text;
   justify-self: center;
-  margin-top: 2rem;
   font-size: 2em;
 }
 
@@ -248,14 +248,14 @@ h1 {
   margin-bottom: 20px;
 }
 .updates > .items {
-  height: 30vh;
+  height: 25vh;
   overflow-y: hidden;
 }
 .updates > .items > .update {
   margin-left: 8vw;
 }
 .updates > .items > .update > h3 {
-  margin-top: 1.5em;
+  margin-top: 1.2em;
   padding: 0px 10px;
   color: #0084ff;
 }
@@ -279,17 +279,13 @@ h1 {
   border-left: 1rem solid #00aeff;
 }
 .updates > .items > .update:hover > h3 {
-  transform: translate(0px, -5px);
   color: #00aeff;
-}
-.updates > .items > .update:hover > p {
-  transform: translate(0px, -5px);
 }
 
 .servers {
   grid-area: servers;
   justify-self: flex-end;
-  width: 25em;
+  width: 50%;
 }
 
 @media only screen and (max-width: 1000px) {

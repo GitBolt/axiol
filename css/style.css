@@ -108,10 +108,14 @@ p {
   top: 8vh;
 }
 .spike1:hover {
-  transform: translate(-50px, 20px);
+  transform: translate(-30%, 20%);
+}
+.spike1:hover > * {
+  background: #00aeff;
 }
 .spike1 > * {
-  background: #00aeff;
+  transition: 0.1s ease;
+  background: #0084ff;
   width: 10vw;
   height: 2px;
   transform: rotate(-20deg);
@@ -122,13 +126,17 @@ p {
   padding: 40px 0px;
   transition: 0.5s ease;
   left: -5vw;
-  top: 40vh;
+  top: 60vh;
 }
 .spike2:hover {
-  transform: translate(40px, -20px);
+  transform: translate(30%, -20%);
+}
+.spike2:hover > * {
+  background: #00aeff;
 }
 .spike2 > * {
-  background: #00aeff;
+  transition: 0.1s ease;
+  background: #0084ff;
   width: 10vw;
   height: 2px;
   transform: rotate(-20deg);
@@ -138,17 +146,21 @@ p {
   position: absolute;
   padding: 40px 0px;
   transition: 0.5s ease;
-  right: 20vw;
-  top: 80vh;
+  right: 5vw;
+  top: 68vh;
 }
 .spike3:hover {
-  transform: translate(60px, 10px);
+  transform: translate(-30%, -20%);
+}
+.spike3:hover > * {
+  background: #00aeff;
 }
 .spike3 > * {
-  background: #00aeff;
+  transition: 0.1s ease;
+  background: #0084ff;
   width: 10vw;
   height: 2px;
-  transform: rotate(10deg);
+  transform: rotate(20deg);
 }
 
 html {
@@ -165,17 +177,17 @@ main {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(10, 0.1fr);
   grid-gap: 2rem;
-  grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source .";
+  grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source ." ". . servers servers" ". . servers servers";
 }
 
 h1 {
   grid-area: head_text;
-  margin-top: 2rem;
   justify-self: center;
+  margin-top: 2rem;
   font-size: 2em;
 }
 
-img {
+.logo {
   grid-area: logo;
   justify-self: flex-end;
   align-self: center;
@@ -198,9 +210,9 @@ img {
 .features {
   grid-area: features;
   display: flex;
-  gap: 15px;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 15px;
 }
 
 .source {
@@ -209,12 +221,12 @@ img {
   gap: 1rem;
 }
 .source > img {
-  width: 2rem;
   transition: 0.4s ease-in-out;
+  width: 2rem;
 }
 .source > p {
-  margin: auto 0;
   transition: 0.4s ease-in-out;
+  margin: auto 0;
 }
 .source:hover > img {
   transform: rotate(-360deg);
@@ -223,14 +235,16 @@ img {
   transform: translate(10px);
 }
 
-@media only screen and (max-width: 1000px) {
-  h1 {
-    grid-column: 1/4;
-  }
+.servers {
+  grid-area: servers;
+  justify-self: flex-end;
+  width: 25em;
+}
 
-  img {
-    margin-left: 50px;
+@media only screen and (max-width: 1000px) {
+  .logo {
     align-self: flex-start;
+    margin-left: 50px;
   }
 }
 @media only screen and (max-width: 700px) {
@@ -240,17 +254,22 @@ img {
     text-align: center;
   }
 
-  img {
+  .logo {
+    justify-self: flex-end;
     margin: 0;
     grid-row: 2;
     grid-column: 3;
-    justify-self: center;
   }
 
   .buttons {
     grid-column: 2/5;
     justify-content: center;
+  }
+
+  .servers {
+    grid-column: 1/6;
     justify-self: center;
+    margin-left: 30px;
   }
 }
 

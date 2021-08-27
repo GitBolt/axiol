@@ -61,8 +61,13 @@
     &:hover {
         transform: translate($rotation1, $rotation2);
     }
+    &:hover > *{
+
+            background: variables.$lighest_main;
+    }
     & > * {
-        background: variables.$lighest_main;
+        transition: .1s ease;
+        background: variables.$light_main;
         width: 10vw;
         height: 2px;
         transform: rotate($angle);

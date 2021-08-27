@@ -3,6 +3,7 @@ main {
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(10, .1fr);
     grid-gap: 2rem;
+
     grid-template-areas: 
     "head_text head_text . ."
     ". . . ."
@@ -11,18 +12,20 @@ main {
     ". . . ."
     ". features features features"
     ". line line line"
-    ". . source .";
+    ". . source ."
+    ". . servers servers"
+    ". . servers servers";
 }
 
 
 h1 {
     grid-area: head_text;
-    margin-top: 2rem;
     justify-self: center;
+    margin-top: 2rem;
     font-size: 2em;
 }
 
-img {
+.logo {
     grid-area: logo;
     justify-self: flex-end;
     align-self: center;
@@ -46,9 +49,9 @@ img {
 .features {
     grid-area: features;
     display: flex;
-    gap: 15px;
     flex-wrap: wrap;
     justify-content: center;
+    gap: 15px;
 }
 
 .source {
@@ -56,12 +59,12 @@ img {
     display: flex;
     gap: 1rem;
     & > img {
-        width: 2rem;
         transition: .4s ease-in-out;
+        width: 2rem;
     }
     & > p {
-        margin: auto 0;
         transition: .4s ease-in-out;
+        margin: auto 0;
     }
     &:hover > img {
         transform: rotate(-360deg);
@@ -72,14 +75,18 @@ img {
     }
 }
 
+.servers { 
+    grid-area: servers;
+    justify-self: flex-end;
+    width: 25em;
+}
+
+
 @media only screen and (max-width: 1000px) {
-    h1 {
-        grid-column: 1/4;
-    }
     
-    img {
-        margin-left: 50px;
+    .logo {
         align-self: flex-start;
+        margin-left: 50px;
     }
 }
 
@@ -89,17 +96,23 @@ img {
         grid-column: 1/6;
         text-align: center;
     }
-    img {
+    
+    .logo {
+        justify-self: flex-end;
         margin: 0;
         grid-row: 2;
         grid-column: 3;
-        justify-self: center;
+
     }
 
     .buttons {
         grid-column: 2/5;
         justify-content: center;
-        justify-self: center;
     }
 
+    .servers { 
+        grid-column: 1/6;
+        justify-self: center;
+        margin-left: 30px;
+    }
 }

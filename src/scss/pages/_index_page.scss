@@ -83,13 +83,13 @@ h1 {
     align-self: center;
     width: 100%;
     cursor: default;
-    & > h2, .items > .slide {
+    & > h2{
         margin-left: 5vw;
         margin-bottom: 20px;
     }
 
     & > .items {
-        height: 25vh;
+        height: 100%;
         overflow-y: hidden;
         
         & > .update{
@@ -108,12 +108,7 @@ h1 {
                 border-left: 1rem solid variables.$main;
             }
         }
-        & > .slide{
-            background: variables.$light_main;
-            width: 2px;
-            height: 25%;
-            position: absolute;
-        }
+
         & > .update{
             & > *{
                 transition: .3s ease;

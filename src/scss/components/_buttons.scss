@@ -1,7 +1,7 @@
 @use "../abstracts/mixins";
 
 .buttons {
-    gap: 2%;
+    gap: max(16px, 2%);
     display: flex;
     flex-flow: row wrap;
     justify-content: center;

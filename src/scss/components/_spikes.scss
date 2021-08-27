@@ -10,12 +10,12 @@
 .spike2 {
    @include mixins.spike(-20deg, 30%, -20%);
    left: -5vw;
-   top: 60vh;
+   top: 50vh;
 }
 
 .spike3 {
    @include mixins.spike(20deg, -30%, -20%);
    right: 5vw;
-   top: 68vh;
+   top: 60vh;
 }
 

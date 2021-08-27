@@ -15,14 +15,14 @@
     border-radius: 0.3em;
     box-shadow: 0 0 30px variables.$main;
 
-    transition: all .2s ease-in-out;
+    transition: all .3s ease-in-out;
 
     &:hover {
         background: variables.$light_main;
         box-shadow: 0 0 20px variables.$light_main;
 
         cursor: pointer;
-        transform: translate(0px, -5px);
+        transform: translate(0px, -.8rem);
     }
 }
 
@@ -42,7 +42,7 @@
     border-radius: 0.3em;
     box-shadow: 0 0 30px variables.$main;
 
-    transition: all .2s ease-in-out;
+    transition: all .3s ease-in-out;
 
     &:hover {
         border: 2px solid variables.$light_main;
@@ -50,7 +50,7 @@
         box-shadow: 0 0 20px variables.$light_main;
 
         cursor: pointer;
-        transform: translate(0px, -5px);
+        transform: translate(0px, -.8rem);
     }
 }
 
@@ -63,7 +63,7 @@
     }
     &:hover > *{
 
-            background: variables.$lighest_main;
+            background: variables.$lightest_main;
     }
     & > * {
         transition: .1s ease;

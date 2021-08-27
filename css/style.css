@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400&display=swap");
 body, * {
   margin: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
@@ -54,13 +55,13 @@ p {
   line-height: 0.8em;
   border-radius: 0.3em;
   box-shadow: 0 0 30px #005ed8;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 .invite-btn:hover {
   background: #0084ff;
   box-shadow: 0 0 20px #0084ff;
   cursor: pointer;
-  transform: translate(0px, -5px);
+  transform: translate(0px, -0.8rem);
 }
 
 .support-btn {
@@ -74,14 +75,14 @@ p {
   line-height: 0.8em;
   border-radius: 0.3em;
   box-shadow: 0 0 30px #005ed8;
-  transition: all 0.2s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 .support-btn:hover {
   border: 2px solid #0084ff;
   background: #0084ff;
   box-shadow: 0 0 20px #0084ff;
   cursor: pointer;
-  transform: translate(0px, -5px);
+  transform: translate(0px, -0.8rem);
 }
 
 .nav {
@@ -126,7 +127,7 @@ p {
   padding: 40px 0px;
   transition: 0.5s ease;
   left: -5vw;
-  top: 60vh;
+  top: 50vh;
 }
 .spike2:hover {
   transform: translate(30%, -20%);
@@ -147,7 +148,7 @@ p {
   padding: 40px 0px;
   transition: 0.5s ease;
   right: 5vw;
-  top: 68vh;
+  top: 60vh;
 }
 .spike3:hover {
   transform: translate(-30%, -20%);
@@ -177,7 +178,7 @@ main {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(10, 0.1fr);
   grid-gap: 2rem;
-  grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source ." ". . servers servers" ". . servers servers";
+  grid-template-areas: "head_text head_text . ." ". . . ." "logo desc desc desc" "logo buttons buttons buttons" ". . . ." ". features features features" ". line line line" ". . source ." "updates updates servers servers" "updates updates servers servers";
 }
 
 h1 {
@@ -235,6 +236,56 @@ h1 {
   transform: translate(10px);
 }
 
+.updates {
+  grid-area: updates;
+  justify-self: center;
+  align-self: center;
+  width: 100%;
+  cursor: default;
+}
+.updates > h2, .updates .items > .slide {
+  margin-left: 5vw;
+  margin-bottom: 20px;
+}
+.updates > .items {
+  height: 30vh;
+  overflow-y: hidden;
+}
+.updates > .items > .update {
+  margin-left: 8vw;
+}
+.updates > .items > .update > h3 {
+  margin-top: 1.5em;
+  padding: 0px 10px;
+  color: #0084ff;
+}
+.updates > .items > .update > .pointer {
+  position: absolute;
+  margin-left: -3vw;
+  border-top: 0.5rem solid transparent;
+  border-bottom: 0.5rem solid transparent;
+  border-left: 1rem solid #005ed8;
+}
+.updates > .items > .slide {
+  background: #0084ff;
+  width: 2px;
+  height: 25%;
+  position: absolute;
+}
+.updates > .items > .update > * {
+  transition: 0.3s ease;
+}
+.updates > .items > .update:hover > .pointer {
+  border-left: 1rem solid #00aeff;
+}
+.updates > .items > .update:hover > h3 {
+  transform: translate(0px, -5px);
+  color: #00aeff;
+}
+.updates > .items > .update:hover > p {
+  transform: translate(0px, -5px);
+}
+
 .servers {
   grid-area: servers;
   justify-self: flex-end;
@@ -270,6 +321,12 @@ h1 {
     grid-column: 1/6;
     justify-self: center;
     margin-left: 30px;
+  }
+
+  .updates {
+    grid-row: 15/20;
+    grid-column: 1/6;
+    justify-self: center;
   }
 }
 

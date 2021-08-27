@@ -1,3 +1,5 @@
+@use "../abstracts/variables";
+
 main {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -13,8 +15,8 @@ main {
     ". features features features"
     ". line line line"
     ". . source ."
-    ". . servers servers"
-    ". . servers servers";
+    "updates updates servers servers"
+    "updates updates servers servers";
 }
 
 
@@ -75,6 +77,64 @@ h1 {
     }
 }
 
+.updates { 
+    grid-area: updates;
+    justify-self: center;
+    align-self: center;
+    width: 100%;
+    cursor: default;
+    & > h2, .items > .slide {
+        margin-left: 5vw;
+        margin-bottom: 20px;
+    }
+
+    & > .items {
+        height: 30vh;
+        overflow-y: hidden;
+        
+        & > .update{
+            margin-left: 8vw;
+            & > h3 {
+                margin-top: 1.5em;
+                padding: 0px 10px;
+                color: variables.$light_main;
+            }
+            
+            & > .pointer {
+                position: absolute;
+                margin-left: -3vw;
+                border-top: .5rem solid transparent;
+                border-bottom: .5rem solid transparent;
+                border-left: 1rem solid variables.$main;
+            }
+        }
+        & > .slide{
+            background: variables.$light_main;
+            width: 2px;
+            height: 25%;
+            position: absolute;
+        }
+        & > .update{
+            & > *{
+                transition: .3s ease;
+            }
+            &:hover {
+                & > .pointer{
+                    border-left: 1rem solid variables.$lightest_main;
+                }
+                & > h3{
+                    transform: translate(0px, -5px);
+                    color: variables.$lightest_main;
+                }
+                & > p{
+                    transform: translate(0px, -5px);
+                }
+            }
+        }
+
+    }
+}
+
 .servers { 
     grid-area: servers;
     justify-self: flex-end;
@@ -114,5 +174,10 @@ h1 {
         grid-column: 1/6;
         justify-self: center;
         margin-left: 30px;
+    }
+    .updates {
+        grid-row: 15/20;
+        grid-column: 1/6;
+        justify-self: center;
     }
 }

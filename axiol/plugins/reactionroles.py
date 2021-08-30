@@ -249,8 +249,8 @@ class ReactionRoles(commands.Cog):
     @commands.command(name="allrr", aliases=['rrall'])
     @has_command_permission()
     async def all_rr(self, ctx):
-        guild = self.bot.get_guild(ctx.guild.id)
-        guild_doc = await db.REACTION_ROLES.find_one({"_id": guild.id})
+
+        guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
 
         if guild_doc is not None and guild_doc["reaction_roles"] != []:
             rr_amount = len(guild_doc.get("reaction_roles"))
@@ -271,13 +271,13 @@ class ReactionRoles(commands.Cog):
             for i in guild_doc["reaction_roles"]:
                 rr_count += 1
                 message_id = i.get("messageid")
-                role = guild.get_role(i.get("roleid"))
+                role = ctx.guild.get_role(i.get("roleid"))
                 emoji = i.get("emoji")
 
                 embed.add_field(
                     name="** **",
                     value=(
-                        f"{emoji} for {role.mention} "
+                        f"{emoji} for {role.mention if role else 'deleted role'} "
                         f"in message ID `{message_id}`"
                     ),
                     inline=False
@@ -311,7 +311,7 @@ class ReactionRoles(commands.Cog):
                     embed.add_field(
                         name=f"** **",
                         value=(
-                            f"{emoji} for {role.mention}\n"
+                            f"{emoji} for {role.mention if role else 'deleted role'}\n"
                             f"MessageID: `{message_id}`"
                         ),
                          inline=False
@@ -373,7 +373,8 @@ class ReactionRoles(commands.Cog):
 
         else:
             await ctx.send(
-                "This server does not have any active reaction roles right now")
+                "This server does not have any active reaction roles right now"
+                )
 
     @commands.command(name="uniquerr")
     @has_command_permission()

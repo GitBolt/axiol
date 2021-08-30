@@ -102,8 +102,8 @@ class ChemistryHelp(commands.Cog):
     @commands.command(name="chem_allmsgs")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_all_msgs(self, ctx):
-        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-        data = guild_col.find_one({"_id": 0})
+        guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        data = await guild_col.find_one({"_id": 0})
         if data is not None:
             rr_amount = len(data)
 
@@ -320,7 +320,7 @@ class ChemistryHelp(commands.Cog):
     @commands.command(name="chem_allreacts")
     @is_user(565059698399641600, 791950104680071188)
     async def chem_all_reacts(self, ctx):
-        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
         data = await guild_col.find_one({"_id": 1})
 
         if data is not None:

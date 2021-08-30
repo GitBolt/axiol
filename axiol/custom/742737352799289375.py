@@ -27,9 +27,9 @@ class ChemistryHelp(commands.Cog):
     async def chem_add_msg(self, ctx, *, msg: str = None):
         if msg is not None:
 
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+            guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
 
-            data = guild_col.find_one({"_id": 0})
+            data = await guild_col.find_one({"_id": 0})
             if data is None:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
@@ -79,8 +79,8 @@ class ChemistryHelp(commands.Cog):
         if msg is None:
             return
 
-        guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
-        data = guild_col.find_one({"_id": 0})
+        guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        data = await guild_col.find_one({"_id": 0})
 
         if data is None:
             await ctx.send("You haven't setted up any message yet...")
@@ -222,9 +222,9 @@ class ChemistryHelp(commands.Cog):
     @is_user(565059698399641600, 791950104680071188)
     async def chem_add_react(self, ctx, *, msg: str = None):
         if msg is not None:
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+            guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
 
-            data = guild_col.find_one({"_id": 1})
+            data = await guild_col.find_one({"_id": 1})
 
             if data is None:
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
@@ -292,7 +292,7 @@ class ChemistryHelp(commands.Cog):
     @is_user(565059698399641600, 791950104680071188)
     async def chem_remove_react(self, ctx, *, msg: str = None):
         if msg is not None:
-            guild_col = await db.CUSTOM_DATABASE[str(ctx.guild.id)]
+            guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
             data = await guild_col.find_one({"_id": 1})
 
             if data is not None:
@@ -442,7 +442,8 @@ class ChemistryHelp(commands.Cog):
             return
         if message.channel.id in [
             742848285416357970, 742849666256732170,
-            844657766794788884, 846840113543905383
+            844657766794788884, 846840113543905383,
+            857713328082911262
         ] and not message.author.bot:
 
             guild_col = db.CUSTOM_DATABASE[str(message.guild.id)]

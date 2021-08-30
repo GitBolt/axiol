@@ -1,4 +1,4 @@
-FROM python:3.10-rc-slim
+FROM python:3
 
 COPY /axiol /main 
 

@@ -50,7 +50,7 @@ class ChemistryHelp(commands.Cog):
                 trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
                 response = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
-                await guild_col.update(data, {"$set": {trigger: response}})
+                await guild_col.update_one(data, {"$set": {trigger: response}})
                 await ctx.send(
                     embed=discord.Embed(
                         description=(
@@ -272,7 +272,7 @@ class ChemistryHelp(commands.Cog):
                         "in hence can't use this emoji either :("
                     )
 
-                await guild_col.update(data, {"$set": {trigger: emoji}})
+                await guild_col.update_one(data, {"$set": {trigger: emoji}})
 
         else:
             await ctx.send(
@@ -300,7 +300,7 @@ class ChemistryHelp(commands.Cog):
                 emoji = msg.split("|")[1].lstrip(' ').rstrip(' ')
 
                 if trigger in data.keys():
-                    await guild_col.update(
+                    await guild_col.update_one(
                         data, {"$unset": {trigger.lower(): emoji}}
                     )
 

@@ -159,12 +159,12 @@ class ChemistryHelp(commands.Cog):
                     or str(r.emoji) == "➡️"
                         or str(r.emoji) == "▶️"
                 ):
-                    return u == ctx.author and reaction.message == bot_msg
+                    return u == ctx.author and r.message == bot_msg
 
             current_page = 0
 
             while True:
-                reaction, user = await self.bot.wait_for(
+                reaction, _ = await self.bot.wait_for(
                     "reaction_add", check=reaction_check
                 )
 
@@ -378,7 +378,7 @@ class ChemistryHelp(commands.Cog):
                     or str(r.emoji) == "➡️"
                     or str(r.emoji) == "▶️"
                 ):
-                    return u == ctx.author and reaction.message == bot_msg
+                    return u == ctx.author and r.message == bot_msg
 
             current_page = 0
             while True:

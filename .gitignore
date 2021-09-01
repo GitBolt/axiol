@@ -3,7 +3,7 @@ __pycache__
 env
 venv
 
-# ide Configurations
+# IDE Configurations
 .vscode
 .idea
 
@@ -11,4 +11,3 @@ venv
 # Bot configuration and private cog
 .old/
 .env
-*private*

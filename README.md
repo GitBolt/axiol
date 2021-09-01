@@ -3,7 +3,7 @@
     <img
       alt="Axiol"
       src="https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
-      width="140"
+      width="160"
     />
   </a>
 </div>
@@ -18,33 +18,33 @@
 
 *Axiol is an advanced, highly customizable, and interactive Discord Bot coded in pure Python.*
 
-| :pushpin: | [Invite the bot to your server](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot) |
+| 📌 | [Invite the bot to your server](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=3691506774&scope=bot) |
 | ------------- | :----------------------------------------------------------------------------------------------------------------------------- |
 
 
 **The default prefix is a dot `.`**
 
 
-## :pencil2: Suggestions
+## 📝 Suggestions
 
-| :exclamation: | Make sure to read the [Docs](/DOCS.md) first |
+| ⚠️ | Make sure to read the [Docs](/DOCS.md) first |
 | ------------- | :------------------------------------------- |
 
 For any suggestions, the command `suggest` (Starting with the server prefix) can be used, and the suggestion will be sent to the
-[Official Discord Support Server](https://discord.gg/Rzz5WS9jXW).
+[Official Discord Support Server](https://discord.gg/6xVasmDVaE).
 
 
-## :fire: Contributing
+## ☄️ Contributing
 Any contribution to the documentation even if it fixes a small typo is appreciated
 
 - Fork → Clone → Edit → Commit → Pull request </br>
 *It is recommended to make a new branch for your changes*
 
-## :grey_question: Support Server & testing area
+## ❔ Support server & Testing area
 ![Discord](https://img.shields.io/discord/843516084266729512)
 > [Join](https://discord.gg/6xVasmDVaE)
 
-## :star2: Bot lists
+## ✨ Bot lists
 - [Top.gg](https://top.gg/bot/843484459113775114/vote)
 - [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)
 - [Bots.gg](https://discord.bots.gg/bots/843484459113775114)

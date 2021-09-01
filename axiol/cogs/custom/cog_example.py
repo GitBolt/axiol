@@ -7,14 +7,14 @@ from axiol.core.embed import Embed
 
 class Test(commands.Cog):
 
-    def __init__(self, client: Bot) -> None:
-        self.client: Bot = client
-        Embed.load(self.client)
+    def __init__(self, bot: Bot) -> None:
+        self.bot: Bot = bot
+        Embed.load(self.bot)
 
     @commands.command()
     async def my(self, ctx: TimedContext):
         await ctx.send(embed=Embed(ctx)(description="Cabbage"))
 
 
-def setup(client: Bot) -> None:
-    client.add_cog(Test(client))
+def setup(bot: Bot) -> None:
+    bot.add_cog(Test(bot))

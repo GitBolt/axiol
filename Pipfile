@@ -13,6 +13,7 @@ motor = "*"
 colorama = "*"
 termcolor = "*"
 python-dotenv = "*"
+embed-templator = "*"
 
 [dev-packages]
 

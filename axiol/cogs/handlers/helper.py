@@ -7,20 +7,20 @@ from axiol.core.embed import Embed
 
 class Helper(commands.Cog):
 
-    def __init__(self, client):
-        self.client: Bot = client
+    def __init__(self, bot):
+        self.bot: Bot = bot
 
-        Embed.load(self.client)
+        Embed.load(self.bot)
 
     @commands.command(name='cmds')
     async def all_commands(self, ctx: TimedContext):
         await ctx.send(
             embed=Embed(ctx)(
                 description=(
-                    f"> {len(self.client.all_commands)} commands available"
+                    f"> {len(self.bot.all_commands)} commands available"
                 )
             ).add_fields(
-                field_list=self.client.cogs.items(),
+                field_list=self.bot.cogs.items(),
                 map_values=lambda cog: ','.join(
                     f'`{cmd.name}`' for cmd in cog.get_commands()
                 )
@@ -28,5 +28,5 @@ class Helper(commands.Cog):
         )
 
 
-def setup(client):
-    client.add_cog(Helper(client))
+def setup(bot):
+    bot.add_cog(Helper(bot))

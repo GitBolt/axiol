@@ -4,6 +4,6 @@ COPY / /main
 
 WORKDIR /main
 
-RUN pip install motor dnspython Pillow nltk discord.py colorama termcolor pymongo python-dotenv
+RUN pip install git+https://github.com/rapptz/discord.py pymongo motor dnspython Pillow nltk colorama termcolor python-dotenv embed-templator
 
 CMD ["python3", "-u", "bot.py"]

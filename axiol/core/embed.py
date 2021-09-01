@@ -19,11 +19,11 @@ class Embed(embed_templator.Embed):
         ) * (not random.randint(0, 10_000))
 
         self.set_footer(
-            icon_url=self.client.user.avatar_url,
+            icon_url=self.bot.user.avatar_url,
             text=lucky or '   '.join(
                 (
                     f"⚙️ {self.ctx.time() * 1000:.2f} ms",
-                    f"⏳ {self.client.latency * 1000:.2f}ms",
+                    f"⏳ {self.bot.latency * 1000:.2f}ms",
                     f"🔑 {self.ctx.prefix}help",
                 )
             )

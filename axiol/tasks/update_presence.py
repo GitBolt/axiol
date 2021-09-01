@@ -9,10 +9,10 @@ if TYPE_CHECKING:
 
 
 @tasks.loop(minutes=1)
-async def update_presence(client: Bot):
-    await client.change_presence(
+async def update_presence(bot: Bot):
+    await bot.change_presence(
         activity=Activity(
             type=ActivityType.watching,
-            name=f"{client.default_prefix}help | {client.latency * 1000:,.3f}ms"
+            name=f"{bot.default_prefix}help | {bot.latency * 1000:,.3f}ms"
         )
     )

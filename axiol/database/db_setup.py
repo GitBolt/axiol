@@ -130,8 +130,8 @@ async def update_db(guild_ids: Generator[int, int, None]) -> None:
 
 
 def main() -> None:
-    client = Updater()  # Setting up a impossible prefix to avoid problems
-    client.run()
+    bot = Updater()  # Setting up a impossible prefix to avoid problems
+    bot.run()
 
 
 if __name__ == '__main__':

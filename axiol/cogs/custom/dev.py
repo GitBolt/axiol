@@ -10,10 +10,10 @@ import contextlib
 
 
 class Owner(commands.Cog):
-    """A private cog which only works for me."""
+    """A private cog which only works for developers."""
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     def cog_check(self, ctx):
         if ctx.author.id not in DEVS_ID:
@@ -33,7 +33,7 @@ class Owner(commands.Cog):
         local_vars = {
             "discord": discord,
             "commands": commands,
-            "bot": self.client,
+            "bot": self.bot,
             "ctx": ctx,
         }
         stdout = io.StringIO()
@@ -61,5 +61,5 @@ class Owner(commands.Cog):
         await ctx.send(f"```python\n{result}```")
 
 
-def setup(client):
-    client.add_cog(Owner(client))
+def setup(bot):
+    bot.add_cog(Owner(bot))

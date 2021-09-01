@@ -80,13 +80,5 @@ class Logger:
         if fatal:
             quit()
 
-    def db(self, message: str) -> None:
-        """Log a db call.
-
-        :param message:
-            Query string or result.
-        """
-        self.__log('white', 'DB', message)
-
 
 log = Logger()

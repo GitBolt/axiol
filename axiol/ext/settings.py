@@ -197,10 +197,10 @@ class Settings(commands.Cog):
                         str(reaction.emoji) == "🎭"
                         and (
                             str(ctx.guild.id)
-                            not in await db.KARMADATBASE.list_collection_names()
+                            not in await db.KARMA_DATABASE.list_collection_names()
                         )
                     ):
-                        guild_doc = await db.KARMADATBASE.create_collection(
+                        guild_doc = await db.KARMA_DATABASE.create_collection(
                             str(ctx.guild.id))
                         guild_doc.insert_one(
                             {

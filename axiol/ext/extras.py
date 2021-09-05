@@ -81,8 +81,8 @@ class Extras(commands.Cog):
         embed = discord.Embed(
             title="My invite link!",
             description=(
-                "[Invite me from here](https://discord.com/oauth2/authorize"
-                "?client_id=843484459113775114&permissions=473295959&scope=bot)"
+                "[Invite me from here](https://discord.com/oauth2/authorize?"
+                "client_id=884099662653562961&permissions=2617633878&scope=applications.commands%20bot"
             ),
             color=var.C_BLUE
         ).set_thumbnail(

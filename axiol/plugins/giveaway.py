@@ -308,7 +308,7 @@ class Giveaway(commands.Cog):
         ).add_field(
             name="⏳ Ending time",
             value=main_time + " " + secondary_time
-        ).set_thumbnail(url=ctx.guild.icon_url)
+        ).set_thumbnail(url=ctx.guild.icon.url)
 
         gw_msg = await channel.send(
             content="New giveaway woohoo!", embed=embed

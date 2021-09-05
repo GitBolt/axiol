@@ -81,7 +81,7 @@ class Leveling(commands.Cog):
                     + (20 - boxes) * "<:left:850041599127584776>"
                 ),
                 inline=False
-            ).set_thumbnail(url=user.avatar_url)
+            ).set_thumbnail(url=user.avatar.url)
 
             await ctx.send(embed=embed)
 
@@ -119,7 +119,7 @@ class Leveling(commands.Cog):
                 "▶️ Last page\n"
             ),
             color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url)
+        ).set_thumbnail(url=ctx.guild.icon.url)
 
         rank_count = 0
         for i in rankings:
@@ -287,7 +287,7 @@ class Leveling(commands.Cog):
             title="Server leveling information",
             color=var.C_BLUE
         ).set_thumbnail(
-            url=ctx.guild.icon_url
+            url=ctx.guild.icon.url
         ).add_field(
             name="Highest XP Member",
             value=max_rank_user,

@@ -15,6 +15,53 @@ class Extras(commands.Cog):
             f"Pong 🏓! Response time: {round(self.bot.latency * 1000)}ms"
         )
 
+    @commands.command(aliases=["userinfo"])
+    async def user(self, ctx, user:discord.User=None):
+        if not user:
+            user = ctx.author
+
+        embed = discord.Embed(
+            title=f"{user} info",
+            color=var.C_MAIN
+        )
+        embed.set_thumbnail(url=user.avatar.url)
+        embed.add_field(name="ID", value=user.id, inline=False)
+        embed.add_field(name="Account created", value=user.created_at.strftime("%B %d, %Y"), inline=False)
+        embed.add_field(name="Bot", value=user.bot, inline=False)
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["memberinfo"])
+    async def member(self, ctx, member:discord.Member=None):
+        if not member:
+            member = ctx.author
+
+        if member.status == discord.Status.online:
+            status = "<:online:313956277808005120>"
+        elif member.status == discord.Status.idle:
+            status = "<:away:313956277220802560>"
+        elif member.status == discord.Status.dnd:
+            status = "<:dnd:313956276893646850>"
+        elif member.status == discord.Status.offline:
+            status = "<:offline:313956277237710868>"
+        else:
+            status = "<:invisible:313956277107556352>"
+
+        embed = discord.Embed(
+            title=f"{member} info",
+            description=status,
+            color=var.C_MAIN
+        )
+        embed.set_thumbnail(url=member.avatar.url)
+        embed.add_field(
+            name="Roles",
+            value=" ".join(role.mention for role in member.roles
+        ), inline=False)
+        embed.add_field(name="Nickname", value=member.nick, inline=False)
+        embed.add_field(name="Status", value=member.status, inline=False)
+        embed.add_field(name="Joined at", value=member.joined_at.strftime("%B %d, %Y"), inline=False)
+        embed.add_field(name="ID", value=member.id, inline=False)
+        await ctx.send(embed=embed)
+
     @commands.command()
     async def source(self, ctx):
         embed = discord.Embed(
@@ -156,7 +203,7 @@ class Extras(commands.Cog):
             inline=False
         )
 
-        embed.set_thumbnail(url=ctx.guild.icon_url)
+        embed.set_thumbnail(url=ctx.guild.icon.url)
 
         guild_verify_doc = await db.VERIFY.find_one({"_id": ctx.guild.id})
         if guild_verify_doc is not None:

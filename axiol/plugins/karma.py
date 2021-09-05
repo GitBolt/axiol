@@ -61,7 +61,7 @@ class Karma(commands.Cog):
                 name="Karma", value=userdata["karma"]
             ).add_field(
                 name="Position", value=f"{position}/{len(karmas)}", inline=False
-            ).set_thumbnail(url=user.avatar_url)
+            ).set_thumbnail(url=user.avatar.url)
 
             total_karma = sum(i["karma"] for i in karmas)
             average = total_karma/len(karmas)
@@ -118,7 +118,7 @@ class Karma(commands.Cog):
             title=f"Karma Board",
             description=f"The average karma in this server is **{average}**",
             color=var.C_BLUE
-        ).set_thumbnail(url=ctx.guild.icon_url)
+        ).set_thumbnail(url=ctx.guild.icon.url)
 
         count = 0
         for i in karmas:

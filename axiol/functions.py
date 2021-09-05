@@ -1,4 +1,3 @@
-import asyncio
 import random
 from variables import DEFAULT_PREFIX
 from database import PREFIXES, LEVEL_DATABASE, PLUGINS, PERMISSIONS
@@ -94,7 +93,6 @@ async def update_db(guild_ids):
     leveling_update = []
 
     for guild_id in guild_ids:
-        guild_plugins = await PLUGINS.find_one({"_id": guild_id})
 
         if not await PLUGINS.count_documents({"_id": guild_id}, limit=1):
             PLUGINS.insert_one({
@@ -132,7 +130,8 @@ async def update_db(guild_ids):
             })
             permissions_update.append(guild_id)
             print(f"✅{guild_id} - Permissions 🔨")
-
+            
+        guild_plugins = await PLUGINS.find_one({"_id": guild_id})
         if (
             guild_plugins["Leveling"]
             and str(guild_id)
@@ -169,8 +168,3 @@ async def update_db(guild_ids):
         f"{len(leveling_update)} leveling"
     )
 
-# serveridlist = [843516084266729512, 751491708465840159]
-# loop = asyncio.get_event_loop()
-# loop.run_until_complete(updatedb(serveridlist))
-
-# update_plugins_and_permissions("Giveaway")

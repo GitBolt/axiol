@@ -89,9 +89,7 @@ async def on_guild_join(guild):
     bot_count = len([b for b in guild.members if b.bot])
     embed = discord.Embed(
         title="I just joined a new server!",
-        description=(
-            f"Thanks to this kind person for inviting me to `{guild.name}` :D"
-        ),
+        description=guild.name,
         color=var.C_GREEN
     ).add_field(
         name="ID", value=guild.id, inline=False
@@ -111,7 +109,7 @@ async def on_guild_remove(guild):
     bot_count = len([b for b in guild.members if b.bot])
     embed = discord.Embed(
         title="I just got removed from a server",
-        description=f"Someone removed me from `{guild.name}` :(",
+        description=guild.name,
         color=var.C_RED
     ).add_field(
         name="ID", value=guild.id, inline=False

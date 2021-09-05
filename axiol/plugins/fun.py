@@ -375,7 +375,7 @@ class Fun(commands.Cog):
         ).set_footer(
             text="Waiting for players to join..."
         ).set_author(
-            name=ctx.author, icon_url=ctx.author.avatar_url)
+            name=ctx.author, icon_url=ctx.author.avatar.url)
         )
 
         if player_amount == 1:
@@ -615,7 +615,7 @@ class Fun(commands.Cog):
                     embed.color = var.C_GREEN
                     embed.set_author(
                         name=ctx.author,
-                        icon_url=ctx.author.avatar_url
+                        icon_url=ctx.author.avatar.url
                     )
 
                     embed.set_footer(
@@ -642,7 +642,7 @@ class Fun(commands.Cog):
     @has_command_permission()
     async def avatar(self, ctx, user: discord.User = None):
         avatar_user = ctx.author if user is None else user
-        avatar = avatar_user.avatar_url
+        avatar = avatar_user.avatar.url
 
         embed = discord.Embed(
             title=f"Avatar of **{avatar_user}**",
@@ -1048,7 +1048,7 @@ class Fun(commands.Cog):
 
                             embed.set_author(
                                 name=author_user,
-                                icon_url=author_user.avatar_url
+                                icon_url=author_user.avatar.url
                             )
 
                             await author_bot_msg.delete()

@@ -27,7 +27,7 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 *It is recommended to make a new branch for your changes*
 
 ### Support Server
-[Also the bot testing area](https://discord.gg/Rzz5WS9jXW)
+[Also the bot testing area](https://discord.gg/6xVasmDVaE)
 
 ### Invite
 [Invite the bot with this link](https://discord.com/oauth2/authorize?client_id=884099662653562961&permissions=2617633878&scope=applications.commands%20bot)

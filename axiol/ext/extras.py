@@ -82,7 +82,7 @@ class Extras(commands.Cog):
             title="My invite link!",
             description=(
                 "[Invite me from here](https://discord.com/oauth2/authorize"
-                "?client_id=843484459113775114&permissions=473295959&scope=bot)"
+                "?client_id=843484459113775114&permissions=3691506774&scope=bot)"
             ),
             color=var.C_BLUE
         ).set_thumbnail(
@@ -137,7 +137,7 @@ class Extras(commands.Cog):
             description=(
                 f"[Donation](https://paypal.me/palbolt) "
                 f"[Vote](https://top.gg/bot/843484459113775114/vote) "
-                f"[Support](https://discord.gg/Rzz5WS9jXW)"
+                f"[Support](https://discord.gg/6xVasmDVaE)"
             ),
             color=var.C_MAIN
         ).add_field(

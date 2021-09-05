@@ -27,10 +27,10 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 *It is recommended to make a new branch for your changes*
 
 ### Support Server
-[Also the bot testing area](https://discord.gg/Rzz5WS9jXW)
+[Also the bot testing area](https://discord.gg/6xVasmDVaE)
 
 ### Invite
-[Invite the bot with this link](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)
+[Invite the bot with this link](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=3691506774&scope=bot)
 
 ### Bot lists
 [Top.gg](https://top.gg/bot/843484459113775114/vote) </br>

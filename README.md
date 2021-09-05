@@ -30,7 +30,7 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 [Also the bot testing area](https://discord.gg/Rzz5WS9jXW)
 
 ### Invite
-[Invite the bot with this link](https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)
+[Invite the bot with this link](https://discord.com/oauth2/authorize?client_id=884099662653562961&permissions=2617633878&scope=applications.commands%20bot)
 
 ### Bot lists
 [Top.gg](https://top.gg/bot/843484459113775114/vote) </br>

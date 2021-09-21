@@ -136,7 +136,7 @@ class Chatbot(commands.Cog):
         guild_plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
         ctx = await self.bot.get_context(message)
 
-        if guild_plugin_doc["Chatbot"]:
+        if guild_plugin_doc["Chatbot"] and message.channel.id != 803308171577393172:
             guild_chatbot_doc = await db.CHATBOT.find_one(
                 {"_id": message.guild.id}
             )

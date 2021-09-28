@@ -440,11 +440,7 @@ class ChemistryHelp(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        if message.channel.id in [
-            742848285416357970, 742849666256732170,
-            844657766794788884, 846840113543905383,
-            857713328082911262
-        ] and not message.author.bot:
+        if message.guild.id == 742737352799289375 and not message.author.bot:
 
             guild_col = db.CUSTOM_DATABASE[str(message.guild.id)]
             msg_data = await guild_col.find_one({"_id": 0})

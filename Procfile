@@ -1,1 +1,1 @@
-worker: python bot.py
+worker: cd axiol/ && python bot.py

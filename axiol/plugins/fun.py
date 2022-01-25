@@ -797,7 +797,10 @@ class Fun(commands.Cog):
         embed.title = user_msg.content
         await preview.edit(embed=embed)
         await title_bot_msg.delete()
-        await user_msg.delete()
+        try:
+            await user_msg.delete()
+        except discord.Forbidden:
+            pass
 
         desc_bot_msg = await ctx.send(
             embed=discord.Embed(
@@ -824,13 +827,19 @@ class Fun(commands.Cog):
             embed.description = None
             await preview.edit(embed=embed)
             await desc_bot_msg.delete()
-            await user_msg.delete()
+            try:
+                await user_msg.delete()
+            except discord.Forbidden:
+                pass
 
         else:
             embed.description = user_msg.content
             await preview.edit(embed=embed)
             await desc_bot_msg.delete()
-            await user_msg.delete()
+            try:
+                await user_msg.delete()
+            except discord.Forbidden:
+                pass
 
         thumbnail_bot_msg = await ctx.send(
             embed=discord.Embed(
@@ -864,13 +873,19 @@ class Fun(commands.Cog):
                 embed.set_thumbnail(url=user_msg.attachments[0].url)
                 await preview.edit(embed=embed)
                 await thumbnail_bot_msg.delete()
-                await user_msg.delete()
+                try:
+                    await user_msg.delete()
+                except discord.Forbidden:
+                    pass
                 break
 
             elif user_msg.content.startswith("https"):
                 embed.set_thumbnail(url=user_msg.content)
                 await thumbnail_bot_msg.delete()
-                await user_msg.delete()
+                try:
+                    await user_msg.delete()
+                except:
+                    pass
                 break
 
             else:

@@ -156,7 +156,7 @@ class LogicallyAnswered(commands.Cog):
                 last_message = fetch[1].content
 
                 increment = int(last_message) + 1
-
+                print(increment)
                 if message.content != str(increment):
                     await message.delete()
                     await message.channel.send(

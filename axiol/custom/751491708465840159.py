@@ -148,7 +148,7 @@ class LogicallyAnswered(commands.Cog):
                         pass
 
             if (
-                str(message.channel) == "💯〢counting-to-420k"
+                str(message.channel) == "💯〢counting-to-69420"
                 and not message.author.bot
             ):
 

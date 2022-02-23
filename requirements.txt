@@ -12,3 +12,4 @@ multidict==6.0.2
 Pillow==9.0.1
 pymongo==3.12.3
 yarl==1.7.2
+python-dotenv==0.19.2

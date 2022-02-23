@@ -572,19 +572,20 @@ class Verification(commands.Cog):
                 # Bot verification
                 # Lookin epic innit bruv?
 
-                base = "https://cdn.disnakeapp.com/attachments/865444983762452520"
+                base = "https://cdn.discordapp.com/attachments/807140294764003350"
 
                 images = {
-                    f'{base}/876497365891178546/axiol_verification.png': "7h3fpaw1",
-                    f'{base}/876497364779692072/axiol_verification.png.png': "bs4hm1gd",
-                    f'{base}/876497363387187240/axiol_verification.png.png.png': "kp6d1vs9",
-                    f'{base}/876497360224669796/axiol_verification.png.png.png.png': "hmxe425",
-                    f'{base}/876497358681149470/axiol_verification.png.png.png.png.png': "jd3573vq",
+                    f'{base}/808170831586787398/': "7h3fpaw1",
+                    f'{base}/808170832744415283/': "bs4hm1gd",
+                    f'{base}/808170834514018304/': "kp6d1vs9",
+                    f'{base}/808170834484789309/': "hmxe425",
+                    f'{base}/808170835957383189/': "jd3573vq",
                 }
 
                 choice = random.choice(list(images))
                 code = images[choice]
-
+                url = choice + code + ".png"
+                print(url)
                 embed = disnake.Embed(
                     title="Beep Bop,  are you a bot?",
                     description=(
@@ -592,7 +593,7 @@ class Verification(commands.Cog):
                         ' below to verify yourself'
                     ),
                     colour=var.C_MAIN
-                ).set_image(url=choice).set_footer(
+                ).set_image(url=url).set_footer(
                     text=(
                         'You have 20 seconds to enter the text, '
                         'if you failed to enter it in time then '

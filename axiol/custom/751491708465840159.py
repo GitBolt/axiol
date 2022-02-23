@@ -11,8 +11,7 @@ class LogicallyAnswered(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    def cog_check(self, ctx):
-        """Simple check this custom cog only runs on this server"""
+    def cog_check(self, ctx) -> bool:
         return ctx.guild.id == 751491708465840159
 
     @commands.command()
@@ -90,10 +89,6 @@ class LogicallyAnswered(commands.Cog):
         if not message.guild:
             return
 
-        def message_check(msg):
-            allowed = list(string.ascii_lowercase + string.digits)
-            return msg <= allowed
-
         if message.guild.id == 751491708465840159:
 
             if str(message.channel) == '💡〢suggestions':
@@ -155,9 +150,13 @@ class LogicallyAnswered(commands.Cog):
                 fetch = await message.channel.history(limit=2).flatten()
                 last_message = fetch[1].content
 
-                increment = int(last_message) + 1
-                print(increment)
-                if message.content != str(increment):
+                if last_message.isdigit():
+                    last_message = int(last_message)
+                else:
+                    await message.channel.send("The previous message isn't integer, fix it and restart me.")
+
+                next_message = str(last_message + 1)
+                if message.content != next_message:
                     await message.delete()
                     await message.channel.send(
                         (

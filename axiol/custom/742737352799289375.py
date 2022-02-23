@@ -1,67 +1,32 @@
-import discord
-from discord.ext import commands
-from discord.ext.commands import check, Context
+import disnake
+from disnake.ext import commands
+from disnake.ext.commands import check, Context
 import database as db
 import variables as var
 from functions import get_prefix
 
 
-def is_user(*user_ids):
+def is_user(*user_ids) -> bool:
     async def predicate(ctx: Context):
         return ctx.author.id in user_ids
-
     return check(predicate)
 
-
 # Custom cog for Chemistry Help discord server | 742737352799289375
+
+
 class ChemistryHelp(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
-    def cog_check(self, ctx):
-        """Simple check this custom cog only runs on this server."""
-        return ctx.guild.id == 742737352799289375 or 807140294276415510
+    def cog_check(self, ctx: Context) -> bool:
+        return ctx.guild.id == 742737352799289375
 
     @commands.command(name="chem_addmsg")
     @is_user(565059698399641600, 791950104680071188)
-    async def chem_add_msg(self, ctx, *, msg: str = None):
-        if msg is not None:
-
-            guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
-
-            data = await guild_col.find_one({"_id": 0})
-            if data is None:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                response = msg.split("|")[1].lstrip(' ').rstrip(' ').lower()
-                await guild_col.insert_one({
-                    "_id": 0,
-                    trigger: response
-                })
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Added the message **{msg}**"
-                            f" with response **{response}**"
-                        ),
-                        color=var.C_BLUE)
-                )
-
-            else:
-                trigger = msg.split("|")[0].lstrip(' ').rstrip(' ').lower()
-                response = msg.split("|")[1].lstrip(' ').rstrip(' ')
-
-                await guild_col.update_one(data, {"$set": {trigger: response}})
-                await ctx.send(
-                    embed=discord.Embed(
-                        description=(
-                            f"Added the message **{trigger}**"
-                            f" with response **{response}**"
-                        ),
-                        color=var.C_BLUE)
-                )
-        else:
-            await ctx.send(
-                embed=discord.Embed(
+    async def chem_add_msg(self, ctx: Context, *, message: str = None):
+        if message is None:
+            return await ctx.send(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define both "
                         "the message and it's response"
@@ -72,6 +37,31 @@ class ChemistryHelp(commands.Cog):
                     value=f"`{await get_prefix(ctx)}addmsg <msg> | <response>`"
                 )
             )
+
+        guild_collection = db.CUSTOM_DATABASE[str(ctx.guild.id)]
+        current_data = await guild_collection.find_one({"_id": 0})
+        trigger = message.split("|")[0].lstrip(' ').rstrip(' ').lower()
+        response = message.split("|")[1].lstrip(' ').rstrip(' ').lower()
+
+        if current_data is None:
+            await guild_collection.insert_one({
+                "_id": 0,
+                trigger: response
+            })
+        else:
+            await guild_collection.update_one(
+                current_data,
+                {"$set": {trigger: response}}
+            )
+
+        await ctx.send(
+            embed=disnake.Embed(
+                description=(
+                    f"Added the message **{trigger}**"
+                    f" with response **{response}**"
+                ),
+                color=var.C_BLUE)
+        )
 
     @commands.command(name="chem_removemsg")
     @is_user(565059698399641600, 791950104680071188)
@@ -95,7 +85,6 @@ class ChemistryHelp(commands.Cog):
                 f"Successfully removed the message **msg**"
                 f" which was having the response **{res}**"
             )
-
         else:
             await ctx.send("This message has no responses setted up")
 
@@ -117,7 +106,7 @@ class ChemistryHelp(commands.Cog):
             else:
                 all_pages = exact_pages
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="All message responses",
                 color=var.C_MAIN
             )
@@ -172,7 +161,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("◀️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page = 0
@@ -183,7 +172,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("➡️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page += 1
@@ -194,7 +183,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("⬅️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page -= 1
@@ -208,7 +197,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("▶️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page = all_pages - 1
@@ -233,7 +222,7 @@ class ChemistryHelp(commands.Cog):
                 try:
                     await ctx.message.add_reaction(emoji)
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             description=(
                                 f"Added the message **{msg}**"
                                 f" with reaction **{emoji}**"
@@ -257,7 +246,7 @@ class ChemistryHelp(commands.Cog):
                 try:
                     await ctx.message.add_reaction(emoji)
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             description=(
                                 f"Added the message **{msg}**"
                                 f" with reaction **{emoji}**"
@@ -276,7 +265,7 @@ class ChemistryHelp(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define both "
                         "the message and it's reaction"
@@ -336,7 +325,7 @@ class ChemistryHelp(commands.Cog):
             else:
                 all_pages = exact_pages
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="All message reactions",
                 color=var.C_MAIN
             )
@@ -390,7 +379,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("◀️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page = 0
@@ -401,7 +390,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("➡️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page += 1
@@ -412,7 +401,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("⬅️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page -= 1
@@ -426,7 +415,7 @@ class ChemistryHelp(commands.Cog):
                     try:
                         await bot_msg.remove_reaction("▶️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     current_page = all_pages - 1
@@ -440,12 +429,11 @@ class ChemistryHelp(commands.Cog):
     async def on_message(self, message):
         if not message.guild:
             return
-        if message.guild.id == 742737352799289375 and not message.author.bot:
 
+        if message.guild.id == 742737352799289375 and not message.author.bot:
             guild_col = db.CUSTOM_DATABASE[str(message.guild.id)]
             msg_data = await guild_col.find_one({"_id": 0})
             reaction_data = await guild_col.find_one({"_id": 1})
-
             if (
                     msg_data is not None
                     and message.content.lower() in msg_data.keys()
@@ -458,8 +446,8 @@ class ChemistryHelp(commands.Cog):
                 reaction_data is not None
                 and message.content.lower() in reaction_data.keys()
             ):
-                await message.add_reaction(
-                    reaction_data.get(message.content.lower()))
+                reaction: str = reaction_data.get(message.content.lower())
+                await message.add_reaction(reaction)
 
 
 def setup(bot):

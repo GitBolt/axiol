@@ -1,9 +1,9 @@
 FROM python:3
 
-COPY /axiol /main 
+COPY /axiol /root 
 
-WORKDIR /main
+WORKDIR /root
 
-RUN pip install motor dnspython pillow nltk git+https://github.com/rapptz/discord.py
+RUN pip install motor dnspython pillow disnake
 
 CMD ["python3", "-u","bot.py"]

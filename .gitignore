@@ -6,6 +6,7 @@ venv
 # ide Configurations
 .vscode
 .idea
+.vim
 
 
 # Bot configuration and private cog

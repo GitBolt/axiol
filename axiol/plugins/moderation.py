@@ -1,7 +1,7 @@
-import discord
+import disnake
 import asyncio
 from typing import Union
-from discord.ext import commands
+from disnake.ext import commands
 import variables as var
 import database as db
 from functions import get_prefix
@@ -21,7 +21,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Moderation plugin "
                         "is disabled in this server"
@@ -34,7 +34,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(ban_members=True)
     @has_command_permission()
     async def ban(
-            self, ctx, user: discord.User = None, *, reason="No reason given"
+            self, ctx, user: disnake.User = None, *, reason="No reason given"
     ):
         if user is not None and user != ctx.author:
 
@@ -43,7 +43,7 @@ class Moderation(commands.Cog):
 
             try:
                 await user.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title=f"You have been banned from {ctx.guild.name}",
                         description=(
                             "Sorry I'm just a bot and I follow orders :("
@@ -57,7 +57,7 @@ class Moderation(commands.Cog):
                     )
                 )
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 pass
 
             guild_log_doc = await db.LOGGING.find_one(
@@ -66,7 +66,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🔨 Ban",
                     description=f"{user.mention} has been banned by {ctx.author.mention}",
                     color=var.C_GREEN
@@ -83,7 +83,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the user to ban them,"
                         " reason is optional"
@@ -100,7 +100,7 @@ class Moderation(commands.Cog):
     async def ban_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to ban the user, "
@@ -115,7 +115,7 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(ban_members=True)
     @has_command_permission()
-    async def unban(self, ctx, user: discord.User = None):
+    async def unban(self, ctx, user: disnake.User = None):
         if user is not None:
             bans = await ctx.guild.bans()
             banned_users = [ban.user for ban in bans]
@@ -126,7 +126,7 @@ class Moderation(commands.Cog):
 
                 try:
                     await user.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title=(
                                 f"You have been unbanned from {ctx.guild.name}!"
                             ),
@@ -136,7 +136,7 @@ class Moderation(commands.Cog):
                             name="Unbanned by", value=ctx.author)
                         )
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
                 
             guild_log_doc = await db.LOGGING.find_one(
@@ -145,7 +145,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🔨 Unban",
                     description=f"{user.mention} has been unbanned by {ctx.author.mention}",
                     color=var.C_BLUE
@@ -154,7 +154,7 @@ class Moderation(commands.Cog):
 
             else:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"The user `{user}` is not banned, "
                             "therefore cannot unban them."
@@ -165,7 +165,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the user to unban them",
                     color=var.C_RED
                 ).add_field(
@@ -178,7 +178,7 @@ class Moderation(commands.Cog):
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to unban the user, make "
@@ -192,18 +192,18 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     @has_command_permission()
-    async def mute(self, ctx, member: discord.Member = None):
+    async def mute(self, ctx, member: disnake.Member = None):
         if member is not None:
-            if not discord.utils.get(ctx.guild.roles, name='Muted'):
+            if not disnake.utils.get(ctx.guild.roles, name='Muted'):
                 muted_role = await ctx.guild.create_role(
-                    name="Muted", colour=discord.Colour(0xa8a8a8)
+                    name="Muted", colour=disnake.Colour(0xa8a8a8)
                 )
 
                 for i in ctx.guild.text_channels:
                     await i.set_permissions(muted_role, send_messages=False)
 
             else:
-                muted_role = discord.utils.get(ctx.guild.roles, name="Muted")
+                muted_role = disnake.utils.get(ctx.guild.roles, name="Muted")
 
             await member.add_roles(muted_role)
             await ctx.send(f"Applied chat mute to `{member}` :mute:")
@@ -214,7 +214,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🔈 Mute",
                     description=f"{member.mention} has been muted by {ctx.author.mention}",
                     color=var.C_GREEN
@@ -222,7 +222,7 @@ class Moderation(commands.Cog):
                 )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define member in order to mute them"
                     ),
@@ -240,9 +240,9 @@ class Moderation(commands.Cog):
 
     @mute.error
     async def mute_error(self, ctx, error):
-        if isinstance(error, discord.Forbidden):
+        if isinstance(error, disnake.Forbidden):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to mute the member, make"
@@ -256,10 +256,10 @@ class Moderation(commands.Cog):
     @commands.command()
     @commands.has_permissions(manage_roles=True)
     @has_command_permission()
-    async def unmute(self, ctx, member: discord.Member = None):
+    async def unmute(self, ctx, member: disnake.Member = None):
         if member is None:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the member to unmute them"
                     ),
@@ -274,14 +274,14 @@ class Moderation(commands.Cog):
                     )
                 )
             )
-        elif not discord.utils.get(ctx.guild.roles, name='Muted'):
+        elif not disnake.utils.get(ctx.guild.roles, name='Muted'):
             await ctx.send(
                 "There is no muted role yet hence I cannot unmute, "
                 "Muting someone automatically makes one."
             )
 
         else:
-            muted_role = discord.utils.get(ctx.guild.roles, name='Muted')
+            muted_role = disnake.utils.get(ctx.guild.roles, name='Muted')
 
             await member.remove_roles(muted_role)
             await ctx.send(f"Unmuted `{member}` :sound:")
@@ -292,7 +292,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🔈 Unmute",
                     description=f"{member.mention} has been unmuted by {ctx.author.mention}",
                     color=var.C_BLUE
@@ -303,7 +303,7 @@ class Moderation(commands.Cog):
     async def unmute_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to unmute the user, "
@@ -319,7 +319,7 @@ class Moderation(commands.Cog):
     @commands.has_permissions(kick_members=True)
     @has_command_permission()
     async def kick(
-        self, ctx, member: discord.Member = None, *, reason="No reason provided"
+        self, ctx, member: disnake.Member = None, *, reason="No reason provided"
     ):
         if member is not None and member != ctx.author:
             await member.kick(reason=reason)
@@ -327,7 +327,7 @@ class Moderation(commands.Cog):
 
             try:
                 await member.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title=f"You have been kicked from {ctx.guild.name}",
                         color=var.C_RED
                     ).add_field(
@@ -337,7 +337,7 @@ class Moderation(commands.Cog):
                     )
                 )
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 pass
 
             guild_log_doc = await db.LOGGING.find_one(
@@ -346,7 +346,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🧹 Kick",
                     description=f"{member.mention} has been kicked by {ctx.author.mention}",
                     color=var.C_GREEN
@@ -356,7 +356,7 @@ class Moderation(commands.Cog):
             await ctx.send("You can't kick yourself :eyes:")
 
         else:
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 description="🚫 You need to define the member to kick them",
                 color=var.C_RED
             ).add_field(
@@ -370,7 +370,7 @@ class Moderation(commands.Cog):
     async def kick_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to kick the member,"
@@ -385,12 +385,12 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["nickname", "changenick"])
     @commands.has_permissions(change_nickname=True)
     @has_command_permission()
-    async def nick(self, ctx, member: discord.Member = None, *, nick=None):
+    async def nick(self, ctx, member: disnake.Member = None, *, nick=None):
         if member and nick is not None:
             previous_nick = member.nick
             await member.edit(nick=nick)
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_ACCEPT} Nickname changed "
                         f"for `{member}` to {nick}"
@@ -404,7 +404,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🧹 Nickname change",
                     description=f"{member.mention}'s nickname has been changed by {ctx.author.mention} to {nick}",
                     color=var.C_GREEN
@@ -415,7 +415,7 @@ class Moderation(commands.Cog):
                 )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define both the member"
                         " and their new nick"
@@ -433,7 +433,7 @@ class Moderation(commands.Cog):
     async def nick_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description=(
                         "🚫 I don't have permissions to change the nickname "
@@ -452,7 +452,7 @@ class Moderation(commands.Cog):
         if limit is not None:
             await ctx.channel.purge(limit=limit + 1)
 
-            info = await ctx.send(embed=discord.Embed(
+            info = await ctx.send(embed=disnake.Embed(
                 description=f"Deleted {limit} messages",
                 color=var.C_ORANGE)
             )
@@ -465,7 +465,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="🧹 Purge",
                     description=f"{ctx.author.mention} has deleted {limit} messages from {ctx.channel.mention}",
                     color=var.C_GREEN
@@ -473,7 +473,7 @@ class Moderation(commands.Cog):
                 )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the amount"
                         " to delete messages too! Make sure the amount is numerical."
@@ -489,7 +489,7 @@ class Moderation(commands.Cog):
     async def purge_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Permission error",
                     description="🚫 I don't have permissions to delete messages",
                     color=var.C_RED
@@ -499,13 +499,13 @@ class Moderation(commands.Cog):
     @commands.command(aliases=["giverole"])
     @has_command_permission()
     async def addrole(
-        self, ctx, member: discord.Member = None, role: discord.Role = None
+        self, ctx, member: disnake.Member = None, role: disnake.Role = None
     ):
         if member and role is not None:
             try:
                 await member.add_roles(role)
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"Successfully updated {member.mention} "
                             f"with {role.mention} role"
@@ -514,9 +514,9 @@ class Moderation(commands.Cog):
                     )
                 )
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title="Missing permissions",
                         description=(
                             f"I don't have permissions to update the roles"
@@ -528,7 +528,7 @@ class Moderation(commands.Cog):
                 )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
                     color=var.C_RED
@@ -546,13 +546,13 @@ class Moderation(commands.Cog):
     @commands.command(name="removerole")
     @has_command_permission()
     async def remove_role(
-        self, ctx, member: discord.Member = None, role: discord.Role = None
+        self, ctx, member: disnake.Member = None, role: disnake.Role = None
     ):
         if member and role is not None:
             try:
                 await member.remove_roles(role)
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"Successfully updated {member.mention} "
                             f"by removing {role.mention} role"
@@ -561,9 +561,9 @@ class Moderation(commands.Cog):
                     )
                 )
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title="Missing permissions",
                         description=(
                             f"I don't have permissions to update the roles of"
@@ -575,7 +575,7 @@ class Moderation(commands.Cog):
                 )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description="You need to define both member and role",
                     color=var.C_RED
@@ -596,11 +596,11 @@ class Moderation(commands.Cog):
     @commands.command(name="massrole")
     @has_command_permission()
     async def mass_role(
-        self, ctx, role: discord.Role = None, role2: discord.Role = None
+        self, ctx, role: disnake.Role = None, role2: disnake.Role = None
     ):
         if role is not None and role2 is not None:
             bot_msg = await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Confirmation",
                     description=(
                         f"Are you sure you want to update all members"
@@ -663,9 +663,9 @@ class Moderation(commands.Cog):
                         if updates:
                             await ctx.send(f"{member} updated")
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 description=(
                                     f"Error giving role to {member.mention}"
                                 ),
@@ -682,7 +682,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
                         "You need to define both Role 1 and Role 2\n`role1` "
@@ -701,11 +701,11 @@ class Moderation(commands.Cog):
     @commands.command(name="massroleremove")
     @has_command_permission()
     async def mass_role_remove(
-        self, ctx, role: discord.Role = None, role2: discord.Role = None
+        self, ctx, role: disnake.Role = None, role2: disnake.Role = None
     ):
         if role is not None and role2 is not None:
             bot_msg = await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Confirmation",
                     description=(
                         f"Are you sure you want to update"
@@ -764,9 +764,9 @@ class Moderation(commands.Cog):
                         if updates:
                             await ctx.send(f"{member} updated")
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 description=(
                                     f"Error giving role to {member.mention}"
                                 ),
@@ -782,7 +782,7 @@ class Moderation(commands.Cog):
         else:
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
                         "You need to define both Role 1 and Role 2\n"
@@ -803,7 +803,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def warn(self, ctx, member: discord.Member = None, *, reason=None):
+    async def warn(self, ctx, member: disnake.Member = None, *, reason=None):
         if member and reason is not None:
             guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
             user_warns = await guild_col.find_one({"_id": member.id})
@@ -828,7 +828,7 @@ class Moderation(commands.Cog):
 
             await ctx.send(
                 content=f"{member.mention} has been warned!",
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"Reason: **{reason}**\n"
                         f"Total warns: **{len(new_warns)}**"
@@ -844,7 +844,7 @@ class Moderation(commands.Cog):
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
                 
-                await channel.send(embed=discord.Embed(
+                await channel.send(embed=disnake.Embed(
                     title="⚠️ Warn",
                     description=f"{member.mention} has been warned by {ctx.author.mention}",
                     color=var.C_GREEN
@@ -859,7 +859,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
                         "You need to define both the member"
@@ -875,7 +875,7 @@ class Moderation(commands.Cog):
     @commands.command(name="removewarn", aliases=["remove-warn", "unwarn"])
     @has_command_permission()
     async def remove_warn(
-        self, ctx, member: discord.Member = None, position=None
+        self, ctx, member: disnake.Member = None, position=None
     ):
         if member and position is not None:
             try:
@@ -883,7 +883,7 @@ class Moderation(commands.Cog):
 
             except ValueError:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=f"The position should be a number!",
                         color=var.C_RED)
                     )
@@ -894,7 +894,7 @@ class Moderation(commands.Cog):
 
             if user_doc is None:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=f"{member.mention} does not have any warns",
                         color=var.C_RED
                     ).set_footer(
@@ -920,7 +920,7 @@ class Moderation(commands.Cog):
 
                     await guild_col.update_one(user_doc, new_data)
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             description=(
                                 f"{var.E_ACCEPT} Removed {position} warn with "
                                 f"the reason **{reason}** from {member.mention}"
@@ -940,7 +940,7 @@ class Moderation(commands.Cog):
                     if guild_log_doc is not None and guild_log_doc["modlog"]:
                         channel = self.bot.get_channel(guild_log_doc["channel_id"])
                         
-                        await channel.send(embed=discord.Embed(
+                        await channel.send(embed=disnake.Embed(
                             title="⚠️ Remove warn",
                             description=f"{member.mention} has been unwarned by {ctx.author.mention}",
                             color=var.C_BLUE
@@ -951,7 +951,7 @@ class Moderation(commands.Cog):
                         )
                 else:
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             description=(
                                 f"{member.mention} does not have"
                                 f" {position} warn(s)"
@@ -962,7 +962,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
                         "You need to define both the member "
@@ -982,7 +982,7 @@ class Moderation(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def warns(self, ctx, member: discord.Member = None):
+    async def warns(self, ctx, member: disnake.Member = None):
         if member is not None:
             guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
             userdata = await guild_col.find_one({"_id": member.id})
@@ -992,7 +992,7 @@ class Moderation(commands.Cog):
 
             else:
                 warns = userdata["warns"]
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title=f"{member} warns", color=var.C_MAIN
                 )
                 for i in warns:
@@ -1007,7 +1007,7 @@ class Moderation(commands.Cog):
                 if guild_doc["modlog"]:
                     channel = self.bot.get_channel(guild_doc["channel_id"])
 
-                    await channel.send(embed=discord.Embed(
+                    await channel.send(embed=disnake.Embed(
                         title="New warn",
                         description=f"{member.mention} has been warned by {ctx.author.mention}",
                         color=var.C_GREEN
@@ -1015,7 +1015,7 @@ class Moderation(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"🚫 Missing arguments",
                     description=(
                         "You need to define the member to view their warns"
@@ -1044,7 +1044,7 @@ class Moderation(commands.Cog):
                 and message.channel.id == ctx.channel.id
             )  
 
-        embed = discord.Embed(title="Mod log")
+        embed = disnake.Embed(title="Mod log")
         if status:
             embed.description = (
                 "Moderation log is currently enabled"
@@ -1108,7 +1108,7 @@ class Moderation(commands.Cog):
                 {"set": {'modlog': True}}
             )
 
-        await ctx.send(embed=discord.Embed(
+        await ctx.send(embed=disnake.Embed(
             description=f"Successfully {'disabled' if status else 'enabled'} moderation logging.",
             color=var.C_RED if status else var.C_GREEN
         ))

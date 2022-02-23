@@ -1,8 +1,8 @@
 import sys
 import traceback
-import discord
+import disnake
 import asyncio
-from discord.ext import commands
+from disnake.ext import commands
 from variables import C_RED
 
 
@@ -16,7 +16,7 @@ class Errors(commands.Cog):
         # Invalid Channel
         if isinstance(error, commands.ChannelNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Invalid Channel",
                     description=(
                         "🚫 Are you sure the channel ID "
@@ -33,7 +33,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.MissingPermissions):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Missing Permissions",
                     description=(
                         "🚫 You don't have permissions to do that "
@@ -45,7 +45,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.MemberNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Member not found",
                     description=(
                         f"🚫 You sure the mention/ID is correct? "
@@ -59,7 +59,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.UserNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="User not found",
                     description=(
                         "🚫 Make sure the User ID is correct,"
@@ -72,7 +72,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.MessageNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Message not found",
                     description=(
                         "🚫 Are you sure that the message ID belongs "
@@ -84,7 +84,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.GuildNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Guild not found",
                     description=(
                         "🚫 Looks like I'm not in the guild or the ID is"
@@ -96,7 +96,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.RoleNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Role not found",
                     description=(
                         "🚫 Make sure that the ID or mention is correct. "
@@ -109,7 +109,7 @@ class Errors(commands.Cog):
 
         elif isinstance(error, commands.EmojiNotFound):
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Emoji not found",
                     description=(
                         "🚫 Either the emoji is invalid or "

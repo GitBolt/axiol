@@ -1,6 +1,6 @@
-import discord
+import disnake
 from typing import Union
-from discord.ext import commands
+from disnake.ext import commands
 import database as db
 import variables as var
 from functions import get_prefix
@@ -19,7 +19,7 @@ class ReactionRoles(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Reaction Roles plugin"
                         " is disabled in this server"
@@ -33,17 +33,17 @@ class ReactionRoles(commands.Cog):
     async def rr(
         self,
         ctx,
-        channel: discord.TextChannel = None,
+        channel: disnake.TextChannel = None,
         message_id: Union[int, None] = None,
-        role: discord.Role = None,
-        emoji: Union[discord.Emoji, str] = None
+        role: disnake.Role = None,
+        emoji: Union[disnake.Emoji, str] = None
     ):
         if type(emoji) == str and emoji.startswith("<"):
             raise commands.EmojiNotFound(ctx)
 
         if {channel, message_id, role, emoji} == {None}:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel, message, "
                         "role and emoji all three to add a reaction role,"
@@ -96,7 +96,7 @@ class ReactionRoles(commands.Cog):
                 await msg.add_reaction(emoji)
                 await ctx.send(
                     f"Reaction role for {role} using {emoji} setted up!"
-                    f" https://discord.com/channels/{ctx.message.guild.id}"
+                    f" https://disnake.com/channels/{ctx.message.guild.id}"
                     f"/{msg.channel.id}/{msg.id}"
                 )
 
@@ -136,13 +136,13 @@ class ReactionRoles(commands.Cog):
                     await msg.add_reaction(emoji)
                     await ctx.send(
                         f"Reaction role for {role} using {emoji} setted up!"
-                        f" https://discord.com/channels/{ctx.message.guild.id}"
+                        f" https://disnake.com/channels/{ctx.message.guild.id}"
                         f"/{msg.channel.id}/{msg.id}"
                     )
         else:
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Role position error",
                     description=(
                         f"The role {role.mention} is above my role "
@@ -157,7 +157,7 @@ class ReactionRoles(commands.Cog):
                     color=var.C_RED
                 ).set_image(
                     url=(
-                        "https://cdn.discordapp.com/attachments/"
+                        "https://cdn.disnakeapp.com/attachments/"
                         "843519647055609856/850711272726986802/unknown.png"
                     )
                 )
@@ -169,12 +169,12 @@ class ReactionRoles(commands.Cog):
         self,
         ctx,
         message_id: Union[int, str] = None,
-        emoji: Union[discord.Emoji, str] = None
+        emoji: Union[disnake.Emoji, str] = None
     ):
 
         if {message_id, emoji} == {None}:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the message "
                         "and emoji both to remove a reaction role"
@@ -194,7 +194,7 @@ class ReactionRoles(commands.Cog):
 
         if type(message_id) == str:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="Message ID needs to be numerical",
                     color=var.C_ORANGE
                 )
@@ -233,7 +233,7 @@ class ReactionRoles(commands.Cog):
             await db.REACTION_ROLES.update_one(guild_doc, new_data)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Reaction role removed",
                     description=(
                         f"Reaction role for {role} using {emoji} "
@@ -262,7 +262,7 @@ class ReactionRoles(commands.Cog):
                 exact_pages = rr_amount / 10
             all_pages = round(exact_pages)
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="All active reaction roles",
                 color=var.C_MAIN
             )
@@ -336,7 +336,7 @@ class ReactionRoles(commands.Cog):
                 if str(reaction.emoji) == "◀️":
                     try:
                         await bot_msg.remove_reaction("◀️", ctx.author)
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
                     current_page = 0
                     await reaction_roles_pagination(current_page, embed)
@@ -345,7 +345,7 @@ class ReactionRoles(commands.Cog):
                 if str(reaction.emoji) == "➡️":
                     try:
                         await bot_msg.remove_reaction("➡️", ctx.author)
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
                     current_page += 1
                     await reaction_roles_pagination(current_page, embed)
@@ -354,7 +354,7 @@ class ReactionRoles(commands.Cog):
                 if str(reaction.emoji) == "⬅️":
                     try:
                         await bot_msg.remove_reaction("⬅️", ctx.author)
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
                     current_page -= 1
                     if current_page < 0:
@@ -365,7 +365,7 @@ class ReactionRoles(commands.Cog):
                 if str(reaction.emoji) == "▶️":
                     try:
                         await bot_msg.remove_reaction("▶️", ctx.author)
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
                     current_page = all_pages - 1
                     await reaction_roles_pagination(current_page, embed)
@@ -378,7 +378,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.command(name="uniquerr")
     @has_command_permission()
-    async def unique_rr(self, ctx, msg: discord.Message = None):
+    async def unique_rr(self, ctx, msg: disnake.Message = None):
 
         if msg is not None:
             guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
@@ -398,7 +398,7 @@ class ReactionRoles(commands.Cog):
 
                     await db.REACTION_ROLES.update_one(guild_doc, new_data)
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title=(
                                 "Successfully marked the message "
                                 "with unique reactions"
@@ -406,7 +406,7 @@ class ReactionRoles(commands.Cog):
                             description=(
                                 "Now users can only react to one emoji and "
                                 "take one role in [this message]"
-                                f"(https://discord.com/channels/{ctx.guild.id}"
+                                f"(https://disnake.com/channels/{ctx.guild.id}"
                                 f"/{msg.channel.id}/{msg.id})"
                             ),
                             color=var.C_GREEN
@@ -427,7 +427,7 @@ class ReactionRoles(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the message "
                         "in order to mark it with unique reactions"
@@ -441,7 +441,7 @@ class ReactionRoles(commands.Cog):
 
     @commands.command(name="removeunique")
     @has_command_permission()
-    async def remove_unique(self, ctx, msg: discord.Message = None):
+    async def remove_unique(self, ctx, msg: disnake.Message = None):
 
         if msg is not None:
             guild_doc = await db.REACTION_ROLES.find_one({"_id": ctx.guild.id})
@@ -462,14 +462,14 @@ class ReactionRoles(commands.Cog):
                     await db.REACTION_ROLES.update_one(guild_doc, new_data)
 
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title=(
                                 "Successfully unmarked the "
                                 "message with unique reactions"
                             ),
                             description=(
                                 "Now users can react and take multiple roles "
-                                "in [this message](https://discord.com/channels"
+                                "in [this message](https://disnake.com/channels"
                                 f"/{ctx.guild.id}/{msg.channel.id}/{msg.id})"
                             ),
                             color=var.C_GREEN
@@ -491,7 +491,7 @@ class ReactionRoles(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the message in order "
                         "to unmark it with unique reactions"

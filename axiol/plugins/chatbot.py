@@ -1,6 +1,6 @@
-import discord
+import disnake
 from aiohttp import request
-from discord.ext import commands
+from disnake.ext import commands
 import database as db
 import variables as var
 from functions import get_prefix
@@ -21,7 +21,7 @@ class Chatbot(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Chatbot plugin is"
                         " disabled in this server"
@@ -32,7 +32,7 @@ class Chatbot(commands.Cog):
 
     @commands.command(name="setchatbot", aliases=["enablechatbot"])
     @has_command_permission()
-    async def set_chat_bot(self, ctx, channel: discord.TextChannel = None):
+    async def set_chat_bot(self, ctx, channel: disnake.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
             await db.CHATBOT.insert_one(
                 {
@@ -60,7 +60,7 @@ class Chatbot(commands.Cog):
 
     @commands.command(name="removechatbot", aliases=["disablechatbot"])
     @has_command_permission()
-    async def remove_chat_bot(self, ctx, channel: discord.TextChannel = None):
+    async def remove_chat_bot(self, ctx, channel: disnake.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
             await db.CHATBOT.insert_one(
                 {
@@ -94,7 +94,7 @@ class Chatbot(commands.Cog):
     @has_command_permission()
     async def chat_bot_channels(self, ctx):
         guild_doc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="All chatbot channels in this server",
             color=var.C_TEAL
         )
@@ -118,7 +118,7 @@ class Chatbot(commands.Cog):
         channel = self.bot.get_channel(843548616505294848)
 
         await channel.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 title="Chatbot suggestion",
                 description=desc,
                 color=var.C_MAIN

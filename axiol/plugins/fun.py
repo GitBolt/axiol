@@ -4,11 +4,11 @@ import time
 import typing
 import difflib
 import asyncio
-import discord
+import disnake
 import textwrap
 from io import BytesIO
 from datetime import datetime
-from discord.ext import commands
+from disnake.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import database as db
 import variables as var
@@ -129,7 +129,7 @@ class TypeRacer:
     async def start(self):
         count = 5
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="All players joined!",
             description=f"Match starting in {count}...",
             color=var.C_MAIN,
@@ -162,7 +162,7 @@ class TypeRacer:
                 await msgs[player].edit(embed=embed)
 
                 await player.send(
-                    file=discord.File(
+                    file=disnake.File(
                         fp=image_binary, filename='axiol_typeracer.png'
                     )
                 )
@@ -170,7 +170,7 @@ class TypeRacer:
                 await msgs[player].delete()
 
         start_time = time.time()
-        result_embed = discord.Embed(
+        result_embed = disnake.Embed(
             title="Typing race results", color=var.C_GREEN
         )
 
@@ -214,7 +214,7 @@ class Fun(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} "
                         "The Fun plugin is disabled in this server"
@@ -223,10 +223,10 @@ class Fun(commands.Cog):
                 )
             )
 
-    def check_playing(self, player: discord.Member):
+    def check_playing(self, player: disnake.Member):
         return any(player in match.players for match in self.matches)
 
-    def get_match(self, player: discord.Member):
+    def get_match(self, player: disnake.Member):
         for match in self.matches:
             if player in match.players:
                 return match
@@ -241,7 +241,7 @@ class Fun(commands.Cog):
 
             return await ctx.send(
                 content=f"You are already in a queue {ctx.author.mention}",
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title=f"Queue info",
                     description=(
                         f"The match currently has `{len(match.players)}` "
@@ -263,7 +263,7 @@ class Fun(commands.Cog):
 
         if not self.matches:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="No matches found",
                     description=(
                         "There are no on going queues right now,"
@@ -290,7 +290,7 @@ class Fun(commands.Cog):
             match.add_player(ctx.author)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="You have been added to the queue!",
                     description=f"The queue currently has **{len(match.players)}** players.",
                     color=var.C_BLUE
@@ -333,7 +333,7 @@ class Fun(commands.Cog):
     async def new(self, ctx, player_amount=None):
         if player_amount is None:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="🚫 Missing argument",
                     description="You need to enter the player amount too!",
                     color=var.C_RED
@@ -356,7 +356,7 @@ class Fun(commands.Cog):
         player_amount = int(player_amount)
         match = TypeRacer(self.bot, ctx.author, player_amount)
         self.matches.append(match)
-        await ctx.send(embed=discord.Embed(
+        await ctx.send(embed=disnake.Embed(
             title="You have started a new match!",
             description=(
                 f"Invite your friends by sharing the code\n"
@@ -386,7 +386,7 @@ class Fun(commands.Cog):
     async def join(self, ctx, code=None):
         if code is None:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="🚫 Missing argument",
                     description="You need to enter the code too!",
                     color=var.C_RED
@@ -407,7 +407,7 @@ class Fun(commands.Cog):
             match.add_player(ctx.author)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="You have been added to the queue!",
                     description=(
                         "The queue currently has "
@@ -438,7 +438,7 @@ class Fun(commands.Cog):
     @type_racer.command()
     @commands.is_owner()
     async def matches(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="All active matches",
             description=f"There are currently {len(self.matches)} queues",
             color=var.C_MAIN
@@ -459,7 +459,7 @@ class Fun(commands.Cog):
 
         if not duration in ["default", "15", "30", "60"]:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="🚫 Invalid arguments",
                     description="Duration can only be one of these three: `15`, `30`, `60`.",
                     color=var.C_RED
@@ -508,7 +508,7 @@ class Fun(commands.Cog):
             image_binary.seek(0)
 
             await ctx.send(
-                file=discord.File(fp=image_binary, filename='image.png')
+                file=disnake.File(fp=image_binary, filename='image.png')
                 )
 
             try:
@@ -585,7 +585,7 @@ class Fun(commands.Cog):
                         "Your typing speed is below average 📉"
                     )
 
-                    embed = discord.Embed(
+                    embed = disnake.Embed(
                         title=f"{wpm} words per minute",
                         description=f"{description} {ctx.author.mention}"
                     )
@@ -629,7 +629,7 @@ class Fun(commands.Cog):
 
             except asyncio.TimeoutError:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             "Time is up! You failed to complete "
                             f"the test in time {ctx.author.mention}"
@@ -640,11 +640,11 @@ class Fun(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def avatar(self, ctx, user: discord.User = None):
+    async def avatar(self, ctx, user: disnake.User = None):
         avatar_user = ctx.author if user is None else user
         avatar = avatar_user.avatar.url
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"Avatar of **{avatar_user}**",
             color=var.C_TEAL
         ).set_image(url=avatar)
@@ -654,9 +654,9 @@ class Fun(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def embed(self, ctx, channel: discord.TextChannel = None):
+    async def embed(self, ctx, channel: disnake.TextChannel = None):
         if channel is None:
-            return await ctx.send(embed=discord.Embed(
+            return await ctx.send(embed=disnake.Embed(
                 description="🚫 You need to define the channel too!",
                 color=var.C_ORANGE
             ).add_field(
@@ -668,7 +668,7 @@ class Fun(commands.Cog):
             )
             )
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Create an embed",
             description=(
                 f"React to the colour circle emojis below to quickly "
@@ -750,7 +750,7 @@ class Fun(commands.Cog):
                     try:
                         await preview.remove_reaction("🖌️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     await ctx.send("Invalid hex code, try again")
@@ -764,7 +764,7 @@ class Fun(commands.Cog):
                 try:
                     await preview.remove_reaction(emojis[index], ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 await preview.edit(embed=embed)
@@ -772,12 +772,12 @@ class Fun(commands.Cog):
         try:
             await preview.clear_reactions()
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             pass
 
-        PREVIEW_URL =f"(https://discord.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})"
+        PREVIEW_URL =f"(https://disnake.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})"
         title_bot_msg = await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 title="Title",
                 description=(
                     f"Now send a message to make it the title of the "
@@ -799,11 +799,11 @@ class Fun(commands.Cog):
         await title_bot_msg.delete()
         try:
             await user_msg.delete()
-        except discord.Forbidden:
+        except disnake.Forbidden:
             pass
 
         desc_bot_msg = await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 title="Description",
                 description=(
                     f"Now send a message to make it the description of the"
@@ -829,7 +829,7 @@ class Fun(commands.Cog):
             await desc_bot_msg.delete()
             try:
                 await user_msg.delete()
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 pass
 
         else:
@@ -838,15 +838,15 @@ class Fun(commands.Cog):
             await desc_bot_msg.delete()
             try:
                 await user_msg.delete()
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 pass
 
         thumbnail_bot_msg = await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 title="Thumbnail",
                 description=(
                     f"Now send a message to make it the thumbnail of the "
-                    f"[embed](https://discord.com/channels/{ctx.guild.id}"
+                    f"[embed](https://disnake.com/channels/{ctx.guild.id}"
                     f"/{preview.channel.id}/{preview.id})"
                 ),
                 color=var.C_BLUE
@@ -875,7 +875,7 @@ class Fun(commands.Cog):
                 await thumbnail_bot_msg.delete()
                 try:
                     await user_msg.delete()
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
                 break
 
@@ -900,7 +900,7 @@ class Fun(commands.Cog):
         await preview.add_reaction(var.E_ACCEPT)
 
         edit = await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 description=(
                     f"React to the {var.E_ACCEPT} emoji in the original"
                     f" [preview]{PREVIEW_URL}"
@@ -973,7 +973,7 @@ class Fun(commands.Cog):
                 try:
                     await edit.remove_reaction("🇦", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
             if str(reaction.emoji) == "🇫":
@@ -993,7 +993,7 @@ class Fun(commands.Cog):
                 try:
                     await edit.clear_reaction("🇫")
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
             if str(reaction.emoji) == "🇮":
@@ -1036,7 +1036,7 @@ class Fun(commands.Cog):
                     try:
                         await edit.clear_reaction("🇮")
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
 
@@ -1072,7 +1072,7 @@ class Fun(commands.Cog):
                             try:
                                 await edit.clear_reaction("🇺")
 
-                            except discord.Forbidden:
+                            except disnake.Forbidden:
                                 pass
 
                             await preview.edit(embed=embed)
@@ -1080,7 +1080,7 @@ class Fun(commands.Cog):
 
                         except Exception:
                             await ctx.send(
-                                embed=discord.Embed(
+                                embed=disnake.Embed(
                                     title="Invalid user",
                                     description=(
                                         "Send the userID or mention again"

@@ -1,6 +1,6 @@
 import asyncio
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import variables as var
 import database as db
 from functions import get_prefix
@@ -20,7 +20,7 @@ class Welcome(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Welcome plugin is "
                         f"disabled in this server"
@@ -57,7 +57,7 @@ class Welcome(commands.Cog):
             )
 
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Invalid Channel",
                     description=(
                         "🚫 I was not able to find the channel which you"
@@ -79,14 +79,14 @@ class Welcome(commands.Cog):
                 "message": None,
                 "greeting": "Hope you enjoy your stay here ✨",
                 "image": (
-                    "https://cdn.discordapp.com/attachments/"
+                    "https://cdn.disnakeapp.com/attachments/"
                     "843519647055609856/864924991597314078/Frame_1.png"
                 ),
                 "assignroles": []
             }
         )
 
-        success_embed = discord.Embed(
+        success_embed = disnake.Embed(
             title="Welcome greeting successfully setup",
             description=(
                 f"{var.E_ACCEPT} New members will now be greeted in"
@@ -112,10 +112,10 @@ class Welcome(commands.Cog):
                 content = guild_doc.get("message")
             return content
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Welcome to the server!",
             description=guild_doc.get("greeting"),
-            color=discord.Colour.random()
+            color=disnake.Colour.random()
         ).set_image(
             url=guild_doc.get("image")
         )
@@ -124,7 +124,7 @@ class Welcome(commands.Cog):
 
     @commands.command(name="wchannel")
     @has_command_permission()
-    async def w_channel(self, ctx, channel: discord.TextChannel = None):
+    async def w_channel(self, ctx, channel: disnake.TextChannel = None):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         if channel is not None:
@@ -136,7 +136,7 @@ class Welcome(commands.Cog):
 
             await db.WELCOME.update_one(guild_doc, new_data)
 
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 title="Changed welcome channel",
                 description=(
                     f"{var.E_ACCEPT} Now users will be"
@@ -147,7 +147,7 @@ class Welcome(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the greeting channel to change it"
                     ),
@@ -163,7 +163,7 @@ class Welcome(commands.Cog):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 tite="Send a message to make it the welcome message",
                 description=(
                     "The next message which"
@@ -207,7 +207,7 @@ class Welcome(commands.Cog):
                 await db.WELCOME.update_one(guild_doc, new_data)
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title=(
                             f"{var.E_ACCEPT}"
                             " Successfully changed the welcome message!"
@@ -231,7 +231,7 @@ class Welcome(commands.Cog):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 tite="Send a message to make it the welcome greeting!",
                 description=(
                     "The next message which you will send "
@@ -275,7 +275,7 @@ class Welcome(commands.Cog):
                 await db.WELCOME.update_one(guild_doc, new_data)
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title=(
                             f"{var.E_ACCEPT} Successfully changed "
                             f"the greeting message!"
@@ -299,7 +299,7 @@ class Welcome(commands.Cog):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 tite="Send a message to make it the image",
                 description="Either send the image as a file or use a link!",
                 color=var.C_BLUE
@@ -329,7 +329,7 @@ class Welcome(commands.Cog):
 
                 await db.WELCOME.update_one(guild_doc, new_data)
 
-                await ctx.send(embed=discord.Embed(
+                await ctx.send(embed=disnake.Embed(
                     title=f"{var.E_ACCEPT} Successfully changed welcome image",
                     description="New welcome image is:",
                     color=var.C_GREEN
@@ -345,7 +345,7 @@ class Welcome(commands.Cog):
                 await db.WELCOME.update_one(guild_doc, new_data)
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title=(
                             f"{var.E_ACCEPT} Successfully changed welcome image"
                         ),
@@ -365,7 +365,7 @@ class Welcome(commands.Cog):
 
     @commands.command(name="wrole")
     @has_command_permission()
-    async def w_role(self, ctx, role: discord.Role = None):
+    async def w_role(self, ctx, role: disnake.Role = None):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         if role is not None:
@@ -381,7 +381,7 @@ class Welcome(commands.Cog):
 
             await db.WELCOME.update_one(guild_doc, new_data)
 
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 title="Successfully added auto assign role",
                 description=(
                     f"{var.E_ACCEPT} Users will be automatically "
@@ -392,7 +392,7 @@ class Welcome(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the role",
                     color=var.C_RED
                 ).add_field(
@@ -407,7 +407,7 @@ class Welcome(commands.Cog):
     @has_command_permission()
     async def w_bots(self, ctx):
         data = await db.WELCOME.find_one({"_id": ctx.guild.id})
-        embed = discord.Embed(title="Greet bots")
+        embed = disnake.Embed(title="Greet bots")
         if data["greet_bots"]:
             embed.description = (
                 f"Currently, bots are greeted by me when they join.\n"
@@ -448,7 +448,7 @@ class Welcome(commands.Cog):
         try:
             await bot_msg.clear_reactions()
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             pass
 
         embed.description = (
@@ -469,7 +469,7 @@ class Welcome(commands.Cog):
                 "message": None,
                 "welcomegreeting": "Hope you enjoy your stay here ✨",
                 "image": (
-                    "https://cdn.discordapp.com/attachments/843519647055609856/"
+                    "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                     "864924991597314078/Frame_1.png"
                 ),
                 "assignroles": [],
@@ -479,7 +479,7 @@ class Welcome(commands.Cog):
 
         await db.WELCOME.update_one(guild_doc, new_data)
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 description=(
                     f"{var.E_ACCEPT} Successfully changed the welcome embed"
                     f" back to the default one"
@@ -512,10 +512,10 @@ class Welcome(commands.Cog):
 
             return content
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Welcome to the server!",
             description=welcome_doc.get("greeting"),
-            color=discord.Colour.random()
+            color=disnake.Colour.random()
         ).set_image(url=welcome_doc.get("image"))
 
         await channel.send(content=get_content(), embed=embed)

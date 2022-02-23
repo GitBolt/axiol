@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import variables as var
 from functions import get_prefix
 import database as db
@@ -16,11 +16,11 @@ class Extras(commands.Cog):
         )
 
     @commands.command(aliases=["userinfo"])
-    async def user(self, ctx, user:discord.User=None):
+    async def user(self, ctx, user:disnake.User=None):
         if not user:
             user = ctx.author
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"{user} info",
             color=var.C_MAIN
         )
@@ -31,22 +31,22 @@ class Extras(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["memberinfo"])
-    async def member(self, ctx, member:discord.Member=None):
+    async def member(self, ctx, member:disnake.Member=None):
         if not member:
             member = ctx.author
 
-        if member.status == discord.Status.online:
+        if member.status == disnake.Status.online:
             status = "<:online:313956277808005120>"
-        elif member.status == discord.Status.idle:
+        elif member.status == disnake.Status.idle:
             status = "<:away:313956277220802560>"
-        elif member.status == discord.Status.dnd:
+        elif member.status == disnake.Status.dnd:
             status = "<:dnd:313956276893646850>"
-        elif member.status == discord.Status.offline:
+        elif member.status == disnake.Status.offline:
             status = "<:offline:313956277237710868>"
         else:
             status = "<:invisible:313956277107556352>"
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"{member} info",
             description=status,
             color=var.C_MAIN
@@ -64,7 +64,7 @@ class Extras(commands.Cog):
 
     @commands.command()
     async def source(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="My Github Source Code Woohoo",
             description="[GitBolt - Axiol](https://github.com/GitBolt/Axiol)",
             color=var.C_TEAL
@@ -78,16 +78,16 @@ class Extras(commands.Cog):
 
     @commands.command()
     async def invite(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="My invite link!",
             description=(
                 "[Invite me from here]"
-               "(https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
+               "(https://disnake.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
             ),
             color=var.C_BLUE
         ).set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )
@@ -100,7 +100,7 @@ class Extras(commands.Cog):
             # Support server suggestion channel
             channel = self.bot.get_channel(843548616505294848)
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"{ctx.author}'s idea",
                 description=(
                     f"This idea came from a server named **{ctx.guild.name}**!"
@@ -132,12 +132,12 @@ class Extras(commands.Cog):
             guild_count += 1
             member_count += guild.member_count
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Some information about me :flushed:",
             description=(
                 f"[Donation](https://paypal.me/palbolt) "
                 f"[Vote](https://top.gg/bot/843484459113775114/vote) "
-                f"[Support](https://discord.gg/6xVasmDVaE)"
+                f"[Support](https://disnake.gg/6xVasmDVaE)"
             ),
             color=var.C_MAIN
         ).add_field(
@@ -160,7 +160,7 @@ class Extras(commands.Cog):
             text=f"Ping: {ping}"
         ).set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )
@@ -169,7 +169,7 @@ class Extras(commands.Cog):
 
     @commands.command()
     async def stats(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"{ctx.guild.name}",
             color=var.C_TEAL
         )

@@ -1,9 +1,11 @@
 import os
-import discord
-from discord.ext import commands
+from dotenv import load_dotenv
+import disnake
+from disnake.ext import commands
 import database as db
 import variables as var
 
+load_dotenv()
 
 async def guild_prefix(_bot, message):
     """Return current guild prefix"""
@@ -16,7 +18,7 @@ async def guild_prefix(_bot, message):
     return prefix_doc["prefix"]
 
 
-intents = discord.Intents().all()
+intents = disnake.Intents().all()
 bot = commands.Bot(command_prefix=guild_prefix, help_command=None,
                    intents=intents)
 
@@ -24,8 +26,8 @@ bot = commands.Bot(command_prefix=guild_prefix, help_command=None,
 @bot.event
 async def on_ready():
     await bot.change_presence(
-        activity=discord.Activity(
-            type=discord.ActivityType.streaming,
+        activity=disnake.Activity(
+            type=disnake.ActivityType.streaming,
             name=f"Ping and ask for help 👀"
         ))
     print("I woke up 🌥️")
@@ -87,7 +89,7 @@ async def on_guild_join(guild):
 
     # Support server Log
     bot_count = len([b for b in guild.members if b.bot])
-    embed = discord.Embed(
+    embed = disnake.Embed(
         title="I just joined a new server!",
         description=guild.name,
         color=var.C_GREEN
@@ -107,7 +109,7 @@ async def on_guild_join(guild):
 async def on_guild_remove(guild):
     
     bot_count = len([b for b in guild.members if b.bot])
-    embed = discord.Embed(
+    embed = disnake.Embed(
         title="I just got removed from a server",
         description=guild.name,
         color=var.C_RED

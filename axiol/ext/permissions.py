@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import database as db
 import variables as var
 from functions import get_prefix
@@ -38,7 +38,7 @@ class Permissions(commands.Cog):
 
     @commands.command(name="allperms")
     async def all_perms(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"Command role permissions", color=var.C_MAIN
         )
 
@@ -84,7 +84,7 @@ class Permissions(commands.Cog):
         ]
 
         if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"All commands for {plugin}",
                 color=var.C_GREEN
             ).add_field(
@@ -143,7 +143,7 @@ class Permissions(commands.Cog):
 
                     if len(data) != 2:
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 title="Invalid format",
                                 description=(
                                     "You don't need to start over again,"
@@ -168,7 +168,7 @@ class Permissions(commands.Cog):
                         for i in self.bot.cogs[plugin_name].walk_commands()
                     ]:
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 title="Command not found",
                                 description=(
                                     f"There is no command named "
@@ -185,7 +185,7 @@ class Permissions(commands.Cog):
                         ctx.guild.get_role(int(data[1].strip("<>@&"))) is None
                     ):
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 title="Role not found",
                                 description=(
                                     f"There is no role with the ID `{data[1]}`."
@@ -207,7 +207,7 @@ class Permissions(commands.Cog):
                         ).mention
 
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 description=(
                                     f"{mention}"
                                     f" role already has permissions for"
@@ -244,7 +244,7 @@ class Permissions(commands.Cog):
 
                         await db.PERMISSIONS.update_one(guild_doc, new_data)
                         await ctx.send(
-                            embed=discord.Embed(
+                            embed=disnake.Embed(
                                 title="Successfully updated permissions",
                                 description=(
                                     f"{var.E_ACCEPT} Users with {role.mention}"
@@ -259,7 +259,7 @@ class Permissions(commands.Cog):
                         break
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define a valid plugin!",
                     color=var.C_RED
                 ).add_field(
@@ -277,7 +277,7 @@ class Permissions(commands.Cog):
         name="removeperm", aliases=["removepermission", "disablepermission"]
     )
     @commands.has_permissions(administrator=True)
-    async def remove_perm(self, ctx, cmd=None, role: discord.Role = None):
+    async def remove_perm(self, ctx, cmd=None, role: disnake.Role = None):
         if cmd and role is not None:
             guild_doc = await db.PERMISSIONS.find_one(
                 {"_id": ctx.guild.id}, {"_id": 0}
@@ -287,7 +287,7 @@ class Permissions(commands.Cog):
 
             if cmd not in all_perm_commands:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title="Invalid command",
                         description="This command has no permissions setup",
                         color=var.C_RED
@@ -318,7 +318,7 @@ class Permissions(commands.Cog):
                     await db.PERMISSIONS.update_one(guild_doc, new_data)
 
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title="Successfully removed permission",
                             description=(
                                 f"{var.E_ACCEPT} Members with {role.mention} "
@@ -335,7 +335,7 @@ class Permissions(commands.Cog):
 
                 except ValueError:
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title="Invalid combination",
                             description=(
                                 f"The command {cmd} "
@@ -348,7 +348,7 @@ class Permissions(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the command name and the role"
                     ),

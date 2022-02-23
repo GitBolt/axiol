@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import variables as var
 import database as db
 from functions import get_prefix
@@ -8,7 +8,7 @@ import asyncio
 
 async def levelhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title=f"{var.E_LEVELING}  Leveling",
         description="Ah yes leveling, MEE6 who?",
         color=var.C_MAIN
@@ -49,7 +49,7 @@ async def levelhelp(ctx: commands.Context):
         value=f"Configure leveling settings",
         inline=False
     ).set_thumbnail(
-        url="https://cdn.discordapp.com/"
+        url="https://cdn.disnakeapp.com/"
             "attachments/843519647055609856/845662999686414336/Logo1.png"
     )
 
@@ -57,7 +57,7 @@ async def levelhelp(ctx: commands.Context):
 async def modhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    return discord.Embed(
+    return disnake.Embed(
         title="🔨 Moderation",
         description="Reasons in every command except warn is optional :)",
         color=var.C_MAIN
@@ -128,14 +128,14 @@ async def modhelp(ctx: commands.Context):
         value="Toggle moderation action logs!",
         inline=False
     ).set_thumbnail(
-            url="https://cdn.discordapp.com/attachments/"
+            url="https://cdn.disnakeapp.com/attachments/"
                 "843519647055609856/845662999686414336/Logo1.png"
         )
 
 
 async def rrhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title="✨ Reaction Roles",
         description=(
             "Whether it be default, custom, animated or even deleted after "
@@ -170,14 +170,14 @@ async def rrhelp(ctx: commands.Context):
         ),
         inline=False
     ).set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/843519647055609856/"
+        url="https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "843530558126817280/Logo.png"
     )
 
 
 async def welcomehelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title="👋 Welcome",
         description="Greet new members with a nice welcome :D",
         color=var.C_MAIN
@@ -213,14 +213,14 @@ async def welcomehelp(ctx: commands.Context):
         value="Resets to the default welcome embed message",
         inline=False
     ).set_thumbnail(
-        url="https://cdn.discordapp.com/attachments/843519647055609856/"
+        url="https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
     )
 
 
 async def verifyhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    embed = discord.Embed(
+    embed = disnake.Embed(
         title="✅ Verification",
         description="Keep the server safe from raiders and bots!",
         color=var.C_MAIN
@@ -252,7 +252,7 @@ async def verifyhelp(ctx: commands.Context):
         ),
         inline=False
         ).set_thumbnail(
-            url="https://cdn.discordapp.com/attachments/843519647055609856/"
+            url="https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
         ).set_footer(
         text=(
@@ -268,7 +268,7 @@ async def verifyhelp(ctx: commands.Context):
 async def chatbothelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
     return (
-        discord.Embed(
+        disnake.Embed(
             title="🤖 Chatbot",
             description=(
                 "I will reply to pings in every channel however setting up "
@@ -295,12 +295,12 @@ async def chatbothelp(ctx: commands.Context):
             name=prefix + "chatbotreport `<description>`",
             value=(
                 "Sends report/bug related to the chatbot directly to the"
-                " [Support server](https://discord.gg/KTn4TgwkUT)!"
+                " [Support server](https://disnake.gg/KTn4TgwkUT)!"
             ),
         )
         .set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )
@@ -309,7 +309,7 @@ async def chatbothelp(ctx: commands.Context):
 
 async def automodhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title="🛡️ Auto Moderation",
         description="I will try my best to keep the chats clean!",
         color=var.C_MAIN,
@@ -355,7 +355,7 @@ async def automodhelp(ctx: commands.Context):
         inline=False
     ).set_thumbnail(
         url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
+            "https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
         )
     )
@@ -364,7 +364,7 @@ async def automodhelp(ctx: commands.Context):
 async def karmahelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    return discord.Embed(
+    return disnake.Embed(
         title="🎭 Karma",
         description="Let's see who is the nicest member!",
         color=var.C_MAIN,
@@ -395,7 +395,7 @@ async def karmahelp(ctx: commands.Context):
         inline=False
     ).set_thumbnail(
         url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
+            "https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
         )
     )
@@ -403,7 +403,7 @@ async def karmahelp(ctx: commands.Context):
 
 async def settingshelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title=f"{var.E_SETTINGS} Settings",
         description="Configure my settings and plugins for this server :D",
         color=var.C_MAIN
@@ -435,7 +435,7 @@ async def settingshelp(ctx: commands.Context):
         inline=False
     ).set_thumbnail(
         url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
+            "https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
         )
     )
@@ -444,7 +444,7 @@ async def settingshelp(ctx: commands.Context):
 async def funhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
     return (
-        discord.Embed(
+        disnake.Embed(
             title=f"🎯 Fun",
             description="Let's have some fun!",
             color=var.C_MAIN,
@@ -497,7 +497,7 @@ async def funhelp(ctx: commands.Context):
         )
         .set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/845662999686414336/Logo1.png"
             )
         )
     )
@@ -506,7 +506,7 @@ async def funhelp(ctx: commands.Context):
 async def giveawayhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
 
-    return discord.Embed(
+    return disnake.Embed(
         title=f"🎉 Giveaway",
         description="",
         color=var.C_MAIN
@@ -527,7 +527,7 @@ async def giveawayhelp(ctx: commands.Context):
         inline=False
     ).set_thumbnail(
         url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
+            "https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
         )
     )
@@ -535,7 +535,7 @@ async def giveawayhelp(ctx: commands.Context):
 
 async def extrahelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
-    return discord.Embed(
+    return disnake.Embed(
         title="▶️ Extras",
         description=(
             "Commands that are useful but don't belong to other categories!"
@@ -563,7 +563,7 @@ async def extrahelp(ctx: commands.Context):
         inline=False
     ).set_thumbnail(
         url=(
-            "https://cdn.discordapp.com/attachments/843519647055609856/"
+            "https://cdn.disnakeapp.com/attachments/843519647055609856/"
             "845662999686414336/Logo1.png"
         )
     )
@@ -577,7 +577,7 @@ class Help(commands.Cog):
     async def help(self, ctx):
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id}, {"_id": 0})
         prefix = await get_prefix(ctx)
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=(
                 "Help subcommands for all **enabled plugins**\nEnable/Disable "
                 "plugins to view more/less help"
@@ -585,14 +585,14 @@ class Help(commands.Cog):
             description=(
                 "[Donation](https://paypal.me/palbolt) "
                 "[Vote](https://top.gg/bot/843484459113775114/vote) "
-                "[Support](https://discord.gg/hxc73psNsB)"
+                "[Support](https://disnake.gg/hxc73psNsB)"
             ),
             color=var.C_MAIN
         ).set_footer(
             text="Either use the subcommand or react to the emojis below"
         ).set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )
@@ -672,7 +672,7 @@ class Help(commands.Cog):
                             str(reaction.emoji), ctx.author
                         )
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                 # Since extra help and plugin is always there
@@ -682,7 +682,7 @@ class Help(commands.Cog):
                     try:
                         await help_msg.remove_reaction("▶️", ctx.author)
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                 if str(reaction.emoji) == var.E_SETTINGS:
@@ -693,14 +693,14 @@ class Help(commands.Cog):
                             var.E_SETTINGS, ctx.author
                         )
 
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
         except asyncio.TimeoutError:
             try:
                 await help_msg.clear_reactions()
 
-            except discord.Forbidden:
+            except disnake.Forbidden:
                 await help_msg.remove_reaction(var.E_SETTINGS, self.bot.user)
 
                 for i in guild_doc:
@@ -720,7 +720,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Leveling plugin is "
                         "disabled in this server"
@@ -738,7 +738,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Moderation plugin "
                         "is disabled in this server"
@@ -757,7 +757,7 @@ class Help(commands.Cog):
             await ctx.send(embed=await rrhelp(ctx))
 
         else:
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 description=(
                     f"{var.E_DISABLE} The Reaction Roles plugin"
                     f" is disabled in this server"
@@ -774,7 +774,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Welcome plugin "
                         f"is disabled in this server"
@@ -792,7 +792,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Verification plugin "
                         "is disabled in this server"
@@ -810,7 +810,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Chatbot plugin "
                         "is disabled in this server"
@@ -828,7 +828,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Auto-Moderation plugin"
                         f" is disabled in this server"
@@ -846,7 +846,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Karma plugin"
                         " is disabled in this server"
@@ -863,7 +863,7 @@ class Help(commands.Cog):
             await ctx.send(embed=await funhelp(ctx))
 
         else:
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 description=(
                     f"{var.E_DISABLE} The Fun plugin is disabled in this server"
                 ),
@@ -879,7 +879,7 @@ class Help(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Fun plugin"
                         f" is disabled in this server"
@@ -900,7 +900,7 @@ class Help(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def level_config(self, ctx):
         prefix = await get_prefix(ctx)
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Configure leveling for this server",
             color=var.C_TEAL
         ).add_field(

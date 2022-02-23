@@ -1,9 +1,9 @@
 import time
 import random
-import discord
+import disnake
 import datetime
 from typing import Union
-from discord.ext import commands, tasks
+from disnake.ext import commands, tasks
 import database as db
 import variables as var
 from functions import get_prefix
@@ -24,7 +24,7 @@ class Giveaway(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Giveaway plugin "
                         f"is disabled in this server"
@@ -50,7 +50,7 @@ class Giveaway(commands.Cog):
             winners = random.sample(users, winner_amount)
 
         await db.GIVEAWAY.delete_one(i)
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Giveaway over",
             description=(
                 f"🎁 {embed_data['title']}\n{hosted_by}\n"
@@ -67,7 +67,7 @@ class Giveaway(commands.Cog):
                 (
                     f"Congratulations, you have won **{embed_data['title']}**!"
                     + ", ".join(w.mention for w in winners) +
-                    f"\nhttps://discord.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
+                    f"\nhttps://disnake.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
                 )
             )
 
@@ -75,7 +75,7 @@ class Giveaway(commands.Cog):
             announcement = await channel.send(
                     (
                     "Aw man, no one participated :("
-                    + f"\nhttps://discord.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
+                    + f"\nhttps://disnake.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
                     )    
                 )
 
@@ -83,10 +83,10 @@ class Giveaway(commands.Cog):
 
     @commands.command(name="gstart")
     @has_command_permission()
-    async def g_start(self, ctx, channel: discord.TextChannel = None):
+    async def g_start(self, ctx, channel: disnake.TextChannel = None):
         if channel is None:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the channel too!",
                     color=var.C_ORANGE
                 ).add_field(
@@ -114,7 +114,7 @@ class Giveaway(commands.Cog):
             "Host":
                 (
                     "🔍 Enter the giveaway host, who is hosting the giveaway?"
-                    " It can be you, someone else, a discord server or any"
+                    " It can be you, someone else, a disnake server or any"
                     " other kind person :D"
                 )
         }
@@ -149,13 +149,13 @@ class Giveaway(commands.Cog):
             else:
                 return True, None
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             color=var.C_BLUE
         ).set_footer(
             text="To stop the proccess, enter cancel"
         ).set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments"
+                "https://cdn.disnakeapp.com/attachments"
                 "/843519647055609856/845662999686414336/Logo1.png"
             )
         )
@@ -209,7 +209,7 @@ class Giveaway(commands.Cog):
                     else:
                         if q == "Duration":
                             await ctx.send(
-                                embed=discord.Embed(
+                                embed=disnake.Embed(
                                     description=(
                                         "Invalid format for time duration,"
                                         " try again.\nExample:\n> 24h"
@@ -232,7 +232,7 @@ class Giveaway(commands.Cog):
 
                         else:
                             await ctx.send(
-                                embed=discord.Embed(
+                                embed=disnake.Embed(
                                     description=(
                                         "Winner amount can only "
                                         "be a positive number!"
@@ -261,7 +261,7 @@ class Giveaway(commands.Cog):
                 else:
                     data.update({q: (user_msg.content, value)})
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Confirm giveaway",
             description=(
                 f"You are about to start the giveaway! "
@@ -296,7 +296,7 @@ class Giveaway(commands.Cog):
         main_time = readable.split(":")[0] + " Hours"
         secondary_time = readable.split(":")[1] + " Minutes"
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=data["Prize"],
             description=(
                 f"React to the 🎉 emoji to participate!\n"
@@ -335,7 +335,7 @@ class Giveaway(commands.Cog):
     @commands.command(name="gshow")
     @has_command_permission()
     async def g_show(self, ctx):
-        embed = discord.Embed(title="All active giveaways", color=var.C_MAIN)
+        embed = disnake.Embed(title="All active giveaways", color=var.C_MAIN)
 
         async for i in db.GIVEAWAY.find(
             {"_id": {"$regex": "^" + str(ctx.guild.id)}}
@@ -352,7 +352,7 @@ class Giveaway(commands.Cog):
                 name=f"Ends in {main_time} {secondary_time}",
                 value=(
                     f"Winners: {i['winner_amount']} "
-                    "[Jump to the message!](https://discord.com/channels/"
+                    "[Jump to the message!](https://disnake.com/channels/"
                     f"{ctx.guild.id}/{i['channel_id']}/{i['message_id']})"
                 ),
                 inline=False
@@ -369,7 +369,7 @@ class Giveaway(commands.Cog):
     async def g_end(self, ctx, msg_id: Union[int, None]):
         if msg_id is None:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the message "
                         "ID in order to end a giveaway!"
@@ -389,7 +389,7 @@ class Giveaway(commands.Cog):
 
         if msg_id not in all_msg_ids:
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"🚫 There are no active giveaways in this "
                         f"server with the message ID **{msg_id}**"
@@ -402,7 +402,7 @@ class Giveaway(commands.Cog):
         announcement_id = await self.end_gw(i)
         await ctx.send(
             f"The giveaway has been ended"
-            f" https://discord.com/channels/{ctx.guild.id}/"
+            f" https://disnake.com/channels/{ctx.guild.id}/"
             f"{i['channel_id']}/{announcement_id}"
         )
 
@@ -434,7 +434,7 @@ class Giveaway(commands.Cog):
                 main_time = readable.split(":")[0] + " Hours"
                 secondary_time = readable.split(":")[1] + " Minutes"
 
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title=embed_data["title"],
                     description=embed_data["description"],
                     color=var.C_MAIN,

@@ -1,6 +1,6 @@
 import random
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import variables as var
 import database as db
 from functions import get_prefix, get_xp_range
@@ -20,7 +20,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Leveling plugin "
                         f"is disabled in this server"
@@ -31,7 +31,7 @@ class Leveling(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def rank(self, ctx, rank_user: discord.User = None):
+    async def rank(self, ctx, rank_user: disnake.User = None):
         user = ctx.author if rank_user is None else rank_user
         guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
         userdata = await guild_col.find_one({"_id": user.id})
@@ -62,7 +62,7 @@ class Leveling(commands.Cog):
                 if userdata["_id"] == x["_id"]:
                     break
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"Level stats for {user.name}",
                 color=var.C_TEAL
             ).add_field(
@@ -109,7 +109,7 @@ class Leveling(commands.Cog):
         else:
             all_pages = exact_pages
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"Leaderboard",
             description=(
                 "◀️ First page\n"
@@ -186,7 +186,7 @@ class Leveling(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("◀️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page = 0
@@ -197,7 +197,7 @@ class Leveling(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("➡️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page += 1
@@ -211,7 +211,7 @@ class Leveling(commands.Cog):
                 try:
                     await bot_msg.clear_reactions()
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 await ctx.invoke(self.bot.get_command('barchart'))
@@ -220,7 +220,7 @@ class Leveling(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("⬅️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page -= 1
@@ -234,7 +234,7 @@ class Leveling(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("▶️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page = all_pages - 1
@@ -283,7 +283,7 @@ class Leveling(commands.Cog):
         status = "Enabled" if settings_doc["alerts"] else "Disabled"
         rewards = settings_doc["rewards"]
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Server leveling information",
             color=var.C_BLUE
         ).set_thumbnail(
@@ -354,12 +354,12 @@ class Leveling(commands.Cog):
     @commands.command(name="givexp")
     @has_command_permission()
     async def give_xp(
-        self, ctx, user: discord.Member = None, amount: int = None
+        self, ctx, user: disnake.Member = None, amount: int = None
     ):
         if user and amount is not None:
             if amount > 10000000:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description="🚫 Ayo that's too much",
                         color=var.C_RED
                     )
@@ -377,7 +377,7 @@ class Leveling(commands.Cog):
 
                 elif data.get("xp") > 10000000:
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             description=(
                                 "🚫 Cannot give more xp to the user,"
                                 " they are too rich already"
@@ -400,7 +400,7 @@ class Leveling(commands.Cog):
                     )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the member"
                         " and the amount to give them xp"
@@ -417,12 +417,12 @@ class Leveling(commands.Cog):
     @commands.command(name="removexp")
     @has_command_permission()
     async def remove_xp(
-            self, ctx, user: discord.Member = None, amount: int = None
+            self, ctx, user: disnake.Member = None, amount: int = None
     ):
         if user and amount is not None:
             if amount > 10000000:
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description="🚫 Ayo that's too much",
                         color=var.C_RED
                     )
@@ -443,7 +443,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the member "
                         "and the amount to remove their xp"
@@ -473,7 +473,7 @@ class Leveling(commands.Cog):
             await guild_col.update_one(settings, new_data)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=f"New xp range is now {min_val} - {max_val}!",
                     color=var.C_GREEN
                 )
@@ -481,7 +481,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the xp range",
                     color=var.C_RED
                 ).add_field(
@@ -492,7 +492,7 @@ class Leveling(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def blacklist(self, ctx, channel: discord.TextChannel = None):
+    async def blacklist(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
@@ -509,7 +509,7 @@ class Leveling(commands.Cog):
             await guild_col.update_one(settings, new_data)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{channel.mention} has been blacklisted,"
                         f" hence users won't gain any xp in that channel."
@@ -520,7 +520,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel to blacklist it"
                     ),
@@ -533,7 +533,7 @@ class Leveling(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def whitelist(self, ctx, channel: discord.TextChannel = None):
+    async def whitelist(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
@@ -551,7 +551,7 @@ class Leveling(commands.Cog):
 
                 await guild_col.update_one(settings, new_data)
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"{channel.mention} has been removed from blacklist"
                             f", hence users will be able to gain xp again in"
@@ -565,7 +565,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel to whitelist it"
                     ),
@@ -590,7 +590,7 @@ class Leveling(commands.Cog):
             }
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=f"{var.E_ACCEPT} Successfully disabled alerts!",
                     color=var.C_GREEN
                 )
@@ -604,7 +604,7 @@ class Leveling(commands.Cog):
             }
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=f"{var.E_ACCEPT} Successfully enabled alerts!",
                     color=var.C_GREEN
                 )
@@ -614,7 +614,7 @@ class Leveling(commands.Cog):
 
     @commands.command(name="alertchannel")
     @has_command_permission()
-    async def alert_channel(self, ctx, channel: discord.TextChannel = None):
+    async def alert_channel(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
@@ -625,7 +625,7 @@ class Leveling(commands.Cog):
 
             await guild_col.update_one(settings, new_data)
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{channel.mention} has been marked as the alert "
                         "channel, hence users who will level up will get "
@@ -636,7 +636,7 @@ class Leveling(commands.Cog):
             )
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel "
                         "to make it the alert channel"
@@ -650,7 +650,7 @@ class Leveling(commands.Cog):
 
     @commands.command(aliases=["addreward"])
     @has_command_permission()
-    async def reward(self, ctx, level: str = None, role: discord.Role = None):
+    async def reward(self, ctx, level: str = None, role: disnake.Role = None):
         if level and role is not None and level.isnumeric():
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
@@ -666,7 +666,7 @@ class Leveling(commands.Cog):
             }
 
             await guild_col.update_one(settings, new_data)
-            await ctx.send(embed=discord.Embed(
+            await ctx.send(embed=disnake.Embed(
                 description=(
                     f"Successfully added {role.mention} "
                     f"as the reward to Level {level}!"
@@ -676,7 +676,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the level"
                         " and role both to add a reward!"
@@ -723,7 +723,7 @@ class Leveling(commands.Cog):
                 dp_role = role.mention if role is not None else 'deleted role'
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"Successfully removed **{dp_role}** "
                             f"as the reward from Level **{level}**!"
@@ -734,7 +734,7 @@ class Leveling(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the level to remove it's reward!"
                     ),
@@ -797,7 +797,7 @@ class Leveling(commands.Cog):
             if level_now > init_lvl and guild_settings_doc["alerts"]:
                 ch = self.bot.get_channel(guild_settings_doc["alertchannel"])
 
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title="You leveled up!",
                     description=(
                         f"{var.E_ACCEPT} You are now level {level_now}!"
@@ -817,7 +817,7 @@ class Leveling(commands.Cog):
                             content=message.author.mention, embed=embed
                         )
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
             rewards = guild_settings_doc["rewards"]

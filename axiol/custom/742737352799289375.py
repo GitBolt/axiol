@@ -11,7 +11,7 @@ def is_user(*user_ids) -> bool:
         return ctx.author.id in user_ids
     return check(predicate)
 
-# Custom cog for Chemistry Help discord server | 742737352799289375
+# Custom cog for Chemistry Help disnake server | 742737352799289375
 
 
 class ChemistryHelp(commands.Cog):

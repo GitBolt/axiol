@@ -1,6 +1,6 @@
-import discord
+import disnake
 from aiohttp import request
-from discord.ext import commands
+from disnake.ext import commands
 import database as db
 from functions import update_db
 import io
@@ -29,7 +29,7 @@ class Owner(commands.Cog):
         code = code.lstrip("```python").rstrip("\n```").lstrip("\n")
 
         local_vars = {
-            "discord": discord,
+            "disnake": disnake,
             "commands": commands,
             "bot": self.bot,
             "ctx": ctx,
@@ -59,7 +59,7 @@ class Owner(commands.Cog):
         await ctx.send(f"```python\n{result}```")
 
     @commands.command()
-    async def get_guilds(self, ctx, *, user: discord.User = None):
+    async def get_guilds(self, ctx, *, user: disnake.User = None):
         if user is None:
             return await ctx.send(
                 "You need to define the user to find in which guilds they are!"
@@ -75,7 +75,7 @@ class Owner(commands.Cog):
         )
 
     @commands.command()
-    async def get_members(self, ctx, *, guild: discord.Guild = None):
+    async def get_members(self, ctx, *, guild: disnake.Guild = None):
         if guild is None:
             return await ctx.send("You need to define the guild too")
 
@@ -89,7 +89,7 @@ class Owner(commands.Cog):
         await ctx.send(members)
 
     @commands.command()
-    async def get_doc(self, ctx, doc_name=None, *, guild: discord.Guild = None):
+    async def get_doc(self, ctx, doc_name=None, *, guild: disnake.Guild = None):
         if doc_name is None or guild is None:
             return await ctx.send(
                 "You need to define both document name and guild name/id"

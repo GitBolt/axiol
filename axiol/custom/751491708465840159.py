@@ -1,7 +1,7 @@
-"""Custom cog for Logically Answered discord server."""
+"""Custom cog for Logically Answered disnake server."""
 
-import discord
-from discord.ext import commands, tasks
+import disnake
+from disnake.ext import commands, tasks
 import string
 from functions import get_random_text
 import variables as var
@@ -17,7 +17,7 @@ class LogicallyAnswered(commands.Cog):
 
     @commands.command()
     async def poll(self, ctx, *, msg: str = None):
-        role = discord.utils.find(
+        role = disnake.utils.find(
             lambda r: r.name == 'Level 30+',
             ctx.message.guild.roles
         )
@@ -26,10 +26,10 @@ class LogicallyAnswered(commands.Cog):
             # Polls channel
             channel = self.bot.get_channel(789214004950204416)
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"{ctx.author.name} asks:",
                 description=msg,
-                color=discord.Colour.green()
+                color=disnake.Colour.green()
             )
 
             msg = await channel.send(
@@ -182,7 +182,7 @@ async def one_word_story(self):
 
     new_word = await get_random_text(0)
 
-    embed = discord.Embed(
+    embed = disnake.Embed(
         title=f"Create a new story!",
         description=f">>> **Previous story**\n{first_word} {previous_story}",
         color=var.C_MAIN

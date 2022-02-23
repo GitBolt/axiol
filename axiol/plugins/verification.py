@@ -1,7 +1,7 @@
 import random
 import asyncio
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import database as db
 import variables as var
 from functions import get_prefix
@@ -21,7 +21,7 @@ class Verification(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Verification plugin"
                         " is disabled in this server"
@@ -32,7 +32,7 @@ class Verification(commands.Cog):
 
     @commands.command(name="verifysetup")
     async def verify_setup(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Send the verify channel",
             description=(
                 "Since this is the first time this plugin is being enabled, "
@@ -65,7 +65,7 @@ class Verification(commands.Cog):
                 await db.PLUGINS.find_one({"_id": ctx.guild.id}),
                 {"$set": {"Welcome": False}})
             return await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="Invalid Channel",
                     description=(
                         "🚫 I was not able to find the channel which you entered"
@@ -82,7 +82,7 @@ class Verification(commands.Cog):
         async def setup():
             try:
                 n_verified = await ctx.guild.create_role(
-                    name="Not Verified", colour=discord.Colour(0xa8a8a8)
+                    name="Not Verified", colour=disnake.Colour(0xa8a8a8)
                 )
 
                 embed.title = "Processing..."
@@ -104,9 +104,9 @@ class Verification(commands.Cog):
                                 n_verified, view_channel=False
                             )
 
-                        except discord.Forbidden:
+                        except disnake.Forbidden:
                             await ctx.send(
-                                embed=discord.Embed(
+                                embed=disnake.Embed(
                                     description=(
                                         f"Skipping {i.mention} since "
                                         f"I don't have access to that channel"
@@ -135,7 +135,7 @@ class Verification(commands.Cog):
                         }
                     )
 
-                    success_embed = discord.Embed(
+                    success_embed = disnake.Embed(
                         title="Verification successfully setted up",
                         description=(
                             f"{var.E_ACCEPT} New members would need to "
@@ -151,14 +151,14 @@ class Verification(commands.Cog):
 
                     await ctx.send(embed=success_embed)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     await db.PLUGINS.update_one(
                         await db.PLUGINS.find_one({"_id": ctx.guild.id}),
                         {"$set": {"Verification": False}}
                     )
 
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title="Missing access",
                             description=(
                                 "I don't have access or change role "
@@ -176,7 +176,7 @@ class Verification(commands.Cog):
                 )
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         title="Missing Permissions",
                         description=(
                             "🚫 I don't have permissions to create and "
@@ -186,9 +186,9 @@ class Verification(commands.Cog):
                     )
                 )
 
-        if discord.utils.get(ctx.guild.roles, name="Not Verified"):
+        if disnake.utils.get(ctx.guild.roles, name="Not Verified"):
             alert_bot_msg = await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     title="**Not Verified** role found",
                     description=(
                         "I have found a role named 'Not Verified' in this "
@@ -237,7 +237,7 @@ class Verification(commands.Cog):
             except Exception:
                 pass
 
-            existing_n_verified = discord.utils.get(
+            existing_n_verified = disnake.utils.get(
                 ctx.guild.roles, name="Not Verified"
             )
 
@@ -252,7 +252,7 @@ class Verification(commands.Cog):
                     }
                 )
 
-                success_embed = discord.Embed(
+                success_embed = disnake.Embed(
                     title="Verification successfully setup",
                     description=(
                         f"{var.E_ACCEPT} New members would need to verify "
@@ -272,14 +272,14 @@ class Verification(commands.Cog):
                 try:
                     await existing_n_verified.delete()
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     await db.PLUGINS.update_one(
                         await db.PLUGINS.find_one({"_id": ctx.guild.id}),
                         {"$set": {"Verification": False}}
                     )
 
                     await ctx.send(
-                        embed=discord.Embed(
+                        embed=disnake.Embed(
                             title="Missing Permissions",
                             description=(
                                 "🚫 I don't have permissions to delete the"
@@ -305,7 +305,7 @@ class Verification(commands.Cog):
 
         verify_type = guild_doc.get("type")
         if verify_type == "command":
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"This server has Command verification",
                 description=(
                     "This is a basic type of verification where users enter a "
@@ -317,7 +317,7 @@ class Verification(commands.Cog):
             )
 
         else:
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="This server has Bot verification",
                 description=(
                     "This is a slightly more advanced bot captcha like "
@@ -352,7 +352,7 @@ class Verification(commands.Cog):
 
     @commands.command(name="verifychannel")
     @has_command_permission()
-    async def verify_channel(self, ctx, channel: discord.TextChannel = None):
+    async def verify_channel(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_doc = await db.VERIFY.find_one({"_id": ctx.guild.id})
             n_verified = ctx.guild.get_role(guild_doc.get("roleid"))
@@ -379,7 +379,7 @@ class Verification(commands.Cog):
             await self.bot.get_channel(channel.id)\
                 .set_permissions(n_verified,  view_channel=True)
 
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title="Successfully changed the verification channel",
                 description=(
                     f"Members will now be verified in {channel.mention}!"
@@ -390,7 +390,7 @@ class Verification(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the"
                         " verification channel to change it"
@@ -423,7 +423,7 @@ class Verification(commands.Cog):
         await db.VERIFY.update_one(guild_doc, new_data)
 
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 title=(
                     "Switched to "
                     + new_data.get("$set").get("type")
@@ -438,7 +438,7 @@ class Verification(commands.Cog):
 
     @commands.command(name="verifyrole")
     @has_command_permission()
-    async def verify_role(self, ctx, role: discord.Role = None):
+    async def verify_role(self, ctx, role: disnake.Role = None):
         if role is not None:
             guild_doc = await db.VERIFY.find_one({"_id": ctx.guild.id})
             new_data = {
@@ -450,7 +450,7 @@ class Verification(commands.Cog):
             await db.VERIFY.update_one(guild_doc, new_data)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_ACCEPT} Successfully added {role.mention}"
                     ),
@@ -465,7 +465,7 @@ class Verification(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the role too!",
                     color=var.C_RED
                 ).add_field(
@@ -497,7 +497,7 @@ class Verification(commands.Cog):
             await db.VERIFY.update_one(guild_doc, new_data)
 
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_ACCEPT} Removed {role.mention}"
                         " from verified role"
@@ -510,7 +510,7 @@ class Verification(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description="🚫 You need to define the role too!",
                     color=var.C_RED
                 ).add_field(
@@ -530,7 +530,7 @@ class Verification(commands.Cog):
         guild_doc = await db.VERIFY.find_one({"_id": ctx.guild.id})
 
         await db.VERIFY.delete_one(guild_doc)
-        await discord.utils.get(ctx.guild.roles, name="Not Verified").delete()
+        await disnake.utils.get(ctx.guild.roles, name="Not Verified").delete()
 
         guild_plugin_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
 
@@ -572,7 +572,7 @@ class Verification(commands.Cog):
                 # Bot verification
                 # Lookin epic innit bruv?
 
-                base = "https://cdn.discordapp.com/attachments/865444983762452520"
+                base = "https://cdn.disnakeapp.com/attachments/865444983762452520"
 
                 images = {
                     f'{base}/876497365891178546/axiol_verification.png': "7h3fpaw1",
@@ -585,7 +585,7 @@ class Verification(commands.Cog):
                 choice = random.choice(list(images))
                 code = images[choice]
 
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title="Beep Bop,  are you a bot?",
                     description=(
                         'Enter the text given in the image'

@@ -1,6 +1,6 @@
-import discord
+import disnake
 from aiohttp import request
-from discord.ext import commands
+from disnake.ext import commands
 import variables as var
 
 
@@ -14,7 +14,7 @@ class BarGraph(commands.Cog):
     async def bar_graph(self, ctx, limit: int = 10):
         if limit > 30:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You cannot view more than 30 users in a bar "
                         "graph, that's way to much haha"

@@ -1,6 +1,6 @@
 import nltk
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 from nltk.sentiment import SentimentIntensityAnalyzer
 import database as db
 import variables as var
@@ -24,7 +24,7 @@ class Karma(commands.Cog):
             return True
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         f"{var.E_DISABLE} The Karma plugin is"
                         " disabled in this server"
@@ -35,7 +35,7 @@ class Karma(commands.Cog):
 
     @commands.command()
     @has_command_permission()
-    async def karma(self, ctx, karma_user: discord.User = None):
+    async def karma(self, ctx, karma_user: disnake.User = None):
         user = ctx.author if karma_user is None else karma_user
         guild_col = db.KARMA_DATABASE[str(ctx.guild.id)]
         userdata = await guild_col.find_one({"_id": user.id})
@@ -54,7 +54,7 @@ class Karma(commands.Cog):
         else:
             # Index starts with zero
             position = karmas.index(userdata) + 1
-            embed = discord.Embed(
+            embed = disnake.Embed(
                 title=f"Karma for {user.name}",
                 color=var.C_MAIN
             ).add_field(
@@ -114,7 +114,7 @@ class Karma(commands.Cog):
 
         average = total_karma/len(karmas)
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title=f"Karma Board",
             description=f"The average karma in this server is **{average}**",
             color=var.C_BLUE
@@ -187,7 +187,7 @@ class Karma(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("◀️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page = 0
@@ -198,7 +198,7 @@ class Karma(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("➡️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page += 1
@@ -212,7 +212,7 @@ class Karma(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("⬅️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page -= 1
@@ -226,7 +226,7 @@ class Karma(commands.Cog):
                 try:
                     await bot_msg.remove_reaction("▶️", ctx.author)
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 current_page = all_pages-1
@@ -235,7 +235,7 @@ class Karma(commands.Cog):
 
     @commands.command(name="kblacklist")
     @has_command_permission()
-    async def k_blacklist(self, ctx, channel: discord.TextChannel = None):
+    async def k_blacklist(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
             settings = await guild_col.find_one({"_id": 0})
@@ -255,7 +255,7 @@ class Karma(commands.Cog):
                 await guild_col.update_one(settings, new_data)
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"{channel.mention} has been blacklisted, "
                             f"hence users won't gain any karma in that channel."
@@ -266,7 +266,7 @@ class Karma(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel to blacklist it!"
                     ),
@@ -279,7 +279,7 @@ class Karma(commands.Cog):
 
     @commands.command(name="kwhitelist")
     @has_command_permission()
-    async def k_whitelist(self, ctx, channel: discord.TextChannel = None):
+    async def k_whitelist(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_col = db.KARMA_DATABASE[(str(ctx.guild.id))]
             settings = await guild_col.find_one({"_id": 0})
@@ -300,7 +300,7 @@ class Karma(commands.Cog):
                 await guild_col.update_one(settings, new_data)
 
                 await ctx.send(
-                    embed=discord.Embed(
+                    embed=disnake.Embed(
                         description=(
                             f"{channel.mention} has been whitelisted, hence "
                             "users would be able to gain karma again in that "
@@ -312,7 +312,7 @@ class Karma(commands.Cog):
 
         else:
             await ctx.send(
-                embed=discord.Embed(
+                embed=disnake.Embed(
                     description=(
                         "🚫 You need to define the channel to whitelist it!"
                     ),

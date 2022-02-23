@@ -1,7 +1,7 @@
 import asyncio
-import discord
-from discord.ext import commands
-from discord.ext.commands import check, Context
+import disnake
+from disnake.ext import commands
+from disnake.ext.commands import check, Context
 import variables as var
 import database as db
 from functions import get_prefix
@@ -34,7 +34,7 @@ class Settings(commands.Cog):
 
         total_amount = len(guild_doc)
 
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="All available plugins",
             description=(
                 "React to the respective emojis below to enable/disable them!"
@@ -47,7 +47,7 @@ class Settings(commands.Cog):
             )
         ).set_thumbnail(
             url=(
-                "https://cdn.discordapp.com/attachments/843519647055609856/"
+                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )
@@ -88,7 +88,7 @@ class Settings(commands.Cog):
                 try:
                     await bot_msg.clear_reactions()
 
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
                 plugin_type = (
@@ -98,7 +98,7 @@ class Settings(commands.Cog):
                     ]
                 )
 
-                embed = discord.Embed(
+                embed = disnake.Embed(
                     title=f"{plugin_type} Plugin",
                 )
 
@@ -134,7 +134,7 @@ class Settings(commands.Cog):
                     try:
                         await enabled_bot_msg.clear_reactions()
                         
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                 else:
@@ -166,7 +166,7 @@ class Settings(commands.Cog):
                     await enabled_bot_msg.edit(embed=embed)
                     try:
                         await enabled_bot_msg.clear_reactions()
-                    except discord.Forbidden:
+                    except disnake.Forbidden:
                         pass
 
                     # Since welcome and verification is not enabled by
@@ -271,13 +271,13 @@ class Settings(commands.Cog):
             except asyncio.TimeoutError:
                 try:
                     await bot_msg.clear_reactions()
-                except discord.Forbidden:
+                except disnake.Forbidden:
                     pass
 
     @commands.command()
     @user_or_admin(791950104680071188)  # This me
     async def prefix(self, ctx):
-        embed = discord.Embed(
+        embed = disnake.Embed(
             title="Prefix :D that's the way you control me aye!",
             description=(
                 f"The prefix for this server is\n"
@@ -296,7 +296,7 @@ class Settings(commands.Cog):
         await self.bot.wait_for('reaction_add', check=reaction_check)
 
         await ctx.send(
-            embed=discord.Embed(
+            embed=disnake.Embed(
                 description=(
                     "Next message which you will send will become the prefix "
                     ":eyes:\nTo cancel it enter\n"
@@ -309,7 +309,7 @@ class Settings(commands.Cog):
         try:
             await bot_msg.clear_reactions()
 
-        except discord.Forbidden:
+        except disnake.Forbidden:
             pass
 
         def message_check(message):

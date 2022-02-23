@@ -1,6 +1,6 @@
-import discord
+import disnake
 from aiohttp import request
-from discord.ext import commands
+from disnake.ext import commands
 import variables as var
 
 

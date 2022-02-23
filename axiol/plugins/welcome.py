@@ -1,10 +1,10 @@
 import asyncio
 import disnake
 from disnake.ext import commands
-import variables as var
+import constants as var
 import database as db
 from functions import get_prefix
-from greetings import greeting
+from constants import greeting
 from ext.permissions import has_command_permission
 
 
@@ -496,11 +496,9 @@ class Welcome(commands.Cog):
         ]
         welcome_doc = await db.WELCOME.find_one({"_id": member.guild.id})
 
-
         if (member.guild.id not in welcome_guild_ids) or (
-            member.bot and not welcome_doc["greet_bots"]):
+                member.bot and not welcome_doc["greet_bots"]):
             return
-
 
         channel = self.bot.get_channel(welcome_doc.get("channelid"))
 

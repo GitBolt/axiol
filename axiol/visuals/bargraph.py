@@ -1,7 +1,7 @@
 import disnake
 from aiohttp import request
 from disnake.ext import commands
-import variables as var
+import constants as var
 
 
 class BarGraph(commands.Cog):

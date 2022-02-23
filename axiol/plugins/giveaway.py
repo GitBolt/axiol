@@ -5,7 +5,7 @@ import datetime
 from typing import Union
 from disnake.ext import commands, tasks
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -73,11 +73,11 @@ class Giveaway(commands.Cog):
 
         else:
             announcement = await channel.send(
-                    (
+                (
                     "Aw man, no one participated :("
                     + f"\nhttps://disnake.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
-                    )    
                 )
+            )
 
         return announcement.id
 

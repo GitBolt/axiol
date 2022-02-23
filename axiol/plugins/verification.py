@@ -3,7 +3,7 @@ import asyncio
 import disnake
 from disnake.ext import commands
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -211,7 +211,7 @@ class Verification(commands.Cog):
                     ),
                     inline=False
                 ).add_field(
-                        name="Update",
+                    name="Update",
                     value=(
                         f"{var.E_CONTINUE} Replace a new one with the "
                         f"existing one (Hence deleting the existing one)",

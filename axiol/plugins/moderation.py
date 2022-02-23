@@ -2,7 +2,7 @@ import disnake
 import asyncio
 from typing import Union
 from disnake.ext import commands
-import variables as var
+import constants as var
 import database as db
 from functions import get_prefix
 from ext.permissions import has_command_permission
@@ -61,11 +61,11 @@ class Moderation(commands.Cog):
                 pass
 
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🔨 Ban",
                     description=f"{user.mention} has been banned by {ctx.author.mention}",
@@ -75,8 +75,6 @@ class Moderation(commands.Cog):
                     value=reason
                 )
                 )
-
-
 
         elif user == ctx.author:
             await ctx.send("You can't ban yourself :eyes:")
@@ -94,7 +92,7 @@ class Moderation(commands.Cog):
                     value=f"`{await get_prefix(ctx)}ban <user> <reason>`"
                 ).set_footer(
                     text="For user either User mention or User ID can be used")
-                )
+            )
 
     @ban.error
     async def ban_error(self, ctx, error):
@@ -134,17 +132,17 @@ class Moderation(commands.Cog):
                             color=var.C_GREEN
                         ).add_field(
                             name="Unbanned by", value=ctx.author)
-                        )
+                    )
 
                 except disnake.Forbidden:
                     pass
-                
+
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🔨 Unban",
                     description=f"{user.mention} has been unbanned by {ctx.author.mention}",
@@ -173,7 +171,7 @@ class Moderation(commands.Cog):
                     value=f"`{await get_prefix(ctx)}unban <user>`"
                 ).set_footer(
                     text="For user either User mention or User ID can be used")
-                )
+            )
 
     async def unban_error(self, ctx, error):
         if isinstance(error, commands.CommandInvokeError):
@@ -209,11 +207,11 @@ class Moderation(commands.Cog):
             await ctx.send(f"Applied chat mute to `{member}` :mute:")
 
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🔈 Mute",
                     description=f"{member.mention} has been muted by {ctx.author.mention}",
@@ -287,11 +285,11 @@ class Moderation(commands.Cog):
             await ctx.send(f"Unmuted `{member}` :sound:")
 
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🔈 Unmute",
                     description=f"{member.mention} has been unmuted by {ctx.author.mention}",
@@ -341,11 +339,11 @@ class Moderation(commands.Cog):
                 pass
 
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🧹 Kick",
                     description=f"{member.mention} has been kicked by {ctx.author.mention}",
@@ -399,11 +397,11 @@ class Moderation(commands.Cog):
                 )
             )
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🧹 Nickname change",
                     description=f"{member.mention}'s nickname has been changed by {ctx.author.mention} to {nick}",
@@ -460,11 +458,11 @@ class Moderation(commands.Cog):
             await info.delete()
 
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="🧹 Purge",
                     description=f"{ctx.author.mention} has deleted {limit} messages from {ctx.channel.mention}",
@@ -839,11 +837,11 @@ class Moderation(commands.Cog):
                 )
             )
             guild_log_doc = await db.LOGGING.find_one(
-                            {"_id": ctx.guild.id}
+                {"_id": ctx.guild.id}
             )
             if guild_log_doc is not None and guild_log_doc["modlog"]:
                 channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                
+
                 await channel.send(embed=disnake.Embed(
                     title="⚠️ Warn",
                     description=f"{member.mention} has been warned by {ctx.author.mention}",
@@ -886,7 +884,7 @@ class Moderation(commands.Cog):
                     embed=disnake.Embed(
                         description=f"The position should be a number!",
                         color=var.C_RED)
-                    )
+                )
                 return
 
             guild_col = db.WARNINGS_DATABASE[str(ctx.guild.id)]
@@ -935,11 +933,12 @@ class Moderation(commands.Cog):
                         )
                     )
                     guild_log_doc = await db.LOGGING.find_one(
-                                    {"_id": ctx.guild.id}
+                        {"_id": ctx.guild.id}
                     )
                     if guild_log_doc is not None and guild_log_doc["modlog"]:
-                        channel = self.bot.get_channel(guild_log_doc["channel_id"])
-                        
+                        channel = self.bot.get_channel(
+                            guild_log_doc["channel_id"])
+
                         await channel.send(embed=disnake.Embed(
                             title="⚠️ Remove warn",
                             description=f"{member.mention} has been unwarned by {ctx.author.mention}",
@@ -1002,8 +1001,8 @@ class Moderation(commands.Cog):
                     )
                 await ctx.send(embed=embed)
                 guild_doc = await db.LOGGING.find_one(
-                                    {"_id": ctx.guild.id}
-                                )
+                    {"_id": ctx.guild.id}
+                )
                 if guild_doc["modlog"]:
                     channel = self.bot.get_channel(guild_doc["channel_id"])
 
@@ -1030,8 +1029,8 @@ class Moderation(commands.Cog):
     @commands.command()
     async def modlog(self, ctx):
         guild_doc = await db.LOGGING.find_one({
-                        "_id": ctx.guild.id
-                    })
+            "_id": ctx.guild.id
+        })
 
         status = False if not guild_doc or not guild_doc["modlog"] else True
 
@@ -1042,7 +1041,7 @@ class Moderation(commands.Cog):
             return (
                 message.author == ctx.author
                 and message.channel.id == ctx.channel.id
-            )  
+            )
 
         embed = disnake.Embed(title="Mod log")
         if status:
@@ -1060,48 +1059,47 @@ class Moderation(commands.Cog):
             embed.color = var.C_RED
 
         bot_msg = await ctx.send(embed=embed)
-        
+
         await bot_msg.add_reaction(
-            var.E_DISABLE 
-            if status else 
+            var.E_DISABLE
+            if status else
             var.E_ENABLE
-            )
+        )
         reaction, _ = await self.bot.wait_for(
-                                        "reaction_add", 
-                                        check=check, 
-                                        timeout=60
-                                        )
+            "reaction_add",
+            check=check,
+            timeout=60
+        )
 
         if str(reaction.emoji) == var.E_ENABLE:
             if not guild_doc:
                 await ctx.send("Send the channel where you would like to log moderation events!")
                 while True:
-                    user_msg = await self.bot.wait_for("message", 
-                                                    check=message_check, 
-                                                    timeout=60
-                                                    )
+                    user_msg = await self.bot.wait_for("message",
+                                                       check=message_check,
+                                                       timeout=60
+                                                       )
                     try:
                         channel = self.bot.get_channel(
                             int(user_msg.content.strip("<>#"))
-                            )
+                        )
                         break
                     except Exception:
                         await ctx.send("Invalid channel ID, try again.")
 
-
                 await db.LOGGING.insert_one(
                     {
-                    "_id": ctx.guild.id,
-                    "channel_id": channel.id, 
-                    "modlog": True
+                        "_id": ctx.guild.id,
+                        "channel_id": channel.id,
+                        "modlog": True
                     }
                 )
             else:
                 await db.LOGGING.insert(
                     guild_doc,
-                    {"set":{'modlog': True}}
+                    {"set": {'modlog': True}}
                 )
-                
+
         elif str(reaction.emoji) == var.E_DISABLE:
             await db.LOGGING.update_db(
                 guild_doc,
@@ -1112,6 +1110,7 @@ class Moderation(commands.Cog):
             description=f"Successfully {'disabled' if status else 'enabled'} moderation logging.",
             color=var.C_RED if status else var.C_GREEN
         ))
+
 
 def setup(bot):
     bot.add_cog(Moderation(bot))

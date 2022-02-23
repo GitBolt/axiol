@@ -2,7 +2,7 @@ import disnake
 from disnake.ext import commands
 from disnake.ext.commands import check, Context
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 
 

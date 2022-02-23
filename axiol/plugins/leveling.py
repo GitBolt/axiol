@@ -1,7 +1,7 @@
 import random
 import disnake
 from disnake.ext import commands
-import variables as var
+import constants as var
 import database as db
 from functions import get_prefix, get_xp_range
 from ext.permissions import has_command_permission

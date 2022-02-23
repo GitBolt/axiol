@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-import variables as var
+import constants as var
 import database as db
 from functions import get_prefix
 import asyncio
@@ -128,9 +128,9 @@ async def modhelp(ctx: commands.Context):
         value="Toggle moderation action logs!",
         inline=False
     ).set_thumbnail(
-            url="https://cdn.disnakeapp.com/attachments/"
-                "843519647055609856/845662999686414336/Logo1.png"
-        )
+        url="https://cdn.disnakeapp.com/attachments/"
+        "843519647055609856/845662999686414336/Logo1.png"
+    )
 
 
 async def rrhelp(ctx: commands.Context):
@@ -251,10 +251,10 @@ async def verifyhelp(ctx: commands.Context):
             " and disabling the plugin"
         ),
         inline=False
-        ).set_thumbnail(
-            url="https://cdn.disnakeapp.com/attachments/843519647055609856/"
-                "845662999686414336/Logo1.png"
-        ).set_footer(
+    ).set_thumbnail(
+        url="https://cdn.disnakeapp.com/attachments/843519647055609856/"
+        "845662999686414336/Logo1.png"
+    ).set_footer(
         text=(
             "For verify role, you can only set one at a time, if a verify role"
             " is already setup then setting up another one will replace the"
@@ -544,7 +544,7 @@ async def extrahelp(ctx: commands.Context):
     ).add_field(
         name=prefix + "stats",
         value="Shows server statistics",
-         inline=False
+        inline=False
     ).add_field(
         name=prefix + "about",
         value="Shows information about me!",

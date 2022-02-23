@@ -3,9 +3,10 @@ from dotenv import load_dotenv
 import disnake
 from disnake.ext import commands
 import database as db
-import variables as var
+import constants as var
 
 load_dotenv()
+
 
 async def guild_prefix(_bot, message):
     """Return current guild prefix"""
@@ -107,7 +108,7 @@ async def on_guild_join(guild):
 # Support server Log
 @bot.event
 async def on_guild_remove(guild):
-    
+
     bot_count = len([b for b in guild.members if b.bot])
     embed = disnake.Embed(
         title="I just got removed from a server",

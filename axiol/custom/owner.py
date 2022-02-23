@@ -15,7 +15,6 @@ class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
- 
     def cog_check(self, ctx):
         return ctx.author.id == 791950104680071188
 
@@ -113,9 +112,9 @@ class Owner(commands.Cog):
     @commands.command()
     async def backup_db(self, ctx):
         headers = {
-            "X-Master-Key": "$2b$10$sHW.6D.jlcsj.XuCzJcytOdqPpcZQKNhVZaOgJhEGia1P5ZlCGEUq", 
+            "X-Master-Key": "$2b$10$sHW.6D.jlcsj.XuCzJcytOdqPpcZQKNhVZaOgJhEGia1P5ZlCGEUq",
             "Content-Type": "application/json"
-                }
+        }
         count = 0
         # Just plugin document for now
         async for i in db.PLUGINS.find({}):
@@ -124,11 +123,10 @@ class Owner(commands.Cog):
                     "https://api.jsonbin.io/v3/b",
                     data=json.dumps(i),
                     headers=headers
-                    ):
+            ):
                 count += 1
-        
-        await ctx.send(f"Backed up {count} plugin documents.")
 
+        await ctx.send(f"Backed up {count} plugin documents.")
 
     @commands.command()
     async def update_db(self, ctx):

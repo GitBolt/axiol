@@ -2,7 +2,7 @@ import disnake
 from typing import Union
 from disnake.ext import commands
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -314,7 +314,7 @@ class ReactionRoles(commands.Cog):
                             f"{emoji} for {role.mention if role else 'deleted role'}\n"
                             f"MessageID: `{message_id}`"
                         ),
-                         inline=False
+                        inline=False
                     )
 
                     if rr_count == (current_page) * 10 + 10:
@@ -374,7 +374,7 @@ class ReactionRoles(commands.Cog):
         else:
             await ctx.send(
                 "This server does not have any active reaction roles right now"
-                )
+            )
 
     @commands.command(name="uniquerr")
     @has_command_permission()
@@ -385,7 +385,8 @@ class ReactionRoles(commands.Cog):
             if guild_doc is not None:
                 unique_list = guild_doc["unique_messages"]
 
-                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
+                all_msg_ids = [i.get("messageid")
+                               for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids:
                     new_list = unique_list.copy()
 
@@ -448,7 +449,8 @@ class ReactionRoles(commands.Cog):
             if guild_doc is not None:
                 unique_list = guild_doc["unique_messages"]
 
-                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
+                all_msg_ids = [i.get("messageid")
+                               for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids and msg.id in unique_list:
                     new_list = unique_list.copy()
 

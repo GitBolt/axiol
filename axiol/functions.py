@@ -1,5 +1,5 @@
 import random
-from variables import DEFAULT_PREFIX
+from constants import DEFAULT_PREFIX
 from database import PREFIXES, LEVEL_DATABASE, PLUGINS, PERMISSIONS
 
 
@@ -85,7 +85,6 @@ async def update_plugins_and_permissions(plugin):
 
     )
 
-
 # updating leveling, plugin, prefix and permission data
 async def update_db(guild_ids):
     plugins_update = []
@@ -130,7 +129,7 @@ async def update_db(guild_ids):
             })
             permissions_update.append(guild_id)
             print(f"✅{guild_id} - Permissions 🔨")
-            
+
         guild_plugins = await PLUGINS.find_one({"_id": guild_id})
         if (
             guild_plugins["Leveling"]
@@ -167,4 +166,3 @@ async def update_db(guild_ids):
         f"{len(permissions_update)} permissions\n"
         f"{len(leveling_update)} leveling"
     )
-

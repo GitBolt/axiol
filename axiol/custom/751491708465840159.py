@@ -4,7 +4,7 @@ import disnake
 from disnake.ext import commands, tasks
 import string
 from functions import get_random_text
-import variables as var
+import constants as var
 
 
 class LogicallyAnswered(commands.Cog):

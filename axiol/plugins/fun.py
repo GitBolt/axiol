@@ -11,7 +11,7 @@ from datetime import datetime
 from disnake.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 import database as db
-import variables as var
+import constants as var
 from ext.permissions import has_command_permission
 from functions import get_random_text, get_prefix, get_code
 
@@ -20,10 +20,10 @@ TYPE_30 = "<:30:866917795261579304>"
 TYPE_60 = "<:60:866917796507418634>"
 
 CONFIGS = {
-    "default":{"time": 60, "size": 75, "width": 35, "height": 120},
-    "15":{"time": 15, "size": 75, "width": 35, "height": 120},
-    "30":{"time": 30, "size": 60, "width": 45, "height": 95},
-    "60":{"time": 60, "size": 55, "width": 50, "height": 82}
+    "default": {"time": 60, "size": 75, "width": 35, "height": 120},
+    "15": {"time": 15, "size": 75, "width": 35, "height": 120},
+    "30": {"time": 30, "size": 60, "width": 45, "height": 95},
+    "60": {"time": 60, "size": 55, "width": 50, "height": 82}
 }
 
 Differentiator = difflib.Differ()
@@ -490,7 +490,7 @@ class Fun(commands.Cog):
         font = ImageFont.truetype(
             os.path.join(os.getcwd(), "resources/fonts/Poppins-Medium.ttf"),
             80
-        )  
+        )
 
         font2 = ImageFont.truetype(
             os.path.join(os.getcwd(), "resources/fonts/Poppins-Light.ttf"),
@@ -509,7 +509,7 @@ class Fun(commands.Cog):
 
             await ctx.send(
                 file=disnake.File(fp=image_binary, filename='image.png')
-                )
+            )
 
             try:
                 initial_time = time.time()
@@ -548,7 +548,7 @@ class Fun(commands.Cog):
                             await bot_msg.edit(content="Only 10 seconds left!")
                         else:
                             bot_msg = await ctx.send("Only 10 seconds left!")
-                            
+
                     if timer == 5:
                         await bot_msg.edit(content=f"Only 5 seconds left {ctx.author.mention}!")
 
@@ -557,9 +557,10 @@ class Fun(commands.Cog):
 
                     text = " ".join(
                         text.split(" ")[:len(user_content.split(" "))]
-                        )
+                    )
 
-                    comparaison = list(Differentiator.compare(text, user_content))
+                    comparaison = list(
+                        Differentiator.compare(text, user_content))
                     mistakes = [x for x in comparaison if "-" in x or "+" in x]
 
                     time_taken = round((time.time() - initial_time) - 1, 2)
@@ -651,7 +652,6 @@ class Fun(commands.Cog):
 
         await ctx.send(embed=embed)
 
-
     @commands.command()
     @has_command_permission()
     async def embed(self, ctx, channel: disnake.TextChannel = None):
@@ -660,11 +660,11 @@ class Fun(commands.Cog):
                 description="🚫 You need to define the channel too!",
                 color=var.C_ORANGE
             ).add_field(
-                name= "Format",
-                value= f"```{await get_prefix(ctx)}embed <#channel>```", inline=False
+                name="Format",
+                value=f"```{await get_prefix(ctx)}embed <#channel>```", inline=False
             ).add_field(
-                name= "Don't worry, this won't send the embed right away!",
-                value= "** **"
+                name="Don't worry, this won't send the embed right away!",
+                value="** **"
             )
             )
 
@@ -775,7 +775,7 @@ class Fun(commands.Cog):
         except disnake.Forbidden:
             pass
 
-        PREVIEW_URL =f"(https://disnake.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})"
+        PREVIEW_URL = f"(https://disnake.com/channels/{ctx.guild.id}/{preview.channel.id}/{preview.id})"
         title_bot_msg = await ctx.send(
             embed=disnake.Embed(
                 title="Title",
@@ -816,7 +816,7 @@ class Fun(commands.Cog):
             ).set_footer(
                 text="Type cancel to stop this proccess"
             )
-            )
+        )
 
         user_msg = await self.bot.wait_for('message', check=msg_check)
         if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
@@ -860,7 +860,7 @@ class Fun(commands.Cog):
 
         while True:
             user_msg = await self.bot.wait_for('message', check=msg_check)
-            
+
             if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
                 await ctx.send("Stopped embed creation proccess.")
                 return
@@ -1039,7 +1039,6 @@ class Fun(commands.Cog):
                     except disnake.Forbidden:
                         pass
 
-
             if str(reaction.emoji) == "🇺":
                 while True:
 
@@ -1093,6 +1092,7 @@ class Fun(commands.Cog):
                                     )
                                 )
                             )
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

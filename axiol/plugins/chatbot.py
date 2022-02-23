@@ -2,7 +2,7 @@ import disnake
 from aiohttp import request
 from disnake.ext import commands
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -10,7 +10,6 @@ from ext.permissions import has_command_permission
 class Chatbot(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
 
     async def cog_check(self, ctx):
         """Simple check to see if this cog (plugin) is enabled"""

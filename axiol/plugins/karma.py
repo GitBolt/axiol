@@ -3,7 +3,7 @@ import disnake
 from disnake.ext import commands
 from nltk.sentiment import SentimentIntensityAnalyzer
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -137,7 +137,7 @@ class Karma(commands.Cog):
 
             if count == 10:
                 break
-            
+
         embed.set_footer(text=f"Page 1/{all_pages}")
         bot_msg = await ctx.send(embed=embed)
         await bot_msg.add_reaction("◀️")
@@ -159,7 +159,7 @@ class Karma(commands.Cog):
             karmas = [
                 x async for x in GuildCol.find(
                     # Removing ID 0 (Config doc, unrelated to user xp)
-                    {"_id": { "$ne": 0 }}
+                    {"_id": {"$ne": 0}}
                 ).sort("karma", -1).limit(user_amount)
             ]
 
@@ -174,7 +174,7 @@ class Karma(commands.Cog):
                     inline=False
                 )
 
-                if rank_count == current_page *10 + 10:
+                if rank_count == current_page * 10 + 10:
                     break
 
         current_page = 0

@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-import variables as var
+import constants as var
 from functions import get_prefix
 import database as db
 
@@ -16,7 +16,7 @@ class Extras(commands.Cog):
         )
 
     @commands.command(aliases=["userinfo"])
-    async def user(self, ctx, user:disnake.User=None):
+    async def user(self, ctx, user: disnake.User = None):
         if not user:
             user = ctx.author
 
@@ -26,12 +26,13 @@ class Extras(commands.Cog):
         )
         embed.set_thumbnail(url=user.avatar.url)
         embed.add_field(name="ID", value=user.id, inline=False)
-        embed.add_field(name="Account created", value=user.created_at.strftime("%B %d, %Y"), inline=False)
+        embed.add_field(name="Account created", value=user.created_at.strftime(
+            "%B %d, %Y"), inline=False)
         embed.add_field(name="Bot", value=user.bot, inline=False)
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["memberinfo"])
-    async def member(self, ctx, member:disnake.Member=None):
+    async def member(self, ctx, member: disnake.Member = None):
         if not member:
             member = ctx.author
 
@@ -55,10 +56,11 @@ class Extras(commands.Cog):
         embed.add_field(
             name="Roles",
             value=" ".join(role.mention for role in member.roles
-        ), inline=False)
+                           ), inline=False)
         embed.add_field(name="Nickname", value=member.nick, inline=False)
         embed.add_field(name="Status", value=member.status, inline=False)
-        embed.add_field(name="Joined at", value=member.joined_at.strftime("%B %d, %Y"), inline=False)
+        embed.add_field(name="Joined at", value=member.joined_at.strftime(
+            "%B %d, %Y"), inline=False)
         embed.add_field(name="ID", value=member.id, inline=False)
         await ctx.send(embed=embed)
 
@@ -82,7 +84,7 @@ class Extras(commands.Cog):
             title="My invite link!",
             description=(
                 "[Invite me from here]"
-               "(https://disnake.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
+                "(https://disnake.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
             ),
             color=var.C_BLUE
         ).set_thumbnail(

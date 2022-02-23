@@ -2,7 +2,7 @@ import asyncio
 import disnake
 from disnake.ext import commands
 from disnake.ext.commands import check, Context
-import variables as var
+import constants as var
 import database as db
 from functions import get_prefix
 
@@ -133,7 +133,7 @@ class Settings(commands.Cog):
 
                     try:
                         await enabled_bot_msg.clear_reactions()
-                        
+
                     except disnake.Forbidden:
                         pass
 

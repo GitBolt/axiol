@@ -3,7 +3,7 @@ import traceback
 import disnake
 import asyncio
 from disnake.ext import commands
-from variables import C_RED
+from constants import C_RED
 
 
 class Errors(commands.Cog):

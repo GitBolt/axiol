@@ -2,7 +2,7 @@ import re
 import disnake
 from disnake.ext import commands
 import database as db
-import variables as var
+import constants as var
 from functions import get_prefix
 from ext.permissions import has_command_permission
 
@@ -10,7 +10,7 @@ from ext.permissions import has_command_permission
 class AutoMod(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+
     async def cog_check(self, ctx):
         """Simple check to see if this cog (plugin) is enabled."""
         guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
@@ -103,7 +103,8 @@ class AutoMod(commands.Cog):
                     inline=False
                 )
 
-            embed.add_field(name="Response", value=f"React to {var.E_SETTINGS}")
+            embed.add_field(name="Response",
+                            value=f"React to {var.E_SETTINGS}")
             embed.add_field(name="Disable", value=f"React to {var.E_DISABLE}")
             bot_msg = await ctx.send(embed=embed)
             await bot_msg.add_reaction(var.E_SETTINGS)
@@ -153,8 +154,8 @@ class AutoMod(commands.Cog):
 
                 def message_check(message):
                     return (
-                            message.author == ctx.author
-                            and message.channel.id == ctx.channel.id
+                        message.author == ctx.author
+                        and message.channel.id == ctx.channel.id
                     )
 
                 user_msg = await self.bot.wait_for(
@@ -755,7 +756,8 @@ class AutoMod(commands.Cog):
                 if guild_doc["Links"]["status"]:
                     regex = re.compile(
                         r"(?:http|ftp)s?://"  # http:// or https://
-                        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # domain...
+                        # domain...
+                        r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"
                         r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
                         r"(?::\d+)?",  # optional port
                         # r"([a-zA-Z0-9\-]+)",
@@ -773,8 +775,10 @@ class AutoMod(commands.Cog):
                 if guild_doc["Invites"]["status"]:
                     regex = re.compile(
                         r"(?:disnake(?:[\.,]|dot)gg|"  # Could be disnake.gg/
-                        r"disnake(?:[\.,]|dot)com(?:\/|slash)invite|"  # or disnake.com/invite/
-                        r"disnakeapp(?:[\.,]|dot)com(?:\/|slash)invite|"  # or disnakeapp.com/invite/
+                        # or disnake.com/invite/
+                        r"disnake(?:[\.,]|dot)com(?:\/|slash)invite|"
+                        # or disnakeapp.com/invite/
+                        r"disnakeapp(?:[\.,]|dot)com(?:\/|slash)invite|"
                         r"disnake(?:[\.,]|dot)me|"  # or disnake.me
                         r"disnake(?:[\.,]|dot)li|"  # or disnake.li
                         r"disnake(?:[\.,]|dot)io"  # or disnake.io.

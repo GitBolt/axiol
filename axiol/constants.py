@@ -47,7 +47,7 @@ DICT_PLUGIN_EMOJIS = {
     "Verification": "✅",
     "Chatbot": "🤖",
     "AutoMod": "🛡️",
-    "Karma": "🎭",
+    # "Karma": "🎭",
     "Fun": "🎯",
     "Giveaway": "🎉",
 }

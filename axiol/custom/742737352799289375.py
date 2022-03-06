@@ -427,7 +427,7 @@ class ChemistryHelp(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if not message.guild:
+        if not message.guild or message.channel.id == 819981037467336744:
             return
 
         if message.guild.id == 742737352799289375 and not message.author.bot:

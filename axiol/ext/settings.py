@@ -47,7 +47,7 @@ class Settings(commands.Cog):
             )
         ).set_thumbnail(
             url=(
-                "https://cdn.disnakeapp.com/attachments/843519647055609856/"
+                "https://cdn.discord.com/attachments/843519647055609856/"
                 "845662999686414336/Logo1.png"
             )
         )

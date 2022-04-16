@@ -84,7 +84,7 @@ class Extras(commands.Cog):
             title="My invite link!",
             description=(
                 "[Invite me from here]"
-                "(https://disnake.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
+                "(https://discord.com/oauth2/authorize?client_id=843484459113775114&permissions=473295959&scope=bot)"
             ),
             color=var.C_BLUE
         ).set_thumbnail(

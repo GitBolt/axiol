@@ -63,6 +63,7 @@ class Settings(commands.Cog):
         bot_msg = await ctx.send(embed=embed)
 
         for i in guild_doc:
+            print(i, var.DICT_PLUGIN_EMOJIS.get(i))
             await bot_msg.add_reaction(var.DICT_PLUGIN_EMOJIS.get(i))
 
         def reaction_check(r, user):

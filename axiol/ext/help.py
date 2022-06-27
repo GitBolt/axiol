@@ -644,7 +644,7 @@ class Help(commands.Cog):
             "Verification": verifyhelp,
             "Chatbot": chatbothelp,
             "AutoMod": automodhelp,
-            "Karma": karmahelp,
+            # "Karma": karmahelp,
             "Fun": funhelp,
             "Giveaway": giveawayhelp
         }

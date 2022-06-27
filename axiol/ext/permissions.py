@@ -78,7 +78,7 @@ class Permissions(commands.Cog):
             'Verification',
             'Chatbot',
             'AutoMod',
-            "Karma",
+            # "Karma",
             'Fun',
             'Giveaway'
         ]

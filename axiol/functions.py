@@ -104,7 +104,7 @@ async def update_db(guild_ids):
                 "Verification": False,
                 "Chatbot": True,
                 "AutoMod": False,
-                "Karma": False,
+                # "Karma": False,
                 "Fun": True,
                 "Giveaway": True
             })
@@ -123,7 +123,7 @@ async def update_db(guild_ids):
                 "Chatbot": {},
                 "Commands": {},
                 "AutoMod": {},
-                "Karma": {},
+                # "Karma": {},
                 "Fun": {},
                 "Giveaway": {}
             })

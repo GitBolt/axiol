@@ -1,16 +1,15 @@
-print("1")
+
 
 import os
 from dotenv import load_dotenv
 import disnake
-print("2")
+
 
 from disnake.ext import commands
 import database as db
 import constants as var
-print("3")
+
 load_dotenv()
-print("4")
 
 
 async def guild_prefix(_bot, message):
@@ -23,17 +22,14 @@ async def guild_prefix(_bot, message):
         return var.DEFAULT_PREFIX
     return prefix_doc["prefix"]
 
-print("5")
 
 intents = disnake.Intents().all()
 bot = commands.Bot(command_prefix=guild_prefix, help_command=None,
                    intents=intents)
-print("6")
 
 
 @bot.event
 async def on_ready():
-    print("7")
     
     await bot.change_presence(
         activity=disnake.Activity(
@@ -42,7 +38,6 @@ async def on_ready():
         ))
     print("I woke up 🌥️")
 
-print("8")
 
 # Loading pogs
 for filename in os.listdir('./custom'):
@@ -60,7 +55,6 @@ for filename in os.listdir('./plugins'):
 for filename in os.listdir('./visuals'):
     if filename.endswith('.py'):
         bot.load_extension(f'visuals.{filename[:-3]}')
-print("9")
 
 
 @bot.event
@@ -77,7 +71,7 @@ async def on_guild_join(guild):
             "Verification": False,
             "Chatbot": True,
             "AutoMod": False,
-            "Karma": False,
+            # "Karma": False,
             "Fun": True,
             "Giveaway": True
         })
@@ -94,7 +88,7 @@ async def on_guild_join(guild):
             "Chatbot": {},
             "Commands": {},
             "AutoMod": {},
-            "Karma": {},
+            # "Karma": {},
             "Fun": {},
             "Giveaway": {}
         })
@@ -135,6 +129,5 @@ async def on_guild_remove(guild):
 
     await bot.get_channel(848207106821980213).send(embed=embed)
 
-print("10")
 
 bot.run(var.TOKEN)

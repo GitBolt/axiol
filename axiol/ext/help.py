@@ -10,7 +10,6 @@ async def levelhelp(ctx: commands.Context):
     prefix = await get_prefix(ctx)
     return disnake.Embed(
         title=f"{var.E_LEVELING}  Leveling",
-        description="Ah yes leveling, MEE6 who?",
         color=var.C_MAIN
     ).add_field(
         name=prefix + "rank `<user>`",

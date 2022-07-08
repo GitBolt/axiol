@@ -5,7 +5,7 @@ from typing import List
 
 # Config
 TOKEN = os.environ["TOKEN"]
-DEFAULT_PREFIX = "!"
+DEFAULT_PREFIX = "."
 
 # Colours
 C_MAIN = 0xFF006A  # Everything Bot Related

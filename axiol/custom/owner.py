@@ -21,9 +21,7 @@ class Owner(commands.Cog):
     @commands.command(aliases=["eval"])
     async def e(self, ctx, *, code: str = None):
         if code is None:
-            return await ctx.send(
-                "Define the code too, what is supposed to execute?"
-            )
+            return await ctx.send("Define the code too, what is supposed to execute?")
 
         code = code.lstrip("```python").rstrip("\n```").lstrip("\n")
 
@@ -37,10 +35,7 @@ class Owner(commands.Cog):
 
         try:
             with contextlib.redirect_stdout(stdout):
-                exec(
-                    f"async def func():\n{textwrap.indent(code, '    ')}",
-                    local_vars
-                )
+                exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_vars)
 
                 obj = await local_vars["func"]()
                 result = f"{stdout.getvalue()}"
@@ -51,8 +46,7 @@ class Owner(commands.Cog):
         if len(str(result)) >= 2000:
             result = result[:1900]
             await ctx.send(
-                "Result larger than 2000 characters, "
-                "returned 1900 characters only."
+                "Result larger than 2000 characters, " "returned 1900 characters only."
             )
 
         await ctx.send(f"```python\n{result}```")
@@ -98,9 +92,7 @@ class Owner(commands.Cog):
             plugin_db = getattr(db, doc_name.upper())
 
         except Exception:
-            return await ctx.send(
-                f"No document with name **{doc_name.upper()}**"
-            )
+            return await ctx.send(f"No document with name **{doc_name.upper()}**")
 
         doc = await plugin_db.find_one({"_id": guild.id})
 
@@ -113,16 +105,16 @@ class Owner(commands.Cog):
     async def backup_db(self, ctx):
         headers = {
             "X-Master-Key": "$2b$10$sHW.6D.jlcsj.XuCzJcytOdqPpcZQKNhVZaOgJhEGia1P5ZlCGEUq",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         }
         count = 0
         # Just plugin document for now
         async for i in db.PLUGINS.find({}):
             async with request(
-                    "POST",
-                    "https://api.jsonbin.io/v3/b",
-                    data=json.dumps(i),
-                    headers=headers
+                "POST",
+                "https://api.jsonbin.io/v3/b",
+                data=json.dumps(i),
+                headers=headers,
             ):
                 count += 1
 

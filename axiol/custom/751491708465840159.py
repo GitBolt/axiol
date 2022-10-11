@@ -17,8 +17,7 @@ class LogicallyAnswered(commands.Cog):
     @commands.command()
     async def poll(self, ctx, *, msg: str = None):
         role = disnake.utils.find(
-            lambda r: r.name == 'Level 30+',
-            ctx.message.guild.roles
+            lambda r: r.name == "Level 30+", ctx.message.guild.roles
         )
 
         if msg is not None and role in ctx.author.roles:
@@ -28,13 +27,10 @@ class LogicallyAnswered(commands.Cog):
             embed = disnake.Embed(
                 title=f"{ctx.author.name} asks:",
                 description=msg,
-                color=disnake.Colour.green()
+                color=disnake.Colour.green(),
             )
 
-            msg = await channel.send(
-                content='<@&789216491090346025>',
-                embed=embed
-            )
+            msg = await channel.send(content="<@&789216491090346025>", embed=embed)
 
             await msg.add_reaction("✅")
             await msg.add_reaction("❌")
@@ -91,25 +87,22 @@ class LogicallyAnswered(commands.Cog):
 
         if message.guild.id == 751491708465840159:
 
-            if str(message.channel) == '💡〢suggestions':
-                await message.add_reaction('<:upvote:776831295946620948>')
-                await message.add_reaction('<:downvote:776831143453786164>')
+            if str(message.channel) == "💡〢suggestions":
+                await message.add_reaction("<:upvote:776831295946620948>")
+                await message.add_reaction("<:downvote:776831143453786164>")
 
-            if str(message.channel) == '✋〢video-requests':
-                await message.add_reaction('👍')
-                await message.add_reaction('👎')
+            if str(message.channel) == "✋〢video-requests":
+                await message.add_reaction("👍")
+                await message.add_reaction("👎")
 
-            if str(message.channel) == '👋〢welcome':
-                await message.add_reaction('<:elonwave:806962782330552340>')
+            if str(message.channel) == "👋〢welcome":
+                await message.add_reaction("<:elonwave:806962782330552340>")
 
-            if str(message.channel) == '🗳〢vote':
-                await message.add_reaction('✅')
-                await message.add_reaction('❌')
+            if str(message.channel) == "🗳〢vote":
+                await message.add_reaction("✅")
+                await message.add_reaction("❌")
 
-            if (
-                str(message.channel) == '📝〢one-word-story'
-                and not message.author.bot
-            ):
+            if str(message.channel) == "📝〢one-word-story" and not message.author.bot:
 
                 last_message = await message.channel.history(limit=2).flatten()
                 last_message_author = last_message[1].author
@@ -120,7 +113,7 @@ class LogicallyAnswered(commands.Cog):
                             "You can't send two messages in a row! "
                             "Wait for someone else to send a message first"
                         ),
-                        delete_after=3
+                        delete_after=3,
                     )
 
                     try:
@@ -142,10 +135,7 @@ class LogicallyAnswered(commands.Cog):
                     except Exception:
                         pass
 
-            if (
-                str(message.channel) == "💯〢counting-to-69420"
-                and not message.author.bot
-            ):
+            if str(message.channel) == "💯〢counting-to-69420" and not message.author.bot:
 
                 fetch = await message.channel.history(limit=2).flatten()
                 last_message = fetch[1].content
@@ -153,7 +143,9 @@ class LogicallyAnswered(commands.Cog):
                 if last_message.isdigit():
                     last_message = int(last_message)
                 else:
-                    await message.channel.send("The previous message isn't integer, fix it and restart me.")
+                    await message.channel.send(
+                        "The previous message isn't integer, fix it and restart me."
+                    )
 
                 next_message = str(last_message + 1)
                 if message.content != next_message:
@@ -164,7 +156,7 @@ class LogicallyAnswered(commands.Cog):
                             " The number you sent is not the correct"
                             " increment of previous one!"
                         ),
-                        delete_after=2
+                        delete_after=2,
                     )
 
 
@@ -184,7 +176,7 @@ async def one_word_story(self):
     embed = disnake.Embed(
         title=f"Create a new story!",
         description=f">>> **Previous story**\n{first_word} {previous_story}",
-        color=var.C_MAIN
+        color=var.C_MAIN,
     ).add_field(name="New word", value=new_word.strip("."))
 
     await channel.send(embed=embed)

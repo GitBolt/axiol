@@ -9,10 +9,7 @@ from functions import get_prefix
 
 def user_or_admin(my_id):
     async def predicate(ctx: Context):
-        return (
-            ctx.author.id == my_id
-            or ctx.author.guild_permissions.administrator
-        )
+        return ctx.author.id == my_id or ctx.author.guild_permissions.administrator
 
     return check(predicate)
 
@@ -34,30 +31,32 @@ class Settings(commands.Cog):
 
         total_amount = len(guild_doc)
 
-        embed = disnake.Embed(
-            title="All available plugins",
-            description=(
-                "React to the respective emojis below to enable/disable them!"
-            ),
-            color=var.C_MAIN
-        ).set_footer(
-            text=(
-                f"{enabled_amount}/{total_amount}"
-                " plugins are enabled in this server"
+        embed = (
+            disnake.Embed(
+                title="All available plugins",
+                description=(
+                    "React to the respective emojis below to enable/disable them!"
+                ),
+                color=var.C_MAIN,
             )
-        ).set_thumbnail(
-            url=(
-                "https://cdn.discord.com/attachments/843519647055609856/"
-                "845662999686414336/Logo1.png"
+            .set_footer(
+                text=(
+                    f"{enabled_amount}/{total_amount}"
+                    " plugins are enabled in this server"
+                )
+            )
+            .set_thumbnail(
+                url=(
+                    "https://cdn.discord.com/attachments/843519647055609856/"
+                    "845662999686414336/Logo1.png"
+                )
             )
         )
 
         for i in guild_doc:
             status = "Enabled" if guild_doc.get(i) == True else "Disabled"
             embed.add_field(
-                name=i,
-                value=f"{var.DICT_PLUGIN_EMOJIS.get(i)} {status}",
-                inline=False
+                name=i, value=f"{var.DICT_PLUGIN_EMOJIS.get(i)} {status}", inline=False
             )
 
         bot_msg = await ctx.send(embed=embed)
@@ -81,7 +80,7 @@ class Settings(commands.Cog):
         while True:
             try:
                 reaction, _ = await self.bot.wait_for(
-                    'reaction_add', check=reaction_check, timeout=60.0
+                    "reaction_add", check=reaction_check, timeout=60.0
                 )
 
                 guild_doc = await db.PLUGINS.find_one({"_id": ctx.guild.id})
@@ -92,12 +91,9 @@ class Settings(commands.Cog):
                 except disnake.Forbidden:
                     pass
 
-                plugin_type = (
-                    list(var.DICT_PLUGIN_EMOJIS.keys())[
-                        list(var.DICT_PLUGIN_EMOJIS.values())
-                        .index(str(reaction.emoji))
-                    ]
-                )
+                plugin_type = list(var.DICT_PLUGIN_EMOJIS.keys())[
+                    list(var.DICT_PLUGIN_EMOJIS.values()).index(str(reaction.emoji))
+                ]
 
                 embed = disnake.Embed(
                     title=f"{plugin_type} Plugin",
@@ -113,20 +109,15 @@ class Settings(commands.Cog):
                     enabled_bot_msg = await ctx.send(embed=embed)
                     await enabled_bot_msg.add_reaction(var.E_DISABLE)
 
-                    await self.bot.wait_for('reaction_add', check=disable_check)
+                    await self.bot.wait_for("reaction_add", check=disable_check)
 
-                    new_data = {
-                        "$set": {
-                            plugin_type: False
-                        }
-                    }
+                    new_data = {"$set": {plugin_type: False}}
 
                     await db.PLUGINS.update_one(guild_doc, new_data)
 
                     embed.title = f"{plugin_type} disabled"
                     embed.description = (
-                        f"{var.E_DISABLE} {plugin_type}"
-                        f" plugin has been disabled"
+                        f"{var.E_DISABLE} {plugin_type}" f" plugin has been disabled"
                     )
 
                     embed.color = var.C_RED
@@ -147,20 +138,15 @@ class Settings(commands.Cog):
                     enabled_bot_msg = await ctx.send(embed=embed)
                     await enabled_bot_msg.add_reaction(var.E_ENABLE)
 
-                    await self.bot.wait_for('reaction_add', check=enable_check)
+                    await self.bot.wait_for("reaction_add", check=enable_check)
 
-                    new_data = {
-                        "$set": {
-                            plugin_type: True
-                        }
-                    }
+                    new_data = {"$set": {plugin_type: True}}
 
                     await db.PLUGINS.update_one(guild_doc, new_data)
 
                     embed.title = f"{plugin_type} enabled"
                     embed.description = (
-                        f"{var.E_ENABLE} {plugin_type}"
-                        " extension has been enabled"
+                        f"{var.E_ENABLE} {plugin_type}" " extension has been enabled"
                     )
 
                     embed.color = var.C_GREEN
@@ -176,33 +162,23 @@ class Settings(commands.Cog):
 
                     # Hence we ask for the channel and insert the data
                     # With leveling we just insert the default configs
-                    if (
-                        str(reaction.emoji) == "👋"
-                        and (
-                            await db.WELCOME.find_one({"_id": ctx.guild.id})
-                            is None
-                        )
+                    if str(reaction.emoji) == "👋" and (
+                        await db.WELCOME.find_one({"_id": ctx.guild.id}) is None
                     ):
-                        await ctx.invoke(self.bot.get_command('welcomesetup'))
+                        await ctx.invoke(self.bot.get_command("welcomesetup"))
 
-                    if (
-                        str(reaction.emoji) == "✅"
-                        and (
-                            await db.VERIFY.find_one({"_id": ctx.guild.id})
-                            is None
-                        )
+                    if str(reaction.emoji) == "✅" and (
+                        await db.VERIFY.find_one({"_id": ctx.guild.id}) is None
                     ):
-                        await ctx.invoke(self.bot.get_command('verifysetup'))
+                        await ctx.invoke(self.bot.get_command("verifysetup"))
 
-                    if (
-                        str(reaction.emoji) == "🎭"
-                        and (
-                            str(ctx.guild.id)
-                            not in await db.KARMA_DATABASE.list_collection_names()
-                        )
+                    if str(reaction.emoji) == "🎭" and (
+                        str(ctx.guild.id)
+                        not in await db.KARMA_DATABASE.list_collection_names()
                     ):
                         guild_doc = await db.KARMA_DATABASE.create_collection(
-                            str(ctx.guild.id))
+                            str(ctx.guild.id)
+                        )
                         guild_doc.insert_one(
                             {
                                 "_id": 0,
@@ -210,15 +186,13 @@ class Settings(commands.Cog):
                             }
                         )
 
-                    if (
-                        str(reaction.emoji) == var.E_LEVELING
-                        and (
-                            str(ctx.guild.id) not in
-                            await db.LEVEL_DATABASE.list_collection_names()
-                        )
+                    if str(reaction.emoji) == var.E_LEVELING and (
+                        str(ctx.guild.id)
+                        not in await db.LEVEL_DATABASE.list_collection_names()
                     ):
                         guild_doc = await db.LEVEL_DATABASE.create_collection(
-                            str(ctx.guild.id))
+                            str(ctx.guild.id)
+                        )
                         guild_doc.insert_one(
                             {
                                 "_id": 0,
@@ -226,46 +200,45 @@ class Settings(commands.Cog):
                                 "alertchannel": None,
                                 "blacklistedchannels": [],
                                 "alerts": True,
-                                "rewards": {}
+                                "rewards": {},
                             }
                         )
 
-                    if (
-                        str(reaction.emoji) == "🛡️"
-                        and (
-                            await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
-                            is None
-                        )
+                    if str(reaction.emoji) == "🛡️" and (
+                        await db.AUTO_MOD.find_one({"_id": ctx.guild.id}) is None
                     ):
                         await db.AUTO_MOD.insert_one(
                             {
                                 "_id": ctx.guild.id,
                                 "BadWords": {
                                     "status": True,
-                                    "words": ["fuck", "bitch", "porn", "slut",
-                                              "asshole"],
-                                    "response":
-                                        "You aren't allowed to say that!"
+                                    "words": [
+                                        "fuck",
+                                        "bitch",
+                                        "porn",
+                                        "slut",
+                                        "asshole",
+                                    ],
+                                    "response": "You aren't allowed to say that!",
                                 },
                                 "Invites": {
                                     "status": True,
-                                    "response": "You can't send invites here!"
+                                    "response": "You can't send invites here!",
                                 },
                                 "Links": {
                                     "status": True,
-                                    "response": "You can't send links here!"
+                                    "response": "You can't send links here!",
                                 },
                                 "Mentions": {
                                     "status": False,
-                                    "response":
-                                        "You can't mention so many people!",
-                                    "amount": 5
+                                    "response": "You can't mention so many people!",
+                                    "amount": 5,
                                 },
                                 "Settings": {
                                     "ignorebots": False,
                                     "blacklists": [],
-                                    "modroles": []
-                                }
+                                    "modroles": [],
+                                },
                             }
                         )
 
@@ -285,7 +258,7 @@ class Settings(commands.Cog):
                 f"```{await get_prefix(ctx)}```\n"
                 f"Wanna change it? React to the {var.E_SETTINGS} emoji below!"
             ),
-            color=var.C_MAIN
+            color=var.C_MAIN,
         )
 
         bot_msg = await ctx.send(embed=embed)
@@ -294,7 +267,7 @@ class Settings(commands.Cog):
         def reaction_check(reaction, user):
             return user == ctx.author and reaction.message == bot_msg
 
-        await self.bot.wait_for('reaction_add', check=reaction_check)
+        await self.bot.wait_for("reaction_add", check=reaction_check)
 
         await ctx.send(
             embed=disnake.Embed(
@@ -303,7 +276,7 @@ class Settings(commands.Cog):
                     ":eyes:\nTo cancel it enter\n"
                     f"```{await get_prefix(ctx)}cancel```"
                 ),
-                color=var.C_ORANGE
+                color=var.C_ORANGE,
             ).set_footer(text="Automatic cancellation after 1 minute")
         )
 
@@ -314,14 +287,11 @@ class Settings(commands.Cog):
             pass
 
         def message_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         try:
             user_msg = await self.bot.wait_for(
-                'message', check=message_check, timeout=60.0
+                "message", check=message_check, timeout=60.0
             )
 
             # Cancel
@@ -339,10 +309,7 @@ class Settings(commands.Cog):
             # If current prefix is default then insert new
             elif await get_prefix(ctx) == var.DEFAULT_PREFIX:
                 await db.PREFIXES.insert_one(
-                    {
-                        "_id": ctx.guild.id,
-                        "prefix": user_msg.content
-                    }
+                    {"_id": ctx.guild.id, "prefix": user_msg.content}
                 )
 
                 await ctx.send(
@@ -350,15 +317,9 @@ class Settings(commands.Cog):
                 )
 
             else:  # Exists so just update it
-                guild_doc = await db.PREFIXES.find_one(
-                    {"_id": user_msg.guild.id}
-                )
+                guild_doc = await db.PREFIXES.find_one({"_id": user_msg.guild.id})
 
-                new_data = {
-                    "$set": {
-                        "prefix": user_msg.content
-                    }
-                }
+                new_data = {"$set": {"prefix": user_msg.content}}
 
                 await db.PREFIXES.update_one(guild_doc, new_data)
                 await ctx.send(

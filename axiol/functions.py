@@ -41,11 +41,7 @@ async def get_random_text(typing_time):
 
 
 def get_code(amount):
-    return ''.join(
-        random.choices(
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=amount
-        )
-    )
+    return "".join(random.choices("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", k=amount))
 
 
 """
@@ -71,19 +67,9 @@ stealing code but it was just me writing bad code which ended up benefiting
 
 # Adding new plugin and permissions
 async def update_plugins_and_permissions(plugin):
-    await PLUGINS.update_many(
-        {plugin: {"$exists": False}},
-        {
-            "$set": {plugin: True}
-        }
-    )
-    await PERMISSIONS.update_many(
-        {plugin: {"$exists": False}},
-        {
-            "$set": {plugin: {}}
-        }
+    await PLUGINS.update_many({plugin: {"$exists": False}}, {"$set": {plugin: True}})
+    await PERMISSIONS.update_many({plugin: {"$exists": False}}, {"$set": {plugin: {}}})
 
-    )
 
 # updating leveling, plugin, prefix and permission data
 async def update_db(guild_ids):
@@ -94,67 +80,65 @@ async def update_db(guild_ids):
     for guild_id in guild_ids:
 
         if not await PLUGINS.count_documents({"_id": guild_id}, limit=1):
-            PLUGINS.insert_one({
-
-                "_id": guild_id,
-                "Leveling": False,
-                "Moderation": True,
-                "ReactionRoles": True,
-                "Welcome": False,
-                "Verification": False,
-                "Chatbot": True,
-                "AutoMod": False,
-                # "Karma": False,
-                "Fun": True,
-                "Giveaway": True
-            })
+            PLUGINS.insert_one(
+                {
+                    "_id": guild_id,
+                    "Leveling": False,
+                    "Moderation": True,
+                    "ReactionRoles": True,
+                    "Welcome": False,
+                    "Verification": False,
+                    "Chatbot": True,
+                    "AutoMod": False,
+                    # "Karma": False,
+                    "Fun": True,
+                    "Giveaway": True,
+                }
+            )
             plugins_update.append(guild_id)
             print(f"✅{guild_id} - Plugins 🔧")
 
         if not await PERMISSIONS.count_documents({"_id": guild_id}, limit=1):
-            PERMISSIONS.insert_one({
-
-                "_id": guild_id,
-                "Leveling": {},
-                "Moderation": {},
-                "ReactionRoles": {},
-                "Welcome": {},
-                "Verification": {},
-                "Chatbot": {},
-                "Commands": {},
-                "AutoMod": {},
-                # "Karma": {},
-                "Fun": {},
-                "Giveaway": {}
-            })
+            PERMISSIONS.insert_one(
+                {
+                    "_id": guild_id,
+                    "Leveling": {},
+                    "Moderation": {},
+                    "ReactionRoles": {},
+                    "Welcome": {},
+                    "Verification": {},
+                    "Chatbot": {},
+                    "Commands": {},
+                    "AutoMod": {},
+                    # "Karma": {},
+                    "Fun": {},
+                    "Giveaway": {},
+                }
+            )
             permissions_update.append(guild_id)
             print(f"✅{guild_id} - Permissions 🔨")
 
         guild_plugins = await PLUGINS.find_one({"_id": guild_id})
         if (
             guild_plugins["Leveling"]
-            and str(guild_id)
-            not in await LEVEL_DATABASE.list_collection_names()
+            and str(guild_id) not in await LEVEL_DATABASE.list_collection_names()
         ):
-            guild_level_db = await LEVEL_DATABASE.create_collection(
-                str(guild_id))
-            await guild_level_db.insert_one({
-
-                "_id": 0,
-                "xprange": [15, 25],
-                "alertchannel": None,
-                "blacklistedchannels": [],
-                "alerts": True
-            })
+            guild_level_db = await LEVEL_DATABASE.create_collection(str(guild_id))
+            await guild_level_db.insert_one(
+                {
+                    "_id": 0,
+                    "xprange": [15, 25],
+                    "alertchannel": None,
+                    "blacklistedchannels": [],
+                    "alerts": True,
+                }
+            )
             leveling_update.append(guild_id)
             print(f"✅{guild_id} - Leveling 📊")
 
         # Only use this when working locally
         try:
-            await PREFIXES.insert_one({
-                "_id": guild_id,
-                "prefix": "ax"
-            })
+            await PREFIXES.insert_one({"_id": guild_id, "prefix": "ax"})
             print(f"✅{guild_id} - Prefix ⚪")
 
         except:

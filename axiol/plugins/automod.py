@@ -24,21 +24,17 @@ class AutoMod(commands.Cog):
                         f"{var.E_DISABLE} The Auto-Moderation plugin"
                         " is disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
-    @commands.group(
-        pass_context=True, invoke_without_command=True, aliases=["filter"]
-    )
+    @commands.group(pass_context=True, invoke_without_command=True, aliases=["filter"])
     @has_command_permission()
     async def filters(self, ctx):
         embed = disnake.Embed(
             title="All Auto-Moderation filters",
-            description=(
-                "Use the subcommand to configure each filter seperately!"
-            ),
-            color=var.C_MAIN
+            description=("Use the subcommand to configure each filter seperately!"),
+            color=var.C_MAIN,
         )
 
         embed.set_footer(
@@ -53,16 +49,12 @@ class AutoMod(commands.Cog):
         )
 
         for i in guild_doc:
-            status = (
-                var.E_ENABLE
-                if guild_doc[i]["status"] == True
-                else var.E_DISABLE
-            )
+            status = var.E_ENABLE if guild_doc[i]["status"] == True else var.E_DISABLE
 
             embed.add_field(
                 name=status + " " + i,
                 value=f"{await get_prefix(ctx)}filters {i.lower()}",
-                inline=False
+                inline=False,
             )
 
         await ctx.send(embed=embed)
@@ -70,8 +62,7 @@ class AutoMod(commands.Cog):
     async def manage_filter(self, filter_name, embed, guild_doc, ctx):
         if guild_doc[filter_name]["status"]:
             embed.description = (
-                f"{var.E_ENABLE} This Auto-Moderation filter"
-                f" is currently enabled"
+                f"{var.E_ENABLE} This Auto-Moderation filter" f" is currently enabled"
             )
 
             embed.color = var.C_GREEN
@@ -79,32 +70,29 @@ class AutoMod(commands.Cog):
                 embed.add_field(
                     name=f"{await get_prefix(ctx)}addbadword `<word>`",
                     value="Adds a word to bad word list",
-                    inline=False
+                    inline=False,
                 )
 
                 embed.add_field(
                     name=f"{await get_prefix(ctx)}removebadword `<word>`",
                     value="Removes a word from bad word list",
-                    inline=False
+                    inline=False,
                 )
 
                 embed.add_field(
                     name=f"{await get_prefix(ctx)}allbadwords",
                     value="Shows all bad words",
-                    inline=False
+                    inline=False,
                 )
 
             if filter_name == "Mentions":
                 embed.add_field(
                     name=f"{await get_prefix(ctx)}mentionamount `<amount>`",
-                    value=(
-                        "Change the mention amount to delete, by default it's 5"
-                    ),
-                    inline=False
+                    value=("Change the mention amount to delete, by default it's 5"),
+                    inline=False,
                 )
 
-            embed.add_field(name="Response",
-                            value=f"React to {var.E_SETTINGS}")
+            embed.add_field(name="Response", value=f"React to {var.E_SETTINGS}")
             embed.add_field(name="Disable", value=f"React to {var.E_DISABLE}")
             bot_msg = await ctx.send(embed=embed)
             await bot_msg.add_reaction(var.E_SETTINGS)
@@ -123,17 +111,12 @@ class AutoMod(commands.Cog):
                 new_dict = current_data.copy()
                 new_dict["status"] = False
 
-                new_data = {
-                    "$set": {
-                        filter_name: new_dict
-                    }
-                }
+                new_data = {"$set": {filter_name: new_dict}}
 
                 await db.AUTO_MOD.update_one(guild_doc, new_data)
                 embed.title = f"{filter_name} filter disabled"
                 embed.description = (
-                    f"{var.E_DISABLE} This Auto-Moderation "
-                    "filter has been disabled"
+                    f"{var.E_DISABLE} This Auto-Moderation " "filter has been disabled"
                 )
 
                 embed.color = var.C_RED
@@ -158,9 +141,7 @@ class AutoMod(commands.Cog):
                         and message.channel.id == ctx.channel.id
                     )
 
-                user_msg = await self.bot.wait_for(
-                    "message", check=message_check
-                )
+                user_msg = await self.bot.wait_for("message", check=message_check)
 
                 if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
                     await ctx.send(f"Cancelled {filter_name} response change")
@@ -170,11 +151,7 @@ class AutoMod(commands.Cog):
                     new_dict = current_data.copy()
                     new_dict["response"] = user_msg.content
 
-                    new_data = {
-                        "$set": {
-                            filter_name: new_dict
-                        }
-                    }
+                    new_data = {"$set": {filter_name: new_dict}}
 
                     await db.AUTO_MOD.update_one(guild_doc, new_data)
                     await ctx.send(
@@ -184,13 +161,12 @@ class AutoMod(commands.Cog):
                                 f"{filter_name} response to \n"
                                 f"**{user_msg.content}**"
                             ),
-                            color=var.C_GREEN
+                            color=var.C_GREEN,
                         )
                     )
         else:
             embed.description = (
-                f"{var.E_DISABLE} This Auto-Moderation filter "
-                f"is currently disabled"
+                f"{var.E_DISABLE} This Auto-Moderation filter " f"is currently disabled"
             )
 
             embed.color = var.C_RED
@@ -201,19 +177,13 @@ class AutoMod(commands.Cog):
                 if str(r.emoji) == var.E_ENABLE:
                     return u == ctx.author and r.message == bot_msg
 
-            reaction, user = await self.bot.wait_for(
-                "reaction_add", check=enable_check
-            )
+            reaction, user = await self.bot.wait_for("reaction_add", check=enable_check)
 
             current_data = guild_doc[filter_name]
             new_dict = current_data.copy()
             new_dict["status"] = True
 
-            new_data = {
-                "$set": {
-                    filter_name: new_dict
-                }
-            }
+            new_data = {"$set": {filter_name: new_dict}}
 
             await db.AUTO_MOD.update_one(guild_doc, new_data)
 
@@ -234,47 +204,31 @@ class AutoMod(commands.Cog):
     @filters.command()
     @has_command_permission()
     async def invites(self, ctx):
-        guild_doc = await db.AUTO_MOD.find_one(
-            {"_id": ctx.guild.id}, {"_id": 0}
-        )
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
-        embed = disnake.Embed(
-            title="Invites filter"
-        )
+        embed = disnake.Embed(title="Invites filter")
         await self.manage_filter("Invites", embed, guild_doc, ctx)
 
     @filters.command()
     @has_command_permission()
     async def links(self, ctx):
-        guild_doc = await db.AUTO_MOD.find_one(
-            {"_id": ctx.guild.id}, {"_id": 0}
-        )
-        embed = disnake.Embed(
-            title="Links filter"
-        )
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id}, {"_id": 0})
+        embed = disnake.Embed(title="Links filter")
         await self.manage_filter("Links", embed, guild_doc, ctx)
 
     @filters.command(name="badwords")
     @has_command_permission()
     async def bad_words(self, ctx):
-        guild_doc = await db.AUTO_MOD.find_one(
-            {"_id": ctx.guild.id}, {"_id": 0}
-        )
-        embed = disnake.Embed(
-            title="BadWords filter"
-        )
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id}, {"_id": 0})
+        embed = disnake.Embed(title="BadWords filter")
         await self.manage_filter("BadWords", embed, guild_doc, ctx)
 
     @filters.command()
     @has_command_permission()
     async def mentions(self, ctx):
-        guild_doc = await db.AUTO_MOD.find_one(
-            {"_id": ctx.guild.id}, {"_id": 0}
-        )
+        guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
-        embed = disnake.Embed(
-            title="Mentions filter"
-        )
+        embed = disnake.Embed(title="Mentions filter")
         await self.manage_filter("Mentions", embed, guild_doc, ctx)
 
     @commands.command(name="addmodrole")
@@ -298,7 +252,7 @@ class AutoMod(commands.Cog):
                         description=(
                             f"{role.mention} is immune from auto moderation now!"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
@@ -310,10 +264,10 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the role too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"```{await get_prefix(ctx)}addmodrole <role>```"
+                    value=f"```{await get_prefix(ctx)}addmodrole <role>```",
                 )
             )
 
@@ -336,10 +290,9 @@ class AutoMod(commands.Cog):
                     embed=disnake.Embed(
                         title="Successfully removed mod role",
                         description=(
-                            f"{role.mention} is not immune "
-                            "from auto moderation now!"
+                            f"{role.mention} is not immune " "from auto moderation now!"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
@@ -351,10 +304,10 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the role too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"```{await get_prefix(ctx)}addmodrole <role>```"
+                    value=f"```{await get_prefix(ctx)}addmodrole <role>```",
                 )
             )
 
@@ -366,13 +319,13 @@ class AutoMod(commands.Cog):
             embed = disnake.Embed(
                 title="Moderator roles",
                 description="These roles are immune to auto-moderation by me!",
-                color=var.C_MAIN
+                color=var.C_MAIN,
             )
 
             value = ""
             for i in guild_doc["Settings"]["modroles"]:
                 role = ctx.guild.get_role(i)
-                value += f'{role.mention} '
+                value += f"{role.mention} "
 
             if value != "":
                 embed.add_field(name="Immune roles", value=value)
@@ -386,14 +339,12 @@ class AutoMod(commands.Cog):
 
     @commands.command(name="automodblacklist")
     @has_command_permission()
-    async def automod_black_list(
-            self, ctx, channel: disnake.TextChannel = None
-    ):
+    async def automod_black_list(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
             if (
-                    guild_doc is not None
-                    and channel.id not in guild_doc["Settings"]["blacklists"]
+                guild_doc is not None
+                and channel.id not in guild_doc["Settings"]["blacklists"]
             ):
                 current_list = guild_doc["Settings"]["blacklists"]
                 new_list = current_list.copy()
@@ -407,10 +358,9 @@ class AutoMod(commands.Cog):
                     embed=disnake.Embed(
                         title="Successfully blacklisted",
                         description=(
-                            f"{channel.mention} is immune "
-                            "from auto moderation now!"
+                            f"{channel.mention} is immune " "from auto moderation now!"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
@@ -422,25 +372,23 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the channel too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
                     value=(
-                        f"```{await get_prefix(ctx)}automodblacklist"
-                        " <#channel>```"
-                    )
+                        f"```{await get_prefix(ctx)}automodblacklist" " <#channel>```"
+                    ),
                 )
             )
 
     @commands.command(name="automodwhitelist")
     @has_command_permission()
-    async def auto_mod_whitelist(self, ctx,
-                                 channel: disnake.TextChannel = None):
+    async def auto_mod_whitelist(self, ctx, channel: disnake.TextChannel = None):
         if channel is not None:
             guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
             if (
-                    guild_doc is not None
-                    and channel.id in guild_doc["Settings"]["blacklists"]
+                guild_doc is not None
+                and channel.id in guild_doc["Settings"]["blacklists"]
             ):
                 current_list = guild_doc["Settings"]["blacklists"]
                 new_list = current_list.copy()
@@ -457,14 +405,13 @@ class AutoMod(commands.Cog):
                             f"{channel.mention} is whitelisted hence affected "
                             "with auto moderation now!"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
             else:
                 await ctx.send(
-                    "This channel is not blacklisted hence"
-                    " can't whitelist either"
+                    "This channel is not blacklisted hence" " can't whitelist either"
                 )
 
         else:
@@ -472,13 +419,12 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the channel too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
                     value=(
-                        f"```{await get_prefix(ctx)}automodblacklist"
-                        " <#channel>```"
-                    )
+                        f"```{await get_prefix(ctx)}automodblacklist" " <#channel>```"
+                    ),
                 )
             )
 
@@ -490,12 +436,10 @@ class AutoMod(commands.Cog):
             embed = disnake.Embed(
                 title="All Auto-Moderation whitelists",
                 description="Messages in these channel are immune from automod",
-                color=var.C_MAIN
+                color=var.C_MAIN,
             )
 
-            desc = "".join(
-                f"{i.mention} " for i in guild_doc["Settings"]["blacklists"]
-            )
+            desc = "".join(f"{i.mention} " for i in guild_doc["Settings"]["blacklists"])
 
             if desc != "":
                 await ctx.send(embed=embed)
@@ -503,8 +447,7 @@ class AutoMod(commands.Cog):
                 await ctx.send("There are no blacklisted channels right now")
 
         else:
-            await ctx.send(
-                "This server does not have automod setup right now")
+            await ctx.send("This server does not have automod setup right now")
 
     @commands.command(name="ignorebots")
     @has_command_permission()
@@ -586,8 +529,7 @@ class AutoMod(commands.Cog):
         if amount is not None:
             guild_doc = await db.AUTO_MOD.find_one({"_id": ctx.guild.id})
             await db.AUTO_MOD.update_one(
-                guild_doc,
-                {"$set": {"Mentions.amount": amount}}
+                guild_doc, {"$set": {"Mentions.amount": amount}}
             )
 
             await ctx.send(
@@ -596,7 +538,7 @@ class AutoMod(commands.Cog):
                         "Successfully changed the amount of "
                         f"mentions to be deleted to **{amount}**"
                     ),
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
         else:
@@ -604,10 +546,10 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the amount too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"```{await get_prefix(ctx)}mentionamount <amount>```"
+                    value=f"```{await get_prefix(ctx)}mentionamount <amount>```",
                 )
             )
 
@@ -631,17 +573,15 @@ class AutoMod(commands.Cog):
                             f"Successfully added the word **{word}**"
                             " in badwords list"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
             else:
                 await ctx.send(
                     embed=disnake.Embed(
-                        description=(
-                            "This word already exists in the bad word list"
-                        ),
-                        color=var.C_RED
+                        description=("This word already exists in the bad word list"),
+                        color=var.C_RED,
                     )
                 )
 
@@ -650,10 +590,10 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the word too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"```{await get_prefix(ctx)}addbadword <word>```"
+                    value=f"```{await get_prefix(ctx)}addbadword <word>```",
                 )
             )
 
@@ -677,7 +617,7 @@ class AutoMod(commands.Cog):
                             f"Successfully added the word **{word}**"
                             " in badwords list"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
@@ -688,7 +628,7 @@ class AutoMod(commands.Cog):
                             f"The word **{word}** does not exist in the bad "
                             f"word list hence can't remove it either"
                         ),
-                        color=var.C_RED
+                        color=var.C_RED,
                     )
                 )
 
@@ -697,10 +637,10 @@ class AutoMod(commands.Cog):
                 embed=disnake.Embed(
                     title="Not enough arguments",
                     description="You need to define the word too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"```{await get_prefix(ctx)}removebadword <word>```"
+                    value=f"```{await get_prefix(ctx)}removebadword <word>```",
                 )
             )
 
@@ -712,10 +652,8 @@ class AutoMod(commands.Cog):
         if guild_doc is not None:
             embed = disnake.Embed(
                 title="Bad Words",
-                description=(
-                    "All other forms of each bad words are also deleted"
-                ),
-                color=var.C_TEAL
+                description=("All other forms of each bad words are also deleted"),
+                color=var.C_TEAL,
             )
 
             all_banned_words = "".join(
@@ -723,8 +661,7 @@ class AutoMod(commands.Cog):
             )
 
             if all_banned_words == "":
-                await ctx.send(
-                    "This server does not have any bad word right now.")
+                await ctx.send("This server does not have any bad word right now.")
 
             else:
                 embed.add_field(name="All bad words", value=all_banned_words)
@@ -741,7 +678,7 @@ class AutoMod(commands.Cog):
         plugin_doc = await db.PLUGINS.find_one({"_id": message.guild.id})
 
         if plugin_doc["AutoMod"]:
-            guild_doc = await db.AUTO_MOD.find_one({'_id': message.guild.id})
+            guild_doc = await db.AUTO_MOD.find_one({"_id": message.guild.id})
             if (
                 guild_doc is not None
                 and message.author != self.bot.user
@@ -761,15 +698,14 @@ class AutoMod(commands.Cog):
                         r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"  # ...or ip
                         r"(?::\d+)?",  # optional port
                         # r"([a-zA-Z0-9\-]+)",
-                        flags=re.IGNORECASE
+                        flags=re.IGNORECASE,
                     )
 
                     if regex.findall(message.content):
                         await message.delete()
                         res = guild_doc["Links"]["response"]
                         await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2
+                            f"{message.author.mention} {res}", delete_after=2
                         )
 
                 if guild_doc["Invites"]["status"]:
@@ -784,15 +720,14 @@ class AutoMod(commands.Cog):
                         r"disnake(?:[\.,]|dot)io"  # or disnake.io.
                         r")(?:[\/]|slash)"  # / or 'slash'
                         r"([a-zA-Z0-9\-]+)",  # the invite code itself
-                        flags=re.IGNORECASE
+                        flags=re.IGNORECASE,
                     )
 
                     if regex.findall(message.content):
                         await message.delete()
                         res = guild_doc["Invites"]["response"]
                         await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2
+                            f"{message.author.mention} {res}", delete_after=2
                         )
 
                 if guild_doc["Mentions"]["status"]:
@@ -801,18 +736,17 @@ class AutoMod(commands.Cog):
                         await message.delete()
                         res = guild_doc["Mentions"]["response"]
                         await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2)
+                            f"{message.author.mention} {res}", delete_after=2
+                        )
 
                 if guild_doc["BadWords"]["status"]:
                     bad_words = guild_doc["BadWords"]["words"]
-                    if len([i for i in bad_words if
-                            i in message.content]) > 0:
+                    if len([i for i in bad_words if i in message.content]) > 0:
                         await message.delete()
                         res = guild_doc["BadWords"]["response"]
                         await message.channel.send(
-                            f"{message.author.mention} {res}",
-                            delete_after=2)
+                            f"{message.author.mention} {res}", delete_after=2
+                        )
 
 
 def setup(bot):

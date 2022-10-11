@@ -29,7 +29,7 @@ class Giveaway(commands.Cog):
                         f"{var.E_DISABLE} The Giveaway plugin "
                         f"is disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -58,7 +58,7 @@ class Giveaway(commands.Cog):
                 f"📋 **{len(winners)}** winners"
             ),
             timestamp=datetime.datetime.now(),
-            color=var.C_BLUE
+            color=var.C_BLUE,
         ).set_footer(text="Ended")
         await message.edit(embed=embed)
 
@@ -66,8 +66,8 @@ class Giveaway(commands.Cog):
             announcement = await channel.send(
                 (
                     f"Congratulations, you have won **{embed_data['title']}**!"
-                    + ", ".join(w.mention for w in winners) +
-                    f"\nhttps://disnake.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
+                    + ", ".join(w.mention for w in winners)
+                    + f"\nhttps://disnake.com/channels/{channel.guild.id}/{channel.id}/{message.id}/"
                 )
             )
 
@@ -88,42 +88,37 @@ class Giveaway(commands.Cog):
             return await ctx.send(
                 embed=disnake.Embed(
                     description="🚫 You need to define the channel too!",
-                    color=var.C_ORANGE
-                ).add_field(
+                    color=var.C_ORANGE,
+                )
+                .add_field(
                     name="Format",
                     value=f"```{await get_prefix(ctx)}gstart <#channel>```",
-                    inline=False
-                ).add_field(
+                    inline=False,
+                )
+                .add_field(
                     name="Don't worry, this won't send the giveaway right away!",
-                    value="** **"
+                    value="** **",
                 )
             )
 
         data = {"Channel": channel.mention}
 
         questions = {
-            "Prize":
-                "🎁 Enter the giveaway prize, what are winners going to get?",
-            "Duration":
-                (
-                    "⏳ Enter the giveaway time duration,"
-                    " how long should the giveaway last?"
-                ),
-            "Winners":
-                "📝 Enter the winner amount, how many winners should there be?",
-            "Host":
-                (
-                    "🔍 Enter the giveaway host, who is hosting the giveaway?"
-                    " It can be you, someone else, a disnake server or any"
-                    " other kind person :D"
-                )
+            "Prize": "🎁 Enter the giveaway prize, what are winners going to get?",
+            "Duration": (
+                "⏳ Enter the giveaway time duration,"
+                " how long should the giveaway last?"
+            ),
+            "Winners": "📝 Enter the winner amount, how many winners should there be?",
+            "Host": (
+                "🔍 Enter the giveaway host, who is hosting the giveaway?"
+                " It can be you, someone else, a disnake server or any"
+                " other kind person :D"
+            ),
         }
 
         def message_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         def reaction_check(reaction, user):
             if str(reaction.emoji) == var.E_ACCEPT:
@@ -149,14 +144,14 @@ class Giveaway(commands.Cog):
             else:
                 return True, None
 
-        embed = disnake.Embed(
-            color=var.C_BLUE
-        ).set_footer(
-            text="To stop the proccess, enter cancel"
-        ).set_thumbnail(
-            url=(
-                "https://cdn.disnakeapp.com/attachments"
-                "/843519647055609856/845662999686414336/Logo1.png"
+        embed = (
+            disnake.Embed(color=var.C_BLUE)
+            .set_footer(text="To stop the proccess, enter cancel")
+            .set_thumbnail(
+                url=(
+                    "https://cdn.disnakeapp.com/attachments"
+                    "/843519647055609856/845662999686414336/Logo1.png"
+                )
             )
         )
 
@@ -172,7 +167,7 @@ class Giveaway(commands.Cog):
                         f"{x}: **{y[0] if type(y) == tuple else y}**"
                         for x, y in data.items()
                     ]
-                )
+                ),
             )
 
             await ctx.send(embed=embed)
@@ -187,9 +182,9 @@ class Giveaway(commands.Cog):
                 return
 
             if check:
-                data.update(
-                    {q: user_msg.content}) if value is None else data.update(
-                    {q: (user_msg.content, value)})
+                data.update({q: user_msg.content}) if value is None else data.update(
+                    {q: (user_msg.content, value)}
+                )
             else:
                 tries = 3
                 status = True
@@ -214,8 +209,9 @@ class Giveaway(commands.Cog):
                                         "Invalid format for time duration,"
                                         " try again.\nExample:\n> 24h"
                                     ),
-                                    color=var.C_ORANGE
-                                ).add_field(
+                                    color=var.C_ORANGE,
+                                )
+                                .add_field(
                                     name="All formats",
                                     value=(
                                         "s: seconds\n"
@@ -223,11 +219,9 @@ class Giveaway(commands.Cog):
                                         "h: hours\n"
                                         "d: days\n"
                                     ),
-                                    inline=False
-                                ).add_field(
-                                    name="Tries left",
-                                    value=tries
+                                    inline=False,
                                 )
+                                .add_field(name="Tries left", value=tries)
                             )
 
                         else:
@@ -237,13 +231,10 @@ class Giveaway(commands.Cog):
                                         "Winner amount can only "
                                         "be a positive number!"
                                     ),
-                                    color=var.C_ORANGE
-                                ).add_field(
-                                    name="Example", value="5", inline=False
-                                ).add_field(
-                                    name="Tries left",
-                                    value=tries
+                                    color=var.C_ORANGE,
                                 )
+                                .add_field(name="Example", value="5", inline=False)
+                                .add_field(name="Tries left", value=tries)
                             )
 
                         user_msg = await self.bot.wait_for(
@@ -261,30 +252,25 @@ class Giveaway(commands.Cog):
                 else:
                     data.update({q: (user_msg.content, value)})
 
-        embed = disnake.Embed(
-            title="Confirm giveaway",
-            description=(
-                f"You are about to start the giveaway! "
-                f"Press {var.E_ACCEPT} to start it."
-            ),
-            color=var.C_GREEN
-        ).add_field(
-            name="Channel", value=data["Channel"], inline=False
-        ).add_field(
-            name="Prize", value=data["Prize"], inline=False
-        ).add_field(
-            name="Duration", value=data["Duration"][0], inline=False
-        ).add_field(
-            name="Winner amount", value=data["Winners"][0], inline=False
-        ).add_field(
-            name="Hosted by", value=data["Host"], inline=False
+        embed = (
+            disnake.Embed(
+                title="Confirm giveaway",
+                description=(
+                    f"You are about to start the giveaway! "
+                    f"Press {var.E_ACCEPT} to start it."
+                ),
+                color=var.C_GREEN,
+            )
+            .add_field(name="Channel", value=data["Channel"], inline=False)
+            .add_field(name="Prize", value=data["Prize"], inline=False)
+            .add_field(name="Duration", value=data["Duration"][0], inline=False)
+            .add_field(name="Winner amount", value=data["Winners"][0], inline=False)
+            .add_field(name="Hosted by", value=data["Host"], inline=False)
         )
 
         bot_msg = await ctx.send(embed=embed)
         await bot_msg.add_reaction(var.E_ACCEPT)
-        await self.bot.wait_for(
-            "reaction_add", check=reaction_check, timeout=60
-        )
+        await self.bot.wait_for("reaction_add", check=reaction_check, timeout=60)
 
         end_time = round(time.time() + int(data["Duration"][1]))
 
@@ -296,28 +282,28 @@ class Giveaway(commands.Cog):
         main_time = readable.split(":")[0] + " Hours"
         secondary_time = readable.split(":")[1] + " Minutes"
 
-        embed = disnake.Embed(
-            title=data["Prize"],
-            description=(
-                f"React to the 🎉 emoji to participate!\n"
-                f"\n📝 Winner amount: **{data['Winners'][0]}**\n"
-                f"🔍 Hosted by: **{data['Host']}**"
-            ),
-            color=var.C_MAIN,
-            timestamp=datetime.datetime.now()
-        ).add_field(
-            name="⏳ Ending time",
-            value=main_time + " " + secondary_time
-        ).set_thumbnail(url=ctx.guild.icon.url)
-
-        gw_msg = await channel.send(
-            content="New giveaway woohoo!", embed=embed
+        embed = (
+            disnake.Embed(
+                title=data["Prize"],
+                description=(
+                    f"React to the 🎉 emoji to participate!\n"
+                    f"\n📝 Winner amount: **{data['Winners'][0]}**\n"
+                    f"🔍 Hosted by: **{data['Host']}**"
+                ),
+                color=var.C_MAIN,
+                timestamp=datetime.datetime.now(),
+            )
+            .add_field(name="⏳ Ending time", value=main_time + " " + secondary_time)
+            .set_thumbnail(url=ctx.guild.icon.url)
         )
+
+        gw_msg = await channel.send(content="New giveaway woohoo!", embed=embed)
 
         await gw_msg.add_reaction("🎉")
 
         guild_gw_cols = [
-            x async for x in db.GIVEAWAY.find(
+            x
+            async for x in db.GIVEAWAY.find(
                 {"_id": {"$regex": "^" + str(ctx.guild.id)}}
             )
         ]
@@ -328,7 +314,7 @@ class Giveaway(commands.Cog):
                 "channel_id": channel.id,
                 "message_id": gw_msg.id,
                 "end_time": end_time,
-                "winner_amount": int(data["Winners"][0])
+                "winner_amount": int(data["Winners"][0]),
             }
         )
 
@@ -337,9 +323,7 @@ class Giveaway(commands.Cog):
     async def g_show(self, ctx):
         embed = disnake.Embed(title="All active giveaways", color=var.C_MAIN)
 
-        async for i in db.GIVEAWAY.find(
-            {"_id": {"$regex": "^" + str(ctx.guild.id)}}
-        ):
+        async for i in db.GIVEAWAY.find({"_id": {"$regex": "^" + str(ctx.guild.id)}}):
             readable = str(
                 datetime.datetime.fromtimestamp(i["end_time"])
                 - datetime.datetime.fromtimestamp(time.time())
@@ -355,7 +339,7 @@ class Giveaway(commands.Cog):
                     "[Jump to the message!](https://disnake.com/channels/"
                     f"{ctx.guild.id}/{i['channel_id']}/{i['message_id']})"
                 ),
-                inline=False
+                inline=False,
             )
 
         embed.description = (
@@ -374,15 +358,15 @@ class Giveaway(commands.Cog):
                         "🚫 You need to define the message "
                         "ID in order to end a giveaway!"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
-                    name="Format",
-                    value=f"`{await get_prefix(ctx)}gend <message_id>`"
+                    name="Format", value=f"`{await get_prefix(ctx)}gend <message_id>`"
                 )
             )
 
         all_msg_ids = [
-            x["message_id"] async for x in db.GIVEAWAY.find(
+            x["message_id"]
+            async for x in db.GIVEAWAY.find(
                 {"_id": {"$regex": "^" + str(ctx.guild.id)}}
             )
         ]
@@ -394,7 +378,7 @@ class Giveaway(commands.Cog):
                         f"🚫 There are no active giveaways in this "
                         f"server with the message ID **{msg_id}**"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 )
             )
 
@@ -434,16 +418,18 @@ class Giveaway(commands.Cog):
                 main_time = readable.split(":")[0] + " Hours"
                 secondary_time = readable.split(":")[1] + " Minutes"
 
-                embed = disnake.Embed(
-                    title=embed_data["title"],
-                    description=embed_data["description"],
-                    color=var.C_MAIN,
-                    timestamp=datetime.datetime.now()
-                ).add_field(
-                    name=embed_data["fields"][0]["name"],
-                    value=main_time + " " + secondary_time
-                ).set_thumbnail(
-                    url=embed_data["thumbnail"]["url"]
+                embed = (
+                    disnake.Embed(
+                        title=embed_data["title"],
+                        description=embed_data["description"],
+                        color=var.C_MAIN,
+                        timestamp=datetime.datetime.now(),
+                    )
+                    .add_field(
+                        name=embed_data["fields"][0]["name"],
+                        value=main_time + " " + secondary_time,
+                    )
+                    .set_thumbnail(url=embed_data["thumbnail"]["url"])
                 )
 
                 await message.edit(embed=embed)

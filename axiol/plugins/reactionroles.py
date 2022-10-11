@@ -24,7 +24,7 @@ class ReactionRoles(commands.Cog):
                         f"{var.E_DISABLE} The Reaction Roles plugin"
                         " is disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -36,7 +36,7 @@ class ReactionRoles(commands.Cog):
         channel: disnake.TextChannel = None,
         message_id: Union[int, None] = None,
         role: disnake.Role = None,
-        emoji: Union[disnake.Emoji, str] = None
+        emoji: Union[disnake.Emoji, str] = None,
     ):
         if type(emoji) == str and emoji.startswith("<"):
             raise commands.EmojiNotFound(ctx)
@@ -49,14 +49,16 @@ class ReactionRoles(commands.Cog):
                         "role and emoji all three to add a reaction role,"
                         " make sure the IDs are numerical."
                     ),
-                    color=var.C_RED
-                ).add_field(
+                    color=var.C_RED,
+                )
+                .add_field(
                     name="Format",
                     value=(
                         f"`{await get_prefix(ctx)}rr"
                         " <#channel> <messageid> <role> <emoji>`"
-                    )
-                ).set_footer(
+                    ),
+                )
+                .set_footer(
                     text=(
                         "You can use either role ID or mention it (use ID if "
                         "you don't want to disturb everyone having the role)"
@@ -83,13 +85,14 @@ class ReactionRoles(commands.Cog):
                 await db.REACTION_ROLES.insert_one(
                     {
                         "_id": ctx.guild.id,
-                        "reaction_roles": [{
-                            "messageid": msg.id,
-                            "roleid": role.id,
-                            "emoji": str(emoji)
-                        }],
-                        "unique_messages": []
-
+                        "reaction_roles": [
+                            {
+                                "messageid": msg.id,
+                                "roleid": role.id,
+                                "emoji": str(emoji),
+                            }
+                        ],
+                        "unique_messages": [],
                     }
                 )
 
@@ -105,8 +108,9 @@ class ReactionRoles(commands.Cog):
 
                 def check():
                     for i in guildrr_list:
-                        if i.get("messageid") == msg.id and i.get(
-                                "emoji") == str(emoji):
+                        if i.get("messageid") == msg.id and i.get("emoji") == str(
+                            emoji
+                        ):
                             return True
 
                 if check():
@@ -119,18 +123,10 @@ class ReactionRoles(commands.Cog):
                 else:
                     new_list = guildrr_list.copy()
                     new_list.append(
-                        {
-                            "messageid": msg.id,
-                            "roleid": role.id,
-                            "emoji": str(emoji)
-                        }
+                        {"messageid": msg.id, "roleid": role.id, "emoji": str(emoji)}
                     )
 
-                    new_data = {
-                        "$set": {
-                            "reaction_roles": new_list
-                        }
-                    }
+                    new_data = {"$set": {"reaction_roles": new_list}}
 
                     await db.REACTION_ROLES.update_one(guild_doc, new_data)
                     await msg.add_reaction(emoji)
@@ -154,7 +150,7 @@ class ReactionRoles(commands.Cog):
                         f"{role.mention} Role **(Shown as the Developer role in"
                         f" the image below)"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).set_image(
                     url=(
                         "https://cdn.disnakeapp.com/attachments/"
@@ -169,7 +165,7 @@ class ReactionRoles(commands.Cog):
         self,
         ctx,
         message_id: Union[int, str] = None,
-        emoji: Union[disnake.Emoji, str] = None
+        emoji: Union[disnake.Emoji, str] = None,
     ):
 
         if {message_id, emoji} == {None}:
@@ -179,13 +175,12 @@ class ReactionRoles(commands.Cog):
                         "🚫 You need to define the message "
                         "and emoji both to remove a reaction role"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
                     value=(
-                        f"`{await get_prefix(ctx)}removerr "
-                        f"<messageid> <emoji>`"
-                    )
+                        f"`{await get_prefix(ctx)}removerr " f"<messageid> <emoji>`"
+                    ),
                 )
             )
 
@@ -195,8 +190,7 @@ class ReactionRoles(commands.Cog):
         if type(message_id) == str:
             return await ctx.send(
                 embed=disnake.Embed(
-                    description="Message ID needs to be numerical",
-                    color=var.C_ORANGE
+                    description="Message ID needs to be numerical", color=var.C_ORANGE
                 )
             )
 
@@ -204,30 +198,23 @@ class ReactionRoles(commands.Cog):
 
         def rr_exists():
             for i in guild_doc["reaction_roles"]:
-                if (
-                    i.get("messageid") == message_id
-                    and i.get("emoji") == str(emoji)
-                ):
+                if i.get("messageid") == message_id and i.get("emoji") == str(emoji):
                     return True
 
         if rr_exists():
+
             def get_pair(lst):
                 for rr_pairs in lst:
-                    if (
-                        message_id == rr_pairs.get("messageid")
-                        and str(emoji) == rr_pairs.get("emoji")
-                    ):
+                    if message_id == rr_pairs.get("messageid") and str(
+                        emoji
+                    ) == rr_pairs.get("emoji"):
                         return rr_pairs
 
             rr_list = guild_doc["reaction_roles"]
             new_list = rr_list.copy()
             pair = get_pair(new_list)
             new_list.remove(pair)
-            new_data = {
-                "$set": {
-                    "reaction_roles": new_list
-                }
-            }
+            new_data = {"$set": {"reaction_roles": new_list}}
 
             role = ctx.guild.get_role(pair["roleid"])
             await db.REACTION_ROLES.update_one(guild_doc, new_data)
@@ -239,14 +226,14 @@ class ReactionRoles(commands.Cog):
                         f"Reaction role for {role} using {emoji} "
                         f"on message with ID {message_id} has been removed"
                     ),
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
 
         else:
             await ctx.send("This reaction role does not exist")
 
-    @commands.command(name="allrr", aliases=['rrall'])
+    @commands.command(name="allrr", aliases=["rrall"])
     @has_command_permission()
     async def all_rr(self, ctx):
 
@@ -262,10 +249,7 @@ class ReactionRoles(commands.Cog):
                 exact_pages = rr_amount / 10
             all_pages = round(exact_pages)
 
-            embed = disnake.Embed(
-                title="All active reaction roles",
-                color=var.C_MAIN
-            )
+            embed = disnake.Embed(title="All active reaction roles", color=var.C_MAIN)
 
             rr_count = 0
             for i in guild_doc["reaction_roles"]:
@@ -280,7 +264,7 @@ class ReactionRoles(commands.Cog):
                         f"{emoji} for {role.mention if role else 'deleted role'} "
                         f"in message ID `{message_id}`"
                     ),
-                    inline=False
+                    inline=False,
                 )
 
                 if rr_count == 10:
@@ -314,7 +298,7 @@ class ReactionRoles(commands.Cog):
                             f"{emoji} for {role.mention if role else 'deleted role'}\n"
                             f"MessageID: `{message_id}`"
                         ),
-                        inline=False
+                        inline=False,
                     )
 
                     if rr_count == (current_page) * 10 + 10:
@@ -331,8 +315,9 @@ class ReactionRoles(commands.Cog):
 
             current_page = 0
             while True:
-                reaction, user = await self.bot.wait_for("reaction_add",
-                                                         check=reaction_check)
+                reaction, user = await self.bot.wait_for(
+                    "reaction_add", check=reaction_check
+                )
                 if str(reaction.emoji) == "◀️":
                     try:
                         await bot_msg.remove_reaction("◀️", ctx.author)
@@ -385,17 +370,12 @@ class ReactionRoles(commands.Cog):
             if guild_doc is not None:
                 unique_list = guild_doc["unique_messages"]
 
-                all_msg_ids = [i.get("messageid")
-                               for i in guild_doc["reaction_roles"]]
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids:
                     new_list = unique_list.copy()
 
                     new_list.append(msg.id)
-                    new_data = {
-                        "$set": {
-                            "unique_messages": new_list
-                        }
-                    }
+                    new_data = {"$set": {"unique_messages": new_list}}
 
                     await db.REACTION_ROLES.update_one(guild_doc, new_data)
                     await ctx.send(
@@ -410,7 +390,7 @@ class ReactionRoles(commands.Cog):
                                 f"(https://disnake.com/channels/{ctx.guild.id}"
                                 f"/{msg.channel.id}/{msg.id})"
                             ),
-                            color=var.C_GREEN
+                            color=var.C_GREEN,
                         )
                     )
 
@@ -433,10 +413,10 @@ class ReactionRoles(commands.Cog):
                         "🚫 You need to define the message "
                         "in order to mark it with unique reactions"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
+                    value=f"`{await get_prefix(ctx)}uniquerr <messageid>`",
                 )
             )
 
@@ -449,17 +429,12 @@ class ReactionRoles(commands.Cog):
             if guild_doc is not None:
                 unique_list = guild_doc["unique_messages"]
 
-                all_msg_ids = [i.get("messageid")
-                               for i in guild_doc["reaction_roles"]]
+                all_msg_ids = [i.get("messageid") for i in guild_doc["reaction_roles"]]
                 if msg.id in all_msg_ids and msg.id in unique_list:
                     new_list = unique_list.copy()
 
                     new_list.remove(msg.id)
-                    new_data = {
-                        "$set": {
-                            "unique_messages": new_list
-                        }
-                    }
+                    new_data = {"$set": {"unique_messages": new_list}}
 
                     await db.REACTION_ROLES.update_one(guild_doc, new_data)
 
@@ -474,7 +449,7 @@ class ReactionRoles(commands.Cog):
                                 "in [this message](https://disnake.com/channels"
                                 f"/{ctx.guild.id}/{msg.channel.id}/{msg.id})"
                             ),
-                            color=var.C_GREEN
+                            color=var.C_GREEN,
                         )
                     )
 
@@ -498,10 +473,10 @@ class ReactionRoles(commands.Cog):
                         "🚫 You need to define the message in order "
                         "to unmark it with unique reactions"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}uniquerr <messageid>`"
+                    value=f"`{await get_prefix(ctx)}uniquerr <messageid>`",
                 )
             )
 
@@ -512,10 +487,9 @@ class ReactionRoles(commands.Cog):
 
         if guild_doc is not None and guild_doc["reaction_roles"] is not None:
             for i in guild_doc["reaction_roles"]:
-                if (
-                    payload.message_id == i.get("messageid")
-                    and str(payload.emoji) == i.get("emoji")
-                ):
+                if payload.message_id == i.get("messageid") and str(
+                    payload.emoji
+                ) == i.get("emoji"):
                     role_id = i.get("roleid")
 
                     guild = self.bot.get_guild(payload.guild_id)
@@ -524,17 +498,15 @@ class ReactionRoles(commands.Cog):
                     if not payload.member.bot:
                         await payload.member.add_roles(assign_role)
 
-        if (
-            guild_doc is not None
-            and payload.message_id in guild_doc["unique_messages"]
-        ):
+        if guild_doc is not None and payload.message_id in guild_doc["unique_messages"]:
             channel = self.bot.get_channel(payload.channel_id)
             message = await channel.fetch_message(payload.message_id)
 
             for r in message.reactions:
                 if (
                     payload.member in await r.users().flatten()
-                    and not payload.member.bot and str(r) != str(payload.emoji)
+                    and not payload.member.bot
+                    and str(r) != str(payload.emoji)
                 ):
                     await message.remove_reaction(r.emoji, payload.member)
 
@@ -545,15 +517,13 @@ class ReactionRoles(commands.Cog):
 
         if guild_doc is not None and guild_doc["reaction_roles"] is not None:
             for i in guild_doc["reaction_roles"]:
-                if (
-                    payload.message_id == i.get("messageid")
-                    and str(payload.emoji) == i.get("emoji")
-                ):
+                if payload.message_id == i.get("messageid") and str(
+                    payload.emoji
+                ) == i.get("emoji"):
                     role_id = i.get("roleid")
 
-                    member = (
-                        self.bot.get_guild(payload.guild_id)
-                            .get_member(payload.user_id)
+                    member = self.bot.get_guild(payload.guild_id).get_member(
+                        payload.user_id
                     )
 
                     if member is not None:

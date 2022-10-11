@@ -19,9 +19,7 @@ def has_command_permission():
                 return True
 
             else:
-                permission = any(
-                    item in permitted_roles for item in author_roles
-                )
+                permission = any(item in permitted_roles for item in author_roles)
 
                 if permission:
                     return True
@@ -38,13 +36,9 @@ class Permissions(commands.Cog):
 
     @commands.command(name="allperms")
     async def all_perms(self, ctx):
-        embed = disnake.Embed(
-            title=f"Command role permissions", color=var.C_MAIN
-        )
+        embed = disnake.Embed(title=f"Command role permissions", color=var.C_MAIN)
 
-        guild_doc = await db.PERMISSIONS.find_one(
-            {"_id": ctx.guild.id},  {"_id": 0}
-        )
+        guild_doc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
         for i in guild_doc:
             perms = guild_doc[i]
@@ -65,28 +59,26 @@ class Permissions(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(
-        name="setperm",
-        aliases=["setpermission", "addperm", "addpermission"]
+        name="setperm", aliases=["setpermission", "addperm", "addpermission"]
     )
     @commands.has_permissions(administrator=True)
     async def set_perm(self, ctx, plugin=None):
         cogs = [
-            'Leveling',
-            'Moderation',
-            'ReactionRoles',
-            'Welcome',
-            'Verification',
-            'Chatbot',
-            'AutoMod',
+            "Leveling",
+            "Moderation",
+            "ReactionRoles",
+            "Welcome",
+            "Verification",
+            "Chatbot",
+            "AutoMod",
             # "Karma",
-            'Fun',
-            'Giveaway'
+            "Fun",
+            "Giveaway",
         ]
 
         if plugin is not None and plugin.lower() in [i.lower() for i in cogs]:
             embed = disnake.Embed(
-                title=f"All commands for {plugin}",
-                color=var.C_GREEN
+                title=f"All commands for {plugin}", color=var.C_GREEN
             ).add_field(
                 name="Note",
                 value=(
@@ -94,7 +86,7 @@ class Permissions(commands.Cog):
                     " that would trigger the command. Just enter the command"
                     " name followed by a space and then role"
                     " (ID or Mention can be used)"
-                )
+                ),
             )
 
             if plugin.lower() == "reactionroles":
@@ -125,19 +117,14 @@ class Permissions(commands.Cog):
                 )
 
             while True:
-                user_msg = await self.bot.wait_for(
-                    "message", check=message_check
-                )
+                user_msg = await self.bot.wait_for("message", check=message_check)
 
                 if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
-                    await ctx.send(
-                        f"Cancelled permissions change for {plugin} plugin")
+                    await ctx.send(f"Cancelled permissions change for {plugin} plugin")
                     break
 
                 else:
-                    guild_doc = await db.PERMISSIONS.find_one(
-                        {"_id": ctx.guild.id}
-                    )
+                    guild_doc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id})
 
                     data = user_msg.content.split(" ")
 
@@ -150,11 +137,10 @@ class Permissions(commands.Cog):
                                     " just send the message in correct "
                                     "format as shown below"
                                 ),
-                                color=var.C_ORANGE
-                            ).add_field(
-                                name="Format",
-                                value="`command_name role`"
-                            ).set_footer(
+                                color=var.C_ORANGE,
+                            )
+                            .add_field(name="Format", value="`command_name role`")
+                            .set_footer(
                                 text=(
                                     "Don't enter the command name with prefix, "
                                     "that would trigger the command, "
@@ -177,12 +163,12 @@ class Permissions(commands.Cog):
                                     f"Try again with correct command in"
                                     f" {plugin_name} plugin"
                                 ),
-                                color=var.C_ORANGE
+                                color=var.C_ORANGE,
                             )
                         )
                     elif (
-                        data[1].strip("<>@&").isnumeric() == False or
-                        ctx.guild.get_role(int(data[1].strip("<>@&"))) is None
+                        data[1].strip("<>@&").isnumeric() == False
+                        or ctx.guild.get_role(int(data[1].strip("<>@&"))) is None
                     ):
                         await ctx.send(
                             embed=disnake.Embed(
@@ -191,20 +177,15 @@ class Permissions(commands.Cog):
                                     f"There is no role with the ID `{data[1]}`."
                                     " Try again with correct role mention or ID"
                                 ),
-                                color=var.C_ORANGE
+                                color=var.C_ORANGE,
                             )
                         )
 
-                    elif (
-                        data[0].lower() in guild_doc[plugin_name].keys()
-                        and (
-                            int(data[1].strip("<>@&"))
-                            in guild_doc[plugin_name][data[0].lower()]
-                        )
+                    elif data[0].lower() in guild_doc[plugin_name].keys() and (
+                        int(data[1].strip("<>@&"))
+                        in guild_doc[plugin_name][data[0].lower()]
                     ):
-                        mention = ctx.guild.get_role(
-                            int(data[1].strip('<>@&'))
-                        ).mention
+                        mention = ctx.guild.get_role(int(data[1].strip("<>@&"))).mention
 
                         await ctx.send(
                             embed=disnake.Embed(
@@ -213,14 +194,12 @@ class Permissions(commands.Cog):
                                     f" role already has permissions for"
                                     f" **{data[0].lower()}**"
                                 ),
-                                color=var.C_RED
+                                color=var.C_RED,
                             )
                         )
 
                     else:
-                        guild_doc = await db.PERMISSIONS.find_one(
-                            {"_id": ctx.guild.id}
-                        )
+                        guild_doc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id})
 
                         role = ctx.guild.get_role(int(data[1].strip("<>@&")))
                         plugin_dict = guild_doc[plugin_name]
@@ -236,11 +215,7 @@ class Permissions(commands.Cog):
                         new_list.append(role.id)
                         new_dict.update({data[0].lower(): new_list})
 
-                        new_data = {
-                            "$set": {
-                                plugin_name: new_dict
-                            }
-                        }
+                        new_data = {"$set": {plugin_name: new_dict}}
 
                         await db.PERMISSIONS.update_one(guild_doc, new_data)
                         await ctx.send(
@@ -250,22 +225,22 @@ class Permissions(commands.Cog):
                                     f"{var.E_ACCEPT} Users with {role.mention}"
                                     f" can now use the command {data[0].lower()}"
                                 ),
-                                color=var.C_GREEN
+                                color=var.C_GREEN,
                             ).add_field(
                                 name="To view all permissions",
-                                value=f"```{await get_prefix(ctx)}allperms```"
+                                value=f"```{await get_prefix(ctx)}allperms```",
                             )
                         )
                         break
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description="🚫 You need to define a valid plugin!",
-                    color=var.C_RED
-                ).add_field(
-                    name="Format",
-                    value=f"`{await get_prefix(ctx)}setperm <plugin>`"
-                ).set_footer(
+                    description="🚫 You need to define a valid plugin!", color=var.C_RED
+                )
+                .add_field(
+                    name="Format", value=f"`{await get_prefix(ctx)}setperm <plugin>`"
+                )
+                .set_footer(
                     text=(
                         f"You can view all plugins"
                         f" by using the command {await get_prefix(ctx)}plugins"
@@ -279,9 +254,7 @@ class Permissions(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def remove_perm(self, ctx, cmd=None, role: disnake.Role = None):
         if cmd and role is not None:
-            guild_doc = await db.PERMISSIONS.find_one(
-                {"_id": ctx.guild.id}, {"_id": 0}
-            )
+            guild_doc = await db.PERMISSIONS.find_one({"_id": ctx.guild.id}, {"_id": 0})
 
             all_perm_commands = [x for i in guild_doc.values() for x in i]
 
@@ -290,14 +263,12 @@ class Permissions(commands.Cog):
                     embed=disnake.Embed(
                         title="Invalid command",
                         description="This command has no permissions setup",
-                        color=var.C_RED
+                        color=var.C_RED,
                     )
                 )
 
             else:
-                plugin_name = [
-                    x for x in guild_doc if cmd in guild_doc[x].keys()
-                ][0]
+                plugin_name = [x for x in guild_doc if cmd in guild_doc[x].keys()][0]
 
                 plugin_dict = guild_doc[plugin_name]
 
@@ -309,11 +280,7 @@ class Permissions(commands.Cog):
                     new_list.remove(role.id)
                     new_dict.update({cmd: new_list})
 
-                    new_data = {
-                        "$set": {
-                            plugin_name: new_dict
-                        }
-                    }
+                    new_data = {"$set": {plugin_name: new_dict}}
 
                     await db.PERMISSIONS.update_one(guild_doc, new_data)
 
@@ -324,12 +291,10 @@ class Permissions(commands.Cog):
                                 f"{var.E_ACCEPT} Members with {role.mention} "
                                 f"role can't use **{cmd}** command anymore"
                             ),
-                            color=var.C_GREEN
+                            color=var.C_GREEN,
                         ).add_field(
                             name="To add new command permission",
-                            value=(
-                                f"```{await get_prefix(ctx)}addperm <plugin>```"
-                            )
+                            value=(f"```{await get_prefix(ctx)}addperm <plugin>```"),
                         )
                     )
 
@@ -342,21 +307,21 @@ class Permissions(commands.Cog):
                                 "has no permissions setup with role"
                                 f" {ctx.guild.get_role(role.id).mention}"
                             ),
-                            color=var.C_RED
+                            color=var.C_RED,
                         )
                     )
 
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description=(
-                        "🚫 You need to define the command name and the role"
-                    ),
-                    color=var.C_RED
-                ).add_field(
+                    description=("🚫 You need to define the command name and the role"),
+                    color=var.C_RED,
+                )
+                .add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}removeperm <command> <role>`"
-                ).set_footer(
+                    value=f"`{await get_prefix(ctx)}removeperm <command> <role>`",
+                )
+                .set_footer(
                     text=(
                         f"You can view all plugins by using the permissions"
                         f" setup using {await get_prefix(ctx)}allperms"

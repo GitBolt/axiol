@@ -25,7 +25,7 @@ class Leveling(commands.Cog):
                         f"{var.E_DISABLE} The Leveling plugin "
                         f"is disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -44,10 +44,10 @@ class Leveling(commands.Cog):
             lvl = 0
             rank = 0
             while True:
-                if xp < ((50 * (lvl ** 2)) + (50 * lvl)):
+                if xp < ((50 * (lvl**2)) + (50 * lvl)):
                     break
                 lvl += 1
-            xp -= ((50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1)))
+            xp -= (50 * ((lvl - 1) ** 2)) + (50 * (lvl - 1))
 
             try:
                 boxes = int((xp / (200 * ((1 / 2) * lvl))) * 20)
@@ -62,26 +62,26 @@ class Leveling(commands.Cog):
                 if userdata["_id"] == x["_id"]:
                     break
 
-            embed = disnake.Embed(
-                title=f"Level stats for {user.name}",
-                color=var.C_TEAL
-            ).add_field(
-                name="Rank",
-                value=f"{rank}/{await guild_col.estimated_document_count() - 1}"
-            ).add_field(
-                name="XP",
-                value=f"{xp}/{int(200 * ((1 / 2) * lvl))}",
-                inline=True
-            ).add_field(
-                name="Level", value=lvl, inline=True
-            ).add_field(
-                name="Progress",
-                value=(
-                    boxes * "<:current:850041599139905586>"
-                    + (20 - boxes) * "<:left:850041599127584776>"
-                ),
-                inline=False
-            ).set_thumbnail(url=user.avatar.url)
+            embed = (
+                disnake.Embed(title=f"Level stats for {user.name}", color=var.C_TEAL)
+                .add_field(
+                    name="Rank",
+                    value=f"{rank}/{await guild_col.estimated_document_count() - 1}",
+                )
+                .add_field(
+                    name="XP", value=f"{xp}/{int(200 * ((1 / 2) * lvl))}", inline=True
+                )
+                .add_field(name="Level", value=lvl, inline=True)
+                .add_field(
+                    name="Progress",
+                    value=(
+                        boxes * "<:current:850041599139905586>"
+                        + (20 - boxes) * "<:left:850041599127584776>"
+                    ),
+                    inline=False,
+                )
+                .set_thumbnail(url=user.avatar.url)
+            )
 
             await ctx.send(embed=embed)
 
@@ -91,7 +91,8 @@ class Leveling(commands.Cog):
         guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
 
         rankings = [
-            x async for x in guild_col.find(
+            x
+            async for x in guild_col.find(
                 # Removing ID 0 (Config doc, unrelated to user xp)
                 {"_id": {"$ne": 0}}
             ).sort("xp", -1)
@@ -118,7 +119,7 @@ class Leveling(commands.Cog):
                 "➡️ Next page\n"
                 "▶️ Last page\n"
             ),
-            color=var.C_BLUE
+            color=var.C_BLUE,
         ).set_thumbnail(url=ctx.guild.icon.url)
 
         rank_count = 0
@@ -128,9 +129,7 @@ class Leveling(commands.Cog):
                 user = self.bot.get_user(i.get("_id"))
                 xp = i.get("xp")
                 embed.add_field(
-                    name=f"{rank_count}: {user}",
-                    value=f"Total XP: {xp}",
-                    inline=False
+                    name=f"{rank_count}: {user}", value=f"Total XP: {xp}", inline=False
                 )
 
             except Exception:
@@ -154,10 +153,14 @@ class Leveling(commands.Cog):
 
             rank_count = current_page * 10
             user_amount = current_page * 10
-            rankings = guild_col.find(
-                # Removing ID 0 (Config doc, unrelated to user xp)
-                {"_id": {"$ne": 0}}
-            ).sort("xp", -1).limit(user_amount)
+            rankings = (
+                guild_col.find(
+                    # Removing ID 0 (Config doc, unrelated to user xp)
+                    {"_id": {"$ne": 0}}
+                )
+                .sort("xp", -1)
+                .limit(user_amount)
+            )
 
             async for i in rankings:
                 rank_count += 1
@@ -165,9 +168,7 @@ class Leveling(commands.Cog):
                 xp = i.get("xp")
 
                 embed.add_field(
-                    name=f"{rank_count}: {user}",
-                    value=f"Total XP: {xp}",
-                    inline=False
+                    name=f"{rank_count}: {user}", value=f"Total XP: {xp}", inline=False
                 )
 
                 if rank_count == current_page * 10 + 10:
@@ -214,7 +215,7 @@ class Leveling(commands.Cog):
                 except disnake.Forbidden:
                     pass
 
-                await ctx.invoke(self.bot.get_command('barchart'))
+                await ctx.invoke(self.bot.get_command("barchart"))
 
             if str(reaction.emoji) == "⬅️":
                 try:
@@ -254,22 +255,23 @@ class Leveling(commands.Cog):
             if self.bot.get_channel(i) is not None
         ]
 
-        blacklisted_channels = ', '.join(bl) if not bl == [] else None
+        blacklisted_channels = ", ".join(bl) if not bl == [] else None
 
         max_rank = [
-            x async for x in guild_col.find(
+            x
+            async for x in guild_col.find(
                 # Removing ID 0 (Config doc, unrelated to user xp)
                 {"_id": {"$ne": 0}}
-            ).sort("xp", -1).limit(1)
+            )
+            .sort("xp", -1)
+            .limit(1)
         ]
 
         max_rank_user = await self.bot.fetch_user(max_rank[0]["_id"])
 
         def get_alert_channel():
             if settings_doc.get("alertchannel") is not None:
-                alert_channel = self.bot.get_channel(
-                    settings_doc.get("alertchannel")
-                )
+                alert_channel = self.bot.get_channel(settings_doc.get("alertchannel"))
 
                 if alert_channel is not None:
                     return alert_channel.mention
@@ -283,39 +285,25 @@ class Leveling(commands.Cog):
         status = "Enabled" if settings_doc["alerts"] else "Disabled"
         rewards = settings_doc["rewards"]
 
-        embed = disnake.Embed(
-            title="Server leveling information",
-            color=var.C_BLUE
-        ).set_thumbnail(
-            url=ctx.guild.icon.url
-        ).add_field(
-            name="Highest XP Member",
-            value=max_rank_user,
-            inline=False
-        ).add_field(
-            name="Leveling XP Range",
-            value=xp_range,
-            inline=False
-        ).add_field(
-            name="Blacklisted channels",
-            value=blacklisted_channels,
-            inline=False
-        ).add_field(
-            name="Alert Status",
-            value=status,
-            inline=False
-        ).add_field(
-            name="Alert channel",
-            value=get_alert_channel(),
-            inline=False
-        ).add_field(
-            name="Level rewards",
-            value=(
-                f"React to {var.E_CONTINUE}"
-                if settings_doc["rewards"] else
-                "There are no level rewards right now"
-            ),
-            inline=False
+        embed = (
+            disnake.Embed(title="Server leveling information", color=var.C_BLUE)
+            .set_thumbnail(url=ctx.guild.icon.url)
+            .add_field(name="Highest XP Member", value=max_rank_user, inline=False)
+            .add_field(name="Leveling XP Range", value=xp_range, inline=False)
+            .add_field(
+                name="Blacklisted channels", value=blacklisted_channels, inline=False
+            )
+            .add_field(name="Alert Status", value=status, inline=False)
+            .add_field(name="Alert channel", value=get_alert_channel(), inline=False)
+            .add_field(
+                name="Level rewards",
+                value=(
+                    f"React to {var.E_CONTINUE}"
+                    if settings_doc["rewards"]
+                    else "There are no level rewards right now"
+                ),
+                inline=False,
+            )
         )
 
         bot_msg = await ctx.send(embed=embed)
@@ -324,10 +312,7 @@ class Leveling(commands.Cog):
 
             def reaction_check(reaction, user):
                 if str(reaction.emoji) == var.E_CONTINUE:
-                    return (
-                        user == ctx.author
-                        and reaction.message == bot_msg
-                    )
+                    return user == ctx.author and reaction.message == bot_msg
 
             await self.bot.wait_for("reaction_add", check=reaction_check)
 
@@ -346,22 +331,19 @@ class Leveling(commands.Cog):
                 embed.add_field(
                     name=f"Level {i}",
                     value=role.mention if role is not None else "deleted role",
-                    inline=False
+                    inline=False,
                 )
 
             await bot_msg.edit(embed=embed)
 
     @commands.command(name="givexp")
     @has_command_permission()
-    async def give_xp(
-        self, ctx, user: disnake.Member = None, amount: int = None
-    ):
+    async def give_xp(self, ctx, user: disnake.Member = None, amount: int = None):
         if user and amount is not None:
             if amount > 10000000:
                 await ctx.send(
                     embed=disnake.Embed(
-                        description="🚫 Ayo that's too much",
-                        color=var.C_RED
+                        description="🚫 Ayo that's too much", color=var.C_RED
                     )
                 )
 
@@ -371,9 +353,7 @@ class Leveling(commands.Cog):
 
                 if data is None:
                     await guild_col.insert_one({"_id": user.id, "xp": amount})
-                    await ctx.send(
-                        f"Successfully awarded {user} with {amount} xp!"
-                    )
+                    await ctx.send(f"Successfully awarded {user} with {amount} xp!")
 
                 elif data.get("xp") > 10000000:
                     await ctx.send(
@@ -382,22 +362,16 @@ class Leveling(commands.Cog):
                                 "🚫 Cannot give more xp to the user,"
                                 " they are too rich already"
                             ),
-                            color=var.C_RED
+                            color=var.C_RED,
                         )
                     )
 
                 else:
-                    new_data = {
-                        "$set": {
-                            "xp": data.get("xp") + amount
-                        }
-                    }
+                    new_data = {"$set": {"xp": data.get("xp") + amount}}
 
                     await guild_col.update_one(data, new_data)
 
-                    await ctx.send(
-                        f"Successfully awarded {user} with {amount} xp!"
-                    )
+                    await ctx.send(f"Successfully awarded {user} with {amount} xp!")
         else:
             await ctx.send(
                 embed=disnake.Embed(
@@ -405,26 +379,23 @@ class Leveling(commands.Cog):
                         "🚫 You need to define the member"
                         " and the amount to give them xp"
                     ),
-                    color=var.C_RED
-                ).add_field(
-                    name="Format",
-                    value=f"```{await get_prefix(ctx)}givexp <user> <amount>```"
-                ).set_footer(
-                    text="For user either user mention or user ID can be used"
+                    color=var.C_RED,
                 )
+                .add_field(
+                    name="Format",
+                    value=f"```{await get_prefix(ctx)}givexp <user> <amount>```",
+                )
+                .set_footer(text="For user either user mention or user ID can be used")
             )
 
     @commands.command(name="removexp")
     @has_command_permission()
-    async def remove_xp(
-            self, ctx, user: disnake.Member = None, amount: int = None
-    ):
+    async def remove_xp(self, ctx, user: disnake.Member = None, amount: int = None):
         if user and amount is not None:
             if amount > 10000000:
                 await ctx.send(
                     embed=disnake.Embed(
-                        description="🚫 Ayo that's too much",
-                        color=var.C_RED
+                        description="🚫 Ayo that's too much", color=var.C_RED
                     )
                 )
 
@@ -432,11 +403,7 @@ class Leveling(commands.Cog):
                 guild_col = db.LEVEL_DATABASE[str(ctx.guild.id)]
                 data = await guild_col.find_one({"_id": user.id})
 
-                new_data = {
-                    "$set": {
-                        "xp": data.get("xp") - amount
-                    }
-                }
+                new_data = {"$set": {"xp": data.get("xp") - amount}}
 
                 await guild_col.update_one(data, new_data)
                 await ctx.send(f"Successfully removed {amount} xp from {user}!")
@@ -448,13 +415,13 @@ class Leveling(commands.Cog):
                         "🚫 You need to define the member "
                         "and the amount to remove their xp"
                     ),
-                    color=var.C_RED
-                ).add_field(
-                    name="Format",
-                    value=f"`{await get_prefix(ctx)}removexp <user> <amount>`"
-                ).set_footer(
-                    text="For user either user mention or user ID can be used"
+                    color=var.C_RED,
                 )
+                .add_field(
+                    name="Format",
+                    value=f"`{await get_prefix(ctx)}removexp <user> <amount>`",
+                )
+                .set_footer(text="For user either user mention or user ID can be used")
             )
 
     @commands.command(name="xprange")
@@ -464,29 +431,24 @@ class Leveling(commands.Cog):
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
 
-            new_data = {
-                "$set": {
-                    "xprange": [min_val, max_val]
-                }
-            }
+            new_data = {"$set": {"xprange": [min_val, max_val]}}
 
             await guild_col.update_one(settings, new_data)
 
             await ctx.send(
                 embed=disnake.Embed(
                     description=f"New xp range is now {min_val} - {max_val}!",
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
 
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description="🚫 You need to define the xp range",
-                    color=var.C_RED
+                    description="🚫 You need to define the xp range", color=var.C_RED
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}xprange <min_xp> <max_xp>`"
+                    value=f"`{await get_prefix(ctx)}xprange <min_xp> <max_xp>`",
                 )
             )
 
@@ -500,11 +462,7 @@ class Leveling(commands.Cog):
             new_settings = settings.get("blacklistedchannels").copy()
             new_settings.append(channel.id)
 
-            new_data = {
-                "$set": {
-                    "blacklistedchannels": new_settings
-                }
-            }
+            new_data = {"$set": {"blacklistedchannels": new_settings}}
 
             await guild_col.update_one(settings, new_data)
 
@@ -514,20 +472,18 @@ class Leveling(commands.Cog):
                         f"{channel.mention} has been blacklisted,"
                         f" hence users won't gain any xp in that channel."
                     ),
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
 
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description=(
-                        "🚫 You need to define the channel to blacklist it"
-                    ),
-                    color=var.C_RED
+                    description=("🚫 You need to define the channel to blacklist it"),
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}blacklist <#channel>`"
+                    value=f"`{await get_prefix(ctx)}blacklist <#channel>`",
                 )
             )
 
@@ -543,11 +499,7 @@ class Leveling(commands.Cog):
             if channel.id in new_settings:
                 new_settings.remove(channel.id)
 
-                new_data = {
-                    "$set": {
-                        "blacklistedchannels": new_settings
-                    }
-                }
+                new_data = {"$set": {"blacklistedchannels": new_settings}}
 
                 await guild_col.update_one(settings, new_data)
                 await ctx.send(
@@ -557,7 +509,7 @@ class Leveling(commands.Cog):
                             f", hence users will be able to gain xp again in"
                             f" that channel."
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
             else:
@@ -566,13 +518,11 @@ class Leveling(commands.Cog):
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description=(
-                        "🚫 You need to define the channel to whitelist it"
-                    ),
-                    color=var.C_RED
+                    description=("🚫 You need to define the channel to whitelist it"),
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}whitelist <#channel>`"
+                    value=f"`{await get_prefix(ctx)}whitelist <#channel>`",
                 )
             )
 
@@ -583,30 +533,22 @@ class Leveling(commands.Cog):
         guild_config = await guild_col.find_one({"_id": 0})
 
         if guild_config.get("alerts"):
-            new_data = {
-                "$set": {
-                    "alerts": False
-                }
-            }
+            new_data = {"$set": {"alerts": False}}
 
             await ctx.send(
                 embed=disnake.Embed(
                     description=f"{var.E_ACCEPT} Successfully disabled alerts!",
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
 
         else:
-            new_data = {
-                "$set": {
-                    "alerts": True
-                }
-            }
+            new_data = {"$set": {"alerts": True}}
 
             await ctx.send(
                 embed=disnake.Embed(
                     description=f"{var.E_ACCEPT} Successfully enabled alerts!",
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
 
@@ -619,9 +561,7 @@ class Leveling(commands.Cog):
             guild_col = db.LEVEL_DATABASE.get_collection(str(ctx.guild.id))
             settings = await guild_col.find_one({"_id": 0})
 
-            new_data = {
-                "$set": {"alertchannel": channel.id}
-            }
+            new_data = {"$set": {"alertchannel": channel.id}}
 
             await guild_col.update_one(settings, new_data)
             await ctx.send(
@@ -631,7 +571,7 @@ class Leveling(commands.Cog):
                         "channel, hence users who will level up will get "
                         "mentioned here!"
                     ),
-                    color=var.C_GREEN
+                    color=var.C_GREEN,
                 )
             )
         else:
@@ -641,10 +581,10 @@ class Leveling(commands.Cog):
                         "🚫 You need to define the channel "
                         "to make it the alert channel"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}alertchannel <#channel>`"
+                    value=f"`{await get_prefix(ctx)}alertchannel <#channel>`",
                 )
             )
 
@@ -659,19 +599,17 @@ class Leveling(commands.Cog):
             new_dict = existing_data.copy()
 
             new_dict.update({level: role.id})
-            new_data = {
-                "$set": {
-                    "rewards": new_dict
-                }
-            }
+            new_data = {"$set": {"rewards": new_dict}}
 
             await guild_col.update_one(settings, new_data)
-            await ctx.send(embed=disnake.Embed(
-                description=(
-                    f"Successfully added {role.mention} "
-                    f"as the reward to Level {level}!"
-                ),
-                color=var.C_GREEN)
+            await ctx.send(
+                embed=disnake.Embed(
+                    description=(
+                        f"Successfully added {role.mention} "
+                        f"as the reward to Level {level}!"
+                    ),
+                    color=var.C_GREEN,
+                )
             )
 
         else:
@@ -681,11 +619,13 @@ class Leveling(commands.Cog):
                         "🚫 You need to define the level"
                         " and role both to add a reward!"
                     ),
-                    color=var.C_RED
-                ).add_field(
+                    color=var.C_RED,
+                )
+                .add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}reward <level> <role>`"
-                ).set_footer(
+                    value=f"`{await get_prefix(ctx)}reward <level> <role>`",
+                )
+                .set_footer(
                     text=(
                         f"Make sure that for level you only the enter level "
                         f"number, example: {await get_prefix(ctx)}reward 2 "
@@ -713,14 +653,10 @@ class Leveling(commands.Cog):
                 role = ctx.guild.get_role(new_dict.get(level))
                 new_dict.pop(level)
 
-                new_data = {
-                    "$set": {
-                        "rewards": new_dict
-                    }
-                }
+                new_data = {"$set": {"rewards": new_dict}}
                 await guild_col.update_one(settings, new_data)
 
-                dp_role = role.mention if role is not None else 'deleted role'
+                dp_role = role.mention if role is not None else "deleted role"
 
                 await ctx.send(
                     embed=disnake.Embed(
@@ -728,7 +664,7 @@ class Leveling(commands.Cog):
                             f"Successfully removed **{dp_role}** "
                             f"as the reward from Level **{level}**!"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
 
@@ -738,11 +674,13 @@ class Leveling(commands.Cog):
                     description=(
                         "🚫 You need to define the level to remove it's reward!"
                     ),
-                    color=var.C_RED
-                ).add_field(
+                    color=var.C_RED,
+                )
+                .add_field(
                     name="Format",
-                    value=f"`{await get_prefix(ctx)}removereward <level>`"
-                ).set_footer(
+                    value=f"`{await get_prefix(ctx)}removereward <level>`",
+                )
+                .set_footer(
                     text=(
                         f"Make sure that for level you only the enter level"
                         f" number, example: {await get_prefix(ctx)}removereward"
@@ -770,16 +708,14 @@ class Leveling(commands.Cog):
         userdata = await guild_level_col.find_one({"_id": message.author.id})
 
         if userdata is None:
-            await guild_level_col.insert_one(
-                {"_id": message.author.id, "xp": 0}
-            )
+            await guild_level_col.insert_one({"_id": message.author.id, "xp": 0})
 
         else:
             xp = userdata["xp"]
 
             init_lvl = 0
             while True:
-                if xp < ((50 * (init_lvl ** 2)) + (50 * init_lvl)):
+                if xp < ((50 * (init_lvl**2)) + (50 * init_lvl)):
                     break
                 init_lvl += 1
 
@@ -789,7 +725,7 @@ class Leveling(commands.Cog):
 
             level_now = 0
             while True:
-                if xp < ((50 * (level_now ** 2)) + (50 * level_now)):
+                if xp < ((50 * (level_now**2)) + (50 * level_now)):
                     break
 
                 level_now += 1
@@ -799,18 +735,13 @@ class Leveling(commands.Cog):
 
                 embed = disnake.Embed(
                     title="You leveled up!",
-                    description=(
-                        f"{var.E_ACCEPT} You are now level {level_now}!"
-                    ),
-                    color=var.C_MAIN
+                    description=(f"{var.E_ACCEPT} You are now level {level_now}!"),
+                    color=var.C_MAIN,
                 )
 
                 try:
                     if ch is not None:
-                        await ch.send(
-                            content=message.author.mention,
-                            embed=embed
-                        )
+                        await ch.send(content=message.author.mention, embed=embed)
 
                     else:
                         await message.channel.send(

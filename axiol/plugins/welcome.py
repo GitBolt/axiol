@@ -25,7 +25,7 @@ class Welcome(commands.Cog):
                         f"{var.E_DISABLE} The Welcome plugin is "
                         f"disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -40,20 +40,16 @@ class Welcome(commands.Cog):
         )
 
         def message_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
-        user_msg = await self.bot.wait_for('message', check=message_check)
+        user_msg = await self.bot.wait_for("message", check=message_check)
 
         try:
             channel_id = int(user_msg.content.strip("<>#"))
 
         except Exception:
             await db.PLUGINS.update_one(
-                db.PLUGINS.find_one({"_id": ctx.guild.id}),
-                {"$set": {"Welcome": False}}
+                db.PLUGINS.find_one({"_id": ctx.guild.id}), {"$set": {"Welcome": False}}
             )
 
             return await ctx.send(
@@ -63,7 +59,7 @@ class Welcome(commands.Cog):
                         "🚫 I was not able to find the channel which you"
                         " entered. The plugin has been disabled, try again"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).set_footer(
                     text=(
                         "You can either mention the channel (example: #general)"
@@ -82,7 +78,7 @@ class Welcome(commands.Cog):
                     "https://cdn.disnakeapp.com/attachments/"
                     "843519647055609856/864924991597314078/Frame_1.png"
                 ),
-                "assignroles": []
+                "assignroles": [],
             }
         )
 
@@ -92,10 +88,9 @@ class Welcome(commands.Cog):
                 f"{var.E_ACCEPT} New members will now be greeted in"
                 f" {self.bot.get_channel(channel_id).mention}!"
             ),
-            color=var.C_GREEN
+            color=var.C_GREEN,
         ).add_field(
-            name="To configure further",
-            value=f"`{await get_prefix(ctx)}help welcome`"
+            name="To configure further", value=f"`{await get_prefix(ctx)}help welcome`"
         )
 
         await ctx.send(embed=success_embed)
@@ -115,10 +110,8 @@ class Welcome(commands.Cog):
         embed = disnake.Embed(
             title="Welcome to the server!",
             description=guild_doc.get("greeting"),
-            color=disnake.Colour.random()
-        ).set_image(
-            url=guild_doc.get("image")
-        )
+            color=disnake.Colour.random(),
+        ).set_image(url=guild_doc.get("image"))
 
         await ctx.send(content=get_content(), embed=embed)
 
@@ -128,21 +121,19 @@ class Welcome(commands.Cog):
         guild_doc = await db.WELCOME.find_one({"_id": ctx.guild.id})
 
         if channel is not None:
-            new_data = {
-                "$set": {
-                    "channelid": channel.id
-                }
-            }
+            new_data = {"$set": {"channelid": channel.id}}
 
             await db.WELCOME.update_one(guild_doc, new_data)
 
-            await ctx.send(embed=disnake.Embed(
-                title="Changed welcome channel",
-                description=(
-                    f"{var.E_ACCEPT} Now users will be"
-                    f" greeted in {channel.mention}"
-                ),
-                color=var.C_GREEN)
+            await ctx.send(
+                embed=disnake.Embed(
+                    title="Changed welcome channel",
+                    description=(
+                        f"{var.E_ACCEPT} Now users will be"
+                        f" greeted in {channel.mention}"
+                    ),
+                    color=var.C_GREEN,
+                )
             )
 
         else:
@@ -151,10 +142,10 @@ class Welcome(commands.Cog):
                     description=(
                         "🚫 You need to define the greeting channel to change it"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
-                    name="Format",
-                    value=f"`{await get_prefix(ctx)}wchannel <#channel>`")
+                    name="Format", value=f"`{await get_prefix(ctx)}wchannel <#channel>`"
+                )
             )
 
     @commands.command(name="wmessage")
@@ -169,11 +160,10 @@ class Welcome(commands.Cog):
                     "The next message which"
                     " you will send will become the embed message!"
                 ),
-                color=var.C_BLUE
-            ).add_field(
-                name="Cancel",
-                value=f"Type `cancel` to stop this process"
-            ).set_footer(
+                color=var.C_BLUE,
+            )
+            .add_field(name="Cancel", value=f"Type `cancel` to stop this process")
+            .set_footer(
                 text=(
                     "Don't confuse this with welcome greeting, that's different"
                     "! This is the text message which pings the member and is"
@@ -184,25 +174,18 @@ class Welcome(commands.Cog):
         )
 
         def msg_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         try:
             user_msg = await self.bot.wait_for(
-                'message', check=msg_check, timeout=300.0
+                "message", check=msg_check, timeout=300.0
             )
 
             if user_msg.content == "cancel" or user_msg.content == "`cancel`":
                 await ctx.send("Cancelled welcome message change :ok_hand:")
 
             else:
-                new_data = {
-                    "$set": {
-                        "message": user_msg.content
-                    }
-                }
+                new_data = {"$set": {"message": user_msg.content}}
 
                 await db.WELCOME.update_one(guild_doc, new_data)
 
@@ -213,10 +196,9 @@ class Welcome(commands.Cog):
                             " Successfully changed the welcome message!"
                         ),
                         description=(
-                            f"The new welcome message is:\n"
-                            f"**{user_msg.content}**"
+                            f"The new welcome message is:\n" f"**{user_msg.content}**"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
         except asyncio.TimeoutError:
@@ -237,11 +219,10 @@ class Welcome(commands.Cog):
                     "The next message which you will send "
                     "will become the embed description!"
                 ),
-                color=var.C_BLUE
-            ).add_field(
-                name="Cancel",
-                value=f"Type `cancel` to cancel this"
-            ).set_footer(
+                color=var.C_BLUE,
+            )
+            .add_field(name="Cancel", value=f"Type `cancel` to cancel this")
+            .set_footer(
                 text=(
                     "Don't confuse this with embed message, that's different!"
                     " This is the embed description which is inside the embed"
@@ -252,25 +233,16 @@ class Welcome(commands.Cog):
         )
 
         def msg_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         try:
-            user_msg = await self.bot.wait_for(
-                'message', check=msg_check, timeout=60.0
-            )
+            user_msg = await self.bot.wait_for("message", check=msg_check, timeout=60.0)
 
             if user_msg.content == "cancel" or user_msg.content == "`cancel`":
                 await ctx.send("Cancelled welcome message change :ok_hand:")
 
             else:
-                new_data = {
-                    "$set": {
-                        "welcomegreeting": user_msg.content
-                    }
-                }
+                new_data = {"$set": {"welcomegreeting": user_msg.content}}
 
                 await db.WELCOME.update_one(guild_doc, new_data)
 
@@ -281,10 +253,9 @@ class Welcome(commands.Cog):
                             f"the greeting message!"
                         ),
                         description=(
-                            f"The new greeting message is:\n"
-                            f"**{user_msg.content}**"
+                            f"The new greeting message is:\n" f"**{user_msg.content}**"
                         ),
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
                     )
                 )
         except asyncio.TimeoutError:
@@ -302,55 +273,42 @@ class Welcome(commands.Cog):
             embed=disnake.Embed(
                 tite="Send a message to make it the image",
                 description="Either send the image as a file or use a link!",
-                color=var.C_BLUE
+                color=var.C_BLUE,
             ).add_field(name="Cancel", value=f"Type `cancel` to cancel this")
         )
 
         def msg_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         try:
-            user_msg = await self.bot.wait_for(
-                "message", check=msg_check, timeout=60.0
-            )
+            user_msg = await self.bot.wait_for("message", check=msg_check, timeout=60.0)
 
             if user_msg.content == "cancel" or user_msg.content == "`cancel`":
                 await ctx.send("Cancelled image change :ok_hand:")
 
             if user_msg.attachments:
-                new_data = {
-                    "$set": {
-                        "image": user_msg.attachments[0].url
-                    }
-                }
-
-                await db.WELCOME.update_one(guild_doc, new_data)
-
-                await ctx.send(embed=disnake.Embed(
-                    title=f"{var.E_ACCEPT} Successfully changed welcome image",
-                    description="New welcome image is:",
-                    color=var.C_GREEN
-                ).set_image(url=user_msg.attachments[0].url))
-
-            elif user_msg.content.startswith("http"):
-                new_data = {
-                    "$set": {
-                        "image": user_msg.content
-                    }
-                }
+                new_data = {"$set": {"image": user_msg.attachments[0].url}}
 
                 await db.WELCOME.update_one(guild_doc, new_data)
 
                 await ctx.send(
                     embed=disnake.Embed(
-                        title=(
-                            f"{var.E_ACCEPT} Successfully changed welcome image"
-                        ),
+                        title=f"{var.E_ACCEPT} Successfully changed welcome image",
                         description="New welcome image is:",
-                        color=var.C_GREEN
+                        color=var.C_GREEN,
+                    ).set_image(url=user_msg.attachments[0].url)
+                )
+
+            elif user_msg.content.startswith("http"):
+                new_data = {"$set": {"image": user_msg.content}}
+
+                await db.WELCOME.update_one(guild_doc, new_data)
+
+                await ctx.send(
+                    embed=disnake.Embed(
+                        title=(f"{var.E_ACCEPT} Successfully changed welcome image"),
+                        description="New welcome image is:",
+                        color=var.C_GREEN,
                     ).set_image(url=user_msg.content)
                 )
 
@@ -373,34 +331,30 @@ class Welcome(commands.Cog):
             updated_list = role_list.copy()
             updated_list.append(role.id)
 
-            new_data = {
-                "$set": {
-                    "assignroles": updated_list
-                }
-            }
+            new_data = {"$set": {"assignroles": updated_list}}
 
             await db.WELCOME.update_one(guild_doc, new_data)
 
-            await ctx.send(embed=disnake.Embed(
-                title="Successfully added auto assign role",
-                description=(
-                    f"{var.E_ACCEPT} Users will be automatically "
-                    f"given {role.mention} when they join"
-                ),
-                color=var.C_GREEN)
+            await ctx.send(
+                embed=disnake.Embed(
+                    title="Successfully added auto assign role",
+                    description=(
+                        f"{var.E_ACCEPT} Users will be automatically "
+                        f"given {role.mention} when they join"
+                    ),
+                    color=var.C_GREEN,
+                )
             )
 
         else:
             await ctx.send(
                 embed=disnake.Embed(
-                    description="🚫 You need to define the role",
-                    color=var.C_RED
-                ).add_field(
-                    name="Format",
-                    value=f"`{await get_prefix(ctx)}wrole <role>`"
-                ).set_footer(
-                    text="For role either role ID or role mention can be used"
+                    description="🚫 You need to define the role", color=var.C_RED
                 )
+                .add_field(
+                    name="Format", value=f"`{await get_prefix(ctx)}wrole <role>`"
+                )
+                .set_footer(text="For role either role ID or role mention can be used")
             )
 
     @commands.command(name="wbots")
@@ -437,11 +391,7 @@ class Welcome(commands.Cog):
                 return user == ctx.author and reaction.message == bot_msg
 
         await self.bot.wait_for("reaction_add", check=check, timeout=60)
-        new_data = {
-            "$set": {
-                "greet_bots": False if data["greet_bots"] else True
-            }
-        }
+        new_data = {"$set": {"greet_bots": False if data["greet_bots"] else True}}
 
         await db.WELCOME.update_one(data, new_data)
 
@@ -484,7 +434,7 @@ class Welcome(commands.Cog):
                     f"{var.E_ACCEPT} Successfully changed the welcome embed"
                     f" back to the default one"
                 ),
-                color=var.C_GREEN
+                color=var.C_GREEN,
             )
         )
 
@@ -497,7 +447,8 @@ class Welcome(commands.Cog):
         welcome_doc = await db.WELCOME.find_one({"_id": member.guild.id})
 
         if (member.guild.id not in welcome_guild_ids) or (
-                member.bot and not welcome_doc["greet_bots"]):
+            member.bot and not welcome_doc["greet_bots"]
+        ):
             return
 
         channel = self.bot.get_channel(welcome_doc.get("channelid"))
@@ -513,7 +464,7 @@ class Welcome(commands.Cog):
         embed = disnake.Embed(
             title="Welcome to the server!",
             description=welcome_doc.get("greeting"),
-            color=disnake.Colour.random()
+            color=disnake.Colour.random(),
         ).set_image(url=welcome_doc.get("image"))
 
         await channel.send(content=get_content(), embed=embed)

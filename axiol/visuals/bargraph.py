@@ -19,20 +19,18 @@ class BarGraph(commands.Cog):
                         "🚫 You cannot view more than 30 users in a bar "
                         "graph, that's way to much haha"
                     ),
-                    color=var.C_RED
+                    color=var.C_RED,
                 )
             )
 
         else:
-            bot_msg = await ctx.send(
-                f"Fetching data {var.E_LOADING} Just a second!"
-            )
+            bot_msg = await ctx.send(f"Fetching data {var.E_LOADING} Just a second!")
 
             await ctx.trigger_typing()
             async with request(
                 "GET",
                 f"https://axiol.up.railway.app/bargraph/{ctx.guild.id}"
-                f"?limit={limit}"
+                f"?limit={limit}",
             ) as res:
                 response = await res.json()
 

@@ -25,7 +25,7 @@ class Chatbot(commands.Cog):
                         f"{var.E_DISABLE} The Chatbot plugin is"
                         " disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -34,10 +34,7 @@ class Chatbot(commands.Cog):
     async def set_chat_bot(self, ctx, channel: disnake.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
             await db.CHATBOT.insert_one(
-                {
-                    "_id": ctx.guild.id,
-                    "channels": [ctx.channel.id]
-                }
+                {"_id": ctx.guild.id, "channels": [ctx.channel.id]}
             )
 
         if channel is None:
@@ -48,11 +45,7 @@ class Chatbot(commands.Cog):
 
         new_list = channel_list.copy()
         new_list.append(channel.id)
-        new_data = {
-            "$set": {
-                "channels": new_list
-            }
-        }
+        new_data = {"$set": {"channels": new_list}}
 
         await db.CHATBOT.update_one(guild_doc, new_data)
         await ctx.send(f"{var.E_ACCEPT} Enabled Chatbot for {channel.mention}")
@@ -61,12 +54,7 @@ class Chatbot(commands.Cog):
     @has_command_permission()
     async def remove_chat_bot(self, ctx, channel: disnake.TextChannel = None):
         if await db.CHATBOT.find_one({"_id": ctx.guild.id}) is None:
-            await db.CHATBOT.insert_one(
-                {
-                    "_id": ctx.guild.id,
-                    "channels": []
-                }
-            )
+            await db.CHATBOT.insert_one({"_id": ctx.guild.id, "channels": []})
 
         if channel is None:
             channel = ctx.channel
@@ -77,11 +65,7 @@ class Chatbot(commands.Cog):
             channel_list = guild_doc.get("channels")
             new_list = channel_list.copy()
             new_list.remove(channel.id)
-            new_data = {
-                "$set": {
-                    "channels": new_list
-                }
-            }
+            new_data = {"$set": {"channels": new_list}}
 
             await db.CHATBOT.update_one(guild_doc, new_data)
             await ctx.send(f"Disabled Chatbot from {channel.mention}")
@@ -94,16 +78,12 @@ class Chatbot(commands.Cog):
     async def chat_bot_channels(self, ctx):
         guild_doc = await db.CHATBOT.find_one({"_id": ctx.guild.id})
         embed = disnake.Embed(
-            title="All chatbot channels in this server",
-            color=var.C_TEAL
+            title="All chatbot channels in this server", color=var.C_TEAL
         )
 
         if guild_doc is not None and guild_doc.get("channels") != []:
             for i in guild_doc.get("channels"):
-                embed.add_field(
-                    name="** **",
-                    value=self.bot.get_channel(i).mention
-                )
+                embed.add_field(name="** **", value=self.bot.get_channel(i).mention)
 
             await ctx.send(embed=embed)
 
@@ -118,13 +98,10 @@ class Chatbot(commands.Cog):
 
         await channel.send(
             embed=disnake.Embed(
-                title="Chatbot suggestion",
-                description=desc,
-                color=var.C_MAIN
-            ).add_field(
-                name="By", value=ctx.author
-            ).add_field(
-                name="Guild ID", value=ctx.guild.id)
+                title="Chatbot suggestion", description=desc, color=var.C_MAIN
+            )
+            .add_field(name="By", value=ctx.author)
+            .add_field(name="Guild ID", value=ctx.guild.id)
         )
 
     @commands.Cog.listener()
@@ -136,9 +113,7 @@ class Chatbot(commands.Cog):
         ctx = await self.bot.get_context(message)
 
         if guild_plugin_doc["Chatbot"] and message.channel.id != 803308171577393172:
-            guild_chatbot_doc = await db.CHATBOT.find_one(
-                {"_id": message.guild.id}
-            )
+            guild_chatbot_doc = await db.CHATBOT.find_one({"_id": message.guild.id})
 
             def channels():
                 if (
@@ -163,16 +138,17 @@ class Chatbot(commands.Cog):
                 async with request(
                     "POST",
                     f"https://axiol.up.railway.app/ai/chatbot",
-                    json={"content": content}
+                    json={"content": content},
                 ) as response:
                     res = await response.json()
 
                 if res["response"] == "help":
-                    await ctx.invoke(self.bot.get_command('help'))
+                    await ctx.invoke(self.bot.get_command("help"))
 
                 elif res["tag"] == "prefix":
                     await message.channel.send(
-                        res["response"].replace("~", await get_prefix(ctx)))
+                        res["response"].replace("~", await get_prefix(ctx))
+                    )
 
                 else:
                     await message.channel.send(res["response"])

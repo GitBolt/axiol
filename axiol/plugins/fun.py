@@ -23,14 +23,13 @@ CONFIGS = {
     "default": {"time": 60, "size": 75, "width": 35, "height": 120},
     "15": {"time": 15, "size": 75, "width": 35, "height": 120},
     "30": {"time": 30, "size": 60, "width": 45, "height": 95},
-    "60": {"time": 60, "size": 55, "width": 50, "height": 82}
+    "60": {"time": 60, "size": 55, "width": 50, "height": 82},
 }
 
 Differentiator = difflib.Differ()
 
 
 class TypeRacer:
-
     def __init__(self, bot, players, required_amount):
         self.bot = bot
         self.players = []
@@ -69,7 +68,7 @@ class TypeRacer:
 
         font2 = ImageFont.truetype(
             os.path.join(os.getcwd(), "resources/fonts/Poppins-Light.ttf"),
-            CONFIGS["15"]["size"]
+            CONFIGS["15"]["size"],
         )
 
         draw.text((810, 55), "60", (184, 184, 184), font=font)
@@ -83,14 +82,14 @@ class TypeRacer:
 
     @staticmethod
     def calculate_result(start_time, end_time, user_content, raw_text):
-        text = " ".join(raw_text.split(" ")[:len(user_content.split(" "))])
+        text = " ".join(raw_text.split(" ")[: len(user_content.split(" "))])
 
         comparaison = Differentiator.compare(text, user_content)
         mistakes = [x for x in comparaison if "-" in x or "+" in x]
 
-        accuracy = round(
-            difflib.SequenceMatcher(None, text, user_content).ratio(), 2
-        ) * 100
+        accuracy = (
+            round(difflib.SequenceMatcher(None, text, user_content).ratio(), 2) * 100
+        )
 
         time_taken = round((end_time - start_time) - 1, 2)
         raw_wpm = round((len(user_content) / 5 / time_taken) * 60, 2)
@@ -122,23 +121,23 @@ class TypeRacer:
                 return time.time(), m.content
 
         except asyncio.TimeoutError:
-            await player.send(
-                "Time is up! You failed to complete the test in time."
-            )
+            await player.send("Time is up! You failed to complete the test in time.")
 
     async def start(self):
         count = 5
 
-        embed = disnake.Embed(
-            title="All players joined!",
-            description=f"Match starting in {count}...",
-            color=var.C_MAIN,
-        ).add_field(
-            name="Started", value=f"{self.time_elapsed()} ago", inline=False
-        ).add_field(
-            name="Players", value="\n".join(
-                [str(player) for player in self.players]
-            ), inline=False
+        embed = (
+            disnake.Embed(
+                title="All players joined!",
+                description=f"Match starting in {count}...",
+                color=var.C_MAIN,
+            )
+            .add_field(name="Started", value=f"{self.time_elapsed()} ago", inline=False)
+            .add_field(
+                name="Players",
+                value="\n".join([str(player) for player in self.players]),
+                inline=False,
+            )
         )
 
         msgs = {}
@@ -155,37 +154,27 @@ class TypeRacer:
 
         with BytesIO() as image_binary:
             image, text = await self.create_board()
-            image.save(image_binary, 'PNG')
+            image.save(image_binary, "PNG")
             for player in self.players:
                 image_binary.seek(0)
                 embed.description = f"Match starting now!"
                 await msgs[player].edit(embed=embed)
 
                 await player.send(
-                    file=disnake.File(
-                        fp=image_binary, filename='axiol_typeracer.png'
-                    )
+                    file=disnake.File(fp=image_binary, filename="axiol_typeracer.png")
                 )
 
                 await msgs[player].delete()
 
         start_time = time.time()
-        result_embed = disnake.Embed(
-            title="Typing race results", color=var.C_GREEN
-        )
+        result_embed = disnake.Embed(title="Typing race results", color=var.C_GREEN)
 
         results = {}
-        datas = await asyncio.gather(
-            *[self.coro(player) for player in self.players]
-        )
+        datas = await asyncio.gather(*[self.coro(player) for player in self.players])
 
         for player, data in zip(self.players, datas):
             results.update(
-                {
-                    self.calculate_result(
-                        start_time, data[0], data[1], text
-                    ): player
-                }
+                {self.calculate_result(start_time, data[0], data[1], text): player}
             )
 
         ordered = sorted(results.items(), reverse=True)
@@ -193,7 +182,7 @@ class TypeRacer:
             result_embed.add_field(
                 name=f"{ordered.index(r) + 1} {r[1]}",
                 value=f"{r[0][0]} WPM, {r[0][1]}% Accuracy",
-                inline=False
+                inline=False,
             )
 
         for player in self.players:
@@ -216,10 +205,9 @@ class Fun(commands.Cog):
             await ctx.send(
                 embed=disnake.Embed(
                     description=(
-                        f"{var.E_DISABLE} "
-                        "The Fun plugin is disabled in this server"
+                        f"{var.E_DISABLE} " "The Fun plugin is disabled in this server"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 )
             )
 
@@ -231,9 +219,7 @@ class Fun(commands.Cog):
             if player in match.players:
                 return match
 
-    @commands.group(
-        name="typeracer", pass_context=True, invoke_without_command=True
-    )
+    @commands.group(name="typeracer", pass_context=True, invoke_without_command=True)
     @has_command_permission()
     async def type_racer(self, ctx):
         if self.check_playing(ctx.author):
@@ -247,18 +233,15 @@ class Fun(commands.Cog):
                         f"The match currently has `{len(match.players)}` "
                         "players in the queue"
                     ),
-                    color=var.C_ORANGE
-                ).add_field(
-                    name="Code", value=match.code, inline=False
-                ).add_field(
-                    name="Started",
-                    value=match.time_elapsed() + " ago",
-                    inline=False
-                ).add_field(
-                    name="Players required",
-                    value=match.required_amount,
-                    inline=False
+                    color=var.C_ORANGE,
                 )
+                .add_field(name="Code", value=match.code, inline=False)
+                .add_field(
+                    name="Started", value=match.time_elapsed() + " ago", inline=False
+                )
+                .add_field(
+                    name="Players required", value=match.required_amount, inline=False
+                ),
             )
 
         if not self.matches:
@@ -269,22 +252,20 @@ class Fun(commands.Cog):
                         "There are no on going queues right now,"
                         " maybe create your own?"
                     ),
-                    color=var.C_ORANGE
+                    color=var.C_ORANGE,
                 ).add_field(
                     name="Start a new match",
                     value=(
                         f"```{await get_prefix(ctx)}typeracer new"
                         f" <number_of_players>```"
-                    )
+                    ),
                 )
             )
 
         else:
             highest_players = max(x.players for x in self.matches)
             match = [
-                match
-                for match in self.matches
-                if match.players == highest_players
+                match for match in self.matches if match.players == highest_players
             ][0]
 
             match.add_player(ctx.author)
@@ -293,19 +274,14 @@ class Fun(commands.Cog):
                 embed=disnake.Embed(
                     title="You have been added to the queue!",
                     description=f"The queue currently has **{len(match.players)}** players.",
-                    color=var.C_BLUE
-                ).add_field(
-                    name="Code",
-                    value=match.code,
-                    inline=False
-                ).add_field(
-                    name="Started",
-                    value=match.time_elapsed() + " ago",
-                    inline=False
-                ).add_field(
-                    name="Players required",
-                    value=match.required_amount,
-                    inline=False
+                    color=var.C_BLUE,
+                )
+                .add_field(name="Code", value=match.code, inline=False)
+                .add_field(
+                    name="Started", value=match.time_elapsed() + " ago", inline=False
+                )
+                .add_field(
+                    name="Players required", value=match.required_amount, inline=False
                 )
             )
 
@@ -336,13 +312,13 @@ class Fun(commands.Cog):
                 embed=disnake.Embed(
                     title="🚫 Missing argument",
                     description="You need to enter the player amount too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="format",
                     value=(
                         f"```{await get_prefix(ctx)}typeracer"
                         f" new <player_amount>```"
-                    )
+                    ),
                 )
             )
 
@@ -350,32 +326,27 @@ class Fun(commands.Cog):
             return await ctx.send("You are already in a match queue!")
 
         if not player_amount.isnumeric():
-            return await ctx.send(
-                "The argument which you entered is not numeric.")
+            return await ctx.send("The argument which you entered is not numeric.")
 
         player_amount = int(player_amount)
         match = TypeRacer(self.bot, ctx.author, player_amount)
         self.matches.append(match)
-        await ctx.send(embed=disnake.Embed(
-            title="You have started a new match!",
-            description=(
-                f"Invite your friends by sharing the code\n"
-                f"The command would be ```{await get_prefix(ctx)}typeracer "
-                f"join {match.code}```"
-            ),
-            color=var.C_GREEN
-        ).add_field(
-            name="Code",
-            value=match.code,
-            inline=False
-        ).add_field(
-            name="Players required",
-            value=match.required_amount,
-            inline=False
-        ).set_footer(
-            text="Waiting for players to join..."
-        ).set_author(
-            name=ctx.author, icon_url=ctx.author.avatar.url)
+        await ctx.send(
+            embed=disnake.Embed(
+                title="You have started a new match!",
+                description=(
+                    f"Invite your friends by sharing the code\n"
+                    f"The command would be ```{await get_prefix(ctx)}typeracer "
+                    f"join {match.code}```"
+                ),
+                color=var.C_GREEN,
+            )
+            .add_field(name="Code", value=match.code, inline=False)
+            .add_field(
+                name="Players required", value=match.required_amount, inline=False
+            )
+            .set_footer(text="Waiting for players to join...")
+            .set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
         )
 
         if player_amount == 1:
@@ -389,13 +360,10 @@ class Fun(commands.Cog):
                 embed=disnake.Embed(
                     title="🚫 Missing argument",
                     description="You need to enter the code too!",
-                    color=var.C_RED
+                    color=var.C_RED,
                 ).add_field(
                     name="format",
-                    value=(
-                        f"```{await get_prefix(ctx)}typeracer"
-                        f" join <code>```"
-                    )
+                    value=(f"```{await get_prefix(ctx)}typeracer" f" join <code>```"),
                 )
             )
 
@@ -410,20 +378,18 @@ class Fun(commands.Cog):
                 embed=disnake.Embed(
                     title="You have been added to the queue!",
                     description=(
-                        "The queue currently has "
-                        f"**{len(match.players)}** players."
+                        "The queue currently has " f"**{len(match.players)}** players."
                     ),
-                    color=var.C_BLUE
-                ).add_field(
-                    name="Code", value=match.code,
-                ).add_field(
-                    name="Started",
-                    value=match.time_elapsed() + " ago",
-                    inline=False
-                ).add_field(
-                    name="Players required",
-                    value=match.required_amount
+                    color=var.C_BLUE,
                 )
+                .add_field(
+                    name="Code",
+                    value=match.code,
+                )
+                .add_field(
+                    name="Started", value=match.time_elapsed() + " ago", inline=False
+                )
+                .add_field(name="Players required", value=match.required_amount)
             )
 
             await match.join_alert(ctx.author)
@@ -441,14 +407,14 @@ class Fun(commands.Cog):
         embed = disnake.Embed(
             title="All active matches",
             description=f"There are currently {len(self.matches)} queues",
-            color=var.C_MAIN
+            color=var.C_MAIN,
         )
 
         for match in self.matches:
             embed.add_field(
                 name=match.code,
                 value=f"{len(match.players)}/{match.required_amount}",
-                inline=False
+                inline=False,
             )
 
         await ctx.send(embed=embed)
@@ -462,7 +428,7 @@ class Fun(commands.Cog):
                 embed=disnake.Embed(
                     title="🚫 Invalid arguments",
                     description="Duration can only be one of these three: `15`, `30`, `60`.",
-                    color=var.C_RED
+                    color=var.C_RED,
                 )
             )
 
@@ -488,13 +454,12 @@ class Fun(commands.Cog):
         )
         draw = ImageDraw.Draw(image)
         font = ImageFont.truetype(
-            os.path.join(os.getcwd(), "resources/fonts/Poppins-Medium.ttf"),
-            80
+            os.path.join(os.getcwd(), "resources/fonts/Poppins-Medium.ttf"), 80
         )
 
         font2 = ImageFont.truetype(
             os.path.join(os.getcwd(), "resources/fonts/Poppins-Light.ttf"),
-            config["size"]
+            config["size"],
         )
         draw.text((810, 55), str(config["time"]), (184, 184, 184), font=font)
         offset = 300
@@ -504,12 +469,10 @@ class Fun(commands.Cog):
             offset += config["height"]
 
         with BytesIO() as image_binary:
-            image.save(image_binary, 'PNG')
+            image.save(image_binary, "PNG")
             image_binary.seek(0)
 
-            await ctx.send(
-                file=disnake.File(fp=image_binary, filename='image.png')
-            )
+            await ctx.send(file=disnake.File(fp=image_binary, filename="image.png"))
 
             try:
                 initial_time = time.time()
@@ -550,30 +513,26 @@ class Fun(commands.Cog):
                             bot_msg = await ctx.send("Only 10 seconds left!")
 
                     if timer == 5:
-                        await bot_msg.edit(content=f"Only 5 seconds left {ctx.author.mention}!")
+                        await bot_msg.edit(
+                            content=f"Only 5 seconds left {ctx.author.mention}!"
+                        )
 
                 else:
                     user_content = waiter.result().content
 
-                    text = " ".join(
-                        text.split(" ")[:len(user_content.split(" "))]
-                    )
+                    text = " ".join(text.split(" ")[: len(user_content.split(" "))])
 
-                    comparaison = list(
-                        Differentiator.compare(text, user_content))
+                    comparaison = list(Differentiator.compare(text, user_content))
                     mistakes = [x for x in comparaison if "-" in x or "+" in x]
 
                     time_taken = round((time.time() - initial_time) - 1, 2)
-                    raw_wpm = round(
-                        (len(user_content) / 5 / time_taken) * 60, 2
-                    )
+                    raw_wpm = round((len(user_content) / 5 / time_taken) * 60, 2)
 
                     mistake_ratio = f"{len(mistakes)}/{len(user_content)}"
 
                     accuracy = round(
-                        difflib.SequenceMatcher(
-                            None, text, user_content
-                        ).ratio() * 100, 2
+                        difflib.SequenceMatcher(None, text, user_content).ratio() * 100,
+                        2,
                     )
 
                     error_rate = round(len(mistakes) / time_taken, 2)
@@ -582,42 +541,31 @@ class Fun(commands.Cog):
 
                     description = (
                         "Your typing speed is above average 📈"
-                        if wpm >= 60 else
-                        "Your typing speed is below average 📉"
+                        if wpm >= 60
+                        else "Your typing speed is below average 📉"
                     )
 
                     embed = disnake.Embed(
                         title=f"{wpm} words per minute",
-                        description=f"{description} {ctx.author.mention}"
+                        description=f"{description} {ctx.author.mention}",
                     )
 
-                    embed.add_field(
-                        name="Raw WPM", value=f"{raw_wpm}", inline=False
-                    )
+                    embed.add_field(name="Raw WPM", value=f"{raw_wpm}", inline=False)
 
                     embed.add_field(
-                        name="Time taken",
-                        value=f"{time_taken} Seconds",
-                        inline=False
+                        name="Time taken", value=f"{time_taken} Seconds", inline=False
                     )
 
-                    embed.add_field(
-                        name="Accuracy", value=f"{accuracy}%", inline=False
-                    )
+                    embed.add_field(name="Accuracy", value=f"{accuracy}%", inline=False)
 
-                    embed.add_field(
-                        name="Mistakes", value=mistake_ratio, inline=False
-                    )
+                    embed.add_field(name="Mistakes", value=mistake_ratio, inline=False)
 
                     embed.add_field(
                         name="Error rate", value=f"{error_rate}%", inline=False
                     )
 
                     embed.color = var.C_GREEN
-                    embed.set_author(
-                        name=ctx.author,
-                        icon_url=ctx.author.avatar.url
-                    )
+                    embed.set_author(name=ctx.author, icon_url=ctx.author.avatar.url)
 
                     embed.set_footer(
                         text=(
@@ -635,7 +583,7 @@ class Fun(commands.Cog):
                             "Time is up! You failed to complete "
                             f"the test in time {ctx.author.mention}"
                         ),
-                        color=var.C_RED
+                        color=var.C_RED,
                     )
                 )
 
@@ -646,8 +594,7 @@ class Fun(commands.Cog):
         avatar = avatar_user.avatar.url
 
         embed = disnake.Embed(
-            title=f"Avatar of **{avatar_user}**",
-            color=var.C_TEAL
+            title=f"Avatar of **{avatar_user}**", color=var.C_TEAL
         ).set_image(url=avatar)
 
         await ctx.send(embed=embed)
@@ -656,16 +603,20 @@ class Fun(commands.Cog):
     @has_command_permission()
     async def embed(self, ctx, channel: disnake.TextChannel = None):
         if channel is None:
-            return await ctx.send(embed=disnake.Embed(
-                description="🚫 You need to define the channel too!",
-                color=var.C_ORANGE
-            ).add_field(
-                name="Format",
-                value=f"```{await get_prefix(ctx)}embed <#channel>```", inline=False
-            ).add_field(
-                name="Don't worry, this won't send the embed right away!",
-                value="** **"
-            )
+            return await ctx.send(
+                embed=disnake.Embed(
+                    description="🚫 You need to define the channel too!",
+                    color=var.C_ORANGE,
+                )
+                .add_field(
+                    name="Format",
+                    value=f"```{await get_prefix(ctx)}embed <#channel>```",
+                    inline=False,
+                )
+                .add_field(
+                    name="Don't worry, this won't send the embed right away!",
+                    value="** **",
+                )
             )
 
         embed = disnake.Embed(
@@ -676,7 +627,7 @@ class Fun(commands.Cog):
                 f" to 🖌️\nWhen you are done selecting embed colour press "
                 f"the {var.E_CONTINUE} emoji to continue editing"
             ),
-            color=var.C_MAIN
+            color=var.C_MAIN,
         ).set_footer(
             text=(
                 "This message will become the live preview of "
@@ -691,17 +642,10 @@ class Fun(commands.Cog):
             var.E_GREEN,
             var.E_BLUE,
             var.E_ORANGE,
-            var.E_YELLOW
+            var.E_YELLOW,
         ]
 
-        colors = [
-            0xFF0000,
-            0xFF58BC,
-            0x24FF00,
-            0x00E0FF,
-            0xFF5C00,
-            0xFFC700
-        ]
+        colors = [0xFF0000, 0xFF58BC, 0x24FF00, 0x00E0FF, 0xFF5C00, 0xFFC700]
 
         await preview.add_reaction("🖌️")
 
@@ -714,14 +658,11 @@ class Fun(commands.Cog):
             return u == ctx.author and r.message == preview
 
         def msg_check(message):
-            return (
-                message.author == ctx.author
-                and message.channel.id == ctx.channel.id
-            )
+            return message.author == ctx.author and message.channel.id == ctx.channel.id
 
         while True:
             reaction, _ = await self.bot.wait_for(
-                'reaction_add',  check=preview_reaction_check
+                "reaction_add", check=preview_reaction_check
             )
 
             if str(reaction.emoji) == "🖌️":
@@ -730,18 +671,14 @@ class Fun(commands.Cog):
                     "You can use either 3 or 6 hex characters"
                 )
 
-                user_msg = await self.bot.wait_for(
-                    'message', check=msg_check
-                )
+                user_msg = await self.bot.wait_for("message", check=msg_check)
 
                 match = re.search(
-                    r'^#(?:[0-9a-fA-F]{3}){1,2}$', user_msg.content.lower()
+                    r"^#(?:[0-9a-fA-F]{3}){1,2}$", user_msg.content.lower()
                 )
 
                 if match:
-                    hexed = int(
-                        hex(int(user_msg.content.replace("#", ""), 16)), 0
-                    )
+                    hexed = int(hex(int(user_msg.content.replace("#", ""), 16)), 0)
 
                     embed.color = hexed
                     await preview.edit(embed=embed)
@@ -783,13 +720,11 @@ class Fun(commands.Cog):
                     f"Now send a message to make it the title of the "
                     f"[embed]{PREVIEW_URL}"
                 ),
-                color=var.C_BLUE
-            ).set_footer(
-                text="Type cancel to stop this proccess"
-            )
+                color=var.C_BLUE,
+            ).set_footer(text="Type cancel to stop this proccess")
         )
 
-        user_msg = await self.bot.wait_for('message', check=msg_check)
+        user_msg = await self.bot.wait_for("message", check=msg_check)
         if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
             await ctx.send("Stopped embed creation proccess.")
             return
@@ -809,16 +744,13 @@ class Fun(commands.Cog):
                     f"Now send a message to make it the description of the"
                     f" [embed]{PREVIEW_URL}"
                 ),
-                color=var.C_BLUE
-            ).add_field(
-                name="** **",
-                value="Type `skip` if you don't want to set this"
-            ).set_footer(
-                text="Type cancel to stop this proccess"
+                color=var.C_BLUE,
             )
+            .add_field(name="** **", value="Type `skip` if you don't want to set this")
+            .set_footer(text="Type cancel to stop this proccess")
         )
 
-        user_msg = await self.bot.wait_for('message', check=msg_check)
+        user_msg = await self.bot.wait_for("message", check=msg_check)
         if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
             await ctx.send("Stopped embed creation proccess.")
             return
@@ -849,17 +781,14 @@ class Fun(commands.Cog):
                     f"[embed](https://disnake.com/channels/{ctx.guild.id}"
                     f"/{preview.channel.id}/{preview.id})"
                 ),
-                color=var.C_BLUE
-            ).add_field(
-                name="** **",
-                value="Type `skip` if you don't want to set this"
-            ).set_footer(
-                text="Type cancel to stop this proccess"
+                color=var.C_BLUE,
             )
+            .add_field(name="** **", value="Type `skip` if you don't want to set this")
+            .set_footer(text="Type cancel to stop this proccess")
         )
 
         while True:
-            user_msg = await self.bot.wait_for('message', check=msg_check)
+            user_msg = await self.bot.wait_for("message", check=msg_check)
 
             if user_msg.content in ["cancel", "`cancel`", "```cancel```"]:
                 await ctx.send("Stopped embed creation proccess.")
@@ -907,24 +836,16 @@ class Fun(commands.Cog):
                     f"to send your embed! To edit more react to the"
                     f" respective emojis below"
                 ),
-                color=var.C_BLUE
-            ).add_field(
-                name="Add field", value="React to 🇦", inline=False
-            ).add_field(
-                name="Footer", value="React to 🇫", inline=False
-            ).add_field(
-                name="Image", value="React to 🇮", inline=False
-            ).add_field(
-                name="Set Author", value="React to 🇺", inline=False
+                color=var.C_BLUE,
             )
+            .add_field(name="Add field", value="React to 🇦", inline=False)
+            .add_field(name="Footer", value="React to 🇫", inline=False)
+            .add_field(name="Image", value="React to 🇮", inline=False)
+            .add_field(name="Set Author", value="React to 🇺", inline=False)
         )
 
         def edit_reaction_check(r, u):
-            return (
-                u == ctx.author
-                and r.message == edit
-                or r.message == preview
-            )
+            return u == ctx.author and r.message == edit or r.message == preview
 
         edit_emojis = ["🇦", "🇫", "🇮", "🇺"]
 
@@ -933,7 +854,7 @@ class Fun(commands.Cog):
 
         while True:
             reaction, _ = await self.bot.wait_for(
-                'reaction_add', check=edit_reaction_check
+                "reaction_add", check=edit_reaction_check
             )
 
             if str(reaction.emoji) == var.E_ACCEPT:
@@ -948,9 +869,7 @@ class Fun(commands.Cog):
                     "name | This is the field value!"
                 )
 
-                user_msg = await self.bot.wait_for(
-                    'message', check=msg_check
-                )
+                user_msg = await self.bot.wait_for("message", check=msg_check)
 
                 field_list = user_msg.content.split("|")
                 if len(field_list) != 2:
@@ -961,9 +880,7 @@ class Fun(commands.Cog):
 
                 else:
                     embed.add_field(
-                        name=field_list[0],
-                        value=field_list[1],
-                        inline=False
+                        name=field_list[0], value=field_list[1], inline=False
                     )
 
                     await preview.edit(embed=embed)
@@ -981,9 +898,7 @@ class Fun(commands.Cog):
                     "Send a message to make it the **Footer**!"
                 )
 
-                user_msg = await self.bot.wait_for(
-                    'message', check=msg_check
-                )
+                user_msg = await self.bot.wait_for("message", check=msg_check)
 
                 embed.set_footer(text=user_msg.content)
                 await preview.edit(embed=embed)
@@ -1004,16 +919,10 @@ class Fun(commands.Cog):
                         "set this"
                     )
 
-                    user_msg = await self.bot.wait_for(
-                        'message', check=msg_check
-                    )
+                    user_msg = await self.bot.wait_for("message", check=msg_check)
 
-                    if user_msg.content in [
-                        "skip", "`skip`", "```skip```"
-                    ]:
-                        await ctx.send(
-                            "Skipped image, react to 🇮 again to set it."
-                        )
+                    if user_msg.content in ["skip", "`skip`", "```skip```"]:
+                        await ctx.send("Skipped image, react to 🇮 again to set it.")
 
                         await edit.remove_reaction("🇮", ctx.author)
                         break
@@ -1032,7 +941,9 @@ class Fun(commands.Cog):
                         await user_msg.delete()
                         break
                     else:
-                        await ctx.send("Look the message you sent is not a file or link, try again.")
+                        await ctx.send(
+                            "Look the message you sent is not a file or link, try again."
+                        )
                     try:
                         await edit.clear_reaction("🇮")
 
@@ -1052,17 +963,14 @@ class Fun(commands.Cog):
                             " if you don't want to set this"
                         )
 
-                        user_msg = await self.bot.wait_for(
-                            "message", check=msg_check
-                        )
+                        user_msg = await self.bot.wait_for("message", check=msg_check)
 
                         userid = user_msg.content.strip("!@<>")
                         try:
                             author_user = await self.bot.fetch_user(int(userid))
 
                             embed.set_author(
-                                name=author_user,
-                                icon_url=author_user.avatar.url
+                                name=author_user, icon_url=author_user.avatar.url
                             )
 
                             await author_bot_msg.delete()
@@ -1081,10 +989,8 @@ class Fun(commands.Cog):
                             await ctx.send(
                                 embed=disnake.Embed(
                                     title="Invalid user",
-                                    description=(
-                                        "Send the userID or mention again"
-                                    ),
-                                    color=var.C_RED
+                                    description=("Send the userID or mention again"),
+                                    color=var.C_RED,
                                 ).set_footer(
                                     text=(
                                         "Make sure your message contains"

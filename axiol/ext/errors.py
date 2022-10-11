@@ -22,7 +22,7 @@ class Errors(commands.Cog):
                         "🚫 Are you sure the channel ID "
                         "or channel mention was correct?"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 ).set_footer(
                     text=(
                         "You can either mention the channel (example: #general)"
@@ -36,10 +36,9 @@ class Errors(commands.Cog):
                 embed=disnake.Embed(
                     title="Missing Permissions",
                     description=(
-                        "🚫 You don't have permissions to do that "
-                        f"{ctx.author.name} "
+                        "🚫 You don't have permissions to do that " f"{ctx.author.name} "
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -53,7 +52,7 @@ class Errors(commands.Cog):
                         f"Maybe they don't even exist? "
                         f"[SpongoBob?](https://youtu.be/wjXBqelv4GM)"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -66,7 +65,7 @@ class Errors(commands.Cog):
                         " if you are sure it's correct then perhaps the "
                         "User deleted their account?"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -78,7 +77,7 @@ class Errors(commands.Cog):
                         "🚫 Are you sure that the message ID belongs "
                         "to this server and is valid?"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -90,7 +89,7 @@ class Errors(commands.Cog):
                         "🚫 Looks like I'm not in the guild or the ID is"
                         " incorrect, maybe invite me there :eyes:"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -103,7 +102,7 @@ class Errors(commands.Cog):
                         "Maybe you pinged any member instead of the role?"
                         " Maybe you copied the wrong ID?"
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 
@@ -116,7 +115,7 @@ class Errors(commands.Cog):
                         "I'm not in the server where this emoji "
                         "is from to be able to use it."
                     ),
-                    color=C_RED
+                    color=C_RED,
                 )
             )
 

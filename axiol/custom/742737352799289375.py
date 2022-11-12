@@ -24,7 +24,7 @@ class ChemistryHelp(commands.Cog):
         return ctx.guild.id == 742737352799289375
 
     @commands.command(name="chem_addmsg")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_add_msg(self, ctx: Context, *, message: str = None):
         if message is None:
             return await ctx.send(
@@ -61,7 +61,7 @@ class ChemistryHelp(commands.Cog):
         )
 
     @commands.command(name="chem_removemsg")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_remove_msg(self, ctx, *, msg: str = None):
         if msg is None:
             return
@@ -84,7 +84,7 @@ class ChemistryHelp(commands.Cog):
             await ctx.send("This message has no responses setted up")
 
     @commands.command(name="chem_allmsgs")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_all_msgs(self, ctx):
         guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
         data = await guild_col.find_one({"_id": 0})
@@ -200,7 +200,7 @@ class ChemistryHelp(commands.Cog):
             await ctx.send("There are no message reactions yet")
 
     @commands.command(name="chem_addreact")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_add_react(self, ctx, *, msg: str = None):
         if msg is not None:
             guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
@@ -271,7 +271,7 @@ class ChemistryHelp(commands.Cog):
             )
 
     @commands.command(name="chem_removereact")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_remove_react(self, ctx, *, msg: str = None):
         if msg is not None:
             guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
@@ -298,7 +298,7 @@ class ChemistryHelp(commands.Cog):
                 await ctx.send("You haven't setted up any reaction yet...")
 
     @commands.command(name="chem_allreacts")
-    @is_user(565059698399641600, 791950104680071188)
+    @is_user(565059698399641600, 791950104680071188, 374610473313763339)
     async def chem_all_reacts(self, ctx):
         guild_col = db.CUSTOM_DATABASE[str(ctx.guild.id)]
         data = await guild_col.find_one({"_id": 1})
@@ -418,6 +418,8 @@ class ChemistryHelp(commands.Cog):
         if not message.guild or message.channel.id == 819981037467336744:
             return
 
+        if message.channel.id == 742747575320313986:
+            await message.add_reaction('❤️')
         if message.guild.id == 742737352799289375 and not message.author.bot:
             guild_col = db.CUSTOM_DATABASE[str(message.guild.id)]
             msg_data = await guild_col.find_one({"_id": 0})

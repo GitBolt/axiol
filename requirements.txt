@@ -12,7 +12,7 @@ joblib==1.2.0
 motor==2.5.1
 multidict==6.0.2
 nltk==3.7
-Pillow==9.0.1
+Pillow==9.2.0
 pymongo==3.12.3
 python-dotenv==0.19.2
 regex==2022.3.15

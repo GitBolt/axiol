@@ -35,3 +35,4 @@ Any contribution to the documentation even if it fixes a small typo is appreciat
 [DiscordBotList.com](https://discordbotlist.com/bots/axiol/upvote)
 
 [Bots.gg](https://discord.bots.gg/bots/843484459113775114)
+

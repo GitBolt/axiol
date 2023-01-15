@@ -704,7 +704,7 @@ class Help(commands.Cog):
             "ReactionRoles": rrhelp,
             "Welcome": welcomehelp,
             "Verification": verifyhelp,
-            "Chatbot": chatbothelp,
+           # "Chatbot": chatbothelp,
             "AutoMod": automodhelp,
             # "Karma": karmahelp,
             "Fun": funhelp,

@@ -364,8 +364,8 @@ class AutoMod(commands.Cog):
                     )
                 )
 
-        else:
-            await ctx.send("This channel is already blacklisted")
+            else:
+                await ctx.send("This channel is already blacklisted")
 
         else:
             await ctx.send(

@@ -409,8 +409,8 @@ class AutoMod(commands.Cog):
                     )
                 )
 
-        else:
-            await ctx.send(
+            else:
+                await ctx.send(
                 "This channel is not blacklisted hence" " can't whitelist either"
             )
 

@@ -4,7 +4,9 @@ from disnake.ext.commands import check, Context
 import database as db
 import constants as var
 from functions import get_prefix
-
+import Discord 
+import re
+import time
 
 def is_user(*user_ids) -> bool:
     async def predicate(ctx: Context):
@@ -13,8 +15,6 @@ def is_user(*user_ids) -> bool:
     return check(predicate)
 
 
-last_action = {}
-time_interval = 10
 
 # Custom cog for Chemistry Help server | 742737352799289375
 
@@ -414,7 +414,12 @@ class ChemistryHelp(commands.Cog):
 
         else:
             await ctx.send("There are no message reactions yet")
-
+    
+    
+    last_action = {}
+    time_interval = 10
+    intents = discord.Intents.all()
+    client = discord.Client(command_prefix='!', intents=intents)
     @commands.Cog.listener()
     async def on_message(self, message):
         if not message.guild or message.channel.id == 819981037467336744:

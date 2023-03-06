@@ -13,8 +13,10 @@ def is_user(*user_ids) -> bool:
     return check(predicate)
 
 
-# Custom cog for Chemistry Help disnake server | 742737352799289375
+last_action = {}
+time_interval = 10
 
+# Custom cog for Chemistry Help server | 742737352799289375
 
 class ChemistryHelp(commands.Cog):
     def __init__(self, bot):
@@ -417,9 +419,37 @@ class ChemistryHelp(commands.Cog):
     async def on_message(self, message):
         if not message.guild or message.channel.id == 819981037467336744:
             return
+        
+        member = message.guild.get_member(message.author.id)
+        if message.author.bot:
+            return
 
+        mentions = re.findall(r'<@!?\d+>', message.content)
+        if mentions:
+            user_id = str(message.author.id)
+            current_time = time.time()
+
+            if user_id in last_action:
+                last_action[user_id]['time'].append(current_time)
+                last_action[user_id]['messages'].append(message)
+            else:
+                last_action[user_id] = {'time': [current_time], 'messages': [message]}
+
+            num_actions = len(last_action[user_id]['time'])
+            if num_actions >= 2 and current_time - last_action[user_id]['time'][0] < time_interval:
+                await message.channel.send(f"{message.author.mention}, please do not spam mentions.")
+                await last_action[user_id]['messages'][0].delete()
+                await message.delete()
+                await member.add_roles(disnake.utils.get(message.guild.roles, id=742801455010021387)) # Insert Role ID (Muted Role)
+
+            while last_action[user_id]['time'] and current_time - last_action[user_id]['time'][0] >= time_interval:
+                last_action[user_id]['time'].pop(0)
+                last_action[user_id]['messages'].pop(0)
+                
+        
         if message.channel.id == 742747575320313986:
             await message.add_reaction('❤️')
+            
         if message.guild.id == 742737352799289375 and not message.author.bot:
             guild_col = db.CUSTOM_DATABASE[str(message.guild.id)]
             msg_data = await guild_col.find_one({"_id": 0})

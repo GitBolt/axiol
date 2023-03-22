@@ -15,7 +15,7 @@ def is_user(*user_ids) -> bool:
 
 
 last_action = {}
-time_interval = 10
+time_interval = 15
 
 # Custom cog for Chemistry Help server | 742737352799289375
 

@@ -5,7 +5,7 @@ attrs==21.4.0
 charset-normalizer==2.0.12
 click==8.0.4
 disnake==2.4.0
-dnspython==2.2.0
+dnspython==2.6.0rc1
 frozenlist==1.3.0
 idna==3.3
 joblib==1.2.0

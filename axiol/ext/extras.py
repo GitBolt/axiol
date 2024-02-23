@@ -94,32 +94,6 @@ class Extras(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def suggest(self, ctx, *, desc=None):
-        if desc is not None:
-            # Support server suggestion channel
-            channel = self.bot.get_channel(843548616505294848)
-
-            embed = disnake.Embed(
-                title=f"{ctx.author}'s idea",
-                description=(
-                    f"This idea came from a server named **{ctx.guild.name}**!"
-                ),
-                color=var.C_BLUE,
-            ).add_field(name="Suggestion", value=desc)
-
-            msg = await channel.send(embed=embed)
-            await msg.add_reaction(var.E_ACCEPT)
-            await msg.add_reaction(var.E_DECLINE)
-            await ctx.send("Suggestion sent to the support server!")
-
-        else:
-            await ctx.send(
-                f"You need to describe your idea too! This is the format\n"
-                f"```{await get_prefix(ctx)} <description of your idea>```\n"
-                f"Don't forget the space after prefix :D"
-            )
-
     @commands.command(aliases=["bot", "info"])
     async def about(self, ctx):
         guild_count = 0

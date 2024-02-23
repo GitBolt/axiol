@@ -45,17 +45,16 @@ def get_code(amount):
 
 
 """
-Some functions to counter errors and warnings while working locally :p
+Below are some functions to counter errors and warnings while working locally.
 
-To get everything work properly database needs to be updates even if it's 
-working locally on a single guild, this is because lots of places have major 
-database dependencies.
+To get everything to work properly, local database needs to be sync, even if it's 
+working locally on a single guild.
 
-First function simply updates all plugin and permissions documents with a new
-plugin, only used when some new plugin is added, not required to use this 
+update_plugins_and_permissions() function simply updates all plugin and permissions documents with a new
+plugin, only used when some new plugin is added. Not required to use this 
 function to fix any errors or warnings.
 
-Second function does the main job, it checks for all plugin, permission, 
+update_db() does the main job, it checks for all plugin, permission, 
 leveling (if enabled) and prefix documents, then updates/adds them if they
 aren't there.
 

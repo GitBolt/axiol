@@ -430,6 +430,18 @@ class ChemistryHelp(commands.Cog):
             user_id = str(message.author.id)
             current_time = time.time()
 
+            if len(mentions) >= 3:
+                dict_mentions = []
+                for mention in mentions:
+                    mention_id = mention[3:-1]
+                    if mention_id not in dict_mentions:
+                        dict_mentions.append(mention_id)
+                if len(dict_mentions) >= 3:
+                    await message.channel.send(f"{message.author.mention}, please do not spam mentions.")
+                    await message.delete()
+                    await member.add_roles(disnake.utils.get(message.guild.roles, id=742801455010021387)) # Insert Role ID (Muted Role)
+                    return
+
             if user_id in last_action:
                 last_action[user_id]['time'].append(current_time)
                 last_action[user_id]['messages'].append(message)
